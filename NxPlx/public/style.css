@@ -1,55 +1,123 @@
+html, body {
+
+    height: 100%;
+}
 body {
     background-color: #616161;
 
-    --video-bgc: #212121;
-    --main-bgc: #424242;
+    --top-bgc: #424242;
+    --left-pane-bgc: #515151;
     --font-color: #dcdcdc;
-    --slider-bgc: #333333;
-    --loaded-color: #1976D2;
+    --hover-font-color: #64B5F6;
+    --top-menu-height: 60px;
 }
 
-.container {
-
+button {
+    color: var(--font-color);
+    transition: color 250ms;
+}
+button:hover {
+    transition: color 250ms;
+    color: var(--hover-font-color);
 }
 
-.left-pane{
-    height: 100%;
+.wrapper {
+    height:100%;
+    width:100%;
 }
 
-#video-player {
+.top-menu {
+    height: var(--top-menu-height);
     width: 100%;
-    background-color: var(--video-bgc);
+    background-color: var(--top-bgc);
+    box-shadow: 0 3px 25px #333;
+}
+.top-menu *, .left-pane-menu * {
+    user-select: none;
+}
+.top-menu .fa {
+    height:var(--top-menu-height);
+    line-height:var(--top-menu-height);
+    font-size: 3rem;
+    cursor: pointer;
+}
+.top-menu h4 {
+    color: #dcdcdc;
+    height: var(--top-menu-height);
+    line-height: var(--top-menu-height);
+    display: inline-block;
+    margin-left:8px;
+}
+.top-menu > div {
+    float: right;
+    margin-right:8px;
+}
+.top-menu button, .top-menu form {
+    display: inline-block;
+    height: var(--top-menu-height);
+    line-height: var(--top-menu-height);
+    margin: 0;
+    vertical-align: top;
+}
+.top-menu button, .left-pane-menu button {
+    border: 0;
+}
+.top-menu input {
+    background-color: #616161;
+    border-color: #646464;
+    color: var(--font-color);
+
+}
+.top-menu input:focus {
+    background-color: #757575;
+    outline: none;
+}
+.top-menu input, .top-menu .fa-search {
+    height: 25px;
+    line-height: 25px;
+}
+.top-menu .fa-search {
+    font-size: 2rem;
+    margin-left:-2.5rem;
+    z-index: 2;
+    color: #212121;
 }
 
-.video-js{
-    font-size: 10px;
+.left-pane-menu {
+    height: calc(100% - 50px);
+    width: 150px;
+    background-color: var(--left-pane-bgc);
+    box-shadow: 2px 0 25px #333;
+}
+
+.collapser {
+    float: right;
+    margin-top: 3px;
+    margin-right: 3px;
+}
+
+.collapsible {
+    transition: width 150ms;
+}
+
+.collapsible > *:not(.collapser) {
+    opacity: 1;
+    transition: opacity 500ms;
+}
+
+.collapsible .collapsed {
+    width: 2rem;
+    transition: width 150ms;
+}
+.collapsible .collapsed > *:not(.collapser) {
+    opacity: 0;
+    display: none;
+}
+
+.fa {
     color: var(--font-color);
 }
 
-.video-js .vjs-slider {
-    background-color: var(--slider-bgc);
-}
-
-
-.video-js .vjs-control-bar,
-.video-js .vjs-big-play-button,
-.video-js .vjs-menu-button .vjs-menu-content {
-    background-color: var(--main-bgc);
-}
-
-.video-js .vjs-volume-level,
-.video-js .vjs-play-progress,
-.video-js .vjs-slider-bar {
-    background: var(--font-color);
-}
-
-.video-js .vjs-load-progress {
-    /*background: lighten(var(--loaded-color), 25%);*/
-    /*background: rgba(var(--loaded-color), 0.5);*/
-    background: var(--loaded-color);
-}
-
-.video-js .vjs-load-progress div {
-    /*background: lighten($slider-bg-color, 50%);*/
-    background: var(--loaded-color);
+.flipped {
+    transform: scale(-1, 1);
 }

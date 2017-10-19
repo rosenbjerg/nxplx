@@ -1,0 +1,55 @@
+body {
+    background-color: #616161;
+
+    --video-bgc: #212121;
+    --main-bgc: #424242;
+    --font-color: #dcdcdc;
+    --slider-bgc: #333333;
+    --loaded-color: #1976D2;
+}
+
+.container {
+
+}
+
+.left-pane{
+    height: 100%;
+}
+
+#video-player {
+    width: 100%;
+    background-color: var(--video-bgc);
+}
+
+.video-js{
+    font-size: 10px;
+    color: var(--font-color);
+}
+
+.video-js .vjs-slider {
+    background-color: var(--slider-bgc);
+}
+
+
+.video-js .vjs-control-bar,
+.video-js .vjs-big-play-button,
+.video-js .vjs-menu-button .vjs-menu-content {
+    background-color: var(--main-bgc);
+}
+
+.video-js .vjs-volume-level,
+.video-js .vjs-play-progress,
+.video-js .vjs-slider-bar {
+    background: var(--font-color);
+}
+
+.video-js .vjs-load-progress {
+    /*background: lighten(var(--loaded-color), 25%);*/
+    /*background: rgba(var(--loaded-color), 0.5);*/
+    background: var(--loaded-color);
+}
+
+.video-js .vjs-load-progress div {
+    /*background: lighten($slider-bg-color, 50%);*/
+    background: var(--loaded-color);
+}
