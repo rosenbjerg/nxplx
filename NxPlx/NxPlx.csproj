@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HandbrakeCliWrapper" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="NReco.VideoInfo" Version="1.0.0" />
     <PackageReference Include="RHttpServer" Version="2.0.5" />
