@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx", "NxPlx\NxPlx.csproj", "{9F41542B-23ED-48CF-B6BA-935646810AA5}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NxPlx", "NxPlx\NxPlx.fsproj", "{8418D65F-F0D0-491E-A9C6-2FD6F04B1854}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9F41542B-23ED-48CF-B6BA-935646810AA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F41542B-23ED-48CF-B6BA-935646810AA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F41542B-23ED-48CF-B6BA-935646810AA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F41542B-23ED-48CF-B6BA-935646810AA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8418D65F-F0D0-491E-A9C6-2FD6F04B1854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8418D65F-F0D0-491E-A9C6-2FD6F04B1854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8418D65F-F0D0-491E-A9C6-2FD6F04B1854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8418D65F-F0D0-491E-A9C6-2FD6F04B1854}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Types.fs" />
+        <Compile Include="TMdbApi.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LiteDB" Version="4.1.4" />
+      <PackageReference Include="LiteDB.FSharp" Version="2.7.0" />
+      <PackageReference Include="RHttpServer" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="tmdb-api-key" />
+    </ItemGroup>
+
+</Project>
