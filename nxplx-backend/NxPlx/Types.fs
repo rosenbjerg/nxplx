@@ -13,7 +13,7 @@ let titleCleanup title =
 
 
 
-type EpisodeEntry = {id:int; name:string; season:int; episode:int; path:string; size:int64}
+type EpisodeEntry = { id:int; name:string; season:int; episode:int; path:string; size:int64 }
 let createEpisodeEntry path =
     let id = path.GetHashCode()
     let size = (new System.IO.FileInfo(path)).Length
@@ -27,7 +27,7 @@ let createEpisodeEntry path =
     let episode = if episodeGroup.Success then Int32.Parse episodeGroup.Value else 1
     {id=id; name=name; season=season; episode=episode; path=path; size=size}
   
-type FilmEntry = {id:int; title:string; year:int; path:string; size:int64}
+type FilmEntry = { id:int; title:string; year:int; path:string; size:int64 }
 let createFilmEntry path =
     let id = path.GetHashCode()
     let filesize = (new System.IO.FileInfo(path)).Length
@@ -40,8 +40,8 @@ let createFilmEntry path =
     {id=id; title=title; year=year; path=path; size=filesize}
 
 
-type Episode = {id:int; eid:int; number:int; description:string; thumbnail:string; aired:DateTime}
-type Season = {number:int; description:string; episodes:Episode array; poster:string}
-type Series = {id:int; name:string; seasons:Season array; aired:DateTime; rating:float32; poster:string; background:string}
-type Film = {id:int; eid:int; title:string; description:string; released:DateTime; poster:string; background:string}
-type Info = {id:int; title:string; poster:string; kind:string}
+type Episode = { id:int; eid:int; number:int; thumbnail:string }
+type Season = { number:int; episodes:Episode array; poster:string }
+type Series = { id:int; name:string; seasons:Season array; poster:string }
+type Film = { id:int; eid:int; title:string; poster:string }
+type Info = { id:int; title:string; poster:string; kind:string }
