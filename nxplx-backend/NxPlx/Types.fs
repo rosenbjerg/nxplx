@@ -40,8 +40,8 @@ let createFilmEntry path =
     {id=id; title=title; year=year; path=path; size=filesize}
 
 
-type Episode = {id:int; number:int; description:string; thumbnail:string; aired:DateTime}
+type Episode = {id:int; eid:int; number:int; description:string; thumbnail:string; aired:DateTime}
 type Season = {number:int; description:string; episodes:Episode array; poster:string}
 type Series = {id:int; name:string; seasons:Season array; aired:DateTime; rating:float32; poster:string; background:string}
-type Film = {id:int; title:string; description:string; released:DateTime; poster:string; background:string}
-type Info = {id:int; title:string; poster:string}
+type Film = {id:int; eid:int; title:string; description:string; released:DateTime; poster:string; background:string}
+type Info = {id:int; title:string; poster:string; kind:string}
