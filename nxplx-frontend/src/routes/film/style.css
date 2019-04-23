@@ -1,0 +1,35 @@
+.bg {
+    margin-top: 56px;
+    padding: 76px 20px;
+    min-height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-repeat: repeat-y;
+}
+
+.poster {
+    max-height: 400px;
+    display: inline-block;
+    box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);
+    border-radius: 4px;
+    margin: 10px;
+}
+.title {
+    display: inline;
+}
+.info {
+    margin: 10px;
+    padding: 4px;
+    border-radius: 8px;
+    background-color: rgba(66, 66, 66, 0.6);
+    display: inline-block;
+    font-size: 16pt;
+}
+
+.infoKey {
+    color: #cdcdcd;
+}
+.infoValue {
+    padding-left: 8px;
+    color: #e0e0e0;
+}
