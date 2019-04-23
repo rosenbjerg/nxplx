@@ -5,47 +5,74 @@ import {route} from "preact-router";
 import { Get } from '../../Fetcher';
 import * as style from './style.css';
 
-import { SeasonDetails } from './SeasonDetails';
-interface Props { id:string; season:string }
+import { Genre, SeasonDetails } from './SeriesDetails';
 
-interface State {  }
+interface Episode { id:number; eid:number; number:number; thumbnail:string }
+interface Season { number:number; episodes:Episode[]; poster:string }
+interface SeriesInfo { id:number; name:string; seasons:Season[]; poster:string }
+
+interface Props { id:string }
+
+interface State { details:SeasonDetails, info:SeriesInfo, bg:string }
+
+interface InfoBundle { title:string, prop:string, func?:(data:string) => string }
 
 export default class Home extends Component<Props, State> {
 
-    public state = {
-        overview: [],
-        search: ''
-    };
-
     public componentDidMount() : void {
-        Get('/api/overview')
-            .then(response => response.json())
-            .then(overview => {
-                console.log("loaded", overview);
-                this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
+        Promise.all(
+            [
+                Get(`/api/series/${this.props.id}`).then(response => response.json()),
+                Get(`/api/series/${this.props.id}/details`).then(response => response.json())
+            ])
+            .then(results => {
+                const info:SeriesInfo = results[0];
+                const details:SeasonDetails = results[1];
+                console.log("loaded", info, details);
+                const bg = `background-image: url("/api/posters/original-${details.backdrop_path.replace('/', '')}");`;
+                this.setState({ details, info, bg });
             });
     }
 
 
     public render(props:Props, state:State) {
+        if (!state.details) {
+            return (<div>Loading...</div>);
+        }
         return (
-            <div class={style.home}>
-                <div>
-                    <input autofocus class={style.search} type="search" onInput={linkState(this, 'search')} />
-                </div>
-                <div class={style.entryContainer}>
-                    {state.overview && state.overview.filter(entry => entry.title.toLowerCase().includes(state.search)).map(entry => (
-                        <img key={entry.id} onClick={this.openEntry(entry)} className={style.entryTile} src={'/api/posters' + entry.poster} title={entry.title} alt={entry.title}>
-                            <p>{entry.title}</p>
-                        </img>
-                    ))}
-                </div>
+            <div class={style.bg} style={state.bg} data-bg={state.details.backdrop_path}>
+                <img class={style.poster} src={'/api/posters/w500-' + state.details.poster_path.replace('/', '')} alt=""/>
+                <span class={style.info}>
+                    <div className={style.title}>{state.details.title}</div>
+                    <div className={style.tag}>{state.details.tagline}</div>
+                    <div>
+                        {
+                            [
+                                {title: 'Released', prop: 'release_date'},
+                                {title: 'Rating', prop: 'vote_average'},
+                                {title: 'Genres', prop: 'genres', func: (ga:Genre[]) => ga.map(g => g.name).join(", ")},
+                            ].map(this.formatInfoPair)
+                        }
+                    </div>
+                </span>
+                <span class={style.info}>
+                    {
+                        [
+                            {title: 'Overview', prop: 'overview'},
+                        ].map(this.formatInfoPair)
+                    }
+                </span>
             </div>
         );
     }
 
-    private openEntry = (entry:Info) => () => {
-        console.log('clicked', `/${entry.kind}/${entry.id}`);
-        // route(`/${entry.kind}/${entry.id}`);
-    };
+    private formatInfoPair =  (ib:InfoBundle):JSX.Element => {
+        const value = ib.func ? ib.func(this.state.details[ib.prop]) : this.state.details[ib.prop];
+        return (
+            <tr>
+                <td className={style.infoKey}>{ib.title}</td>
+                <td className={style.infoValue}>{value}</td>
+            </tr>
+        );
+    }
 }

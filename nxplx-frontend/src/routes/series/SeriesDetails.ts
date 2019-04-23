@@ -48,7 +48,7 @@ export interface Season {
     season_number: number;
 }
 
-export interface SeasonDetails {
+export interface SeriesDetails {
     backdrop_path: string;
     created_by: CreatedBy[];
     episode_run_time: number[];

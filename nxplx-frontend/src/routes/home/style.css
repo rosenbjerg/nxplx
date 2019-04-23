@@ -20,6 +20,7 @@
     border-radius: 2px;
     max-height: 200px;
     cursor: pointer;
+    max-width: 32%;
 }
 
 .search {

@@ -2,6 +2,7 @@
 export const bg: string;
 export const poster: string;
 export const title: string;
+export const tag: string;
 export const info: string;
 export const infoKey: string;
 export const infoValue: string;

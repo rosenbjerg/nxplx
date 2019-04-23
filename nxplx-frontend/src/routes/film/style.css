@@ -15,7 +15,12 @@
     margin: 10px;
 }
 .title {
-    display: inline;
+    font-size: 20pt;
+    font-weight: 700;
+}
+.tag {
+    font-size: 14pt;
+    font-weight: 700;
 }
 .info {
     margin: 10px;

@@ -7,54 +7,55 @@ import * as style from './style.css';
 
 import {FilmDetails, Genre, ProductionCompany, ProductionCountry, SpokenLanguage} from './FilmDetails';
 
+interface FilmInfo { id:number; eid:number; title:string; poster:string }
+
 interface Props { id:string }
 
-interface State { info:FilmDetails, bg:string }
+interface State { details:FilmDetails, info:FilmInfo, bg:string }
 
 interface InfoBundle { title:string, prop:string, func?:(data:string) => string }
 
 export default class Home extends Component<Props, State> {
 
     public componentDidMount() : void {
-        Get(`/api/film/${this.props.id}`)
-            .then(response => response.json())
-            .then((info:FilmDetails) => {
-                console.log("loaded", info);
-                const bg = `background-image: url("/api/posters/original-${info.backdrop_path.replace('/', '')}");`;
-                this.setState({ info, bg });
+        Promise.all(
+            [
+                Get(`/api/film/${this.props.id}`).then(response => response.json()),
+                Get(`/api/film/${this.props.id}/details`).then(response => response.json())
+            ])
+            .then(results => {
+                const info:FilmInfo = results[0];
+                const details:FilmDetails = results[1];
+                console.log("loaded", info, details);
+                const bg = `background-image: url("/api/posters/original-${details.backdrop_path.replace('/', '')}");`;
+                this.setState({ details, info, bg });
             });
     }
 
 
     public render(props:Props, state:State) {
-        if (!state.info) {
+        if (!state.details) {
             return (<div>Loading...</div>);
         }
         return (
-            <div class={style.bg} style={state.bg} data-bg={state.info.backdrop_path}>
-                <img class={style.poster} src={'/api/posters/w500-' + state.info.poster_path.replace('/', '')} alt=""/>
-                <table class={style.info}>
-                    <thead>
-                        <tr>
-                            <h2 className={style.title}>{state.info.title}</h2>
-                        </tr>
-                        <tr>
-                            <h5 className={style.title}><i>{state.info.tagline}</i></h5>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        [
-                            {title: 'Released', prop: 'release_date'},
-                            {title: 'Rating', prop: 'vote_average'},
-                            {title: 'Genres', prop: 'genres', func: (ga:Genre[]) => ga.map(g => g.name).join(", ")},
-                            {title: 'Production companies', prop: 'production_companies', func: (ga:ProductionCompany[]) => ga.map(g => g.name).join(", ")},
-                            {title: 'Production countries', prop: 'production_countries', func: (ga:ProductionCountry[]) => ga.map(g => g.name).join(", ")},
-                            {title: 'Spoken languages', prop: 'spoken_languages', func: (ga:SpokenLanguage[]) => ga.map(g => g.name).join(", ")},
-                        ].map(this.formatInfoPair)
-                    }
-                    </tbody>
-                </table>
+            <div class={style.bg} style={state.bg} data-bg={state.details.backdrop_path}>
+                <img class={style.poster} src={'/api/posters/w500-' + state.details.poster_path.replace('/', '')} alt=""/>
+                <span class={style.info}>
+                    <div>
+                        <div className={style.title}>{state.details.title}</div>
+                        <div className={style.tag}>{state.details.tagline}</div>
+                        {
+                            [
+                                {title: 'Released', prop: 'release_date', func: (s:string) => s.substr(0, 4)},
+                                {title: 'Rating', prop: 'vote_average'},
+                                {title: 'Genres', prop: 'genres', func: (ga:Genre[]) => ga.map(g => g.name).join(", ")},
+                                {title: 'Production companies', prop: 'production_companies', func: (ga:ProductionCompany[]) => ga.map(g => g.name).join(", ")},
+                                {title: 'Production countries', prop: 'production_countries', func: (ga:ProductionCountry[]) => ga.map(g => g.name).join(", ")},
+                                {title: 'Spoken languages', prop: 'spoken_languages', func: (ga:SpokenLanguage[]) => ga.map(g => `${g.name} (${g.iso_639_1})`).join(", ")},
+                            ].map(this.formatInfoPair)
+                        }
+                    </div>
+                </span>
                 <span class={style.info}>
                     {
                         [
@@ -67,7 +68,7 @@ export default class Home extends Component<Props, State> {
     }
 
     private formatInfoPair =  (ib:InfoBundle):JSX.Element => {
-        const value = ib.func ? ib.func(this.state.info[ib.prop]) : this.state.info[ib.prop];
+        const value = ib.func ? ib.func(this.state.details[ib.prop]) : this.state.details[ib.prop];
         return (
             <tr>
                 <td className={style.infoKey}>{ib.title}</td>

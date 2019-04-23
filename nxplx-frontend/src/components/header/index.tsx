@@ -9,13 +9,13 @@ export default class Header extends Component {
                 <h1>NxPlx</h1>
                 <nav>
                     <Link activeClassName={style.active} href="/">
-                        Overview
+                        <i className="material-icons">list</i>
                     </Link>
                     <Link activeClassName={style.active} href="/profile">
-                        Account
+                        <i className="material-icons">account_circle</i>
                     </Link>
-                    <Link activeClassName={style.active} href="/profile/john">
-                        Settings
+                    <Link activeClassName={style.active} href="/settings">
+                        <i className="material-icons">settings</i>
                     </Link>
                 </nav>
             </header>

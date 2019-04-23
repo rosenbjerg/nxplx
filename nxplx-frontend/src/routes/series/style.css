@@ -1,33 +1,40 @@
-.home {
+.bg {
+    margin-top: 56px;
     padding: 76px 20px;
     min-height: 100%;
     width: 100%;
+    background-size: cover;
+    background-repeat: repeat-y;
 }
 
-.entryContainer {
-    padding-top: 10px;
+.poster {
+    max-height: 400px;
+    display: inline-block;
+    box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);
+    border-radius: 4px;
+    margin: 10px;
 }
-.entryContainer:empty::after {
-    content: "No entries to show";
-    color: #212121;
+.title {
+    font-size: 20pt;
+    font-weight: 700;
 }
-
-.entryTile {
-    margin: 3px;
-    box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
-    border-radius: 2px;
-    max-height: 200px;
+.tag {
+    font-size: 14pt;
+    font-weight: 700;
 }
-
-.search {
-    padding-left: 5px;
-    width: 100%;
-    font-size: 20px;
-    border: 2px solid #585858;
+.info {
+    margin: 10px;
+    padding: 4px;
     border-radius: 8px;
-    background: none;
+    background-color: rgba(66, 66, 66, 0.6);
+    display: inline-block;
+    font-size: 16pt;
 }
-.search:focus {
-    border-color: #1565c0;
-    outline: none;
+
+.infoKey {
+    color: #cdcdcd;
+}
+.infoValue {
+    padding-left: 8px;
+    color: #e0e0e0;
 }
