@@ -1,7 +1,7 @@
 import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-import {route} from "preact-router";
+import {Link, route} from "preact-router";
 import { Get } from '../../Fetcher';
 import * as style from './style.css';
 
@@ -38,7 +38,10 @@ export default class Home extends Component<Props, State> {
                     {state.overview && state.overview
                         .filter(this.entrySearch(state.search))
                         .map(entry => (
-                            <img key={entry.id} onClick={this.openEntry(entry)} className={style.entryTile} src={'/api/posters/w185-' + entry.poster.replace('/', '')} title={entry.title} alt={entry.title} />
+                            <Link href={`/${entry.kind}/${entry.id}`}>
+                                <img key={entry.id} className={style.entryTile} src={'/api/posters/w185-' + entry.poster.replace('/', '')} title={entry.title} alt={entry.title} />
+                            </Link>
+
                         )
                     )}
                 </div>
@@ -48,12 +51,7 @@ export default class Home extends Component<Props, State> {
 
     private entrySearch = (search:string) => (entry:Info) => {
         const lowercaseSearch = search.toLowerCase();
-        return entry.kind.includes(lowercaseSearch) ||
-            entry.title.toLowerCase().includes(lowercaseSearch);
-    };
-
-    private openEntry = (entry:Info) => () => {
-        console.log('clicked', `/${entry.kind}/${entry.id}`);
-        route(`/${entry.kind}/${entry.id}`);
+        return  entry.kind.includes(lowercaseSearch) ||
+                entry.title.toLowerCase().includes(lowercaseSearch);
     };
 }

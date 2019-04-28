@@ -13,7 +13,19 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+body::-webkit-scrollbar {
+    width: 0.5em;
+    background-color: #616161;
+}
 
+body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #212121;
+    outline: 1px solid #616161;
+}
 * {
     box-sizing: border-box;
 }

@@ -1,0 +1,1 @@
+interface NxPlxStore { user:object|null, subtitles:object }

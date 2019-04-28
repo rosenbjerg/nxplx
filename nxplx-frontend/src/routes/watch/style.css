@@ -1,0 +1,11 @@
+.container {
+    background-color: black;
+    margin-top: 56px;
+    min-height: 100%;
+    width: 100%;
+}
+.container video {
+    height: calc(100vh - 56px);
+    margin: auto;
+    display: block;
+}

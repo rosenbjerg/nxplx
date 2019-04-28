@@ -27,7 +27,7 @@ let indexSeries = Array.groupBy (fun (e:EpisodeEntry) -> e.name) >> Array.Parall
                 let tmdbEpisodeInfo = tmdbSeasonInfo.episodes.[e.episode - 1]
                 tmdbApi.downloadImage "w185" tmdbEpisodeInfo.still_path  |> Async.RunSynchronously |> ignore
                 tmdbApi.downloadImage "w500" tmdbEpisodeInfo.still_path  |> Async.RunSynchronously |> ignore
-                { id=tmdbEpisodeInfo.id; eid=e.id; number=e.episode; thumbnail=tmdbEpisodeInfo.still_path })
+                { id=tmdbEpisodeInfo.id; eid=e.id; subtitles=e.subtitles; number=e.episode; thumbnail=tmdbEpisodeInfo.still_path })
             tmdbApi.downloadImage "w185" tmdbSeasonInfo.poster_path |> Async.RunSynchronously |> ignore
             tmdbApi.downloadImage "w500" tmdbSeasonInfo.poster_path |> Async.RunSynchronously |> ignore
             { number=number; episodes=episodes; poster=tmdbSeasonInfo.poster_path })
@@ -41,7 +41,7 @@ let indexFilm = Array.Parallel.map (fun f ->
         tmdbApi.downloadImage "w185" info.poster_path |> Async.RunSynchronously |> ignore
         tmdbApi.downloadImage "w500" info.poster_path |> Async.RunSynchronously |> ignore
         tmdbApi.downloadImage "original" info.backdrop_path |> Async.RunSynchronously |> ignore
-        { id=info.id; eid=f.id; title=info.title; poster=info.poster_path }        
+        { id=info.id; eid=f.id; title=info.title; subtitles=f.subtitles; poster=info.poster_path }        
     )
 
 [<EntryPoint>]
@@ -64,7 +64,6 @@ let main argv =
     let server = new RedHttpServer (5990, "public")
     server.Get("/api/overview", (fun (req:Request) (res:Response) -> res.SendJson overview))
     server.Get("/api/posters/*", Red.Utils.SendFiles "public/posters")
-            
     server.Get("/api/film/:id", (fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "id")
         let series = Array.find (fun (entry:Film) -> entry.id = id) film
@@ -74,7 +73,12 @@ let main argv =
         let details = tmdbApi.getFilmDetails (req.Context.ExtractUrlParameter "id")
         res.SendString (details, "application/json")))
     
-    server.Get("/api/film/:eid/watch", (fun (req:Request) (res:Response) ->
+    server.Get("/api/watch/film/:eid", (fun (req:Request) (res:Response) ->
+        let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
+        let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
+        res.SendFile film.path))
+    
+    server.Get("/api/subtitles/film/:eid/:lang", (fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
         let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
         res.SendFile film.path))
@@ -89,10 +93,10 @@ let main argv =
         let details = tmdbApi.getSeriesDetails (req.Context.ExtractUrlParameter "id")
         res.SendString (details, "application/json")))
     
-    server.Get("/api/series/:eid/watch", (fun (req:Request) (res:Response) ->
+    server.Get("/api/watch/series/:eid", (fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
         let episode = Array.find (fun (entry:EpisodeEntry) -> entry.id = id) seriesEntries
-        res.SendFile episode.path))
+        res.SendFile (episode.path, null, true)))
     
     printfn "Starting NxPlx - the lightweight media server"
     server.RunAsync() |> Async.AwaitTask |> Async.RunSynchronously
