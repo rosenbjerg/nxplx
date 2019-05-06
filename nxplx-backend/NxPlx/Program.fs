@@ -60,43 +60,45 @@ let main argv =
     let overview =  Array.concat [ filmOverview; seriesOverview ]
     
     printfn "Done indexing"
+    
+    let bufferSize = 1048576
         
     let server = new RedHttpServer (5990, "public")
-    server.Get("/api/overview", (fun (req:Request) (res:Response) -> res.SendJson overview))
+    server.Get("/api/overview", fun (req:Request) (res:Response) -> res.SendJson overview)
     server.Get("/api/posters/*", Red.Utils.SendFiles "public/posters")
-    server.Get("/api/film/:id", (fun (req:Request) (res:Response) ->
+    server.Get("/api/film/:id", fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "id")
         let series = Array.find (fun (entry:Film) -> entry.id = id) film
-        res.SendJson series))
+        res.SendJson series)
             
-    server.Get("/api/film/:id/details", (fun (req:Request) (res:Response) ->
+    server.Get("/api/film/:id/details", fun (req:Request) (res:Response) ->
         let details = tmdbApi.getFilmDetails (req.Context.ExtractUrlParameter "id")
-        res.SendString (details, "application/json")))
+        res.SendString (details, "application/json"))
     
-    server.Get("/api/watch/film/:eid", (fun (req:Request) (res:Response) ->
+    server.Get("/api/watch/film/:eid", fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
         let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
-        res.SendFile film.path))
+        res.SendFile (film.path, "video/mp4", true, bufferSize))
     
-    server.Get("/api/subtitles/film/:eid/:lang", (fun (req:Request) (res:Response) ->
+    server.Get("/api/subtitles/film/:eid/:lang", fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
         let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
-        res.SendFile film.path))
+        res.SendFile film.path)
     
     
-    server.Get("/api/series/:id", (fun (req:Request) (res:Response) ->
+    server.Get("/api/series/:id", fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "id")
         let series = Array.find (fun (entry:Series) -> entry.id = id) series
-        res.SendJson series))
+        res.SendJson series)
     
-    server.Get("/api/series/:id/details", (fun (req:Request) (res:Response) ->
+    server.Get("/api/series/:id/details", fun (req:Request) (res:Response) ->
         let details = tmdbApi.getSeriesDetails (req.Context.ExtractUrlParameter "id")
-        res.SendString (details, "application/json")))
+        res.SendString (details, "application/json"))
     
-    server.Get("/api/watch/series/:eid", (fun (req:Request) (res:Response) ->
+    server.Get("/api/watch/series/:eid", fun (req:Request) (res:Response) ->
         let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
         let episode = Array.find (fun (entry:EpisodeEntry) -> entry.id = id) seriesEntries
-        res.SendFile (episode.path, null, true)))
+        res.SendFile (episode.path, "video/mp4", true, bufferSize))
     
     printfn "Starting NxPlx - the lightweight media server"
     server.RunAsync() |> Async.AwaitTask |> Async.RunSynchronously

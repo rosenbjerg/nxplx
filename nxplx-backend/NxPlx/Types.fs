@@ -14,7 +14,7 @@ let titleCleanup title =
 
     
 let hashPath (path:string) =
-    path |> Seq.map int |> Seq.reduce (fun (hash:int) (c:int) -> (((hash <<< 5) - hash) + c) ||| 0)
+    path |> Seq.map int |> Seq.reduce (fun (hash:int) (c:int) -> (((hash <<< 5) - hash) + c) ||| 0) |> abs
 
 
 let getSubtitleLanguage (path:string) =

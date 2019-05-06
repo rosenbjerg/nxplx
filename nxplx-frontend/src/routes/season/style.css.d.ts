@@ -5,3 +5,5 @@ export const title: string;
 export const info: string;
 export const marked: string;
 export const episode: string;
+export const play: string;
+export const playPosterContainer: string;

@@ -9,7 +9,7 @@ export default class Header extends Component {
                 <h1>NxPlx</h1>
                 <nav>
                     <Link activeClassName={style.active} href="/">
-                        <i className="material-icons">list</i>
+                        <i className="material-icons">home</i>
                     </Link>
                     <Link activeClassName={style.active} href="/profile">
                         <i className="material-icons">account_circle</i>

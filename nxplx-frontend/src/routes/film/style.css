@@ -1,5 +1,4 @@
 .bg {
-    margin-top: 56px;
     padding: 15px 15px;
     min-height: 100%;
     width: 100%;
@@ -8,28 +7,36 @@
 }
 
 .poster {
-    max-height: 340px;
+    height: 340px;
     display: inline-block;
     box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);
     border-radius: 4px;
-    transition: 0.5s ease;
+    transition: opacity 0.5s ease;
     margin: 10px;
 }
 .play {
-    transition: 0.5s ease;
+    transition: opacity 0.5s ease;
     opacity: 0;
     position: absolute;
-    top: 50%;
+    top: -170px;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+}
+.play i {
+    color: white;
+    font-size: 70px;
 }
 .playPosterContainer {
     /*display: inline-block;*/
     position: relative;
 }
 .playPosterContainer:hover .poster {
-    opacity: 0.3;
+    opacity: 0.9;
+    border: #1565c0 solid 3px;
+    border-radius: 5px;
+    outline: none;
+    transition: border 300ms;
 }
 .playPosterContainer:hover .play {
     opacity: 1;

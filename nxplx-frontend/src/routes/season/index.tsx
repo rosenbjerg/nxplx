@@ -51,8 +51,7 @@ export default class Season extends Component<Props, State> {
                     <div>
                         {
                             [
-                                {title: 'Released', value: details.air_date},
-                                {title: 'Overview', value: details.overview}
+                                {title: 'Released', value: details.air_date}
                             ].map(formatInfoPair)
                         }
                     </div>
@@ -60,10 +59,12 @@ export default class Season extends Component<Props, State> {
                 <div>
                     {orderBy(info.episodes, ['number'], ['asc'])
                         .map((episode:EpisodeInfo) => (
-                                <Link href={`/watch/series/${episode.eid}`}>
-                                    <img tabIndex={1} key={episode.number} class={style.episode} src={'/api/posters/w185-' + episode.thumbnail.replace('/', '')} title={`Episode ${episode.number}`} alt={episode.number.toString()} />
+                            <span class={style.playPosterContainer}>
+                                <img tabIndex={1} key={episode.number} class={style.episode} src={'/api/posters/w185-' + episode.thumbnail.replace('/', '')} height={120} width={215} title={`Episode ${episode.number}`} alt={episode.number.toString()} />
+                                <Link class={style.play} href={`/watch/series/${episode.eid}`}>
+                                    <i class="material-icons">play_arrow</i>
                                 </Link>
-                            )
+                            </span>)
                         )}
                 </div>
             </div>

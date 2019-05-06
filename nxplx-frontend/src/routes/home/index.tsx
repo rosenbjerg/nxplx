@@ -39,7 +39,7 @@ export default class Home extends Component<Props, State> {
                         .filter(this.entrySearch(state.search))
                         .map(entry => (
                             <Link href={`/${entry.kind}/${entry.id}`}>
-                                <img key={entry.id} className={style.entryTile} src={'/api/posters/w185-' + entry.poster.replace('/', '')} title={entry.title} alt={entry.title} />
+                                <img key={entry.id} className={style.entryTile} src={'/api/posters/w185-' + entry.poster.replace('/', '')} height={200} width={133} title={entry.title} alt={entry.title} />
                             </Link>
 
                         )

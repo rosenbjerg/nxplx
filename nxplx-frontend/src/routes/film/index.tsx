@@ -1,5 +1,6 @@
 import linkState from 'linkstate';
 import { Component, h } from 'preact';
+import {Link} from "preact-router";
 import {Store} from 'unistore';
 import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
 import Subtitles from '../../components/Subtitles';
@@ -34,7 +35,6 @@ export default class Home extends Component<Props, State> {
             });
     }
 
-
     public render(props:Props, { info, details, bg, subtitle }:State) {
         if (!details) {
             return (<div>Loading...</div>);
@@ -50,10 +50,10 @@ export default class Home extends Component<Props, State> {
                     </div>
                 )}
                 <span class={style.playPosterContainer}>
-                    <img className={style.poster} src={'/api/posters/w500-' + details.poster_path.replace('/', '')} alt=""/>
-                    <span className={style.play}>
-                        <i className="material-icons">play_arrow</i>
-                    </span>
+                    <img class={style.poster} src={'/api/posters/w500-' + details.poster_path.replace('/', '')} alt=""/>
+                    <Link class={style.play} href={`/watch/film/${info.eid}`} >
+                        <i class="material-icons">play_arrow</i>
+                    </Link>
                 </span>
                 <span class={[style.info, style.marked].join(" ")}>
                     <div>

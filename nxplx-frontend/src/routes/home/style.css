@@ -1,5 +1,5 @@
 .home {
-    padding: 76px 10px;
+    padding: 10px 10px;
     min-height: 100%;
     width: 100%;
 }
@@ -18,7 +18,8 @@
     margin-left: 2px;
     box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
     border-radius: 2px;
-    max-height: 200px;
+    height: 200px;
+    width: 133px;
     cursor: pointer;
     max-width: 32%;
 }
