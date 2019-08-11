@@ -6,9 +6,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="SrtConverter.fs" />
         <Compile Include="Types.fs" />
+        <Compile Include="Utils.fs" />
+        <Compile Include="SrtConverter.fs" />
         <Compile Include="TMdbApi.fs" />
+        <Compile Include="Indexing.fs" />
+        <Compile Include="SeriesRoutes.fs" />
+        <Compile Include="EpisodeRoutes.fs" />
+        <Compile Include="FilmRoutes.fs" />
+        <Compile Include="SubtitlePersistence.fs" />
+        <Compile Include="ProgressPersistence.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
@@ -18,10 +25,7 @@
       <PackageReference Include="Red.CookieSessions.LiteDBStore" Version="1.0.0" />
       <PackageReference Include="RHttpServer" Version="4.0.1" />
       <PackageReference Include="sqlite-net-pcl-fsharp" Version="1.0.13" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="tmdb-api-key" />
+      <PackageReference Include="TaskBuilder.fs" Version="2.1.0" />
     </ItemGroup>
 
 </Project>

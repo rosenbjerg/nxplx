@@ -3,3 +3,5 @@ export const home: string;
 export const entryContainer: string;
 export const entryTile: string;
 export const search: string;
+export const scan: string;
+export const top: string;

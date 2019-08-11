@@ -1,104 +1,48 @@
 ﻿module NxPlx.Server
 
+open NxPlx
+open NxPlx.Indexing
 open Red
+open Red.Extensions
 open System
-open System.IO
-open NxPlx.Types
-open NxPlx.TMdbApi
-open Red
+open System.Globalization
+open System.Net
+open System.Threading.Tasks
 
-let isEpisode path = path |> seriesRegex.IsMatch
-let isFilm path = path |> seriesRegex.IsMatch |> not
-let extensionFilter (file:string) = Array.contains (Path.GetExtension file) [| ".mp4"; ".mkv" |]
+let handlerMapper = Array.map (fun e -> new Func<Request, Response, Task<HandlerType>>(e))
 
-let findVideoFiles dir = Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories) |> Array.where extensionFilter
-let findFilm dir = findVideoFiles dir |> Array.where isFilm |> Array.Parallel.map createFilmEntry
-let findEpisodes dir = findVideoFiles dir |> Array.where isEpisode |> Array.Parallel.map createEpisodeEntry
-
-
-let tmdbApi = new TMdbApi(ApiKeyPath("./tmdb-api-key"))
-let indexSeries = Array.groupBy (fun (e:EpisodeEntry) -> e.name) >> Array.Parallel.map (fun seriesGroup ->
-        let name, seriesEpisodes = seriesGroup
-        let tmdbSeriesInfo = tmdbApi.findSeries name |> (fun s -> s.results.[0])
-        let seasons = seriesEpisodes |> Array.groupBy (fun e -> e.season) |> Array.Parallel.map (fun seasonGroup ->
-            let number, seasonEpisodes = seasonGroup
-            let tmdbSeasonInfo = tmdbApi.findSeason tmdbSeriesInfo.id number
-            let episodes = seasonEpisodes |> Array.map (fun e ->
-                let tmdbEpisodeInfo = tmdbSeasonInfo.episodes.[e.episode - 1]
-                tmdbApi.downloadImage "w185" tmdbEpisodeInfo.still_path  |> Async.RunSynchronously |> ignore
-                tmdbApi.downloadImage "w500" tmdbEpisodeInfo.still_path  |> Async.RunSynchronously |> ignore
-                { id=tmdbEpisodeInfo.id; eid=e.id; subtitles=e.subtitles; number=e.episode; thumbnail=tmdbEpisodeInfo.still_path })
-            tmdbApi.downloadImage "w185" tmdbSeasonInfo.poster_path |> Async.RunSynchronously |> ignore
-            tmdbApi.downloadImage "w500" tmdbSeasonInfo.poster_path |> Async.RunSynchronously |> ignore
-            { number=number; episodes=episodes; poster=tmdbSeasonInfo.poster_path })
-        tmdbApi.downloadImage "w185" tmdbSeriesInfo.poster_path |> Async.RunSynchronously |> ignore
-        tmdbApi.downloadImage "w500" tmdbSeriesInfo.poster_path |> Async.RunSynchronously |> ignore
-        tmdbApi.downloadImage "original" tmdbSeriesInfo.backdrop_path |> Async.RunSynchronously |> ignore
-        { id=tmdbSeriesInfo.id; name=tmdbSeriesInfo.name; seasons=seasons; poster=tmdbSeriesInfo.poster_path })
-
-let indexFilm = Array.Parallel.map (fun f ->
-        let info = tmdbApi.findFilm f |> (fun s -> s.results.[0])
-        tmdbApi.downloadImage "w185" info.poster_path |> Async.RunSynchronously |> ignore
-        tmdbApi.downloadImage "w500" info.poster_path |> Async.RunSynchronously |> ignore
-        tmdbApi.downloadImage "original" info.backdrop_path |> Async.RunSynchronously |> ignore
-        { id=info.id; eid=f.id; title=info.title; subtitles=f.subtitles; poster=info.poster_path }        
-    )
-
+type Red.RedHttpServer with
+    member __.get (route:string) ([<ParamArray>] handlers:(Request -> Response -> Task<HandlerType>) array) =
+        __.Get(route, handlerMapper handlers)
+    
 [<EntryPoint>]
-let main argv =    
-    printfn "Indexing..."
-    let directory = "C:\\Users\\Malte\\Documents\\Kode\\boxconverter\\test\\test"
+let main argv =
+//    System.Globalization.CultureInfo.CurrentCulture <- CultureInfo.InvariantCulture
+//    System.Globalization.CultureInfo.DefaultThreadCurrentCulture <- CultureInfo.InvariantCulture
+//    System.Threading.Thread.CurrentThread.CurrentCulture <- CultureInfo.InvariantCulture
     
-    let filmEntries = findFilm directory
-    let seriesEntries = findEpisodes directory
+    let indexer = new NxPlx.Indexing.Indexer "C:\\Users\\Malte\\Documents\\Kode\\boxconverter\\test\\test"
     
-    let film = indexFilm filmEntries
-    let series = indexSeries seriesEntries
-    
-    let filmOverview = Array.map (fun (f:Film) -> {id=f.id; title=f.title; poster=f.poster; kind="film"}) film
-    let seriesOverview = Array.map (fun (f:Series) -> {id=f.id; title=f.name; poster=f.poster; kind="series"}) series
-    let overview =  Array.concat [ filmOverview; seriesOverview ]
-    
+    printfn "Indexing..."    
+    indexer.index
     printfn "Done indexing"
-    
-    let bufferSize = 1048576
         
     let server = new RedHttpServer (5990, "public")
-    server.Get("/api/overview", fun (req:Request) (res:Response) -> res.SendJson overview)
-    server.Get("/api/posters/*", Red.Utils.SendFiles "public/posters")
-    server.Get("/api/film/:id", fun (req:Request) (res:Response) ->
-        let id = Int32.Parse (req.Context.ExtractUrlParameter "id")
-        let series = Array.find (fun (entry:Film) -> entry.id = id) film
-        res.SendJson series)
-            
-    server.Get("/api/film/:id/details", fun (req:Request) (res:Response) ->
-        let details = tmdbApi.getFilmDetails (req.Context.ExtractUrlParameter "id")
-        res.SendString (details, "application/json"))
     
-    server.Get("/api/watch/film/:eid", fun (req:Request) (res:Response) ->
-        let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
-        let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
-        res.SendFile (film.path, "video/mp4", true, bufferSize))
+    server.Get("/api/overview", fun (req:Request) (res:Response) -> res.SendJson indexer.entries)
     
-    server.Get("/api/subtitles/film/:eid/:lang", fun (req:Request) (res:Response) ->
-        let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
-        let film = Array.find (fun (entry:FilmEntry) -> entry.id = id) filmEntries
-        res.SendFile film.path)
+    server.Get("/api/posters/*", Red.Utils.SendFiles "data/posters")
     
+    server.Post("/api/scan", fun (req:Request) (res:Response) ->
+        indexer.index
+        res.SendStatus HttpStatusCode.OK)
+
+    FilmRoutes.register (server.CreateRouter "/api/film") indexer
+    SeriesRoutes.register (server.CreateRouter "/api/series") indexer
+    EpisodeRoutes.register (server.CreateRouter "/api/episode") indexer
     
-    server.Get("/api/series/:id", fun (req:Request) (res:Response) ->
-        let id = Int32.Parse (req.Context.ExtractUrlParameter "id")
-        let series = Array.find (fun (entry:Series) -> entry.id = id) series
-        res.SendJson series)
-    
-    server.Get("/api/series/:id/details", fun (req:Request) (res:Response) ->
-        let details = tmdbApi.getSeriesDetails (req.Context.ExtractUrlParameter "id")
-        res.SendString (details, "application/json"))
-    
-    server.Get("/api/watch/series/:eid", fun (req:Request) (res:Response) ->
-        let id = Int32.Parse (req.Context.ExtractUrlParameter "eid")
-        let episode = Array.find (fun (entry:EpisodeEntry) -> entry.id = id) seriesEntries
-        res.SendFile (episode.path, "video/mp4", true, bufferSize))
+    SubtitlePersistence.register (server.CreateRouter "/api/subtitle") indexer
+    ProgressPersistence.register (server.CreateRouter "/api/progress")
     
     printfn "Starting NxPlx - the lightweight media server"
     server.RunAsync() |> Async.AwaitTask |> Async.RunSynchronously

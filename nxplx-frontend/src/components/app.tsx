@@ -36,13 +36,13 @@ export default class App extends Component {
                 <div id="app">
                     <Header />
                     <Router onChange={this.handleRoute}>
-                        <Route path="/" component={Home} />
+                        <Route path="/" component={Home} default />
                         <Route path="/film/:id" component={Film} />
                         <Route path="/series/:id" component={Series} />
                         <Route path="/series/:id/:season" component={Season} />
-                        <Route path="/watch/:kind/:eid" component={Watch} />
+                        <Route path="/watch/:kind/:id" component={Watch} />
                         {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
-                        <Route path="/profile/:user" component={Profile} />
+                        <Route path="/profile" component={Profile} />
                     </Router>
                 </div>
             </Provider>

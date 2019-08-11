@@ -4,6 +4,7 @@
     width: 100%;
     background-size: cover;
     background-repeat: repeat-y;
+    background-position-x: center;
 }
 
 .poster {
@@ -13,6 +14,7 @@
     border-radius: 4px;
     transition: opacity 0.5s ease;
     margin: 10px;
+    border-color: #1565c0;
 }
 .play {
     transition: opacity 0.5s ease;
@@ -22,6 +24,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    padding: 35px;
 }
 .play i {
     color: white;
@@ -36,7 +39,7 @@
     border: #1565c0 solid 3px;
     border-radius: 5px;
     outline: none;
-    transition: border 300ms;
+    transition: border 200ms;
 }
 .playPosterContainer:hover .play {
     opacity: 1;

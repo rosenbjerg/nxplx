@@ -1,16 +1,13 @@
 module NxPlx.TMdbApi
 
+open FSharp.Control.Tasks
 open NxPlx.Types
 open System.Net.Http
 open Newtonsoft.Json
 open System
 open System.IO
 open System.Web
-//open SQLite
-//open SQLite.FSharp
 open LiteDB
-open LiteDB
-open LiteDB.FSharp
 open LiteDB.FSharp.Extensions
 
 type TMdbFilmResult = {vote_count:int; id:int; video:bool; vote_average:float32; title:string; popularity:float32;
@@ -46,9 +43,9 @@ let fetchWeb (httpClient:HttpClient) (url:string) = async {
     return content
 }    
     
-let fetch (db:LiteDatabase) (httpClient:HttpClient) (kind:string) (validTimeSpan:TimeSpan) (url:string) =
+let fetch (cache:LiteCollection<CachedTMdbSearchRequest>) (httpClient:HttpClient) (validTimeSpan:TimeSpan) (url:string) =
     let expiryDate = DateTime.UtcNow.Add validTimeSpan
-    let cache = db.GetCollection<CachedTMdbSearchRequest> "requests"
+    
     let bsonId = BsonValue url;
     let cachedOption = cache.TryFindById bsonId
     
@@ -66,6 +63,7 @@ let fetch (db:LiteDatabase) (httpClient:HttpClient) (kind:string) (validTimeSpan
         content
 
 type TMdbApiKey = ApiKeyValue of string | ApiKeyPath of string
+
 type TMdbApi(apiKey:TMdbApiKey) =
     
     let key = match apiKey with
@@ -73,9 +71,10 @@ type TMdbApi(apiKey:TMdbApiKey) =
               | ApiKeyPath kp -> System.IO.File.ReadAllText kp
     
     let db =
-        Directory.CreateDirectory "database" |> ignore
-        let db = new LiteDatabase(Path.Combine("database", "tmdb-cache.litedb"))
-        db
+        let dir = Path.Combine("data", "database");
+        Directory.CreateDirectory dir |> ignore
+        let db = new LiteDatabase(Path.Combine(dir, "tmdb-cache.litedb"))
+        db.GetCollection<CachedTMdbSearchRequest> "requests"
        
     
     let client =
@@ -83,33 +82,41 @@ type TMdbApi(apiKey:TMdbApiKey) =
         client.DefaultRequestHeaders.Add("User-Agent", "NxPlx")
         client
        
-    let _fetchAndDeserialize kind validTimeSpan url : 'a =
-        fetch db client kind validTimeSpan url |> JsonConvert.DeserializeObject<'a>
+    let _fetchAndDeserialize validTimeSpan url : 'a =
+        fetch db client validTimeSpan url |> JsonConvert.DeserializeObject<'a>
         
-    let _fetch kind validTimeSpan url =
-        fetch db client kind validTimeSpan url
+    let _fetch validTimeSpan url =
+        fetch db client validTimeSpan url
         
-    member __.downloadImage (size:string) (posterUrl:string) = async {
-        Directory.CreateDirectory (Path.Combine ("public", "posters")) |> ignore
-        let outputPath = Path.Combine ("public", "posters", (sprintf "%s-%s" size (posterUrl.TrimStart '/')))
-        if File.Exists outputPath then return outputPath
-        else 
-            let! response = client.GetAsync((sprintf "http://image.tmdb.org/t/p/%s%s?api_key=%s" size posterUrl key)) |> Async.AwaitTask
-            use! inputStream = response.Content.ReadAsStreamAsync() |> Async.AwaitTask
-            use outputStream = File.OpenWrite outputPath
-            let! task = inputStream.CopyToAsync outputStream |> Async.AwaitTask
-            return outputPath
-    }
+    member __.downloadImage (size:string) (posterUrl:string) =
+        let dir = Path.Combine ("data", "posters")
+        let run = task {
+            Directory.CreateDirectory dir |> ignore
+            let posterName = Path.GetFileNameWithoutExtension posterUrl
+            let outputPath = Path.Combine (dir, (sprintf "%s-%s.jpg" posterName size))
+            if File.Exists outputPath then return outputPath
+            else 
+                let! response = client.GetAsync((sprintf "http://image.tmdb.org/t/p/%s%s?api_key=%s" size posterUrl key))
+                use! inputStream = response.Content.ReadAsStreamAsync()
+                use outputStream = File.OpenWrite outputPath
+                do! inputStream.CopyToAsync outputStream
+                return outputPath
+        }
+        run |> ignore
     member __.getFilmDetails id =    
-        _fetch "film_details" (TimeSpan.FromDays 1000.0) (sprintf "https://api.themoviedb.org/3/movie/%s?api_key=%s" id key)
+        _fetch (TimeSpan.FromDays 500.0) (sprintf "https://api.themoviedb.org/3/movie/%s?api_key=%s" id key)
     member __.getSeriesDetails id =    
-        _fetch "series_details" (TimeSpan.FromDays 50.0) (sprintf "https://api.themoviedb.org/3/tv/%s?api_key=%s" id key)
+        _fetch (TimeSpan.FromDays 50.0) (sprintf "https://api.themoviedb.org/3/tv/%s?api_key=%s" id key)
+    member __.getEpisodeDetails id season episode =    
+        _fetch (TimeSpan.FromDays 500.0) (sprintf "https://api.themoviedb.org/3/tv/%s/season/%s/episode/%s?api_key=%s" id season episode key)
         
     
     member __.findFilm (film:FilmEntry) : TMdbFilmSearch  =
         let year = match film.year with | -1 -> "" | _ -> sprintf "&year=%i" film.year        
-        _fetchAndDeserialize "film" (TimeSpan.FromDays 1000.0) (sprintf "https://api.themoviedb.org/3/search/movie?api_key=%s&query=%s%s" key (HttpUtility.UrlEncode film.title) year)
+        _fetchAndDeserialize (TimeSpan.FromDays 500.0) (sprintf "https://api.themoviedb.org/3/search/movie?api_key=%s&query=%s%s" key (HttpUtility.UrlEncode film.title) year)
     member __.findSeries (name:string) : TMdbSeriesSearch =
-        _fetchAndDeserialize "series" (TimeSpan.FromDays 1000.0) (sprintf "https://api.themoviedb.org/3/search/tv?api_key=%s&query=%s" key (HttpUtility.UrlEncode name))
+        _fetchAndDeserialize (TimeSpan.FromDays 500.0) (sprintf "https://api.themoviedb.org/3/search/tv?api_key=%s&query=%s" key (HttpUtility.UrlEncode name))
     member __.findSeason  id season : TMdbSeasonSearch   =
-        _fetchAndDeserialize "season" (TimeSpan.FromDays 100.0) (sprintf "https://api.themoviedb.org/3/tv/%i/season/%i?api_key=%s" id season key)
+        _fetchAndDeserialize (TimeSpan.FromDays 100.0) (sprintf "https://api.themoviedb.org/3/tv/%i/season/%i?api_key=%s" id season key)
+
+let tmdbApi = new TMdbApi(ApiKeyPath(Path.Combine("data", "tmdb-api-key")))

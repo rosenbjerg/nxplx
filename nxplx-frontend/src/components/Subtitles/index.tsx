@@ -1,12 +1,12 @@
-import {FunctionalComponent, h} from "preact";
-import {Store} from "unistore";
-import {connect} from "unistore/preact";
+import {Component, h} from "preact";
+import http from "../../Http";
 import * as style from "./style.css";
 
-interface Props { id:number, languages:string[] }
+interface Props { eid:number, languages:string[] }
 
+interface State { selected?:string }
 
-function formatSubtitleName(name:string) : string {
+export function formatSubtitleName(name:string) : string {
     switch (name) {
             case 'eng': return 'english';
             case 'da': return 'dansk';
@@ -26,29 +26,27 @@ function formatSubtitleName(name:string) : string {
     }
 }
 
-const actions = (store:Store<NxPlxStore>) => ({
-    set: ({ subtitles }, {id, lang, name}) => {
-        subtitles[id] = { name, lang };
-        console.log(subtitles);
-        return { subtitles };
-    }
-});
+export default class SubtitleSelector extends Component<Props, State> {
 
-export default connect('subtitles', actions)(({ id, languages, subtitles, set }:Props) => {
-    if (languages.length === 0) {
-        return (<span>None</span>);
+    public componentDidMount(): void {
+        http.get('/api/subtitle/' + this.props.eid)
+            .then(response => response.text())
+            .then(lang => this.setState({selected: lang}));
     }
-    const setter = (event:Event) => {
-        const lang = event.target.value;
-        const name = formatSubtitleName(lang);
-        set({id, lang, name});
-    };
-    const selected:string = subtitles[id] ? subtitles[id].lang : "none";
-    console.log(subtitles, selected);
-    return (
-        <select value={selected} class={style.subtitles} name="Subtitles" onInput={setter}>
+
+    public render(props:Props, state:State) {
+        return (
+            <select value={state.selected} class={style.subtitles} name="Subtitles" onInput={this.setSubtitle}>
                 <option>none</option>
-                {languages.map(sub => (<option value={sub}>{formatSubtitleName(sub)}</option>))}
-        </select>
-    );
-});
+                {props.languages.map(sub => (<option value={sub}>{formatSubtitleName(sub)}</option>))}
+            </select>
+        );
+    }
+
+    private setSubtitle = (event:Event) => {
+        // @ts-ignore
+        const lang = event.target.value;
+        if (!lang) { return; }
+        http.post(`/api/subtitle/${this.props.eid}`, { value: lang });
+    }
+}

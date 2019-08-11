@@ -7,15 +7,10 @@ open System.Text.RegularExpressions
 let cueIdRegex      = new Regex (@"^\d+$", RegexOptions.Compiled)
 let timeStringRegex = new Regex (@"(\d\d:\d\d:\d\d(?:[,.]\d\d\d)?) --> (\d\d:\d\d:\d\d(?:[,.]\d\d\d)?)", RegexOptions.Compiled)
 
-let readLines (filePath:string) = seq {
-    use sr = new StreamReader (filePath, System.Text.Encoding.UTF8)
-    while not sr.EndOfStream do
-        yield sr.ReadLine ()
-}
-    
-
 let srt2vtt (srtFile:string) (outputFile:string) (offsetMs:float) =
     use vttWriter = new StreamWriter(outputFile)
+    vttWriter.WriteLine "WEBVTT"
+    vttWriter.WriteLine ()
     File.ReadLines srtFile |> Seq.iter (fun line ->
         if cueIdRegex.IsMatch(line) |> not then
             let m = timeStringRegex.Match line;

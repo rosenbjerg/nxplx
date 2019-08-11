@@ -33,6 +33,18 @@ body::-webkit-scrollbar-thumb {
 #app {
     height: 100%;
 }
+
+button.material-icons {
+    background: none;
+    transition: border-color 150ms;
+    border: 2px solid #585858;
+    border-radius: 8px;
+    cursor: pointer;
+}
+button.material-icons:hover {
+    border-color: #1565c0;
+    outline: none;
+}
 .vjs-tech {
     position: unset !important;
 }
@@ -57,5 +69,13 @@ body::-webkit-scrollbar-thumb {
     width: 2em !important;
     border-radius: 1em !important;
 }
+.vjs-poster {
+    background-position: center !important;
+    background-size: cover !important;
+}
 .video-js .vjs-paused {
+}
+
+.video-js .vjs-captions {
+    font-family: "Lato", "Helvetica Neue", arial, sans-serif;
 }

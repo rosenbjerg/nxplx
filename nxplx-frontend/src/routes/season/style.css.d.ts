@@ -7,3 +7,4 @@ export const marked: string;
 export const episode: string;
 export const play: string;
 export const playPosterContainer: string;
+export const number: string;

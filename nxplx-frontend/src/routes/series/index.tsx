@@ -1,10 +1,13 @@
 import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-import { Link, route } from "preact-router";
+// @ts-ignore
+import Helmet from 'preact-helmet';
+import { Link } from "preact-router";
 import { formatInfoPair, formatRunTime } from '../../commonFilmInfo';
-import { SeriesDetails } from "../../Details";
-import { Get } from '../../Fetcher';
+import Loading from '../../components/loading';
+import {SeriesDetails} from "../../Details";
+import http from '../../Http';
 import { SeasonInfo, SeriesInfo } from "../../Info";
 import * as style from './style.css';
 
@@ -17,13 +20,13 @@ export default class Series extends Component<Props, State> {
         console.log("Series opened");
         Promise.all(
             [
-                Get(`/api/series/${this.props.id}`).then(response => response.json()),
-                Get(`/api/series/${this.props.id}/details`).then(response => response.json())
+                http.get(`/api/series/${this.props.id}`).then(response => response.json()),
+                http.get(`/api/series/${this.props.id}/details`).then(response => response.json())
             ])
             .then(results => {
                 const info:SeriesInfo = results[0];
                 const details:SeriesDetails = results[1];
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("/api/posters/original-${details.backdrop_path.replace('/', '')}");`;
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${`/api/posters/${info.backdrop}-w1280.jpg`}");`;
                 this.setState({ details, info, bg });
             });
     }
@@ -31,14 +34,15 @@ export default class Series extends Component<Props, State> {
 
     public render(props:Props, { details, info, bg }:State) {
         if (!details) {
-            return (<div>Loading...</div>);
+            return (<Loading/>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop_path}>
+                <Helmet title={`${details.name} - NxPlx`} />
                 <div>
-                    <h2 className={[style.title, style.marked].join(" ")}>{details.name}</h2>
+                    <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                 </div>
-                <img className={style.poster} src={'/api/posters/w500-' + details.poster_path.replace('/', '')}
+                <img class={style.poster} src={`/api/posters/${info.poster}-w342.jpg`}
                      alt=""/>
                 <span class={[style.info, style.marked].join(" ")}>
                     <div>
@@ -61,9 +65,13 @@ export default class Series extends Component<Props, State> {
                 <div>
                     {orderBy(info.seasons, ['number'], ['asc'])
                         .map((season:SeasonInfo) => (
+                            <span class={style.seasonContainer}>
                                 <Link href={`/series/${info.id}/${season.number}`}>
-                                    <img tabIndex={1} key={season.number} className={style.season} src={'/api/posters/w185-' + season.poster.replace('/', '')} title={`Season ${season.number}`} alt={season.number.toString()} />
+                                    <img tabIndex={1} key={season.number} class={style.season} src={`/api/posters/${season.poster}-w154.jpg`} title={`Season ${season.number}`} alt={season.number.toString()} />
                                 </Link>
+                                <b class={style.number}>S{season.number}</b>
+                            </span>
+
                             )
                         )}
                 </div>

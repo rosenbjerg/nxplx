@@ -1,17 +1,18 @@
-import linkState from 'linkstate';
 import { Component, h } from 'preact';
+// @ts-ignore
+import Helmet from 'preact-helmet';
 import {Link} from "preact-router";
-import {Store} from 'unistore';
 import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
+import Loading from '../../components/loading';
 import Subtitles from '../../components/Subtitles';
-import { FilmDetails } from "../../Details";
-import { Get } from '../../Fetcher';
+import {FilmDetails} from "../../Details";
+import http from '../../Http';
 import { FilmInfo } from "../../Info";
 import * as style from './style.css';
 
-interface Props { id:string, store:Store<NxPlxStore> }
+interface Props { id:string }
 
-interface State { details:FilmDetails, info:FilmInfo, bg:string; subtitle:string }
+interface State { details?:FilmDetails, info?:FilmInfo, bg:string; subtitle:string }
 
 export default class Home extends Component<Props, State> {
 
@@ -21,26 +22,26 @@ export default class Home extends Component<Props, State> {
     };
 
     public componentDidMount() : void {
-        console.log("Season opened");
         Promise.all(
             [
-                Get(`/api/film/${this.props.id}`).then(response => response.json()),
-                Get(`/api/film/${this.props.id}/details`).then(response => response.json())
+                http.get(`/api/film/${this.props.id}`).then(response => response.json()),
+                http.get(`/api/film/${this.props.id}/details`).then(response => response.json())
             ])
             .then(results => {
                 const info:FilmInfo = results[0];
                 const details:FilmDetails = results[1];
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("/api/posters/original-${details.backdrop_path.replace('/', '')}");`;
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${`/api/posters/${info.backdrop}-w1280.jpg`}");`;
                 this.setState({ details, info, bg });
             });
     }
 
     public render(props:Props, { info, details, bg, subtitle }:State) {
-        if (!details) {
-            return (<div>Loading...</div>);
+        if (!details || !info) {
+            return (<Loading />);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop_path}>
+                <Helmet title={`${details.title} - NxPlx`} />
                 <div>
                     <h2 className={[style.title, style.marked].join(" ")}>{details.title}</h2>
                 </div>
@@ -50,8 +51,8 @@ export default class Home extends Component<Props, State> {
                     </div>
                 )}
                 <span class={style.playPosterContainer}>
-                    <img class={style.poster} src={'/api/posters/w500-' + details.poster_path.replace('/', '')} alt=""/>
-                    <Link class={style.play} href={`/watch/film/${info.eid}`} >
+                    <img class={style.poster} src={`/api/posters/${info.poster}-w342.jpg`} alt=""/>
+                    <Link class={style.play} href={`/watch/film/${info.id}`} >
                         <i class="material-icons">play_arrow</i>
                     </Link>
                 </span>
@@ -66,7 +67,7 @@ export default class Home extends Component<Props, State> {
                                 {title: 'Original languages', value: details.spoken_languages.map(sl => `${sl.name} (${sl.iso_639_1})`).join(", ")},
                                 {title: 'Production companies', value: details.production_companies.map(pc => pc.name).join(", ")},
                                 {title: 'Production countries', value: details.production_countries.map(pc => pc.name).join(", ")},
-                                {title: 'Subtitles', value: (<Subtitles id={info.id} languages={info.subtitles} />)}
+                                {title: 'Subtitles', value: info.subtitles.length > 0 && (<Subtitles eid={info.eid} languages={info.subtitles} />) || "None"}
                             ].map(formatInfoPair)
                         }
                     </div>
