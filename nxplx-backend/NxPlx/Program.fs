@@ -1,19 +1,8 @@
 ﻿module NxPlx.Server
 
 open NxPlx
-open NxPlx.Indexing
 open Red
-open Red.Extensions
-open System
-open System.Globalization
 open System.Net
-open System.Threading.Tasks
-
-let handlerMapper = Array.map (fun e -> new Func<Request, Response, Task<HandlerType>>(e))
-
-type Red.RedHttpServer with
-    member __.get (route:string) ([<ParamArray>] handlers:(Request -> Response -> Task<HandlerType>) array) =
-        __.Get(route, handlerMapper handlers)
     
 [<EntryPoint>]
 let main argv =
@@ -21,7 +10,7 @@ let main argv =
 //    System.Globalization.CultureInfo.DefaultThreadCurrentCulture <- CultureInfo.InvariantCulture
 //    System.Threading.Thread.CurrentThread.CurrentCulture <- CultureInfo.InvariantCulture
     
-    let indexer = new NxPlx.Indexing.Indexer "C:\\Users\\Malte\\Documents\\Kode\\boxconverter\\test\\test"
+    let indexer = new NxPlx.Indexing.Indexer "C:\\NxPlx test data"
     
     printfn "Indexing..."    
     indexer.index

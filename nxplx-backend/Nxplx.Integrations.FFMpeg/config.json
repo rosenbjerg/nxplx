@@ -1,0 +1,5 @@
+{
+  "FFMpegPath": "C:\\NoInstall\\ffmpeg-4.2-win64-static\\bin\\ffmpeg.exe",
+  "FFProbePath": "C:\\NoInstall\\ffmpeg-4.2-win64-static\\bin\\ffprobe.exe",
+  "ConcurrentWorkers": 2
+}

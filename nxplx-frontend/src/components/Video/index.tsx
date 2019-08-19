@@ -10,6 +10,7 @@ export default class Video extends Component {
     public componentDidMount() {
         // instantiate Video.js
         const {children, ...props} = this.props;
+        // @ts-ignore
         this.player = videojs(this.videoNode, props, () => {
             console.log('onPlayerReady', this)
         });

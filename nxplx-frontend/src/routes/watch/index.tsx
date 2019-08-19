@@ -1,4 +1,4 @@
-import { createSnackbar, Snackbar } from '@egoist/snackbar'
+import { createSnackbar, Snackbar, SnackOptions, Action } from '@egoist/snackbar'
 import '@egoist/snackbar/dist/snackbar.css'
 import { Component, h } from "preact";
 // @ts-ignore
@@ -83,7 +83,7 @@ export default class Watch extends Component<Props, State> {
 
         const tracks = this.video.textTracks();
         let subtitleLang = 'none';
-        for (let i = 0; i < tracks.length; i++) {
+         for (let i = 0; i < tracks.length; i++) {
             if (tracks[i].mode === 'showing') {
                 subtitleLang = tracks[i].language;
             }
@@ -111,12 +111,12 @@ export default class Watch extends Component<Props, State> {
                     createSnackbar(`Continuing from ${formatProgress(progress)}`, { timeout: 10000, actions: [
                             {
                                 text: 'RESTART',
-                                callback: (snackbar:Snackbar) => {
+                                callback: (_, snackbar:Snackbar) => {
                                     video.currentTime(0.0);
                                     snackbar.destroy()
                                 }
                             }
-                        ] });
+                        ]});
                 }
                 video.play();
             });

@@ -2,12 +2,14 @@ import { resolve } from "path";
 
 export default function(config, env, helpers) {
     config.output.publicPath = "/";
-    config.devServer.proxy = [
-        {
-            path: "/api/**",
-            target: "http://localhost:5990"
-        }
-    ];
+    if (config.devServer !== undefined) {
+        config.devServer.proxy = [
+            {
+                path: "/api/**",
+                target: "http://localhost:5990"
+            }
+        ];
+    }
     // Switch css-loader for typings-for-css-modules-loader, which is a wrapper
     // that automatically generates .d.ts files for loaded CSS
     helpers.getLoadersByName(config, "css-loader").forEach(({ loader }) => {

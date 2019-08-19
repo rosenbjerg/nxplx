@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>NxPlx.Jobs.Server</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Hangfire.AspNetCore" Version="1.7.6" />
+      <PackageReference Include="Hangfire.Core" Version="1.7.6" />
+      <PackageReference Include="Hangfire.PostgreSql" Version="1.6.0" />
+      <PackageReference Include="NLog" Version="4.6.6" />
+      <PackageReference Include="RHttpServer" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
+    </ItemGroup>
+
+</Project>

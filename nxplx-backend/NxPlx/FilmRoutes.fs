@@ -21,4 +21,4 @@ let register (router:IRouter) (indexer:Indexer) =
     router.Get("/:eid/watch", fun (req:Request) (res:Response) ->
         let eid = req.Context.ExtractUrlParameter "eid" |> Int32.Parse
         let film = Map.find eid indexer.filmEntries
-        res.SendFile (film.path, "video/mp4", true, 1 * 1024 * 1024))
+        res.SendFile (film.path, "video/mp4", true))

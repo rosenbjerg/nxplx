@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Red.CookieSessions" Version="3.1.0" />
+      <PackageReference Include="RHttpServer" Version="4.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Services.Caching\NxPlx.Services.Caching.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Database\NxPlx.Services.Database.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
+    </ItemGroup>
+
+</Project>
