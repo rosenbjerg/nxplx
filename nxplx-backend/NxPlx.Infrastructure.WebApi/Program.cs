@@ -1,13 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Caching.Distributed;
+using NxPlx.Abstractions;
 using NxPlx.Configuration;
+using NxPlx.Infrastructure.IoC;
+using NxPlx.Infrastructure.Logging;
+using NxPlx.Integrations.TMDBApi;
 using NxPlx.Models;
 using NxPlx.Models.File;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
 using NxPlx.Services.Index;
+using NxPlx.WebApi.Routers;
 using Red;
 
 namespace NxPlx.WebApi
@@ -16,27 +27,37 @@ namespace NxPlx.WebApi
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
-
             var indexer = new Indexer();
-//            await indexer.IndexFolder("\\\\raspberrypi.local\\data\\NxPlx test data");
-            await indexer.IndexFolder("\\\\raspberrypi.local\\data\\Media");
-            
-            
             var cfg = ConfigurationService.Current;
+
+            {
+                var registration = new RegistrationContainer();
+                registration.Register<ICachingService, RedisCachingService>();
+                registration.Register<IDetailsMapper, TMDbMapper>();
+                registration.Register<ILogger, NLogger>();
+            }
+            
+            var container = new ResolveContainer();
+            var tmdb = new TmdbApi(cfg.TMDbApiKey);
+            await indexer.IndexMovieLibrary(tmdb);
+            await indexer.IndexSeriesLibrary(tmdb);
+
+           
             var server = new RedHttpServer(cfg.HttpPort);
             
             server.RespondWithExceptionDetails = true;
             
             var databaseContextManager = new DatabaseContextManager();
+
             
-            server.Plugins.Register<ICachingService, RedisCachingService>(new RedisCachingService());
             
             server.ConfigureServices = services =>
             {
                 databaseContextManager.Register(services);
             };
             databaseContextManager.Initialize();
+            
+            EpisodeRoutes.Register(server.CreateRouter("/series"));
             
             server.Get("/insert", async (req, res) =>
             {
@@ -69,8 +90,11 @@ namespace NxPlx.WebApi
                 }
             });
 
-            Console.WriteLine("NxPlx.WebApi starting...");
+            Console.WriteLine("NxPlx.Infrastructure.WebApi starting...");
             await server.RunAsync();
         }
+        
+        
     }
+    
 }
