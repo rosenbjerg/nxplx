@@ -1,4 +1,4 @@
-namespace NxPlx.Infrastructure.Logging
+namespace NxPlx.Abstractions
 {
     public interface ILogger
     {
