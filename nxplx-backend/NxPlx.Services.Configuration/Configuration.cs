@@ -5,8 +5,10 @@ namespace NxPlx.Configuration
     public class Configuration
     {
         public int HttpPort { get; set; }
-        
         public int JobServerPort { get; set; }
+
+        public string ImagesFolder { get; set; }
+        public string LogFolder { get; set; }
         
         public string SqlHost { get; set; }
         public string SqlMediaDatabase { get; set; }
@@ -18,6 +20,9 @@ namespace NxPlx.Configuration
         public string RedisInstance { get; set; }
         public string RedisPassword { get; set; }
         
+        
         public string ProbeToken { get; set; }
+        
+        public string TMDbApiKey { get; set; }
     }
 }
