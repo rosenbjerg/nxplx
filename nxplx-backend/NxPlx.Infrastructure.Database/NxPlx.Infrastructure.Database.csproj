@@ -10,6 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
     </ItemGroup>

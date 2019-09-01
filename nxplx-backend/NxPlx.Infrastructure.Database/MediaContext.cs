@@ -2,10 +2,14 @@ using System.IO;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
 using NxPlx.Models;
+using NxPlx.Models.Database;
+using NxPlx.Models.Database.Film;
+using NxPlx.Models.Database.Series;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
+using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
+using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 
 namespace NxPlx.Services.Database
 {
