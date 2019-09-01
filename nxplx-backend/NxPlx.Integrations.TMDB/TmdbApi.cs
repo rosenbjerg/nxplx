@@ -4,18 +4,27 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NxPlx.Models.TMDbApi.Movie;
-using NxPlx.Models.TMDbApi.Search;
-using NxPlx.Models.TMDbApi.Tv;
-using NxPlx.Models.TMDbApi.TvSeason;
+using NxPlx.Abstractions;
+using NxPlx.Infrastructure.IoC;
+using NxPlx.Integrations.TMDBApi.Models.Movie;
+using NxPlx.Integrations.TMDBApi.Models.Search;
+using NxPlx.Integrations.TMDBApi.Models.Tv;
+using NxPlx.Integrations.TMDBApi.Models.TvSeason;
 using NxPlx.Services.Caching;
 
 namespace NxPlx.Integrations.TMDBApi
 {
+
+    public interface IDetailsApi
+    {
+        
+    }
+    
     public class TmdbApi
     {
         private const string ImageFolder = "images";
+
+        private const string BaseUrl = "https://api.themoviedb.org/3";
         
         private string _key;
         private ICachingService _cachingService;
@@ -28,36 +37,38 @@ namespace NxPlx.Integrations.TMDBApi
         };
 
 
-        public TmdbApi(string apiKey, ICachingService cachingService)
+        public TmdbApi(string apiKey)
         {
             _key = apiKey;
-            _cachingService = cachingService;
+            
+            var container = new ResolveContainer();
+            _cachingService = container.Resolve<ICachingService>();
             Directory.CreateDirectory(Path.Combine("data", ImageFolder));
         }
         
 
-        public async Task<SearchResult<MovieResult>> SearchMovies(string title, int year = 0)
+        public async Task<SearchResult<MovieResult>> SearchMovies(string title, int year)
         {
             var encodedTitle = HttpUtility.UrlEncode(title);
             var encodedYear = year == 0 ? "" : $"&year={year}";
-            var url = $"https://api.themoviedb.org/3/search/movie?api_key={_key}&query={encodedTitle}{encodedYear}";
+            var url = $"{BaseUrl}/search/movie?api_key={_key}&query={encodedTitle}{encodedYear}";
 
             var content = await Fetch(url);
             return JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
         }
         
-        public async Task<SearchResult<TVShowResult>> SearchTvShows(string name)
+        public async Task<SearchResult<TvShowResult>> SearchTvShows(string name)
         {
             var encodedTitle = HttpUtility.UrlEncode(name);
-            var url = $"https://api.themoviedb.org/3/search/tv?api_key={_key}&query={encodedTitle}";
+            var url = $"{BaseUrl}/search/tv?api_key={_key}&query={encodedTitle}";
 
             var content = await Fetch(url);
-            return JsonConvert.DeserializeObject<SearchResult<TVShowResult>>(content);
+            return JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
         }
 
         public async Task<MovieDetails> FetchMovieDetails(int id)
         {
-            var url = $"https://api.themoviedb.org/3/movie/{id}?api_key={_key}";
+            var url = $"{BaseUrl}/movie/{id}?api_key={_key}";
             
             var content = await Fetch(url);
             return JsonConvert.DeserializeObject<MovieDetails>(content);
@@ -65,7 +76,7 @@ namespace NxPlx.Integrations.TMDBApi
         
         public async Task<TvDetails> FetchTvDetails(int id)
         {
-            var url = $"https://api.themoviedb.org/3/tv/{id}?api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}?api_key={_key}";
             
             var content = await Fetch(url);
             return JsonConvert.DeserializeObject<TvDetails>(content);
@@ -73,30 +84,38 @@ namespace NxPlx.Integrations.TMDBApi
         
         public async Task<TvSeasonDetails> FetchTvSeasonDetails(int id, int season)
         {
-            var url = $"https://api.themoviedb.org/3/tv/{id}/season/{season}?api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}/season/{season}?api_key={_key}";
 
             var content = await Fetch(url);
             return JsonConvert.DeserializeObject<TvSeasonDetails>(content);
         }
         
-        public async Task<string> DownloadImage(string size, string imageUrl)
+        public async Task DownloadImage(string size, string imageUrl)
         {
-            var imageName = Path.GetFileNameWithoutExtension(imageUrl);
-            var outputPath = Path.Combine(Path.Combine("data", ImageFolder, $"{imageName}.{size}.jpg"));
+            if (string.IsNullOrEmpty(imageUrl)) return;
+            
+            var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
+            var outputPath = Path.Combine(Path.Combine("data", ImageFolder, $"{imageName}-{size}.jpg"));
 
-            if (File.Exists(outputPath))
+            if (!File.Exists(outputPath))
             {
-                return outputPath;
+                var response = await _client.GetAsync($"https://image.tmdb.org/t/p/{size}{imageUrl}?api_key={_key}");
+                using (var imageStream = await response.Content.ReadAsStreamAsync())
+                {
+                    try
+                    {
+                        using (var outputStream = File.OpenWrite(outputPath))
+                        {
+                         await imageStream.CopyToAsync(outputStream);
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        
+                    }
+                }
+                
             }
-            
-            var response = await _client.GetAsync($"http://image.tmdb.org/t/p/{size}{imageUrl}?api_key={_key}");
-            using (var imageStream = await response.Content.ReadAsStreamAsync())
-            using (var outputStream = File.OpenWrite(outputPath))
-            {
-                await imageStream.CopyToAsync(outputStream);
-            }
-            
-            return outputPath;
         }
         
         private async Task<string> Fetch(string url)
