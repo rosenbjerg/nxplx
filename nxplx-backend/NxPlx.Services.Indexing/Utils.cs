@@ -20,37 +20,35 @@ namespace NxPlx.Services.Index
         private static readonly Regex CueIdRegex = new Regex(@"^\d+$", RegexOptions.Compiled);
         private static readonly Regex TimeStringRegex = new Regex(@"(\d\d:\d\d:\d\d(?:[,.]\d\d\d)?) --> (\d\d:\d\d:\d\d(?:[,.]\d\d\d)?)", RegexOptions.Compiled);
         
-        public static async Task Srt2Vtt(string srtFile, string outputFile, float offsetMs = 0)
+        public static void Srt2Vtt(string srtFile, string outputFile, float offsetMs = 0)
         {
-            using (var vttWriter = new StreamWriter(outputFile))
+            using var vttWriter = new StreamWriter(outputFile);
+            vttWriter.WriteLine("WEBVTT");
+            vttWriter.WriteLine();
+
+            foreach (var line in File.ReadLines(srtFile))
             {
-                await vttWriter.WriteLineAsync("WEBVTT");
-                await vttWriter.WriteLineAsync();
-
-                foreach (var line in File.ReadLines(srtFile))
+                if (!CueIdRegex.IsMatch(line))
                 {
-                    if (!CueIdRegex.IsMatch(line))
+                    var match = TimeStringRegex.Match(line);
+                    if (match.Success)
                     {
-                        var match = TimeStringRegex.Match(line);
-                        if (match.Success)
-                        {
-                            var startTime = TimeSpan.Parse(match.Groups[1].Value.Replace(',', '.'));
-                            var endTime =   TimeSpan.Parse(match.Groups[2].Value.Replace(',', '.'));
+                        var startTime = TimeSpan.Parse(match.Groups[1].Value.Replace(',', '.'));
+                        var endTime =   TimeSpan.Parse(match.Groups[2].Value.Replace(',', '.'));
 
-                            if (offsetMs != 0)
-                            {
-                                var startTimeMs = startTime.TotalMilliseconds + offsetMs;
-                                var endTimeMs =   endTime.TotalMilliseconds + offsetMs;
-                                startTime = TimeSpan.FromMilliseconds(startTimeMs < 0.0 ? 0.0 : startTimeMs);
-                                endTime = TimeSpan.FromMilliseconds(endTimeMs < 0.0 ? 0.0 : endTimeMs);
-                            }
-                            
-                            await vttWriter.WriteLineAsync($"{startTime:hh\\:mm\\:ss\\.fff} --> {endTime:hh\\:mm\\:ss\\.fff}");
-                        }
-                        else
+                        if (offsetMs != 0)
                         {
-                            await vttWriter.WriteLineAsync(line);
+                            var startTimeMs = startTime.TotalMilliseconds + offsetMs;
+                            var endTimeMs =   endTime.TotalMilliseconds + offsetMs;
+                            startTime = TimeSpan.FromMilliseconds(startTimeMs < 0.0 ? 0.0 : startTimeMs);
+                            endTime = TimeSpan.FromMilliseconds(endTimeMs < 0.0 ? 0.0 : endTimeMs);
                         }
+                            
+                        vttWriter.WriteLine($"{startTime:hh\\:mm\\:ss\\.fff} --> {endTime:hh\\:mm\\:ss\\.fff}");
+                    }
+                    else
+                    {
+                        vttWriter.WriteLine(line);
                     }
                 }
             }

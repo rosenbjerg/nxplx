@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
+      <ProjectReference Include="..\NxPlx.Integrations.TMDB\NxPlx.Integrations.TMDB.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Services.Database\NxPlx.Services.Database.csproj" />
     </ItemGroup>
 
 </Project>
