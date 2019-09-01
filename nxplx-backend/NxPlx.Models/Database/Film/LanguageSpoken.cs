@@ -1,4 +1,6 @@
-namespace NxPlx.Models.Details.Film
+using NxPlx.Models.Details.Film;
+
+namespace NxPlx.Models.Database.Film
 {
     public class LanguageSpoken
     {

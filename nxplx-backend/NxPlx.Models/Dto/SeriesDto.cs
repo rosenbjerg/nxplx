@@ -3,6 +3,7 @@ using System.Linq;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
+using SeriesDetails = NxPlx.Models.Database.Series.SeriesDetails;
 
 namespace NxPlx.Models.Dto
 {

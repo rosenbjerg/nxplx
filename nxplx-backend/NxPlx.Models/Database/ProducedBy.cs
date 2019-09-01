@@ -1,4 +1,6 @@
-namespace NxPlx.Models.Details
+using NxPlx.Models.Details;
+
+namespace NxPlx.Models.Database
 {
     public class ProducedBy
     {

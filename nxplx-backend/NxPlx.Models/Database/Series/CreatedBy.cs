@@ -1,4 +1,6 @@
-namespace NxPlx.Models.Details.Series
+using NxPlx.Models.Details.Series;
+
+namespace NxPlx.Models.Database.Series
 {
     public class CreatedBy
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
+using FilmDetails = NxPlx.Models.Database.Film.FilmDetails;
 
 namespace NxPlx.Models.Dto
 {
