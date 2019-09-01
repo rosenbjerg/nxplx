@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <RootNamespace>NxPlx.Services.Database</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
+    </ItemGroup>
+
+</Project>
