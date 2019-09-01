@@ -51,7 +51,7 @@ namespace NxPlx.Services.Index
         private Regex _filmRegex = new Regex("^(?<title>.+?)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
         private Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
         
-        public List<EpisodeFile> IndexEpisodes(HashSet<string> existing, params string[] folders)
+        public List<EpisodeFile> IndexEpisodes(HashSet<string> existing, IEnumerable<string> folders)
         {
             return folders.SelectMany(folder =>
                 {
@@ -88,7 +88,7 @@ namespace NxPlx.Services.Index
                 }).ToList();
         }
         
-        public List<FilmFile> IndexFilm(HashSet<string> existing, params string[] folders)
+        public List<FilmFile> IndexFilm(HashSet<string> existing, IEnumerable<string> folders)
         {
             return folders.SelectMany(folder =>
                 {

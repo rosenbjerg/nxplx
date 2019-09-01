@@ -27,20 +27,22 @@ namespace NxPlx.WebApi
     {
         static async Task Main(string[] args)
         {
-            var indexer = new Indexer();
             var cfg = ConfigurationService.Current;
 
             {
                 var registration = new RegistrationContainer();
                 registration.Register<ICachingService, RedisCachingService>();
-                registration.Register<IDetailsMapper, TMDbMapper>();
                 registration.Register<ILogger, NLogger>();
+                registration.Register<IDetailsMapper, TMDbMapper>();
+                registration.Register<IDetailsApi, TmdbApi>();
+                registration.Register<Indexer>();
             }
             
             var container = new ResolveContainer();
-            var tmdb = new TmdbApi(cfg.TMDbApiKey);
-            await indexer.IndexMovieLibrary(tmdb);
-            await indexer.IndexSeriesLibrary(tmdb);
+            var indexer = container.Resolve<Indexer>();
+            
+            await indexer.IndexMovieLibrary();
+            await indexer.IndexSeriesLibrary();
 
            
             var server = new RedHttpServer(cfg.HttpPort);

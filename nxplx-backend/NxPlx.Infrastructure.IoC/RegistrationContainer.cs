@@ -23,12 +23,12 @@ namespace NxPlx.Infrastructure.IoC
             ContainerManager.DefaultBuilder.Value.RegisterType<TInstance>().As<TInterface>().SingleInstance();
         }
         
-//        public void Register<TInterface>()
-//        {
-//            if (ContainerManager.Default.IsValueCreated) 
-//                throw new InvalidOperationException("Registration must take place before calls to resolve");
-//
-//            ContainerManager.DefaultBuilder.Value.RegisterType<TInterface>();
-//        }
+        public void Register<TInstance>()
+        {
+            if (ContainerManager.Default.IsValueCreated) 
+                throw new InvalidOperationException("Registration must take place before calls to resolve");
+
+            ContainerManager.DefaultBuilder.Value.RegisterType<TInstance>().SingleInstance();
+        }
     }
 }

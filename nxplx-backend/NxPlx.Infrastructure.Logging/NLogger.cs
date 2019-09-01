@@ -3,6 +3,7 @@ using System.IO;
 using NLog;
 using NLog.Targets;
 using NxPlx.Configuration;
+using ILogger = NxPlx.Abstractions.ILogger;
 
 namespace NxPlx.Infrastructure.Logging
 {

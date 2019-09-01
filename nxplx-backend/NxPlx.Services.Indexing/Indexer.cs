@@ -27,9 +27,23 @@ namespace NxPlx.Services.Index
 {
     public class Indexer
     {
-        public async Task IndexMovieLibrary(TmdbApi tmdb)
+        private IDetailsApi _detailsApi;
+        private ILogger _logger;
+
+        public Indexer(IDetailsApi detailsApi, ILogger logger)
         {
-            
+            _detailsApi = detailsApi;
+            _logger = logger;
+        }
+        
+        public async Task IndexMovieLibrary(IEnumerable<string> folders)
+        {
+            folders = new[]
+            {
+                "\\\\raspberrypi.local\\data\\Media\\Film",
+                "\\\\raspberrypi.local\\data\\Media\\Disney",
+                "\\\\raspberrypi.local\\data\\Media\\Danske film"
+            };
             
             var fileIndexer = new FileIndexer();
             using var ctx = new MediaContext();
@@ -38,8 +52,7 @@ namespace NxPlx.Services.Index
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching current film");
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
             Console.WriteLine(DateTime.UtcNow + ": " + "Indexing film");
-            var newFilm = fileIndexer.IndexFilm(currentFilm, "\\\\raspberrypi.local\\data\\Media\\Film",
-                "\\\\raspberrypi.local\\data\\Media\\Disney", "\\\\raspberrypi.local\\data\\Media\\Danske film");
+            var newFilm = fileIndexer.IndexFilm(currentFilm, folders);
 
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
@@ -50,37 +63,35 @@ namespace NxPlx.Services.Index
                 
             foreach (var filmFile in newFilm)
             {
-                var searchResult = await tmdb.SearchMovies(filmFile.Title, filmFile.Year);
+                var searchResults = await _detailsApi.SearchMovies(filmFile.Title, filmFile.Year);
 
-                if (searchResult.results == null || !searchResult.results.Any())
+                if (!searchResults.Any())
                 {
-                    searchResult = await tmdb.SearchMovies(filmFile.Title, 0);
+                    searchResults = await _detailsApi.SearchMovies(filmFile.Title, 0);
                 }
 
-                var resultDetails = (searchResult.results != null && searchResult.results.Any())
-                    ? searchResult.results[0]
-                    : null;
+                var resultDetails = searchResults.Any() ? searchResults[0] : null;
 
                 if (resultDetails != null)
                 {
-                    var movieDetails = await tmdb.FetchMovieDetails(resultDetails.id);
+                    var movieDetails = await _detailsApi.FetchMovieDetails(resultDetails.Id);
                     filmFile.FilmDetails = mapper.Map<MovieDetails, FilmDetails>(movieDetails);
                     allDetails.Add(movieDetails);
 
                     imageDownloads.AddRange(new[]
                     {
-                        tmdb.DownloadImage("w154", movieDetails.poster_path),
-                        tmdb.DownloadImage("w342", movieDetails.poster_path),
-                        tmdb.DownloadImage("w1280", movieDetails.backdrop_path)
+                        _detailsApi.DownloadImage("w154", movieDetails.poster_path),
+                        _detailsApi.DownloadImage("w342", movieDetails.poster_path),
+                        _detailsApi.DownloadImage("w1280", movieDetails.backdrop_path)
                     });
 
                     if (movieDetails.belongs_to_collection != null)
                     {
                         imageDownloads.AddRange(new[]
                         {
-                            tmdb.DownloadImage("w154", movieDetails.belongs_to_collection.poster_path),
-                            tmdb.DownloadImage("w342", movieDetails.belongs_to_collection.poster_path),
-                            tmdb.DownloadImage("w1280", movieDetails.belongs_to_collection.backdrop_path)
+                            _detailsApi.DownloadImage("w154", movieDetails.BelongsToCollection.),
+                            _detailsApi.DownloadImage("w342", movieDetails.belongs_to_collection.poster_path),
+                            _detailsApi.DownloadImage("w1280", movieDetails.belongs_to_collection.backdrop_path)
                         });
                     }
                         
@@ -119,8 +130,13 @@ namespace NxPlx.Services.Index
             await ctx.SaveChangesAsync();
             Console.WriteLine(DateTime.UtcNow + ": " + "Saved film");
         }
-        public async Task IndexSeriesLibrary(TmdbApi tmdb)
+        public async Task IndexSeriesLibrary(IEnumerable<string> folders)
         {
+            folders = new[]
+            {
+                "\\\\raspberrypi.local\\data\\Media\\Serier"
+            };
+            
             var fileIndexer = new FileIndexer();
             using var ctx = new MediaContext();
             ctx.Database.EnsureCreated();
@@ -128,34 +144,32 @@ namespace NxPlx.Services.Index
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching current series");
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
             Console.WriteLine(DateTime.UtcNow + ": " + "Indexing series");
-            var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, "\\\\raspberrypi.local\\data\\Media\\Serier");
+            var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, folders);
 
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
                 
             var mapper = new TMDbMapper();
             var imageDownloads = new List<Task>(newEpisodes.Count * 3);
-            var allDetails = new List<TvDetails>();
+            var allDetails = new List<SeriesDetails>();
                 
             foreach (var episodeFile in newEpisodes)
             {
-                var searchResult = await tmdb.SearchTvShows(episodeFile.Name);
+                var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
 
-                var details = (searchResult.results != null && searchResult.results.Any())
-                    ? searchResult.results[0]
-                    : null;
-
+                var details = searchResults.Any() ? searchResults[0] : null;
+                
                 if (details != null)
                 {
-                    var tvDetails = await tmdb.FetchTvDetails(details.id);
-                    episodeFile.SeriesDetails = mapper.Map<TvDetails, SeriesDetails>(tvDetails);
+                    var tvDetails = await _detailsApi.FetchTvDetails(details.Id);
+                    episodeFile.SeriesDetailsId = tvDetails.Id;
                     allDetails.Add(tvDetails);
                         
                     imageDownloads.AddRange(new[]
                     {
-                        tmdb.DownloadImage("w154", details.poster_path),
-                        tmdb.DownloadImage("w342", details.poster_path),
-                        tmdb.DownloadImage("w1280", details.backdrop_path)
+                        _detailsApi.DownloadImage("w154", tvDetails.PosterPath),
+                        _detailsApi.DownloadImage("w342", tvDetails.PosterPath),
+                        _detailsApi.DownloadImage("w1280", tvDetails.PosterPath)
                     });
                 }
                 else
