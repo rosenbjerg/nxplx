@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using NxPlx.Abstractions;
 using NxPlx.Integrations.TMDBApi.Models.Movie;
+using NxPlx.Integrations.TMDBApi.Models.Search;
 using NxPlx.Integrations.TMDBApi.Models.Tv;
+using NxPlx.Models.Database;
+using NxPlx.Models.Database.Film;
+using NxPlx.Models.Database.Series;
 using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
+using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
-using CreatedBy = NxPlx.Models.Details.Series.CreatedBy;
+using CreatedBy = NxPlx.Models.Database.Series.CreatedBy;
+using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
 using MovieCollection = NxPlx.Models.Details.Film.MovieCollection;
 using Network = NxPlx.Models.Details.Series.Network;
 using ProductionCountry = NxPlx.Models.Details.Film.ProductionCountry;
+using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 using SpokenLanguage = NxPlx.Models.Details.Film.SpokenLanguage;
 
 namespace NxPlx.Integrations.TMDBApi
@@ -36,31 +42,10 @@ namespace NxPlx.Integrations.TMDBApi
                 VoteAverage = tvDetails.vote_average,
                 VoteCount = tvDetails.vote_count,
             
-                CreatedBy = tvDetails.created_by.Select(cb => new CreatedBy
-                {
-                    CreatorId = cb.id,
-                    SeriesDetailsId = tvDetails.Id
-                }).ToList(),
-                Genres = tvDetails.genres.Select(g => new InGenre
-                {
-                    GenreId = g.id,
-                    DetailsEntityId = tvDetails.Id
-                }).ToList(),
-                Networks = tvDetails.networks.Select(n => new BroadcastOn()
-                {
-                    NetworkId = n.id,
-                    SeriesDetailsId = tvDetails.Id
-                }).ToList(),
-                Seasons = tvDetails.seasons.Select(s => new Season
-                {
-                    SeasonDetailsId = s.id,
-                    SeriesDetailsId = tvDetails.Id
-                }).ToList(),
-                ProductionCompanies = tvDetails.production_companies.Select(pb => new ProducedBy()
-                {
-                    ProductionCompanyId = pb.id,
-                    DetailsEntityId = tvDetails.Id
-                }).ToList(),
+                CreatedBy = tvDetails.created_by.Select(Map<Models.Tv.CreatedBy, Creator>).ToList(),
+                Networks = tvDetails.networks.Select(Map<Models.Tv.Network, Network>).ToList(),
+                Seasons = tvDetails.seasons.Select(Map<TvDetailsSeason, SeasonDetails>).ToList(),
+                ProductionCompanies = tvDetails.production_companies.Select(Map<Models.ProductionCompany, ProductionCompany>).ToList(),
             });
             
             SetMapping<MovieDetails, FilmDetails>(movieDetails => new FilmDetails
@@ -83,32 +68,11 @@ namespace NxPlx.Integrations.TMDBApi
                 OriginalTitle = movieDetails.original_title,
                 ReleaseDate = movieDetails.release_date,
                 
-                
-                BelongsToCollection = movieDetails.belongs_to_collection == null ? null : new BelongsInCollection
-                {
-                    MovieCollectionId = movieDetails.Id,
-                    FilmDetailsId = movieDetails.belongs_to_collection.id
-                },
-                Genres = movieDetails?.genres?.Select(g => new InGenre
-                {
-                    GenreId = g.id,
-                    DetailsEntityId = movieDetails.Id
-                }).ToList(),
-                SpokenLanguages = movieDetails?.spoken_languages?.Select(ls => new LanguageSpoken
-                {
-                    SpokenLanguageId = ls.iso_6391,
-                    FilmDetailsId = movieDetails.Id
-                }).ToList(),
-                ProductionCountries = movieDetails?.production_countries?.Select(pi => new ProducedIn
-                {
-                    ProductionCountryId = pi.iso_3166_1,
-                    FilmDetailsId = movieDetails.Id
-                }).ToList(),
-                ProductionCompanies = movieDetails?.production_companies?.Select(pb => new ProducedBy()
-                {
-                    ProductionCompanyId = pb.id,
-                    DetailsEntityId = movieDetails.Id
-                }).ToList()
+                BelongsToCollection = Map<Models.Movie.MovieCollection, MovieCollection>(movieDetails.belongs_to_collection),
+                Genres = movieDetails?.genres?.Select(Map<Models.Genre, Genre>).ToList(),
+                SpokenLanguages = movieDetails?.spoken_languages?.Select(Map<Models.Movie.SpokenLanguage, SpokenLanguage>).ToList(),
+                ProductionCountries = movieDetails?.production_countries?.Select(Map<Models.Movie.ProductionCountry, ProductionCountry>).ToList(),
+                ProductionCompanies = movieDetails?.production_companies?.Select(Map<Models.ProductionCompany, ProductionCompany>).ToList(),
             });
             
             SetMapping<Models.Genre, Genre>(genre => new Genre
@@ -117,7 +81,7 @@ namespace NxPlx.Integrations.TMDBApi
                 Name = genre.name
             });
             
-            SetMapping<Models.ProductionCompany, Genre>(productionCompany => new Genre
+            SetMapping<Models.ProductionCompany, ProductionCompany>(productionCompany => new ProductionCompany
             {
                 Id = productionCompany.id,
                 Name = productionCompany.name
@@ -151,7 +115,7 @@ namespace NxPlx.Integrations.TMDBApi
                 Name = createdBy.name
             });
             
-            SetMapping<Models.Tv.TvDetailsSeason, SeasonDetails>(tvDetailsSeason => new SeasonDetails
+            SetMapping<TvDetailsSeason, SeasonDetails>(tvDetailsSeason => new SeasonDetails
             {
                 Id = tvDetailsSeason.id,
                 Name = tvDetailsSeason.name,
@@ -161,6 +125,37 @@ namespace NxPlx.Integrations.TMDBApi
                 SeasonNumber = tvDetailsSeason.season_number
             });
             
+            SetMapping<SearchResult<TvShowResult>, SeriesResult[]>(searchResult 
+                => searchResult.results.Select(Map<TvShowResult, SeriesResult>).ToArray());
+            
+            SetMapping<SearchResult<MovieResult>, FilmResult[]>(searchResult 
+                => searchResult.results.Select(Map<MovieResult, FilmResult>).ToArray());
+            
+            
+            SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
+            {
+                Id = tvShowResult.id,
+                Overview = tvShowResult.overview,
+                Popularity = tvShowResult.popularity,
+                GenreIds = tvShowResult.genre_ids,
+                OriginalLanguage = tvShowResult.original_language,
+                Name = tvShowResult.name,
+                OriginalName = tvShowResult.original_name,
+                OriginCountry = tvShowResult.origin_country,
+                FirstAirDate = tvShowResult.first_air_date
+            });
+            
+            SetMapping<MovieResult, FilmResult>(movieResult => new FilmResult
+            {
+                Id = movieResult.id,
+                Overview = movieResult.overview,
+                Popularity = movieResult.popularity,
+                Title = movieResult.title,
+                GenreIds = movieResult.genre_ids,
+                OriginalLanguage = movieResult.original_language,
+                OriginalTitle = movieResult.original_title,
+                ReleaseDate = movieResult.release_date
+            });
         }
         
 
