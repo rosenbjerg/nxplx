@@ -2,7 +2,7 @@ using System;
 
 namespace NxPlx.Models.File
 {
-    public class FFMpegProbeDetails : Entity
+    public class FFMpegProbeDetails : EntityBase
     {
         public string VideoCodec { get; set; }
         

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NxPlx.Models.Details.Series;
 
 namespace NxPlx.Models.File
 {
@@ -10,6 +11,9 @@ namespace NxPlx.Models.File
         public int SeasonNumber { get; set; }
         
         public int EpisodeNumber { get; set; }
+
+        public SeriesDetails SeriesDetails { get; set; }
+        public int SeriesDetailsId { get; set; }
 
         public override string ToString()
         {
