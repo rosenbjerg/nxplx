@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
+using NxPlx.Abstractions;
 
 namespace NxPlx.Services.Caching
 {
@@ -25,7 +26,7 @@ namespace NxPlx.Services.Caching
         {
             return _distributedCache.SetStringAsync(key, value, new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes((int)kind)
+                SlidingExpiration = TimeSpan.FromMinutes((int)kind)
             });
         }
 

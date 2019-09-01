@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.Extensions.Caching.Redis;
 using NxPlx.Configuration;
 using StackExchange.Redis;
@@ -12,6 +13,8 @@ namespace NxPlx.Services.Caching
             InstanceName = ConfigurationService.Current.RedisInstance,
             ConfigurationOptions = new ConfigurationOptions
             {
+                ClientName = "NxPlx Caching Service",
+                EndPoints = { ConfigurationService.Current.RedisConfiguration },
                 Password = ConfigurationService.Current.RedisPassword
             }
         }))
