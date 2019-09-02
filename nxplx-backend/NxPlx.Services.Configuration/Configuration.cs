@@ -7,7 +7,7 @@ namespace NxPlx.Configuration
         public int HttpPort { get; set; }
         public int JobServerPort { get; set; }
 
-        public string ImagesFolder { get; set; }
+        public string ImageFolder { get; set; }
         public string LogFolder { get; set; }
         
         public string SqlHost { get; set; }
