@@ -14,7 +14,7 @@ namespace NxPlx.WebApi.Routers
             router.Get("/:filename", async (req, res) =>
             {
                 var filename = req.Context.ExtractUrlParameter("filename");
-                var imagepath = Configuration.ConfigurationService.Current.ImagesFolder;
+                var imagepath = Configuration.ConfigurationService.Current.ImageFolder;
                 var fullpath = Path.Combine(imagepath, filename);
 
                 return await res.SendFile(fullpath, handleRanges: false);

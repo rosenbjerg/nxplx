@@ -33,6 +33,7 @@ namespace NxPlx.WebApi
                 var registration = new RegistrationContainer();
                 registration.Register<ICachingService, RedisCachingService>();
                 registration.Register<ILogger, NLogger>();
+                registration.Register<IDatabaseMapper, DatabaseMapper>();
                 registration.Register<IDetailsMapper, TMDbMapper>();
                 registration.Register<IDetailsApi, TmdbApi>();
                 registration.Register<Indexer>();
@@ -41,8 +42,8 @@ namespace NxPlx.WebApi
             var container = new ResolveContainer();
             var indexer = container.Resolve<Indexer>();
             
-            await indexer.IndexMovieLibrary();
-            await indexer.IndexSeriesLibrary();
+            await indexer.IndexMovieLibrary(new []{""});
+            await indexer.IndexSeriesLibrary(new []{""});
 
            
             var server = new RedHttpServer(cfg.HttpPort);
