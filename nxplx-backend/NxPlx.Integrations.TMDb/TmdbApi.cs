@@ -31,7 +31,7 @@ namespace NxPlx.Integrations.TMDBApi
         {
             var cfg = ConfigurationService.Current;
             _key = cfg.TMDbApiKey;
-            _imageFolder = cfg.ImagesFolder;
+            _imageFolder = cfg.ImageFolder;
             Directory.CreateDirectory(_imageFolder);
         }
         

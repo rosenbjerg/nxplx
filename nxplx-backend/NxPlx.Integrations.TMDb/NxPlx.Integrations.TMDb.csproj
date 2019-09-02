@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp2.2</TargetFramework>
         <RootNamespace>NxPlx.Integrations.TMDBApi</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
