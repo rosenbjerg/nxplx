@@ -19,6 +19,7 @@ namespace NxPlx.Infrastructure.Logging
             
             var logfile = new FileTarget("logfile")
             {
+                FileName = Path.Combine(cfg.LogFolder, "archives/log.{#####}.txt"),
                 ArchiveFileName = Path.Combine(cfg.LogFolder, "archives/log.{#####}.txt"),
                 ArchiveAboveSize = 5000000,
                 ArchiveEvery = FileArchivePeriod.Day,
