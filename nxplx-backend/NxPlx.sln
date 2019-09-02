@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nxplx.Integrations.FFMpeg",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing", "NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj", "{E056F05E-69B2-4B52-BCFD-074AC70B589D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDB", "NxPlx.Integrations.TMDB\NxPlx.Integrations.TMDB.csproj", "{F6A1398C-72E9-42DB-B2A4-2CCF1002C9EF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDb", "NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj", "{F6A1398C-72E9-42DB-B2A4-2CCF1002C9EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Configuration", "NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj", "{CCD7AD3B-D96E-4CC7-9848-F76271FBFF20}"
 EndProject

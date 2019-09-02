@@ -6,18 +6,12 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
-using NxPlx.Integrations.TMDBApi;
-using NxPlx.Integrations.TMDBApi.Models.Movie;
-using NxPlx.Integrations.TMDBApi.Models.Tv;
-using NxPlx.Integrations.TMDBApi.Models.TvSeason;
 using NxPlx.Models;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
-using CreatedBy = NxPlx.Integrations.TMDBApi.Models.Tv.CreatedBy;
-using Genre = NxPlx.Integrations.TMDBApi.Models.Genre;
 using MovieCollection = NxPlx.Models.Details.Film.MovieCollection;
 using Network = NxPlx.Models.Details.Series.Network;
 using ProductionCountry = NxPlx.Models.Details.Film.ProductionCountry;
@@ -28,12 +22,36 @@ namespace NxPlx.Services.Index
     public class Indexer
     {
         private IDetailsApi _detailsApi;
+        private IDatabaseMapper _databaseMapper;
+        private IDetailsMapper _detailsMapper;
         private ILogger _logger;
 
-        public Indexer(IDetailsApi detailsApi, ILogger logger)
+        public Indexer(IDetailsApi detailsApi, IDetailsMapper detailsMapper, IDatabaseMapper databaseMapper, ILogger logger)
         {
             _detailsApi = detailsApi;
+            _detailsMapper = detailsMapper;
+            _databaseMapper = databaseMapper;
             _logger = logger;
+        }
+        private void AddDownloadTask(List<Task> tasks, DetailsEntityBase detailsEntityBase)
+        {      
+            tasks.AddRange(new[]
+            {
+                _detailsApi.DownloadImage("w154", detailsEntityBase.PosterPath),
+                _detailsApi.DownloadImage("w342", detailsEntityBase.PosterPath),
+                _detailsApi.DownloadImage("w1280", detailsEntityBase.PosterPath)
+            });
+            
+            
+            if (detailsEntityBase is FilmDetails filmDetails && filmDetails.BelongsToCollection != null)
+            {
+                tasks.AddRange(new[]
+                {
+                    _detailsApi.DownloadImage("w154", filmDetails.BelongsToCollection.PosterPath),
+                    _detailsApi.DownloadImage("w342", filmDetails.BelongsToCollection.PosterPath),
+                    _detailsApi.DownloadImage("w1280", filmDetails.BelongsToCollection.BackdropPath)
+                });
+            }
         }
         
         public async Task IndexMovieLibrary(IEnumerable<string> folders)
@@ -56,64 +74,36 @@ namespace NxPlx.Services.Index
 
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
-
-            var mapper = new TMDbMapper();
             var imageDownloads = new List<Task>(newFilm.Count * 6);
-            var allDetails = new List<MovieDetails>();
+            var allDetails = new List<FilmDetails>();
                 
             foreach (var filmFile in newFilm)
             {
                 var searchResults = await _detailsApi.SearchMovies(filmFile.Title, filmFile.Year);
-
-                if (!searchResults.Any())
-                {
+                if (searchResults == null || !searchResults.Any()) 
                     searchResults = await _detailsApi.SearchMovies(filmFile.Title, 0);
-                }
 
-                var resultDetails = searchResults.Any() ? searchResults[0] : null;
-
-                if (resultDetails != null)
-                {
-                    var movieDetails = await _detailsApi.FetchMovieDetails(resultDetails.Id);
-                    filmFile.FilmDetails = mapper.Map<MovieDetails, FilmDetails>(movieDetails);
-                    allDetails.Add(movieDetails);
-
-                    imageDownloads.AddRange(new[]
-                    {
-                        _detailsApi.DownloadImage("w154", movieDetails.poster_path),
-                        _detailsApi.DownloadImage("w342", movieDetails.poster_path),
-                        _detailsApi.DownloadImage("w1280", movieDetails.backdrop_path)
-                    });
-
-                    if (movieDetails.belongs_to_collection != null)
-                    {
-                        imageDownloads.AddRange(new[]
-                        {
-                            _detailsApi.DownloadImage("w154", movieDetails.BelongsToCollection.),
-                            _detailsApi.DownloadImage("w342", movieDetails.belongs_to_collection.poster_path),
-                            _detailsApi.DownloadImage("w1280", movieDetails.belongs_to_collection.backdrop_path)
-                        });
-                    }
-                        
-                }
-                else
-                {
-                    filmFile.FilmDetails = new FilmDetails
-                    {
-                        Title = filmFile.Title,
-                        ReleaseDate = new DateTime(filmFile.Year, 1, 1)
-                    };
-                }
+                if (searchResults == null || !searchResults.Any()) 
+                    continue;
+                
+                var resultDetails = searchResults[0];
+                var filmDetails = await _detailsApi.FetchMovieDetails(resultDetails.Id);
+                filmFile.FilmDetailsId = filmDetails.Id;
+                allDetails.Add(filmDetails);
+                AddDownloadTask(imageDownloads, filmDetails);
             }
 
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Saving unique subentities");
-            await SaveNewUnique<Models.Details.Genre, MovieDetails, Genre, int>(mapper, allDetails, f => f.genres, g => g.id);
-            await SaveNewUnique<SpokenLanguage, MovieDetails, Integrations.TMDBApi.Models.Movie.SpokenLanguage, string, string>(mapper, allDetails, f => f.spoken_languages, g => g.iso_6391, g => g.Iso6391);
-            await SaveNewUnique<ProductionCountry, MovieDetails, Integrations.TMDBApi.Models.Movie.ProductionCountry, string, string>(mapper, allDetails, f => f.production_countries, g => g.iso_3166_1, g => g.Iso3166_1);
-            await SaveNewUnique<ProductionCompany, MovieDetails, Integrations.TMDBApi.Models.ProductionCompany, int>(mapper, allDetails, f => f.production_companies, g => g.id);
-            await SaveNewUnique<MovieCollection, MovieDetails, Integrations.TMDBApi.Models.Movie.MovieCollection, int>(mapper, allDetails, f => f.belongs_to_collection, g => g.id);
-
+            var uniqueDetails = GetUnique(allDetails)
+                .Select(_databaseMapper.Map<FilmDetails, Models.Database.Film.FilmDetails>)
+                .ToList();
+            var genres = GetUnique(allDetails.SelectMany(d => d.Genres ?? new List<Genre>()));
+            var productionCountries = GetUnique(allDetails.SelectMany(d => d.ProductionCountries ?? new List<ProductionCountry>()), pc => pc.Iso3166_1);
+            var spokenLanguages = GetUnique(allDetails.SelectMany(d => d.SpokenLanguages ?? new List<SpokenLanguage>()), sl => sl.Iso639_1);
+            var productionCompanies = GetUnique(allDetails.SelectMany(d => d.ProductionCompanies ?? new List<ProductionCompany>()));
+            var movieCollections = GetUnique(allDetails.Select(d => d.BelongsToCollection));
+            
             Console.WriteLine(DateTime.UtcNow + ": " + "Await image downloads to finish");
             await Task.WhenAll(imageDownloads);
 
@@ -125,7 +115,14 @@ namespace NxPlx.Services.Index
                 .Where(cf => !File.Exists(cf));
                 
             Console.WriteLine(DateTime.UtcNow + ": " + "Tracking film");
-            await ctx.FilmFiles.AddRangeAsync(newFilm);
+            await ctx.AddRangeAsync(newFilm);
+            await ctx.AddRangeAsync(uniqueDetails);
+            await ctx.AddRangeAsync(genres);
+            await ctx.AddRangeAsync(productionCountries);
+            await ctx.AddRangeAsync(spokenLanguages);
+            await ctx.AddRangeAsync(productionCompanies);
+            await ctx.AddRangeAsync(movieCollections);
+            
             Console.WriteLine(DateTime.UtcNow + ": " + "Saving film");
             await ctx.SaveChangesAsync();
             Console.WriteLine(DateTime.UtcNow + ": " + "Saved film");
@@ -149,7 +146,6 @@ namespace NxPlx.Services.Index
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
                 
-            var mapper = new TMDbMapper();
             var imageDownloads = new List<Task>(newEpisodes.Count * 3);
             var allDetails = new List<SeriesDetails>();
                 
@@ -158,38 +154,26 @@ namespace NxPlx.Services.Index
                 var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
 
                 var details = searchResults.Any() ? searchResults[0] : null;
+
+                if (details == null) continue;
                 
-                if (details != null)
-                {
-                    var tvDetails = await _detailsApi.FetchTvDetails(details.Id);
-                    episodeFile.SeriesDetailsId = tvDetails.Id;
-                    allDetails.Add(tvDetails);
-                        
-                    imageDownloads.AddRange(new[]
-                    {
-                        _detailsApi.DownloadImage("w154", tvDetails.PosterPath),
-                        _detailsApi.DownloadImage("w342", tvDetails.PosterPath),
-                        _detailsApi.DownloadImage("w1280", tvDetails.PosterPath)
-                    });
-                }
-                else
-                {
-                    episodeFile.SeriesDetails = new SeriesDetails
-                    {
-                        Name = episodeFile.Name
-                    };
-                }
+                var seriesDetails = await _detailsApi.FetchTvDetails(details.Id);
+                episodeFile.SeriesDetailsId = seriesDetails.Id;
+                allDetails.Add(seriesDetails);
+                AddDownloadTask(imageDownloads, seriesDetails);
             }
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Saving unique subentities");
-            await SaveNewUnique<SeriesDetails, EpisodeFile, SeriesDetails, int>(mapper, newEpisodes, f => f.SeriesDetails, g => g.Id);
+            var uniqueDetails = GetUnique(allDetails)
+                .Select(_databaseMapper.Map<SeriesDetails, Models.Database.Series.SeriesDetails>)
+                .ToList();
+            var genres = GetUnique(allDetails.SelectMany(d => d.Genres));
+            var networks = GetUnique(allDetails.SelectMany(d => d.Networks));
+            var seasons = GetUnique(allDetails.SelectMany(d => d.Seasons));
+            var productionCompanies = GetUnique(allDetails.SelectMany(d => d.ProductionCompanies));
+            var creators = GetUnique(allDetails.SelectMany(d => d.CreatedBy));
+       
             
-            await SaveNewUnique<Models.Details.Genre, TvDetails, Genre, int>(mapper, allDetails, f => f.genres, g => g.id);
-            await SaveNewUnique<Creator, TvDetails, CreatedBy, int>(mapper, allDetails, f => f.created_by, g => g.id);
-            await SaveNewUnique<Network, TvDetails, Integrations.TMDBApi.Models.Tv.Network, int>(mapper, allDetails, f => f.networks, g => g.id);
-            await SaveNewUnique<ProductionCompany, TvDetails, Integrations.TMDBApi.Models.ProductionCompany, int>(mapper, allDetails, f => f.production_companies, g => g.id);
-            await SaveNewUnique<SeasonDetails, TvDetails, TvDetailsSeason, int>(mapper, allDetails, f => f.seasons, g => g.id);
-
             Console.WriteLine(DateTime.UtcNow + ": " + "Await image downloads to finish");
             await Task.WhenAll(imageDownloads);
 
@@ -217,62 +201,23 @@ namespace NxPlx.Services.Index
             Console.WriteLine(DateTime.UtcNow + ": " + "Saved series");
         }
 
-        private Task SaveNewUnique<TPropertyEntity, TEntity, TProperty, TPropertyKey>(IDetailsMapper mapper, 
-            IEnumerable<TEntity> entities, 
-            Func<TEntity, TProperty> propertySelector,
-            Expression<Func<TProperty, TPropertyKey>> keySelector)
-            where TEntity : EntityBase
-            where TProperty : class
-            where TPropertyEntity : EntityBase
-        {
-            var keySelectorFunc = keySelector.Compile();
-            var properties = mapper.UniqueProperties(entities, propertySelector, keySelectorFunc)
-                .Select(mapper.Map<TProperty, TPropertyEntity>);
-            return SaveNew(properties);
-        }
-
-        private Task SaveNewUnique<TPropertyEntity, TEntity, TProperty, TPropertyKey>(IDetailsMapper mapper,
-            IEnumerable<TEntity> entities,
-            Func<TEntity, IEnumerable<TProperty>> propertySelector,
-            Expression<Func<TProperty, TPropertyKey>> keySelector)
-            where TEntity : EntityBase
-            where TProperty : class
-            where TPropertyEntity : EntityBase
-        => SaveNewUnique<TPropertyEntity, TEntity, TProperty, TPropertyKey, int>(mapper, entities, propertySelector, keySelector, pe => pe.Id);
-
-        private Task SaveNewUnique<TPropertyEntity, TEntity, TProperty, TPropertyKey, TPropertyEntityKey>(
-            IDetailsMapper mapper, 
-            IEnumerable<TEntity> entities, 
-            Func<TEntity, IEnumerable<TProperty>> propertySelector,
-            Expression<Func<TProperty, TPropertyKey>> keySelector,
-            Expression<Func<TPropertyEntity, TPropertyEntityKey>> entityKeySelector)
-            where TEntity : EntityBase
-            where TProperty : class
-            where TPropertyEntity : class
-        {
-            var keySelectorFunc = keySelector.Compile();
-            var properties = mapper.UniqueProperties(entities, propertySelector, keySelectorFunc)
-                .Select(mapper.Map<TProperty, TPropertyEntity>);
-            return SaveNew(properties, entityKeySelector);
-        }
-
-        private Task SaveNew<TPropertyEntity>(IEnumerable<TPropertyEntity> properties)
-            where TPropertyEntity : EntityBase
-        => SaveNew(properties, pe => pe.Id);
+        private static List<T> GetUnique<T>(IEnumerable<T> entities)
+            where T : EntityBase
+            => GetUnique(entities, e => e.Id);
         
-        private async Task SaveNew<TPropertyEntity, TPropertyEntityKey>(IEnumerable<TPropertyEntity> properties,
-            Expression<Func<TPropertyEntity, TPropertyEntityKey>> entityKeySelector)
-            where TPropertyEntity : class
+        private static List<T> GetUnique<T, TKey>(IEnumerable<T> entities, Func<T, TKey> keySelector)
+            where T : class
         {
-            using var ctx = new MediaContext();
-            var existing = await ctx.Set<TPropertyEntity>().Select(entityKeySelector).ToListAsync();
-            var existingHashset = existing.ToHashSet();
+            var unique = new Dictionary<TKey, T>();
+            foreach (var entity in entities)
+            {
+                if (entity == null) 
+                    continue;
+                var key = keySelector(entity);
+                unique[key] = entity;
+            }
 
-            var keySelector = entityKeySelector.Compile();
-            var newProperties = properties.Where(p => p != null && !existingHashset.Contains(keySelector(p)));
-
-            await ctx.AddRangeAsync(newProperties);
-            await ctx.SaveChangesAsync();
+            return unique.Values.ToList();
         }
     }
 }
