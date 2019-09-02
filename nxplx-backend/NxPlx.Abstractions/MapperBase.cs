@@ -13,14 +13,17 @@ namespace NxPlx.Abstractions
         }
 
         public TTo Map<TFrom, TTo>(TFrom instance)
+            where TFrom : class
         {
+            if (instance == default) return default;
+            
             if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
             {
                 var mapper = (Func<TFrom, TTo>) mapperObject;
                 return mapper(instance);
             }
 
-            return default;
+            throw new ArgumentException($"No mapping from {typeof(TFrom).Name} to {typeof(TTo).Name}", nameof(instance));
         }
     }
 }

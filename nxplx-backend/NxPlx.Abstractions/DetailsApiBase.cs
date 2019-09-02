@@ -27,7 +27,7 @@ namespace NxPlx.Abstractions
             Mapper = mapper;
         }
 
-        protected async Task<string> Fetch(string url)
+        protected virtual async Task<string> Fetch(string url)
         {
             var content = await _cachingService.GetAsync(url);
 
@@ -35,8 +35,9 @@ namespace NxPlx.Abstractions
             {
                 var response = await Client.GetAsync(url);
                 content = await response.Content.ReadAsStringAsync();
-                
-                await _cachingService.SetAsync(url, content, CacheKind.WebRequest);
+
+                if (response.IsSuccessStatusCode)
+                    await _cachingService.SetAsync(url, content, CacheKind.WebRequest);
             }
 
             return content;

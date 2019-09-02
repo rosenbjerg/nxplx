@@ -1,6 +1,6 @@
 namespace NxPlx.Abstractions
 {
-    public interface IDatabaseMapper
+    public interface IDatabaseMapper : IMapper
     {
         
     }
