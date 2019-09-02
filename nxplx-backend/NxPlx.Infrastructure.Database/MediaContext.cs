@@ -8,8 +8,8 @@ using NxPlx.Models.Database.Series;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
-using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
-using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
+using FilmDetails = NxPlx.Models.Database.Film.FilmDetails;
+using SeriesDetails = NxPlx.Models.Database.Series.SeriesDetails;
 
 namespace NxPlx.Services.Database
 {
@@ -37,7 +37,7 @@ namespace NxPlx.Services.Database
             modelBuilder.Entity<FilmFile>().HasIndex(ff => ff.FilmDetailsId);
             
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
-            modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso6391);
+            modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);
             
             modelBuilder.Entity<InGenre>().HasKey(e =>    new { e.DetailsEntityId, e.GenreId });
             modelBuilder.Entity<ProducedBy>().HasKey(e => new { e.DetailsEntityId, e.ProductionCompanyId });

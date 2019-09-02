@@ -90,7 +90,7 @@ namespace NxPlx.Services.Database
                 }).ToList(),
                 SpokenLanguages = movieDetails.SpokenLanguages?.Select(spokenLanguage => new LanguageSpoken
                 {
-                    SpokenLanguageId = spokenLanguage.Iso6391,
+                    SpokenLanguageId = spokenLanguage.Iso639_1,
                     FilmDetailsId = movieDetails.Id
                 }).ToList(),
                 ProductionCountries = movieDetails.ProductionCountries?.Select(productionCountry => new ProducedIn
