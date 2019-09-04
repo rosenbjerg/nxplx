@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Models.Dto;
+using NxPlx.Models.Dto.Models;
 using NxPlx.Services.Database;
 using Red.Interfaces;
 
@@ -27,7 +28,7 @@ namespace NxPlx.WebApi.Routers
                     return await res.SendStatus(HttpStatusCode.NotFound);
                 }
                     
-                return await res.SendJson(new SeriesDto(seriesDetails, episodes));
+                return await res.SendJson(new SeriesDto());
             });
             
             router.Get("/:series_id/:season_no", async (req, res) =>
@@ -42,13 +43,13 @@ namespace NxPlx.WebApi.Routers
                     return await res.SendStatus(HttpStatusCode.NotFound);
                 }
                     
-                var season = series.Seasons.FirstOrDefault(s => s.SeasonDetails.SeasonNumber == no);
+                var season = series.Seasons.FirstOrDefault(s => s.Entity2.SeasonNumber == no);
                 if (season == null)
                 {
                     return await res.SendStatus(HttpStatusCode.NotFound);
                 }
 
-                var seasonDetails = season.SeasonDetails;
+                var seasonDetails = season.Entity2;
 
                 var episodes = await ctx.EpisodeFiles
                     .Where(e => e.SeriesDetailsId == id && e.SeasonNumber == no)

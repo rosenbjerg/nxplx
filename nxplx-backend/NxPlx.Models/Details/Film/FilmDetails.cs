@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Details.Film
 {
-    public class FilmDetails : DetailsEntityBase
+    public class FilmDetails : EntityBase
     {
         public bool Adult { get; set; }
         public long Budget { get; set; }
@@ -17,5 +17,15 @@ namespace NxPlx.Models.Details.Film
         public virtual List<SpokenLanguage> SpokenLanguages { get; set; }
         public string Tagline { get; set; }
         public string Title { get; set; }
+        
+        public string BackdropPath { get; set; }
+        public List<Genre> Genres { get; set; }
+        public string OriginalLanguage { get; set; }
+        public string Overview { get; set; }
+        public float Popularity { get; set; }
+        public string PosterPath { get; set; }
+        public List<ProductionCompany> ProductionCompanies { get; set; }
+        public float VoteAverage { get; set; }
+        public int VoteCount { get; set; }
     }
 }

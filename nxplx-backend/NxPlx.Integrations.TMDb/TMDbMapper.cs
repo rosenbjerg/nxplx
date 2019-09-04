@@ -108,7 +108,7 @@ namespace NxPlx.Integrations.TMDBApi
                 Name = network.name
             });
             
-            SetMapping<Models.Tv.CreatedBy, Creator>(createdBy => new Creator
+            SetMapping<CreatedBy, Creator>(createdBy => new Creator
             {
                 Id = createdBy.id,
                 Name = createdBy.name
@@ -122,9 +122,19 @@ namespace NxPlx.Integrations.TMDBApi
                 AirDate = tvSeasonDetails.air_date,
                 PosterPath = tvSeasonDetails.poster_path,
                 SeasonNumber = tvSeasonDetails.season_number,
-                Episodes = tvSeasonDetails.episodes.Select(Map<Episode, EpisodeDetails>).ToList()
+                Episodes = tvSeasonDetails.episodes?.Select(Map<Episode, EpisodeDetails>).ToList()
             });
-            
+            SetMapping<TvDetailsSeason, SeasonDetails>(tvSeasonDetails => new SeasonDetails
+            {
+                Id = tvSeasonDetails.id,
+                Name = tvSeasonDetails.name,
+                Overview = tvSeasonDetails.overview,
+                AirDate = tvSeasonDetails.air_date,
+                PosterPath = tvSeasonDetails.poster_path,
+                SeasonNumber = tvSeasonDetails.season_number,
+                TotalEpisodes = tvSeasonDetails.episode_count
+            });
+
             SetMapping<Episode, EpisodeDetails>(episode => new EpisodeDetails
             {
                 Id = episode.id,

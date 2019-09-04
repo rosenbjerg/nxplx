@@ -6,6 +6,7 @@ using NxPlx.Configuration;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Logging;
 using NxPlx.Integrations.TMDBApi;
+using NxPlx.Models.Dto;
 using NxPlx.Models.File;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
@@ -26,6 +27,7 @@ namespace NxPlx.WebApi
                 var registration = new RegistrationContainer();
                 registration.Register<ICachingService, RedisCachingService>();
                 registration.Register<ILogger, NLogger>();
+                registration.Register<IDtoMapper, DtoMapper>();
                 registration.Register<IDatabaseMapper, DatabaseMapper>();
                 registration.Register<IDetailsMapper, TMDbMapper>();
                 registration.Register<IDetailsApi, TmdbApi>();

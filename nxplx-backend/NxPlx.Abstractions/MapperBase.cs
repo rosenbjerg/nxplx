@@ -23,7 +23,7 @@ namespace NxPlx.Abstractions
                 return mapper(instance);
             }
 
-            throw new ArgumentException($"No mapping from {typeof(TFrom).Name} to {typeof(TTo).Name}", nameof(instance));
+            throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instance));
         }
     }
 }

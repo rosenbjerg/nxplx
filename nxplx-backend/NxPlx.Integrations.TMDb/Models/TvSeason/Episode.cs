@@ -12,7 +12,7 @@ namespace NxPlx.Integrations.TMDBApi.Models.TvSeason
         public string production_code { get; set; }
         public int season_number { get; set; }
         public string still_path { get; set; }
-        public double vote_average { get; set; }
+        public float vote_average { get; set; }
         public int vote_count { get; set; }
     }
 }

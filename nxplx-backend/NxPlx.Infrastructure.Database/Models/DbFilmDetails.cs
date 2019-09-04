@@ -1,29 +1,32 @@
 using System;
 using System.Collections.Generic;
+using NxPlx.Models;
+using NxPlx.Models.Details;
+using NxPlx.Models.Details.Film;
 
-namespace NxPlx.Models.Database.Film
+namespace NxPlx.Services.Database.Models
 {
-    public class FilmDetails : EntityBase
+    public class DbFilmDetails : EntityBase
     {
         public bool Adult { get; set; }
         public long Budget { get; set; }
         public string ImdbId { get; set; }
-        public virtual BelongsInCollection BelongsToCollection { get; set; }
+        public virtual JoinEntity<DbFilmDetails, MovieCollection> BelongsToCollection { get; set; }
         public string OriginalTitle { get; set; }
-        public virtual List<ProducedIn> ProductionCountries { get; set; }
+        public virtual List<JoinEntity<DbFilmDetails, ProductionCountry, string>> ProductionCountries { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public long Revenue { get; set; }
         public int? Runtime { get; set; }
-        public virtual List<LanguageSpoken> SpokenLanguages { get; set; }
+        public virtual List<JoinEntity<DbFilmDetails, SpokenLanguage, string>> SpokenLanguages { get; set; }
         public string Tagline { get; set; }
         public string Title { get; set; }
         public string BackdropPath { get; set; }
-        public List<InGenre> Genres { get; set; }
+        public List<JoinEntity<DbFilmDetails, Genre>> Genres { get; set; }
         public string OriginalLanguage { get; set; }
         public string Overview { get; set; }
         public double Popularity { get; set; }
         public string PosterPath { get; set; }
-        public List<ProducedBy> ProductionCompanies { get; set; }
+        public List<JoinEntity<DbFilmDetails, ProductionCompany>> ProductionCompanies { get; set; }
         public double VoteAverage { get; set; }
         public int VoteCount { get; set; }
     }

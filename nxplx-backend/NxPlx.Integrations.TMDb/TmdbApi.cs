@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
@@ -86,7 +87,12 @@ namespace NxPlx.Integrations.TMDBApi
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
-            return Mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
+            var mapped = Mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
+            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.Id));
+            var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
+            mapped.Seasons = seasonDetails.ToList();
+            
+            return mapped;
         }
         
         public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season)

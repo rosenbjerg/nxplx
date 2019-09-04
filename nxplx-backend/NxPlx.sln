@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Abstractions", "NxPlx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Logging", "NxPlx.Infrastructure.Logging\NxPlx.Infrastructure.Logging.csproj", "{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Models.Dto", "NxPlx.Models.Dto\NxPlx.Models.Dto.csproj", "{A13FCD67-45B1-4D42-B39F-622D558CDE57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,5 +92,9 @@ Global
 		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

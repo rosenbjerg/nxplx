@@ -1,55 +1,49 @@
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
-using NxPlx.Models.Database;
-using NxPlx.Models.Database.Film;
-using NxPlx.Models.Database.Series;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
+using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
-using FilmDetails = NxPlx.Models.Database.Film.FilmDetails;
-using SeriesDetails = NxPlx.Models.Database.Series.SeriesDetails;
+using NxPlx.Services.Database.Models;
 
 namespace NxPlx.Services.Database
 {
     public class MediaContext : DbContext
     {
         public DbSet<FilmFile> FilmFiles { get; set; }
-
         public DbSet<EpisodeFile> EpisodeFiles { get; set; }
         
-        public DbSet<FilmDetails> Film { get; set; }
         
-        public DbSet<SeriesDetails> Series { get; set; }
+        public DbSet<DbFilmDetails> Film { get; set; }
+        public DbSet<DbSeriesDetails> Series { get; set; }
+        
         
         public DbSet<Genre> Genres { get; set; }
-        
         public DbSet<MovieCollection> MovieCollections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             
-            modelBuilder.Entity<EpisodeFile>().HasOne(sf => sf.SeriesDetails).WithMany();
-            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeriesDetailsId);
+//            modelBuilder.Entity<EpisodeFile>().HasOne(sf => sf.SeriesDetails).WithMany();
             modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
 
-            modelBuilder.Entity<FilmFile>().HasOne(ff => ff.FilmDetails).WithMany();
-            modelBuilder.Entity<FilmFile>().HasIndex(ff => ff.FilmDetailsId);
+//            modelBuilder.Entity<FilmFile>().HasOne(ff => ff.FilmDetails).WithMany();
             
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
             modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);
             
-            modelBuilder.Entity<InGenre>().HasKey(e =>    new { e.DetailsEntityId, e.GenreId });
-            modelBuilder.Entity<ProducedBy>().HasKey(e => new { e.DetailsEntityId, e.ProductionCompanyId });
-            modelBuilder.Entity<Season>().HasKey(e => new { e.SeriesDetailsId, e.SeasonDetailsId });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, MovieCollection>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
             
-            modelBuilder.Entity<CreatedBy>().HasKey(e =>   new { e.SeriesDetailsId, e.CreatorId });
-            modelBuilder.Entity<BroadcastOn>().HasKey(e => new { e.SeriesDetailsId, e.NetworkId });
-            
-            modelBuilder.Entity<ProducedIn>().HasKey(e =>          new { e.FilmDetailsId, e.ProductionCountryId });
-            modelBuilder.Entity<LanguageSpoken>().HasKey(e =>      new { e.FilmDetailsId, e.SpokenLanguageId });
-            modelBuilder.Entity<BelongsInCollection>().HasKey(e => new { e.FilmDetailsId, e.MovieCollectionId });
-            
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, SeasonDetails>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

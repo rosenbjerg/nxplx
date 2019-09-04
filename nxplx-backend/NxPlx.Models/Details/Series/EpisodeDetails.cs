@@ -16,7 +16,7 @@ namespace NxPlx.Models.Details.Series
         
         public string StillPath { get; set; }
         
-        public double VoteAverage { get; set; }
+        public float VoteAverage { get; set; }
         
         public int VoteCount { get; set; }
         

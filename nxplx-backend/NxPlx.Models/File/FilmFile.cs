@@ -1,12 +1,10 @@
-using FilmDetails = NxPlx.Models.Database.Film.FilmDetails;
-
 namespace NxPlx.Models.File
 {
     public class FilmFile : MediaFile
     {
         public string Title { get; set; }
 
-        public FilmDetails FilmDetails { get; set; }
+//        public FilmDetails FilmDetails { get; set; }
         
         public int FilmDetailsId { get; set; }
         

@@ -11,6 +11,7 @@ using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
+using NxPlx.Services.Database.Models;
 
 namespace NxPlx.Services.Index
 {
@@ -28,17 +29,36 @@ namespace NxPlx.Services.Index
             _databaseMapper = databaseMapper;
             _logger = logger;
         }
-        private void AddDownloadTask(List<Task> tasks, DetailsEntityBase detailsEntityBase)
+        private void AddDownloadTask(List<Task> tasks, SeriesDetails seriesDetails)
         {      
             tasks.AddRange(new[]
             {
-                _detailsApi.DownloadImage("w154", detailsEntityBase.PosterPath),
-                _detailsApi.DownloadImage("w342", detailsEntityBase.PosterPath),
-                _detailsApi.DownloadImage("w1280", detailsEntityBase.PosterPath)
+                _detailsApi.DownloadImage("w154", seriesDetails.PosterPath),
+                _detailsApi.DownloadImage("w342", seriesDetails.PosterPath),
+                _detailsApi.DownloadImage("w1280", seriesDetails.PosterPath)
+            });
+            seriesDetails.Seasons?.ForEach(s =>
+            {
+                tasks.Add(_detailsApi.DownloadImage("w154", s.PosterPath));
+                tasks.Add(_detailsApi.DownloadImage("w342", s.PosterPath));
+                if (s.Episodes != null)
+                {
+                    tasks.AddRange(s.Episodes.Select(e => _detailsApi.DownloadImage("w185", e.StillPath)));
+                    tasks.AddRange(s.Episodes.Select(e => _detailsApi.DownloadImage("w1280", e.StillPath)));
+                }
+            });
+        }
+        private void AddDownloadTask(List<Task> tasks, FilmDetails filmDetails)
+        {      
+            tasks.AddRange(new[]
+            {
+                _detailsApi.DownloadImage("w154", filmDetails.PosterPath),
+                _detailsApi.DownloadImage("w342", filmDetails.PosterPath),
+                _detailsApi.DownloadImage("w1280", filmDetails.PosterPath)
             });
             
             
-            if (detailsEntityBase is FilmDetails filmDetails && filmDetails.BelongsToCollection != null)
+            if (filmDetails.BelongsToCollection != null)
             {
                 tasks.AddRange(new[]
                 {
@@ -82,7 +102,7 @@ namespace NxPlx.Services.Index
             await ctx.AddRangeAsync(spokenLanguages);
             await ctx.AddRangeAsync(productionCompanies);
             await ctx.AddRangeAsync(movieCollections);
-            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<FilmDetails, Models.Database.Film.FilmDetails>);
+            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<FilmDetails, DbFilmDetails>);
             var newDetails = await GetNew(databaseDetails, d => d.Id);
             await ctx.AddRangeAsync(newDetails);
             await ctx.AddRangeAsync(newFilm);
@@ -145,7 +165,7 @@ namespace NxPlx.Services.Index
             var productionCompanies = await GetUniqueNew(uniqueDetails.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies));
 
             await ctx.AddRangeAsync(newEpisodes);
-            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<SeriesDetails, Models.Database.Series.SeriesDetails>);
+            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<SeriesDetails, DbSeriesDetails>);
             var newDetails = await GetNew(databaseDetails, d => d.Id);
             await ctx.AddRangeAsync(newDetails);
             await ctx.AddRangeAsync(genres);

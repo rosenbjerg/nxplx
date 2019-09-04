@@ -9,9 +9,9 @@ namespace NxPlx.Integrations.TMDBApi.Models.Search
         public string poster_path { get; set; }
         public string backdrop_path { get; set; }
         
-        public double popularity { get; set; }
+        public float popularity { get; set; }
         public int vote_count { get; set; }
-        public double vote_average { get; set; }
+        public float vote_average { get; set; }
         
         public string original_language { get; set; }
         public List<int> genre_ids { get; set; }
