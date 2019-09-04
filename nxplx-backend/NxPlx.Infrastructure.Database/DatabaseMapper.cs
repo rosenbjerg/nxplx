@@ -80,8 +80,8 @@ namespace NxPlx.Services.Database
                 
                 BelongsToCollection = movieDetails.BelongsToCollection == null ? null : new BelongsInCollection
                 {
-                    MovieCollectionId = movieDetails.Id,
-                    FilmDetailsId = movieDetails.BelongsToCollection.Id
+                    MovieCollectionId = movieDetails.BelongsToCollection.Id,
+                    FilmDetailsId = movieDetails.Id
                 },
                 Genres = movieDetails.Genres?.Select(genre => new InGenre
                 {

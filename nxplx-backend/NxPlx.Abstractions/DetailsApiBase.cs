@@ -27,22 +27,24 @@ namespace NxPlx.Abstractions
             Mapper = mapper;
         }
 
-        protected virtual async Task<string> Fetch(string url)
+        protected async Task<(string content, bool cached)> FetchInternal(string url)
         {
+            var cached = true;
             var content = await _cachingService.GetAsync(url);
 
             if (string.IsNullOrEmpty(content))
             {
                 var response = await Client.GetAsync(url);
                 content = await response.Content.ReadAsStringAsync();
+                cached = false;
 
                 if (response.IsSuccessStatusCode)
                     await _cachingService.SetAsync(url, content, CacheKind.WebRequest);
             }
 
-            return content;
+            return (content, cached);
         }
-
+        
         public abstract Task<FilmResult[]> SearchMovies(string title, int year);
         public abstract Task<SeriesResult[]> SearchTvShows(string name);
         public abstract Task<FilmDetails> FetchMovieDetails(int id);

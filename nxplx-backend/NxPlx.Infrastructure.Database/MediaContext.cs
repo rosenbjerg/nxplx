@@ -31,9 +31,11 @@ namespace NxPlx.Services.Database
         {
             base.OnModelCreating(modelBuilder);
             
+            modelBuilder.Entity<EpisodeFile>().HasOne(sf => sf.SeriesDetails).WithMany();
             modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeriesDetailsId);
             modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
-            
+
+            modelBuilder.Entity<FilmFile>().HasOne(ff => ff.FilmDetails).WithMany();
             modelBuilder.Entity<FilmFile>().HasIndex(ff => ff.FilmDetailsId);
             
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
