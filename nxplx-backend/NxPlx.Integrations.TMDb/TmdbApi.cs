@@ -1,12 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Integrations.TMDBApi.Models.Movie;
 using NxPlx.Integrations.TMDBApi.Models.Search;
 using NxPlx.Integrations.TMDBApi.Models.Tv;
@@ -14,18 +12,16 @@ using NxPlx.Integrations.TMDBApi.Models.TvSeason;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
-using NxPlx.Services.Caching;
 
 namespace NxPlx.Integrations.TMDBApi
 {
     public class TmdbApi : DetailsApiBase
     {
+        private const int ThrottlingMs = 1000 / 40;
         private const string BaseUrl = "https://api.themoviedb.org/3";
         
         private string _key;
         private string _imageFolder;
-
-
 
         public TmdbApi(ICachingService cachingService, IDetailsMapper mapper, ILogger logger) : base(cachingService, mapper, logger)
         {
@@ -34,7 +30,22 @@ namespace NxPlx.Integrations.TMDBApi
             _imageFolder = cfg.ImageFolder;
             Directory.CreateDirectory(_imageFolder);
         }
+
+        private DateTime _lastRequest = DateTime.MinValue;
         
+        private async Task<string> Fetch(string url)
+        {
+            var delay = DateTime.UtcNow.Subtract(_lastRequest).TotalMilliseconds;
+            if (delay < ThrottlingMs) await Task.Delay(TimeSpan.FromMilliseconds(delay));
+
+            var (content, cached) = await FetchInternal(url);
+            if (!cached)
+            {
+                _lastRequest = DateTime.UtcNow;
+            }
+            
+            return content;
+        }
 
         public override async Task<FilmResult[]> SearchMovies(string title, int year)
         {
@@ -108,7 +119,7 @@ namespace NxPlx.Integrations.TMDBApi
                     }
                     catch (IOException e)
                     {
-                        Logger.Trace("Failed to download image {path}", outputPath);
+                        Logger.Trace("Failed to download image {path}. It is already being downloaded", outputPath);
                     }
                 }
                 

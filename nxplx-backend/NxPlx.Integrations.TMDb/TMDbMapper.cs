@@ -5,6 +5,7 @@ using NxPlx.Abstractions;
 using NxPlx.Integrations.TMDBApi.Models.Movie;
 using NxPlx.Integrations.TMDBApi.Models.Search;
 using NxPlx.Integrations.TMDBApi.Models.Tv;
+using NxPlx.Integrations.TMDBApi.Models.TvSeason;
 using NxPlx.Models.Database;
 using NxPlx.Models.Database.Film;
 using NxPlx.Models.Database.Series;
@@ -92,11 +93,13 @@ namespace NxPlx.Integrations.TMDBApi
                 Id = movieCollection.id,
                 Name = movieCollection.name
             });
+            
             SetMapping<Models.Movie.ProductionCountry, ProductionCountry>(productionCountry => new ProductionCountry
             {
                 Iso3166_1 = productionCountry.iso_3166_1,
                 Name = productionCountry.name
             });
+            
             SetMapping<Models.Movie.SpokenLanguage, SpokenLanguage>(spokenLanguage => new SpokenLanguage
             {
                 Iso639_1 = spokenLanguage.iso_639_1,
@@ -115,14 +118,24 @@ namespace NxPlx.Integrations.TMDBApi
                 Name = createdBy.name
             });
             
-            SetMapping<TvDetailsSeason, SeasonDetails>(tvDetailsSeason => new SeasonDetails
+            SetMapping<TvSeasonDetails, SeasonDetails>(tvSeasonDetails => new SeasonDetails
             {
-                Id = tvDetailsSeason.id,
-                Name = tvDetailsSeason.name,
-                Overview = tvDetailsSeason.overview,
-                AirDate = tvDetailsSeason.air_date,
-                PosterPath = tvDetailsSeason.poster_path,
-                SeasonNumber = tvDetailsSeason.season_number
+                Id = tvSeasonDetails.id,
+                Name = tvSeasonDetails.name,
+                Overview = tvSeasonDetails.overview,
+                AirDate = tvSeasonDetails.air_date,
+                PosterPath = tvSeasonDetails.poster_path,
+                SeasonNumber = tvSeasonDetails.season_number,
+                Episodes = tvSeasonDetails.episodes.Select(Map<Episode, EpisodeDetails>).ToList()
+            });
+            
+            SetMapping<Episode, EpisodeDetails>(episode => new EpisodeDetails
+            {
+                Id = episode.id,
+                Name = episode.name,
+                Overview = episode.overview,
+                SeasonNumber = episode.season_number,
+                
             });
             
             SetMapping<SearchResult<TvShowResult>, SeriesResult[]>(searchResult 
@@ -130,7 +143,6 @@ namespace NxPlx.Integrations.TMDBApi
             
             SetMapping<SearchResult<MovieResult>, FilmResult[]>(searchResult 
                 => searchResult.results?.Select(Map<MovieResult, FilmResult>).ToArray());
-            
             
             SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
             {

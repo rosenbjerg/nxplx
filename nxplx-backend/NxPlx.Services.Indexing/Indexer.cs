@@ -56,6 +56,7 @@ namespace NxPlx.Services.Index
         
         public async Task IndexMovieLibrary(IEnumerable<string> folders)
         {
+            var startTime = DateTime.UtcNow;
             folders = new[]
             {
                 "\\\\raspberrypi.local\\data\\Media\\Film",
@@ -67,25 +68,51 @@ namespace NxPlx.Services.Index
             using var ctx = new MediaContext();
             ctx.Database.EnsureCreated();
 
-            Console.WriteLine(DateTime.UtcNow + ": " + "Fetching current film");
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
-            Console.WriteLine(DateTime.UtcNow + ": " + "Indexing film");
             var newFilm = fileIndexer.IndexFilm(currentFilm, folders);
-
-
-            Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
+            _logger.Info("Found {NewAmount} new film files in {LibraryFoldersAmount} folder(s) in {ScanTime} seconds", newFilm.Count, folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            
             var imageDownloads = new List<Task>(newFilm.Count * 6);
+            var uniqueDetails = GetUnique(await FindFilmDetails(newFilm, imageDownloads));
+            _logger.Info("Downloaded details for {NewAmount} new film in {DownloadTime} seconds", uniqueDetails.Count, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            
+            var genres = await GetUniqueNew(uniqueDetails.Where(d => d.Genres != null).SelectMany(d => d.Genres));
+            var productionCountries = await GetUniqueNew(uniqueDetails.Where(d => d.ProductionCountries != null).SelectMany(d => d.ProductionCountries), pc => pc.Iso3166_1);
+            var spokenLanguages = await GetUniqueNew(uniqueDetails.Where(d => d.SpokenLanguages != null).SelectMany(d => d.SpokenLanguages), sl => sl.Iso639_1);
+            var productionCompanies = await GetUniqueNew(uniqueDetails.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies));
+            var movieCollections = await GetUniqueNew(uniqueDetails.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection));
+            
+            await ctx.AddRangeAsync(genres);
+            await ctx.AddRangeAsync(productionCountries);
+            await ctx.AddRangeAsync(spokenLanguages);
+            await ctx.AddRangeAsync(productionCompanies);
+            await ctx.AddRangeAsync(movieCollections);
+            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<FilmDetails, Models.Database.Film.FilmDetails>);
+            var newDetails = await GetNew(databaseDetails, d => d.Id);
+            await ctx.AddRangeAsync(newDetails);
+            await ctx.AddRangeAsync(newFilm);
+            
+            await ctx.SaveChangesAsync();
+            await Task.WhenAll(imageDownloads);
+            _logger.Info("Indexing film in {LibraryFoldersAmount} folders took {Elapsed} seconds", folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+
+        }
+
+        private async Task<List<FilmDetails>> FindFilmDetails(List<FilmFile> newFilm, List<Task> imageDownloads)
+        {
             var allDetails = new List<FilmDetails>();
-                
             foreach (var filmFile in newFilm)
             {
                 var searchResults = await _detailsApi.SearchMovies(filmFile.Title, filmFile.Year);
-                if (searchResults == null || !searchResults.Any()) 
+                if (searchResults == null || !searchResults.Any())
                     searchResults = await _detailsApi.SearchMovies(filmFile.Title, 0);
 
-                if (searchResults == null || !searchResults.Any()) 
+                if (searchResults == null || !searchResults.Any())
+                {
+                    filmFile.FilmDetailsId = -1;
                     continue;
-                
+                }
+
                 var resultDetails = searchResults[0];
                 var filmDetails = await _detailsApi.FetchMovieDetails(resultDetails.Id);
                 filmFile.FilmDetailsId = filmDetails.Id;
@@ -93,42 +120,12 @@ namespace NxPlx.Services.Index
                 AddDownloadTask(imageDownloads, filmDetails);
             }
 
-
-            Console.WriteLine(DateTime.UtcNow + ": " + "Saving unique subentities");
-            var uniqueDetails = GetUnique(allDetails)
-                .Select(_databaseMapper.Map<FilmDetails, Models.Database.Film.FilmDetails>)
-                .ToList();
-            var genres = GetUnique(allDetails.SelectMany(d => d.Genres ?? new List<Genre>()));
-            var productionCountries = GetUnique(allDetails.SelectMany(d => d.ProductionCountries ?? new List<ProductionCountry>()), pc => pc.Iso3166_1);
-            var spokenLanguages = GetUnique(allDetails.SelectMany(d => d.SpokenLanguages ?? new List<SpokenLanguage>()), sl => sl.Iso639_1);
-            var productionCompanies = GetUnique(allDetails.SelectMany(d => d.ProductionCompanies ?? new List<ProductionCompany>()));
-            var movieCollections = GetUnique(allDetails.Select(d => d.BelongsToCollection));
-            
-            Console.WriteLine(DateTime.UtcNow + ": " + "Await image downloads to finish");
-            await Task.WhenAll(imageDownloads);
-
-
-            Console.WriteLine(DateTime.UtcNow + ": " + "Determining deleted film");
-            var deletedFilm = currentFilm
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount / 2)
-                .Where(cf => !File.Exists(cf));
-                
-            Console.WriteLine(DateTime.UtcNow + ": " + "Tracking film");
-            await ctx.AddRangeAsync(newFilm);
-            await ctx.AddRangeAsync(uniqueDetails);
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(productionCountries);
-            await ctx.AddRangeAsync(spokenLanguages);
-            await ctx.AddRangeAsync(productionCompanies);
-            await ctx.AddRangeAsync(movieCollections);
-            
-            Console.WriteLine(DateTime.UtcNow + ": " + "Saving film");
-            await ctx.SaveChangesAsync();
-            Console.WriteLine(DateTime.UtcNow + ": " + "Saved film");
+            return allDetails;
         }
+
         public async Task IndexSeriesLibrary(IEnumerable<string> folders)
         {
+            var startTime = DateTime.UtcNow;
             folders = new[]
             {
                 "\\\\raspberrypi.local\\data\\Media\\Serier"
@@ -138,17 +135,41 @@ namespace NxPlx.Services.Index
             using var ctx = new MediaContext();
             ctx.Database.EnsureCreated();
 
-            Console.WriteLine(DateTime.UtcNow + ": " + "Fetching current series");
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
-            Console.WriteLine(DateTime.UtcNow + ": " + "Indexing series");
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, folders);
+            _logger.Info("Found {NewAmount} new episode files in {LibraryFoldersAmount} folder(s) in {ScanTime} seconds", newEpisodes.Count, folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
-
-            Console.WriteLine(DateTime.UtcNow + ": " + "Fetching TMDb details and posters");
-                
             var imageDownloads = new List<Task>(newEpisodes.Count * 3);
+            var uniqueDetails = await GetUniqueNew(await FindSeriesDetails(newEpisodes, imageDownloads));
+            _logger.Info("Downloaded details for {NewAmount} new series in {DownloadTime} seconds", uniqueDetails.Count, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+
+            var genres = await GetUniqueNew(uniqueDetails.Where(d => d.Genres != null).SelectMany(d => d.Genres));
+            var networks = await GetUniqueNew(uniqueDetails.Where(d => d.Networks != null).SelectMany(d => d.Networks));
+            var seasons = await GetUniqueNew(uniqueDetails.Where(d => d.Seasons != null).SelectMany(d => d.Seasons));
+            var creators = await GetUniqueNew(uniqueDetails.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy));
+            var productionCompanies = await GetUniqueNew(uniqueDetails.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies));
+
+            await ctx.AddRangeAsync(newEpisodes);
+            var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<SeriesDetails, Models.Database.Series.SeriesDetails>);
+            var newDetails = await GetNew(databaseDetails, d => d.Id);
+            await ctx.AddRangeAsync(newDetails);
+            await ctx.AddRangeAsync(genres);
+            await ctx.AddRangeAsync(networks);
+            await ctx.AddRangeAsync(seasons);
+            await ctx.AddRangeAsync(creators);
+            await ctx.AddRangeAsync(productionCompanies);
+            
+            await ctx.SaveChangesAsync();
+            await Task.WhenAll(imageDownloads);
+            _logger.Info("Indexing episodes in {LibraryFoldersAmount} folders took {Elapsed} seconds", folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+
+            Console.WriteLine(DateTime.UtcNow + ": " + "Saved series");
+        }
+
+        private async Task<List<SeriesDetails>> FindSeriesDetails(List<EpisodeFile> newEpisodes, List<Task> imageDownloads)
+        {
             var allDetails = new List<SeriesDetails>();
-                
+
             foreach (var episodeFile in newEpisodes)
             {
                 var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
@@ -156,51 +177,39 @@ namespace NxPlx.Services.Index
                 var details = searchResults.Any() ? searchResults[0] : null;
 
                 if (details == null) continue;
-                
+
                 var seriesDetails = await _detailsApi.FetchTvDetails(details.Id);
                 episodeFile.SeriesDetailsId = seriesDetails.Id;
                 allDetails.Add(seriesDetails);
                 AddDownloadTask(imageDownloads, seriesDetails);
             }
 
-            Console.WriteLine(DateTime.UtcNow + ": " + "Saving unique subentities");
-            var uniqueDetails = GetUnique(allDetails)
-                .Select(_databaseMapper.Map<SeriesDetails, Models.Database.Series.SeriesDetails>)
-                .ToList();
-            var genres = GetUnique(allDetails.SelectMany(d => d.Genres));
-            var networks = GetUnique(allDetails.SelectMany(d => d.Networks));
-            var seasons = GetUnique(allDetails.SelectMany(d => d.Seasons));
-            var productionCompanies = GetUnique(allDetails.SelectMany(d => d.ProductionCompanies));
-            var creators = GetUnique(allDetails.SelectMany(d => d.CreatedBy));
-       
-            
-            Console.WriteLine(DateTime.UtcNow + ": " + "Await image downloads to finish");
-            await Task.WhenAll(imageDownloads);
-
-
-            Console.WriteLine(DateTime.UtcNow + ": " + "Determining deleted series");
-            var deletedEpisodes = currentEpisodes
-                .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount / 2)
-                .Where(cf => !File.Exists(cf));
-
-
-                
-            Console.WriteLine(DateTime.UtcNow + ": " + "Tracking series");
-            try
-            {
-                await ctx.EpisodeFiles.AddRangeAsync(newEpisodes);
-                Console.WriteLine(DateTime.UtcNow + ": " + "Saving series");
-                await ctx.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-            Console.WriteLine(DateTime.UtcNow + ": " + "Saved series");
+            return allDetails;
         }
 
+        private static Task<List<T>> GetUniqueNew<T>(IEnumerable<T> entities)
+            where T : EntityBase
+            => GetUniqueNew(entities, e => e.Id);
+        
+        private static async Task<List<T>> GetUniqueNew<T, TKey>(IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector)
+            where T : class
+        {
+            var keySelectorFunc = keySelector.Compile();
+            var unique = GetUnique(entities, keySelectorFunc);
+            return await GetNew(unique, keySelector);
+        }
+        
+        private static async Task<List<T>> GetNew<T, TKey>(IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector)
+            where T : class
+        {
+            using var ctx = new MediaContext();
+            var unique = await ctx.Set<T>().Select(keySelector).ToListAsync();
+            var uniqueHashset = unique.ToHashSet();
+
+            var keySelectorFunc = keySelector.Compile();
+            return entities.Where(e => !uniqueHashset.Contains(keySelectorFunc(e))).ToList();
+        }
+        
         private static List<T> GetUnique<T>(IEnumerable<T> entities)
             where T : EntityBase
             => GetUnique(entities, e => e.Id);
