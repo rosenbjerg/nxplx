@@ -27,6 +27,7 @@ namespace NxPlx.WebApi
     {
         static async Task Main(string[] args)
         {
+            
             var cfg = ConfigurationService.Current;
 
             {
@@ -41,6 +42,8 @@ namespace NxPlx.WebApi
             
             var container = new ResolveContainer();
             var indexer = container.Resolve<Indexer>();
+            var logger = container.Resolve<ILogger>();
+            logger.Info("NxPlx.Infrastructure.WebApi starting...");
             
             await indexer.IndexMovieLibrary(new []{""});
             await indexer.IndexSeriesLibrary(new []{""});
@@ -92,8 +95,7 @@ namespace NxPlx.WebApi
                     return await res.SendJson(files);
                 }
             });
-
-            Console.WriteLine("NxPlx.Infrastructure.WebApi starting...");
+            
             await server.RunAsync();
         }
         
