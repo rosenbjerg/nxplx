@@ -1,7 +1,5 @@
-using System.IO;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
-using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Database.Film;
 using NxPlx.Models.Database.Series;

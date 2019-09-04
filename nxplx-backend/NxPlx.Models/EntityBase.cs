@@ -1,5 +1,3 @@
-using System;
-
 namespace NxPlx.Models
 {
     public abstract class EntityBase

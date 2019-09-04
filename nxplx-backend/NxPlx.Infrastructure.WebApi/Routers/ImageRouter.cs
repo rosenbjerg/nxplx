@@ -1,8 +1,4 @@
 using System.IO;
-using System.Linq;
-using System.Net;
-using Microsoft.EntityFrameworkCore;
-using NxPlx.Services.Database;
 using Red.Interfaces;
 
 namespace NxPlx.WebApi.Routers

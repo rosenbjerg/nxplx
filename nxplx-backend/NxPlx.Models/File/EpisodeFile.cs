@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using NxPlx.Models.Details.Series;
 
 namespace NxPlx.Models.File

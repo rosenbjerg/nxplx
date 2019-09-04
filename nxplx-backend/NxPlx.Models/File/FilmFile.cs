@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
 using FilmDetails = NxPlx.Models.Database.Film.FilmDetails;
 
 namespace NxPlx.Models.File

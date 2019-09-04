@@ -1,4 +1,3 @@
-using System.Net;
 using Microsoft.Extensions.Caching.Redis;
 using NxPlx.Configuration;
 using StackExchange.Redis;
@@ -19,7 +18,6 @@ namespace NxPlx.Services.Caching
             }
         }))
         {
-            
         }
     }
 }

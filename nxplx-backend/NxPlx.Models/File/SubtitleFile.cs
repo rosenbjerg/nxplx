@@ -1,5 +1,3 @@
-using System;
-
 namespace NxPlx.Models.File
 {
     public class SubtitleFile : PhysicalFile

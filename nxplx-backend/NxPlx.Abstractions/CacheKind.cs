@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NxPlx.Abstractions
+﻿namespace NxPlx.Abstractions
 {
     public enum CacheKind
     {

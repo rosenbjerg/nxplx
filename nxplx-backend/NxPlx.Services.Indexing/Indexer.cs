@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -12,10 +11,6 @@ using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
-using MovieCollection = NxPlx.Models.Details.Film.MovieCollection;
-using Network = NxPlx.Models.Details.Series.Network;
-using ProductionCountry = NxPlx.Models.Details.Film.ProductionCountry;
-using SpokenLanguage = NxPlx.Models.Details.Film.SpokenLanguage;
 
 namespace NxPlx.Services.Index
 {

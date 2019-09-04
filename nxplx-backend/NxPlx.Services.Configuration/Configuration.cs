@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NxPlx.Configuration
+﻿namespace NxPlx.Configuration
 {
     public class Configuration
     {
