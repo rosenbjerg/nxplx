@@ -29,43 +29,36 @@ namespace NxPlx.Services.Index
             _databaseMapper = databaseMapper;
             _logger = logger;
         }
-        private void AddDownloadTask(List<Task> tasks, SeriesDetails seriesDetails)
-        {      
-            tasks.AddRange(new[]
-            {
-                _detailsApi.DownloadImage("w154", seriesDetails.PosterPath),
-                _detailsApi.DownloadImage("w342", seriesDetails.PosterPath),
-                _detailsApi.DownloadImage("w1280", seriesDetails.PosterPath)
-            });
+        private void AddDownloadTask(HashSet<(string size, string url)> urls, SeriesDetails seriesDetails)
+        {
+            urls.Add(("w154", seriesDetails.PosterPath));
+            urls.Add(("w342", seriesDetails.PosterPath));
+            urls.Add(("w1280", seriesDetails.BackdropPath));
             seriesDetails.Seasons?.ForEach(s =>
             {
-                tasks.Add(_detailsApi.DownloadImage("w154", s.PosterPath));
-                tasks.Add(_detailsApi.DownloadImage("w342", s.PosterPath));
+                urls.Add(("w154", s.PosterPath));
+                urls.Add(("w342", s.PosterPath));
                 if (s.Episodes != null)
                 {
-                    tasks.AddRange(s.Episodes.Select(e => _detailsApi.DownloadImage("w185", e.StillPath)));
-                    tasks.AddRange(s.Episodes.Select(e => _detailsApi.DownloadImage("w1280", e.StillPath)));
+                    foreach (var episode in s.Episodes)
+                    {
+                        urls.Add(("w185", episode.StillPath));
+                        urls.Add(("w1280", episode.StillPath));
+                    }
                 }
             });
         }
-        private void AddDownloadTask(List<Task> tasks, FilmDetails filmDetails)
+        private void AddDownloadTask(HashSet<(string size, string url)> urls, FilmDetails filmDetails)
         {      
-            tasks.AddRange(new[]
-            {
-                _detailsApi.DownloadImage("w154", filmDetails.PosterPath),
-                _detailsApi.DownloadImage("w342", filmDetails.PosterPath),
-                _detailsApi.DownloadImage("w1280", filmDetails.PosterPath)
-            });
-            
+            urls.Add(("w154", filmDetails.PosterPath));
+            urls.Add(("w342", filmDetails.PosterPath));
+            urls.Add(("w1280", filmDetails.BackdropPath));
             
             if (filmDetails.BelongsToCollection != null)
             {
-                tasks.AddRange(new[]
-                {
-                    _detailsApi.DownloadImage("w154", filmDetails.BelongsToCollection.PosterPath),
-                    _detailsApi.DownloadImage("w342", filmDetails.BelongsToCollection.PosterPath),
-                    _detailsApi.DownloadImage("w1280", filmDetails.BelongsToCollection.BackdropPath)
-                });
+                urls.Add(("w154", filmDetails.BelongsToCollection.PosterPath));
+                urls.Add(("w342", filmDetails.BelongsToCollection.PosterPath));
+                urls.Add(("w1280", filmDetails.BelongsToCollection.BackdropPath));
             }
         }
         
@@ -87,7 +80,7 @@ namespace NxPlx.Services.Index
             var newFilm = fileIndexer.IndexFilm(currentFilm, folders);
             _logger.Info("Found {NewAmount} new film files in {LibraryFoldersAmount} folder(s) in {ScanTime} seconds", newFilm.Count, folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
-            var imageDownloads = new List<Task>(newFilm.Count * 6);
+            var imageDownloads = new HashSet<(string size, string url)>(newFilm.Count * 6);
             var uniqueDetails = GetUnique(await FindFilmDetails(newFilm, imageDownloads));
             _logger.Info("Downloaded details for {NewAmount} new film in {DownloadTime} seconds", uniqueDetails.Count, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
@@ -108,12 +101,16 @@ namespace NxPlx.Services.Index
             await ctx.AddRangeAsync(newFilm);
             
             await ctx.SaveChangesAsync();
-            await Task.WhenAll(imageDownloads);
+
+            foreach (var (size, url) in imageDownloads.AsParallel().WithDegreeOfParallelism(8))
+            {
+                await _detailsApi.DownloadImage(size, url);
+            }
             _logger.Info("Indexing film in {LibraryFoldersAmount} folders took {Elapsed} seconds", folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
         }
 
-        private async Task<List<FilmDetails>> FindFilmDetails(List<FilmFile> newFilm, List<Task> imageDownloads)
+        private async Task<List<FilmDetails>> FindFilmDetails(List<FilmFile> newFilm, HashSet<(string size, string url)> imageDownloads)
         {
             var allDetails = new List<FilmDetails>();
             foreach (var filmFile in newFilm)
@@ -154,7 +151,7 @@ namespace NxPlx.Services.Index
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, folders);
             _logger.Info("Found {NewAmount} new episode files in {LibraryFoldersAmount} folder(s) in {ScanTime} seconds", newEpisodes.Count, folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
-            var imageDownloads = new List<Task>(newEpisodes.Count * 3);
+            var imageDownloads = new HashSet<(string size, string url)>(newEpisodes.Count * 5);
             var uniqueDetails = await GetUniqueNew(await FindSeriesDetails(newEpisodes, imageDownloads));
             _logger.Info("Downloaded details for {NewAmount} new series in {DownloadTime} seconds", uniqueDetails.Count, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
@@ -175,13 +172,16 @@ namespace NxPlx.Services.Index
             await ctx.AddRangeAsync(productionCompanies);
             
             await ctx.SaveChangesAsync();
-            await Task.WhenAll(imageDownloads);
+            foreach (var (size, url) in imageDownloads.AsParallel().WithDegreeOfParallelism(8))
+            {
+                await _detailsApi.DownloadImage(size, url);
+            }
             _logger.Info("Indexing episodes in {LibraryFoldersAmount} folders took {Elapsed} seconds", folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             Console.WriteLine(DateTime.UtcNow + ": " + "Saved series");
         }
 
-        private async Task<List<SeriesDetails>> FindSeriesDetails(List<EpisodeFile> newEpisodes, List<Task> imageDownloads)
+        private async Task<List<SeriesDetails>> FindSeriesDetails(List<EpisodeFile> newEpisodes, HashSet<(string size, string url)> imageDownloads)
         {
             var allDetails = new List<SeriesDetails>();
 
@@ -189,9 +189,10 @@ namespace NxPlx.Services.Index
             {
                 var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
 
-                var details = searchResults.Any() ? searchResults[0] : null;
+                var details = (searchResults != null && searchResults.Any()) ? searchResults[0] : null;
 
-                if (details == null) continue;
+                if (details == null) 
+                    continue;
 
                 var seriesDetails = await _detailsApi.FetchTvDetails(details.Id);
                 episodeFile.SeriesDetailsId = seriesDetails.Id;

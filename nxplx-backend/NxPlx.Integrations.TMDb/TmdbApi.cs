@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Esendex.TokenBucket;
 using Newtonsoft.Json;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
@@ -18,7 +20,7 @@ namespace NxPlx.Integrations.TMDBApi
 {
     public class TmdbApi : DetailsApiBase
     {
-        private const int ThrottlingMs = 1000 / 40;
+        private const int ThrottlingMs = 10000 / 40;
         private const string BaseUrl = "https://api.themoviedb.org/3";
         
         private string _key;
@@ -32,19 +34,26 @@ namespace NxPlx.Integrations.TMDBApi
             Directory.CreateDirectory(_imageFolder);
         }
 
-        private DateTime _lastRequest = DateTime.MinValue;
-        
+        private readonly ITokenBucket _bucket = TokenBuckets.Construct()
+            .WithCapacity(10)
+            .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(4))
+            .Build();
         private async Task<string> Fetch(string url)
         {
-            var delay = DateTime.UtcNow.Subtract(_lastRequest).TotalMilliseconds;
-            if (delay < ThrottlingMs) await Task.Delay(TimeSpan.FromMilliseconds(delay));
-
-            var (content, cached) = await FetchInternal(url);
-            if (!cached)
             {
-                _lastRequest = DateTime.UtcNow;
+                var cachedContent = await CachingService.GetAsync(url);
+                if (!string.IsNullOrEmpty(cachedContent)) return cachedContent;
             }
+
+            _bucket.Consume(1);
             
+            var (content, cached) = await FetchInternal(url);
+            
+            if (content.StartsWith("{\"status_code\":25"))
+            {
+                return await Fetch(url);
+            }
+
             return content;
         }
 
@@ -68,7 +77,9 @@ namespace NxPlx.Integrations.TMDBApi
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
 
-            return Mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
+            var mapped = Mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
+            
+            return mapped;
         }
 
         public override async Task<FilmDetails> FetchMovieDetails(int id)
@@ -88,7 +99,7 @@ namespace NxPlx.Integrations.TMDBApi
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = Mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.Id));
+            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             
@@ -110,26 +121,7 @@ namespace NxPlx.Integrations.TMDBApi
             
             var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
             var outputPath = Path.Combine(Path.Combine(_imageFolder, $"{imageName}-{size}.jpg"));
-
-            if (!File.Exists(outputPath))
-            {
-                var response = await Client.GetAsync($"https://image.tmdb.org/t/p/{size}{imageUrl}?api_key={_key}");
-                using (var imageStream = await response.Content.ReadAsStreamAsync())
-                {
-                    try
-                    {
-                        using (var outputStream = File.OpenWrite(outputPath))
-                        {
-                         await imageStream.CopyToAsync(outputStream);
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        Logger.Trace("Failed to download image {path}. It is already being downloaded", outputPath);
-                    }
-                }
-                
-            }
+            await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", outputPath);
         }
     }
 }

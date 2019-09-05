@@ -14,4 +14,8 @@
       <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Esendex.TokenBucket" Version="1.0.7" />
+    </ItemGroup>
+
 </Project>
