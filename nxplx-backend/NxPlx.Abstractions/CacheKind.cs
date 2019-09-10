@@ -2,7 +2,7 @@
 {
     public enum CacheKind
     {
-        WebRequest = 1440,
+        WebRequest = 10080,
         UserSession = 10080
     }
 }

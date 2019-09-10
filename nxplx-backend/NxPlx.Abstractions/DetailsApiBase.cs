@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using NxPlx.Models.Details.Film;
@@ -37,7 +36,7 @@ namespace NxPlx.Abstractions
 
             if (string.IsNullOrEmpty(content))
             {
-                Console.WriteLine($"{DateTime.Now.ToLongTimeString()}\t{url}");
+                Console.WriteLine($"{url}");
                 var response = await Client.GetAsync(url);
                 
                 content = await response.Content.ReadAsStringAsync();

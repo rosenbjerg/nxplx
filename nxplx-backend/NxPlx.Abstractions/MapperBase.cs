@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NxPlx.Abstractions
 {
@@ -24,6 +25,20 @@ namespace NxPlx.Abstractions
             }
 
             throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instance));
+        }
+        
+        public IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
+            where TFrom : class
+        {
+            if (instances == null) return new TTo[0];
+            
+            if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
+            {
+                var mapper = (Func<TFrom, TTo>) mapperObject;
+                return instances.Select(e => e == default ? default : mapper(e));
+            }
+
+            throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instances));
         }
     }
 }
