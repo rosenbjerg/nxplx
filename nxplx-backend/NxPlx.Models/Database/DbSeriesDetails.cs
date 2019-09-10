@@ -15,7 +15,7 @@ namespace NxPlx.Services.Database.Models
         public string Name { get; set; }
         public virtual List<JoinEntity<DbSeriesDetails, Network>> Networks { get; set; }
         public string OriginalName { get; set; }
-        public virtual List<JoinEntity<DbSeriesDetails, SeasonDetails>> Seasons { get; set; }
+        public virtual List<SeasonDetails> Seasons { get; set; }
         public string Type { get; set; }
         public string BackdropPath { get; set; }
         public List<JoinEntity<DbSeriesDetails, Genre>> Genres { get; set; }

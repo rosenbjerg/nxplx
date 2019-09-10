@@ -11,7 +11,7 @@ namespace NxPlx.Services.Database.Models
         public bool Adult { get; set; }
         public long Budget { get; set; }
         public string ImdbId { get; set; }
-        public virtual JoinEntity<DbFilmDetails, MovieCollection> BelongsToCollection { get; set; }
+        public virtual MovieCollection BelongsInCollection { get; set; }
         public string OriginalTitle { get; set; }
         public virtual List<JoinEntity<DbFilmDetails, ProductionCountry, string>> ProductionCountries { get; set; }
         public DateTime? ReleaseDate { get; set; }
@@ -24,10 +24,10 @@ namespace NxPlx.Services.Database.Models
         public List<JoinEntity<DbFilmDetails, Genre>> Genres { get; set; }
         public string OriginalLanguage { get; set; }
         public string Overview { get; set; }
-        public double Popularity { get; set; }
+        public float Popularity { get; set; }
         public string PosterPath { get; set; }
         public List<JoinEntity<DbFilmDetails, ProductionCompany>> ProductionCompanies { get; set; }
-        public double VoteAverage { get; set; }
+        public float VoteAverage { get; set; }
         public int VoteCount { get; set; }
     }
 }

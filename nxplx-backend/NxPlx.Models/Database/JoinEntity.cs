@@ -6,10 +6,10 @@ namespace NxPlx.Services.Database.Models
         where TEntity1 : EntityBase
         where TEntity2 : EntityBase
     {
-        public TEntity1 Entity1 { get; set; }
+        public virtual TEntity1 Entity1 { get; set; }
         public int Entity1Id { get; set; }
         
-        public TEntity2 Entity2 { get; set; }
+        public virtual TEntity2 Entity2 { get; set; }
         public int Entity2Id { get; set; }
     }
     
@@ -17,10 +17,10 @@ namespace NxPlx.Services.Database.Models
         where TEntity1 : EntityBase
         where TEntity2 : class
     {
-        public TEntity1 Entity1 { get; set; }
+        public virtual TEntity1 Entity1 { get; set; }
         public int Entity1Id { get; set; }
         
-        public TEntity2 Entity2 { get; set; }
+        public virtual TEntity2 Entity2 { get; set; }
         public TEntity2Key Entity2Id { get; set; }
     }
 }
