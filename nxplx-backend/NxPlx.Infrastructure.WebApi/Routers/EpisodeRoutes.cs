@@ -2,7 +2,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Models.Dto;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Services.Database;
 using Red.Interfaces;
@@ -18,7 +17,7 @@ namespace NxPlx.WebApi.Routers
                 var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
                 
                 using var ctx = new MediaContext();
-                var seriesDetails = await ctx.Series.FindAsync(id);
+                var seriesDetails = await ctx.SeriesDetails.FindAsync(id);
                 var episodes = await ctx.EpisodeFiles
                     .Where(e => e.SeriesDetailsId == id)
                     .ToListAsync();
@@ -37,25 +36,23 @@ namespace NxPlx.WebApi.Routers
                 var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
                 
                 using var ctx = new MediaContext();
-                var series = await ctx.Series.FindAsync(id);
+                var series = await ctx.SeriesDetails.FindAsync(id);
                 if (series == null)
                 {
                     return await res.SendStatus(HttpStatusCode.NotFound);
                 }
                     
-                var season = series.Seasons.FirstOrDefault(s => s.Entity2.SeasonNumber == no);
+                var season = series.Seasons.FirstOrDefault(s => s.SeasonNumber == no);
                 if (season == null)
                 {
                     return await res.SendStatus(HttpStatusCode.NotFound);
                 }
 
-                var seasonDetails = season.Entity2;
-
                 var episodes = await ctx.EpisodeFiles
                     .Where(e => e.SeriesDetailsId == id && e.SeasonNumber == no)
                     .ToListAsync();
                     
-                return await res.SendJson(new { seasonDetails, episodes });
+                return await res.SendJson(new { season, episodes });
             });
             
             router.Get("/watch/:file_id", async (req, res) =>

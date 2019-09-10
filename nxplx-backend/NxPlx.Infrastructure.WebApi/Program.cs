@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Logging;
 using NxPlx.Integrations.TMDBApi;
-using NxPlx.Models.Dto;
-using NxPlx.Models.File;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
 using NxPlx.Services.Index;
@@ -27,11 +23,10 @@ namespace NxPlx.WebApi
                 var registration = new RegistrationContainer();
                 registration.Register<ICachingService, RedisCachingService>();
                 registration.Register<ILogger, NLogger>();
-                registration.Register<IDtoMapper, DtoMapper>();
                 registration.Register<IDatabaseMapper, DatabaseMapper>();
-                registration.Register<IDetailsMapper, TMDbMapper>();
-                registration.Register<IDetailsApi, TmdbApi>();
-                registration.Register<Indexer>();
+                registration.Register<IDetailsMapper, TMDbMapper>(false);
+                registration.Register<IDetailsApi, TmdbApi>(false);
+                registration.Register<Indexer>(false);
             }
             
             var container = new ResolveContainer();
@@ -39,57 +34,22 @@ namespace NxPlx.WebApi
             var logger = container.Resolve<ILogger>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
             
-            await indexer.IndexMovieLibrary(new []{""});
-            await indexer.IndexSeriesLibrary(new []{""});
+//            await indexer.IndexMovieLibrary(new []{""});
+//            await indexer.IndexSeriesLibrary(new []{""});
 
            
             var server = new RedHttpServer(cfg.HttpPort);
-            
-            server.RespondWithExceptionDetails = true;
-            
             var databaseContextManager = new DatabaseContextManager();
-
-            
-            
-            server.ConfigureServices = services =>
-            {
-                databaseContextManager.Register(services);
-            };
+            server.RespondWithExceptionDetails = true;
+            server.ConfigureServices = databaseContextManager.Register;
             databaseContextManager.Initialize();
             
-            EpisodeRoutes.Register(server.CreateRouter("/series"));
+            EpisodeRoutes.Register(server.CreateRouter("/api/series"));
+            FilmRoutes.Register(server.CreateRouter("/api/film"));
+            OverviewRoutes.Register(server.CreateRouter("/api/overview"));
+            ImageRoutes.Register(server.CreateRouter("/api/images"));
             
-            server.Get("/insert", async (req, res) =>
-            {
-                var dummyfile = new EpisodeFile
-                {
-                    FileSizeBytes = 12398,
-                    Path = "/daw/daw/daw",
-                    MediaDetails = new FFMpegProbeDetails(),
-                    Added = DateTime.UtcNow,
-                    LastWrite = DateTime.UtcNow
-                };
-                
-                
-                using (var context = new MediaContext())
-                {
-                    context.EpisodeFiles.Add(dummyfile);
-
-                    await context.SaveChangesAsync();
-                }
-                
-                return await res.SendString("ok");
-            });
-            
-            server.Get("/fetch", async (req, res) =>
-            {
-                using (var context = new MediaContext())
-                {
-                    var files = await context.EpisodeFiles.Include(e => e.MediaDetails).ToListAsync();
-                    return await res.SendJson(files);
-                }
-            });
-            
+        
             await server.RunAsync();
         }
         

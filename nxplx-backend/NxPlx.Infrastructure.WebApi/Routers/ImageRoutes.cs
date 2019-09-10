@@ -3,7 +3,7 @@ using Red.Interfaces;
 
 namespace NxPlx.WebApi.Routers
 {
-    public class ImageRouter
+    public class ImageRoutes
     {
         public static void Register(IRouter router)
         {
