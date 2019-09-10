@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Models;
-using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
@@ -152,22 +151,26 @@ namespace NxPlx.Services.Index
             _logger.Info("Found {NewAmount} new episode files in {LibraryFoldersAmount} folder(s) in {ScanTime} seconds", newEpisodes.Count, folders.Count(), Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var imageDownloads = new HashSet<(string size, string url)>(newEpisodes.Count * 5);
-            var uniqueDetails = await GetUniqueNew(await FindSeriesDetails(newEpisodes, imageDownloads));
+            var uniqueDetails = GetUnique(await FindSeriesDetails(newEpisodes, imageDownloads));
             _logger.Info("Downloaded details for {NewAmount} new series in {DownloadTime} seconds", uniqueDetails.Count, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var genres = await GetUniqueNew(uniqueDetails.Where(d => d.Genres != null).SelectMany(d => d.Genres));
             var networks = await GetUniqueNew(uniqueDetails.Where(d => d.Networks != null).SelectMany(d => d.Networks));
             var seasons = await GetUniqueNew(uniqueDetails.Where(d => d.Seasons != null).SelectMany(d => d.Seasons));
+            var episodes = await GetUniqueNew(seasons.Where(d => d.Episodes != null).SelectMany(d => d.Episodes));
             var creators = await GetUniqueNew(uniqueDetails.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy));
             var productionCompanies = await GetUniqueNew(uniqueDetails.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies));
 
             await ctx.AddRangeAsync(newEpisodes);
+            
             var databaseDetails = uniqueDetails.Select(_databaseMapper.Map<SeriesDetails, DbSeriesDetails>);
             var newDetails = await GetNew(databaseDetails, d => d.Id);
-            await ctx.AddRangeAsync(newDetails);
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(networks);
-            await ctx.AddRangeAsync(seasons);
+            await ctx.SeriesDetails.AddRangeAsync(newDetails);
+           
+            await ctx.SeasonsDetails.AddRangeAsync(seasons);
+            await ctx.EpisodeDetails.AddRangeAsync(episodes);
+            await ctx.Genres.AddRangeAsync(genres);
+            await ctx.Networks.AddRangeAsync(networks);
             await ctx.AddRangeAsync(creators);
             await ctx.AddRangeAsync(productionCompanies);
             

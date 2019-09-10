@@ -104,12 +104,14 @@ namespace NxPlx.Services.Index
                     var titleGroup = match.Groups["title"];
                     var yearGroup = match.Groups["year"];
 
+                    var title = titleGroup.Value != "" ? titleGroup.Value : Path.GetFileNameWithoutExtension(filmPath);
+
                     return new FilmFile
                     {
                         Added = DateTime.UtcNow,
                         Created = fileInfo.CreationTimeUtc,
                         LastWrite = fileInfo.LastWriteTimeUtc,
-                        Title = TitleCleanup(titleGroup.Value),
+                        Title = TitleCleanup(title),
                         Year = yearGroup.Success ? int.Parse(yearGroup.Value) : 1,
                         Path = filmPath,
                         FileSizeBytes = fileInfo.Length,
