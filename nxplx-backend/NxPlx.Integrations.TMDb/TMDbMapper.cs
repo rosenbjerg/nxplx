@@ -122,7 +122,7 @@ namespace NxPlx.Integrations.TMDBApi
                 AirDate = tvSeasonDetails.air_date,
                 PosterPath = tvSeasonDetails.poster_path,
                 SeasonNumber = tvSeasonDetails.season_number,
-                Episodes = tvSeasonDetails.episodes?.Select(Map<Episode, EpisodeDetails>).ToList()
+                Episodes = MapMany<Episode, EpisodeDetails>(tvSeasonDetails.episodes).ToList()
             });
             SetMapping<TvDetailsSeason, SeasonDetails>(tvSeasonDetails => new SeasonDetails
             {
@@ -131,8 +131,7 @@ namespace NxPlx.Integrations.TMDBApi
                 Overview = tvSeasonDetails.overview,
                 AirDate = tvSeasonDetails.air_date,
                 PosterPath = tvSeasonDetails.poster_path,
-                SeasonNumber = tvSeasonDetails.season_number,
-                TotalEpisodes = tvSeasonDetails.episode_count
+                SeasonNumber = tvSeasonDetails.season_number
             });
 
             SetMapping<Episode, EpisodeDetails>(episode => new EpisodeDetails
@@ -141,14 +140,21 @@ namespace NxPlx.Integrations.TMDBApi
                 Name = episode.name,
                 Overview = episode.overview,
                 SeasonNumber = episode.season_number,
+                AirDate = episode.air_date,
+                EpisodeNumber = episode.episode_number,
+                ProductionCode = episode.production_code,
+                StillPath = episode.still_path,
+                VoteAverage = episode.vote_average,
+                VoteCount = episode.vote_count
+                
                 
             });
             
             SetMapping<SearchResult<TvShowResult>, SeriesResult[]>(searchResult 
-                => searchResult.results?.Select(Map<TvShowResult, SeriesResult>).ToArray());
+                => MapMany<TvShowResult, SeriesResult>(searchResult.results).ToArray());
             
             SetMapping<SearchResult<MovieResult>, FilmResult[]>(searchResult 
-                => searchResult.results?.Select(Map<MovieResult, FilmResult>).ToArray());
+                => MapMany<MovieResult, FilmResult>(searchResult.results).ToArray());
             
             SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
             {

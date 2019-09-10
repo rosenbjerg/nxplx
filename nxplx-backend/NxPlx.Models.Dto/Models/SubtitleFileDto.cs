@@ -1,10 +1,10 @@
-using NxPlx.Models.File;
+using System;
 
 namespace NxPlx.Models.Dto.Models
 {
     public class SubtitleFileDto
     {
-        public int id { get; set; }
+        public Guid id { get; set; }
 
         public string language { get; set; }
     }

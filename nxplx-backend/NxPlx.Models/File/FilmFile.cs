@@ -1,10 +1,12 @@
+using NxPlx.Services.Database.Models;
+
 namespace NxPlx.Models.File
 {
-    public class FilmFile : MediaFile
+    public class FilmFile : MediaFileBase
     {
         public string Title { get; set; }
 
-//        public FilmDetails FilmDetails { get; set; }
+        public virtual DbFilmDetails FilmDetails { get; set; }
         
         public int FilmDetailsId { get; set; }
         

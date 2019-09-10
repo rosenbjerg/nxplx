@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Esendex.TokenBucket;
@@ -36,7 +35,7 @@ namespace NxPlx.Integrations.TMDBApi
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
             .WithCapacity(10)
-            .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(4))
+            .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(3))
             .Build();
         private async Task<string> Fetch(string url)
         {
@@ -60,7 +59,13 @@ namespace NxPlx.Integrations.TMDBApi
         public override async Task<FilmResult[]> SearchMovies(string title, int year)
         {
             var encodedTitle = HttpUtility.UrlEncode(title);
-            var encodedYear = year == 0 ? "" : $"&year={year}";
+
+            if (title == "" || encodedTitle == "")
+            {
+                return new FilmResult[0];
+            }
+            
+            var encodedYear = year < 2 ? "" : $"&year={year}";
             var url = $"{BaseUrl}/search/movie?api_key={_key}&query={encodedTitle}{encodedYear}";
 
             var content = await Fetch(url);

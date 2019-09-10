@@ -11,6 +11,5 @@ namespace NxPlx.Models.Details.Series
         public string PosterPath { get; set; }
         public int SeasonNumber { get; set; }
         public List<EpisodeDetails> Episodes { get; set; }
-        public int TotalEpisodes { get; set; }
     }
 }

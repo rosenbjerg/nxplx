@@ -1,8 +1,10 @@
+using System;
+
 namespace NxPlx.Models.Details.Series
 {
     public class EpisodeDetails : EntityBase
     {
-        public string AirDate { get; set; }
+        public DateTime? AirDate { get; set; }
         
         public int EpisodeNumber { get; set; }
         
