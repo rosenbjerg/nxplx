@@ -1,0 +1,29 @@
+.login {
+    width: 400px;
+    max-width: 98%;
+    margin: 15vh auto auto;
+}
+
+.login form span {
+    width: 25%;
+    display: inline-block;
+    color: var(--faded-text);
+}
+
+.login form input {
+    border: var(--border-color) solid 1px;
+    border-radius: 3px;
+    background-color: var(--secondary-color);
+    color: var(--focused-text);
+    line-height: 1.5em;
+    padding-left: 3px;
+    margin-bottom: 5px;
+    width: 75%;
+}
+.login button {
+    float: right;
+    border: var(--border-color) solid 1px;
+    background-color: var(--secondary-color);
+    color: var(--focused-text);
+    line-height: 1.5em;
+}

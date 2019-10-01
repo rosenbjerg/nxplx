@@ -6,7 +6,7 @@ export default function(config, env, helpers) {
         config.devServer.proxy = [
             {
                 path: "/api/**",
-                target: "http://localhost:5990"
+                target: "http://localhost:5353"
             }
         ];
     }

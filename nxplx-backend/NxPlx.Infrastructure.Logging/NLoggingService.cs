@@ -3,16 +3,16 @@ using NLog;
 using NLog.Layouts;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
+using NxPlx.Abstractions;
 using NxPlx.Configuration;
-using ILogger = NxPlx.Abstractions.ILogger;
 
 namespace NxPlx.Infrastructure.Logging
 {
-    public class NLogger : ILogger
+    public class NLoggingService : ILoggingService
     {
         private readonly Logger _logger = LogManager.GetLogger("System");
 
-        public NLogger()
+        public NLoggingService()
         {
             var cfg = ConfigurationService.Current;
             

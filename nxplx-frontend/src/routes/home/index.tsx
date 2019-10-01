@@ -7,6 +7,7 @@ import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import {Link, route} from "preact-router";
 import Loading from '../../components/loading';
+import { imageUrl } from "../../Details";
 import http from '../../Http';
 import * as style from './style.css';
 
@@ -14,14 +15,14 @@ interface Info { id:number; title:string; poster:string; kind:'film'|'series' }
 
 interface Props {}
 
-interface State { overview: Info[]; progress?: object; search:string }
+interface State { overview?: Info[]; progress?: object; search:string }
 
 interface Progress { id:number; uid:number; eid:number; progress:number; duration:number }
 
 export default class Home extends Component<Props, State> {
 
     public state = {
-        overview: [],
+        overview: undefined,
         progress: undefined,
         search: ''
     };
@@ -31,7 +32,7 @@ export default class Home extends Component<Props, State> {
     }
 
 
-    public render(props:Props, state:State) {
+    public render(props:Props, { overview, search }: State) {
         return (
             <div class={style.home}>
                 <Helmet title="NxPlx" />
@@ -40,22 +41,24 @@ export default class Home extends Component<Props, State> {
                     <button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>
                 </div>
 
-                {state.overview.length === 0 && <Loading />}
-                <div class={style.entryContainer}>
-                    {state.overview && state.overview
-                        .filter(this.entrySearch(state.search))
-                        .map(entry => (
-                            <Link key={entry.id} href={`/${entry.kind}/${entry.id}`}>
-                                <img key={entry.id} class={style.entryTile} src={`/api/posters/${entry.poster}-w154.jpg`} title={entry.title} alt={entry.title} />
-                            </Link>
+                {overview === undefined ? (
+                    <Loading />
+                ) : (
+                    <div class={style.entryContainer}>
+                        {overview && overview
+                            .filter(this.entrySearch(search))
+                            .map(entry => (
+                                    <Link key={entry.id} href={`/${entry.kind}/${entry.id}`}>
+                                        <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 154)} title={entry.title} alt={entry.title} />
+                                    </Link>
 
-                        )
-                    )}
-                </div>
+                                )
+                            )}
+                    </div>
+                )}
             </div>
         );
     }
-
     private entrySearch = (search:string) => (entry:Info) => {
         const lowercaseSearch = search.toLowerCase();
         return  entry.kind.includes(lowercaseSearch) ||
@@ -64,17 +67,15 @@ export default class Home extends Component<Props, State> {
 
     private load = () => {
         http.get('/api/overview')
-            .then(response => response.json())
-            .then(overview => this.setState({ overview: orderBy(overview, ['title'], ['asc']) }));
-        // http.get('/api/progress/all')
-        //     .then(response => response.json())
-        //     .then(progress => {
-        //         const progressDict = progress.reduce((acc:object, p:Progress) => {
-        //             acc[p.eid] = p.duration / p.progress;
-        //             return acc;
-        //         }, {});
-        //         this.setState({progress: progressDict})
-        // });
+            .then(async response => {
+                if (response.ok) {
+                    const overview = await response.json();
+                    this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
+                }
+                else {
+                    route('/login');
+                }
+            })
     };
 
     private scan = () => {

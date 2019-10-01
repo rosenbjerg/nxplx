@@ -1,1 +1,1 @@
-interface NxPlxStore { user:object|null, subtitles:object }
+interface NxPlxStore { isAdmin:boolean }

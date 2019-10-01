@@ -1,6 +1,6 @@
 namespace NxPlx.Abstractions
 {
-    public interface ILogger
+    public interface ILoggingService
     {
         void Trace(string message, params object[] arguments);
         void Debug(string message, params object[] arguments);

@@ -1,4 +1,4 @@
-import { createSnackbar, Snackbar, SnackOptions, Action } from '@egoist/snackbar'
+import { Action, createSnackbar, Snackbar, SnackOptions } from '@egoist/snackbar'
 import '@egoist/snackbar/dist/snackbar.css'
 import { Component, h } from "preact";
 // @ts-ignore
@@ -9,22 +9,13 @@ import 'video.js/dist/video-js.min.css';
 import {formatProgress} from '../../commonFilmInfo';
 import Loading from '../../components/loading';
 import { formatSubtitleName } from '../../components/Subtitles';
+import { imageUrl, Info } from "../../Details";
 import http from "../../Http";
-import {ExtEpisodeInfo, FilmInfo} from '../../Info';
 import * as style from "./style.css";
 
-interface Props { store:Store<object>; kind:string; id:string }
+interface Props { store:Store<object>; kind:string; fid:string }
 
-interface State { time:number; count:number, info:FilmInfo|ExtEpisodeInfo }
-
-const pad = (obj:any) => obj.toString().padStart(2, '0');
-
-const formatTitle = (info:FilmInfo|ExtEpisodeInfo) => {
-    // @ts-ignore
-    if (info.season === undefined) { return info.title; }
-    // @ts-ignore
-    return `${info.title} S${pad(info.season)} E${pad(info.number)}`
-};
+interface State { time:number; count:number, info:Info }
 
 export default class Watch extends Component<Props, State> {
     // @ts-ignore
@@ -37,17 +28,17 @@ export default class Watch extends Component<Props, State> {
     private previousUnload?: any;
 
 
-    public render({ kind, id }:Props, { info }:State) {
+    public render({ kind, fid }:Props, { info }:State) {
         if (!info) { return <Loading /> }
         setTimeout(this.loadVideo, 0);
         return (
             <div class={style.container}>
-                <Helmet title={`▶ ${formatTitle(info)} - NxPlx`} />
+                <Helmet title={`▶ ${info.title} - NxPlx`} />
 
                 <video id="video" class="video-js vjs-default-skin vjs-big-play-centered" controls muted preload="metadata">
-                    <source src={`/api/${kind}/${info.eid}/watch`} type="video/mp4" />
+                    <source src={`/api/${kind}/watch/${fid}`} type="video/mp4" />
                     {info.subtitles.map(lang => (
-                        <track key={lang} src={`/api/subtitle/${kind}/${info.eid}/${lang}`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
+                        <track key={lang} src={`/api/subtitle/${fid}/${lang}`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
                         ))}
                 </video>
             </div>
@@ -63,8 +54,8 @@ export default class Watch extends Component<Props, State> {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
 
-        const { kind, id } = this.props;
-        http.get(`/api/${kind}/${id}`)
+        const { kind, fid } = this.props;
+        http.get(`/api/${kind}/info/${fid}`)
             .then(response => response.json())
             .then(info => this.setState({ info }));
     }
@@ -76,19 +67,19 @@ export default class Watch extends Component<Props, State> {
 
         if (!this.state.info) { return; }
         const progress = this.video.currentTime();
-        const duration = this.video.duration();
         if (progress > 5) {
-            http.post('/api/progress/' + this.state.info.eid, { duration, progress });
+            http.put('/api/progress/' + this.state.info.fid, { value: progress });
         }
 
         const tracks = this.video.textTracks();
         let subtitleLang = 'none';
-         for (let i = 0; i < tracks.length; i++) {
+        for (let i = 0; i < tracks.length; i++) {
             if (tracks[i].mode === 'showing') {
                 subtitleLang = tracks[i].language;
+                break;
             }
         }
-        http.post('/api/subtitle/' + this.state.info.eid, { value: subtitleLang });
+        http.put('/api/subtitle/preference/' + this.state.info.fid, { value: subtitleLang });
 
         this.video.dispose();
     };
@@ -97,11 +88,11 @@ export default class Watch extends Component<Props, State> {
         const video : videojs.Player = videojs('video');
         this.video = video;
 
-        const { eid } = this.state.info;
+        const { fid } = this.state.info;
 
         Promise.all([
-            http.get(`/api/subtitle/${eid}`).then(response => response.text()),
-            http.get(`/api/progress/${eid}`).then(response => response.text()),
+            http.get(`/api/subtitle/preference/${fid}`).then(response => response.text()),
+            http.get(`/api/progress/${fid}`).then(response => response.text()),
         ]).then(results => {
             const defaultLang = results[0];
             const progress = parseFloat(results[1]);
@@ -130,7 +121,7 @@ export default class Watch extends Component<Props, State> {
             }
         });
 
-        video.poster(`/api/posters/${this.state.info.backdrop}-w1280.jpg`);
+        video.poster(imageUrl(this.state.info.backdrop, 1280));
         const volume = parseFloat(localStorage.getItem('player_volume') || '1.0');
         const muted = localStorage.getItem('player_muted') === 'true';
         const autoplay = localStorage.getItem('player_autoplay') === 'true';

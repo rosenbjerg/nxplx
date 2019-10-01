@@ -55,15 +55,11 @@
     opacity: 0.8;
     text-shadow: 0 0 4px black;
     position: absolute;
-    top: -18px;
-    left: -10%;
-    width: 100%;
+    top: -20px;
+    left: 0;
+    width: 160px;
     text-align: right;
     transition: top 90ms, left 90ms;
-}
-.seasonContainer:hover .number {
-    top: -20px;
-    left: calc(-10% - 2px);
 }
 .seasonContainer:hover .season {
     opacity: 0.9;

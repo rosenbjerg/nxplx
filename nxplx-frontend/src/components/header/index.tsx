@@ -1,24 +1,35 @@
 import { Component, h } from "preact";
-import { Link } from "preact-router/match";
+import { Link } from "preact-router";
+import { connect } from 'unistore/preact'
 import * as style from "./style.css";
 
-export default class Header extends Component {
-    public render() {
-        return (
-            <header class={style.header}>
+
+const Header = connect('isAdmin')(
+    ({ isAdmin }) => (
+        <header class={style.header}>
+            <Link href={'/'}>
                 <h1>NxPlx</h1>
-                <nav>
-                    <Link activeClassName={style.active} href="/">
-                        <i className="material-icons">home</i>
+            </Link>
+            <nav class={style.menu}>
+                <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
+
+                {isAdmin && (
+                    <Link href="/admin">
+                        <i class="material-icons">supervisor_account</i>
                     </Link>
-                    <Link activeClassName={style.active} href="/profile">
-                        <i className="material-icons">account_circle</i>
-                    </Link>
-                    <Link activeClassName={style.active} href="/settings">
-                        <i className="material-icons">settings</i>
-                    </Link>
-                </nav>
-            </header>
-        );
-    }
-}
+                )}
+                <Link href="/">
+                    <i class="material-icons">home</i>
+                </Link>
+                <Link href="/profile">
+                    <i class="material-icons">account_circle</i>
+                </Link>
+                <Link href="/settings">
+                    <i class="material-icons">settings</i>
+                </Link>
+            </nav>
+        </header>
+    )
+);
+
+export default Header;

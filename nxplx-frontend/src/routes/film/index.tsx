@@ -3,16 +3,16 @@ import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import {Link} from "preact-router";
 import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
+import { FilmPoster } from "../../components/FilmPoster";
 import Loading from '../../components/loading';
 import Subtitles from '../../components/Subtitles';
-import {FilmDetails} from "../../Details";
+import { FilmDetails, imageUrl, SeriesDetails } from "../../Details";
 import http from '../../Http';
-import { FilmInfo } from "../../Info";
 import * as style from './style.css';
 
 interface Props { id:string }
 
-interface State { details?:FilmDetails, info?:FilmInfo, bg:string; subtitle:string }
+interface State { details?:FilmDetails, bg:string; subtitle:string }
 
 export default class Home extends Component<Props, State> {
 
@@ -22,25 +22,31 @@ export default class Home extends Component<Props, State> {
     };
 
     public componentDidMount() : void {
-        Promise.all(
-            [
-                http.get(`/api/film/${this.props.id}`).then(response => response.json()),
-                http.get(`/api/film/${this.props.id}/details`).then(response => response.json())
-            ])
-            .then(results => {
-                const info:FilmInfo = results[0];
-                const details:FilmDetails = results[1];
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${`/api/posters/${info.backdrop}-w1280.jpg`}");`;
-                this.setState({ details, info, bg });
-            });
+        http.get(`/api/film/detail/${this.props.id}`)
+            .then(response => response.json())
+            .then(details => {
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
+                this.setState({ details, bg });
+        });
     }
 
-    public render(props:Props, { info, details, bg, subtitle }:State) {
-        if (!details || !info) {
+    public playPoster(details:FilmDetails) {
+        return (
+            <div class={style.playPosterContainer}>
+                <img class={style.poster} src={imageUrl(details.poster, 342)} alt=""/>
+                <Link class={style.play} href={`/watch/film/${details.fid}`} >
+                    <i class="material-icons">play_arrow</i>
+                </Link>
+            </div>
+        );
+    }
+
+    public render(props:Props, { details, bg, subtitle }:State) {
+        if (!details) {
             return (<Loading />);
         }
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdrop_path}>
+            <div class={style.bg} style={bg} data-bg={details.backdrop}>
                 <Helmet title={`${details.title} - NxPlx`} />
                 <div>
                     <h2 className={[style.title, style.marked].join(" ")}>{details.title}</h2>
@@ -50,24 +56,19 @@ export default class Home extends Component<Props, State> {
                         <h4 className={[style.tag, style.marked].join(" ")}>{details.tagline}</h4>
                     </div>
                 )}
-                <span class={style.playPosterContainer}>
-                    <img class={style.poster} src={`/api/posters/${info.poster}-w342.jpg`} alt=""/>
-                    <Link class={style.play} href={`/watch/film/${info.id}`} >
-                        <i class="material-icons">play_arrow</i>
-                    </Link>
-                </span>
+                <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
                 <span class={[style.info, style.marked].join(" ")}>
                     <div>
                         {
                             [
-                                {title: 'Released', value: details.release_date.substr(0, 4)},
+                                {title: 'Released', value: (details.releaseDate || '    ').substr(0, 4)},
                                 {title: 'Run time', value: formatRunTime(details.runtime)},
-                                {title: 'Rating', value: `${details.vote_average} from ${details.vote_count} votes`},
+                                {title: 'Rating', value: `${details.voteAverage}/10 from ${details.voteCount} votes`},
                                 {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},
-                                {title: 'Original languages', value: details.spoken_languages.map(sl => `${sl.name} (${sl.iso_639_1})`).join(", ")},
-                                {title: 'Production companies', value: details.production_companies.map(pc => pc.name).join(", ")},
-                                {title: 'Production countries', value: details.production_countries.map(pc => pc.name).join(", ")},
-                                {title: 'Subtitles', value: info.subtitles.length > 0 && (<Subtitles eid={info.eid} languages={info.subtitles} />) || "None"}
+                                {title: 'Original languages', value: details.spokenLanguages.map(sl => `${sl.name} (${sl.iso639_1})`).join(", ")},
+                                {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
+                                {title: 'Production countries', value: details.productionCountries.map(pc => pc.name).join(", ")},
+                                {title: 'Subtitles', value: <Subtitles file_id={details.fid.toString()} />}
                             ].map(formatInfoPair)
                         }
                     </div>

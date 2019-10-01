@@ -1,20 +1,20 @@
 
 interface Http {
 	get: (url:string) => Promise<Response>,
-	post: (url:string, body:any, json?:boolean) => Promise<Response>,
-	put: (url:string, body:any, json?:boolean) => Promise<Response>,
-	delete: (url:string, body:any, json?:boolean) => Promise<Response>
+	post: (url:string, body?:any, json?:boolean) => Promise<Response>,
+	put: (url:string, body?:any, json?:boolean) => Promise<Response>,
+	delete: (url:string, body?:any, json?:boolean) => Promise<Response>
 }
 
 function buildOptions(method:string, body:any, json:boolean) : object {
 	return json ? {
 		credentials: 'same-origin',
-		method: 'POST',
+		method,
 		body: JSON.stringify(body),
 		headers: { 'Content-Type': 'application/json' }
 	} : {
 		credentials: 'same-origin',
-		method: 'POST',
+		method,
 		body
 	};
 }

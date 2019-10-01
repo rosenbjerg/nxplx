@@ -2,12 +2,13 @@ import {Component, h} from "preact";
 import http from "../../Http";
 import * as style from "./style.css";
 
-interface Props { eid:number, languages:string[] }
+interface Props { file_id:string }
 
-interface State { selected?:string }
+interface State { selected?:string, languages?:string[] }
 
 export function formatSubtitleName(name:string) : string {
     switch (name) {
+            case 'en':
             case 'eng': return 'english';
             case 'da': return 'dansk';
             case 'sv': return 'svenska';
@@ -29,16 +30,23 @@ export function formatSubtitleName(name:string) : string {
 export default class SubtitleSelector extends Component<Props, State> {
 
     public componentDidMount(): void {
-        http.get('/api/subtitle/' + this.props.eid)
-            .then(response => response.text())
-            .then(lang => this.setState({selected: lang}));
+        http.get(`/api/subtitle/languages/${this.props.file_id}`)
+            .then(response => response.json())
+            .then(langs => this.setState({languages: langs}));
+
+        http.get(`/api/subtitle/preference/${this.props.file_id}`)
+            .then(response => response.text() || "none")
+            .then(preference => this.setState({selected: preference }));
     }
 
     public render(props:Props, state:State) {
+        if (state.languages === undefined || state.languages.length === 0) {
+            return "None"
+        }
         return (
             <select value={state.selected} class={style.subtitles} name="Subtitles" onInput={this.setSubtitle}>
-                <option>none</option>
-                {props.languages.map(sub => (<option value={sub}>{formatSubtitleName(sub)}</option>))}
+                <option value="none">none</option>
+                {state.languages.map(lang => (<option value={lang}>{formatSubtitleName(lang)}</option>))}
             </select>
         );
     }
@@ -47,6 +55,6 @@ export default class SubtitleSelector extends Component<Props, State> {
         // @ts-ignore
         const lang = event.target.value;
         if (!lang) { return; }
-        http.post(`/api/subtitle/${this.props.eid}`, { value: lang });
+        http.put(`/api/subtitle/preference/${this.props.file_id}`, { value: lang });
     }
 }

@@ -1,4 +1,4 @@
-namespace NxPlx.Models.Dto.Models
+namespace NxPlx.Models.Dto.Models.Film
 {
     public class SpokenLanguageDto
     {
