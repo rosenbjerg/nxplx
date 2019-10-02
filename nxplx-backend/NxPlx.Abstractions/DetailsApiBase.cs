@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,7 +11,8 @@ namespace NxPlx.Abstractions
     {
         protected readonly ICachingService CachingService;
         protected IDetailsMapper Mapper;
-        protected ILogger Logger;
+        protected ILoggingService LoggingService;
+        private string _imageFolder;
         
         private readonly HttpClient Client = new HttpClient
         {
@@ -22,11 +22,12 @@ namespace NxPlx.Abstractions
             }
         };
 
-        protected DetailsApiBase(ICachingService cachingService, IDetailsMapper mapper, ILogger logger)
+        protected DetailsApiBase(string imageFolder, ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService)
         {
             CachingService = cachingService;
-            Logger = logger;
+            LoggingService = loggingService;
             Mapper = mapper;
+            _imageFolder = imageFolder;
         }
         
         protected async Task<(string content, bool cached)> FetchInternal(string url)
@@ -36,21 +37,26 @@ namespace NxPlx.Abstractions
 
             if (string.IsNullOrEmpty(content))
             {
-                Console.WriteLine($"{url}");
                 var response = await Client.GetAsync(url);
-                
-                content = await response.Content.ReadAsStringAsync();
-                cached = false;
 
                 if (response.IsSuccessStatusCode)
+                {
+                    content = await response.Content.ReadAsStringAsync();
                     await CachingService.SetAsync(url, content, CacheKind.WebRequest);
+                }
+                cached = false;
+
             }
 
             return (content, cached);
         }
 
-        protected async Task DownloadImageInternal(string url, string outputPath)
+        protected async Task DownloadImageInternal(string url, string size, string imageName)
         {
+            var sizeDir = Path.Combine(_imageFolder, size);
+            var outputPath = Path.Combine(Path.Combine(sizeDir, $"{imageName}.jpg"));
+            Directory.CreateDirectory(sizeDir);
+            
             if (!File.Exists(outputPath))
             {
                 var response = await Client.GetAsync(url);
@@ -63,9 +69,9 @@ namespace NxPlx.Abstractions
                             await imageStream.CopyToAsync(outputStream);
                         }
                     }
-                    catch (IOException e)
+                    catch (IOException)
                     {
-                        Logger.Trace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
+                        LoggingService.Trace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
                     }
                 }
                 
@@ -74,9 +80,9 @@ namespace NxPlx.Abstractions
         
         public abstract Task<FilmResult[]> SearchMovies(string title, int year);
         public abstract Task<SeriesResult[]> SearchTvShows(string name);
-        public abstract Task<FilmDetails> FetchMovieDetails(int id);
-        public abstract Task<SeriesDetails> FetchTvDetails(int id);
-        public abstract Task<SeasonDetails> FetchTvSeasonDetails(int id, int season);
+        public abstract Task<FilmDetails> FetchMovieDetails(int id, string language);
+        public abstract Task<SeriesDetails> FetchTvDetails(int id, string language);
+        public abstract Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language);
         public abstract Task DownloadImage(string size, string imageUrl);
     }
 }

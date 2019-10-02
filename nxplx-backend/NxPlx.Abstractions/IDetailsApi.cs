@@ -9,9 +9,9 @@ namespace NxPlx.Abstractions
         Task<Models.Details.Search.FilmResult[]> SearchMovies(string title, int year);
         Task<Models.Details.Search.SeriesResult[]> SearchTvShows(string name);
 
-        Task<FilmDetails> FetchMovieDetails(int id);
-        Task<SeriesDetails> FetchTvDetails(int id);
-        Task<SeasonDetails> FetchTvSeasonDetails(int id, int season);
+        Task<FilmDetails> FetchMovieDetails(int id, string language);
+        Task<SeriesDetails> FetchTvDetails(int id, string language);
+        Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language);
         Task DownloadImage(string size, string imageUrl);
     }
 }
