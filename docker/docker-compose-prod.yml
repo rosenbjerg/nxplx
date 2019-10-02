@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  nxplx-database:
+    image: postgres:12-alpine
+    volumes:
+      - volumes/database:/var/lib/postgresql/data
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
+    ports:
+      - "5432:5432"
+      
+  nxplx-database:
+    image: redis:5.0.6-alpine
+    command: redis-server --requirepass 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
+    restart: always
+    ports:
+      - "6379:6379"
+
+  nxplx-webapi:
+    build: webapi
+    restart: on-failure
+    volumes:
+      - volumes/webapi:/nxplx-data
+    depends_on:
+      - database
+      - cache
+    ports:
+      - "5353:5353"
