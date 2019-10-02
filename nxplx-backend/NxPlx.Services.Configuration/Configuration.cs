@@ -10,12 +10,12 @@
         
         public string SqlHost { get; set; }
         public string SqlMediaDatabase { get; set; }
+        public string SqlUserDatabase { get; set; }
         public string SqlJobDatabase { get; set; }
         public string SqlUsername { get; set; }
         public string SqlPassword { get; set; }
         
-        public string RedisConfiguration { get; set; }
-        public string RedisInstance { get; set; }
+        public string RedisHost { get; set; }
         public string RedisPassword { get; set; }
         
         
