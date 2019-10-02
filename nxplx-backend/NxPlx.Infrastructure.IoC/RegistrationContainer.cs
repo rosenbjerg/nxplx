@@ -35,7 +35,6 @@ namespace NxPlx.Infrastructure.IoC
             
             if (singleInstance)
                 registration.SingleInstance();
-            ContainerManager.DefaultBuilder.Value.RegisterType<TInstance>().SingleInstance();
         }
     }
 }
