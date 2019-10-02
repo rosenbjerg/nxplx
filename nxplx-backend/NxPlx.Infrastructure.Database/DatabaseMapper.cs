@@ -1,11 +1,14 @@
 using System.Linq;
 using NxPlx.Abstractions;
+using NxPlx.Models;
+using NxPlx.Models.Database;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.Dto.Models;
+using NxPlx.Models.Dto.Models.Film;
+using NxPlx.Models.Dto.Models.Series;
 using NxPlx.Models.File;
-using NxPlx.Services.Database.Models;
 using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
 using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 
@@ -54,23 +57,6 @@ namespace NxPlx.Services.Database
                     Entity2Id = pb.Id,
                 }).ToList(),
             });
-            
-            SetMapping<DbSeriesDetails, SeriesDto>(seriesDetails => new SeriesDto
-            {
-                id = seriesDetails.Id,
-                backdropPath = seriesDetails.BackdropPath,
-                posterPath = seriesDetails.PosterPath,
-                voteAverage = seriesDetails.VoteAverage,
-                voteCount = seriesDetails.VoteCount,
-                name = seriesDetails.Name,
-                networks = seriesDetails.Networks.Select(n => n.Entity2),
-                genres = seriesDetails.Genres.Select(g => g.Entity2),
-                createdBy = seriesDetails.CreatedBy.Select(cb => cb.Entity2),
-                productionCompanies = seriesDetails.ProductionCompanies.Select(pc => pc.Entity2),
-                overview = seriesDetails.Overview,
-                seasons = seriesDetails.Seasons
-            });
-            
             SetMapping<FilmDetails, DbFilmDetails>(movieDetails => new DbFilmDetails
             {
                 Id = movieDetails.Id,
@@ -90,7 +76,7 @@ namespace NxPlx.Services.Database
                 ImdbId = movieDetails.ImdbId,
                 OriginalTitle = movieDetails.OriginalTitle,
                 ReleaseDate = movieDetails.ReleaseDate,
-                BelongsInCollection = movieDetails.BelongsToCollection,
+                BelongsInCollectionId = movieDetails.BelongsToCollection?.Id,
                 
                 Genres = movieDetails.Genres?.Select(genre => new JoinEntity<DbFilmDetails, Genre>
                 {
@@ -114,29 +100,49 @@ namespace NxPlx.Services.Database
                 }).ToList()
             });
             
-            SetMapping<DbFilmDetails, FilmDto>(filmDetails => new FilmDto
+            SetMapping<DbSeriesDetails, SeriesDto>(seriesDetails => new SeriesDto
             {
-                id = filmDetails.Id,
-                backdropPath = filmDetails.BackdropPath,
-                posterPath = filmDetails.PosterPath,
-                voteAverage = filmDetails.VoteAverage,
-                voteCount = filmDetails.VoteCount,
-                title = filmDetails.Title,
-                overview = filmDetails.Overview,
-                budget = filmDetails.Budget,
-                revenue = filmDetails.Revenue,
-                releaseDate = filmDetails.ReleaseDate,
-                runtime = filmDetails.Runtime,
-                imdbId = filmDetails.ImdbId,
-                tagline = filmDetails.Tagline,
-                belongsToCollection = filmDetails.BelongsInCollection,
-                genres = filmDetails.Genres?.Select(g => g.Entity2),
-                networks = filmDetails.SpokenLanguages?.Select(sl => sl.Entity2),
-                productionCountry = filmDetails.ProductionCountries?.Select(pc => pc.Entity2),
-                productionCompanies = filmDetails.ProductionCompanies?.Select(pc => pc.Entity2)
+                id = seriesDetails.Id,
+                backdrop = seriesDetails.BackdropPath,
+                poster = seriesDetails.PosterPath,
+                voteAverage = seriesDetails.VoteAverage,
+                voteCount = seriesDetails.VoteCount,
+                name = seriesDetails.Name,
+                networks = MapMany<Network, NetworkDto>(seriesDetails.Networks.Select(n => n.Entity2)),
+                genres = MapMany<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)),
+                createdBy = MapMany<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)),
+                productionCompanies = MapMany<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)),
+                overview = seriesDetails.Overview,
+                seasons = MapMany<SeasonDetails, SeasonLiteDto>(seriesDetails.Seasons)
             });
-
-            
+            SetMapping<SeasonDetails, SeasonLiteDto>(seasonDetails => new SeasonLiteDto
+            {
+                name = seasonDetails.Name,
+                number = seasonDetails.SeasonNumber,
+                airDate = seasonDetails.AirDate,
+                poster = seasonDetails.PosterPath,
+                overview = seasonDetails.Overview
+            });
+            SetMapping<SeasonDetails, SeasonDto>(seasonDetails => new SeasonDto
+            {
+                name = seasonDetails.Name,
+                number = seasonDetails.SeasonNumber,
+                airDate = seasonDetails.AirDate,
+                poster = seasonDetails.PosterPath,
+                overview = seasonDetails.Overview,
+                episodes = MapMany<EpisodeDetails, EpisodeDto>(seasonDetails.Episodes)
+            });
+            SetMapping<EpisodeDetails, EpisodeDto>(episodeDetails => new EpisodeDto
+            {
+                name = episodeDetails.Name,
+                seasonNumber = episodeDetails.SeasonNumber,
+                airDate = episodeDetails.AirDate,
+                overview = episodeDetails.Overview,
+                episodeNumber = episodeDetails.EpisodeNumber,
+                still = episodeDetails.StillPath,
+                voteAverage = episodeDetails.VoteAverage,
+                voteCount = episodeDetails.VoteCount
+            });
             
             SetMapping<DbSeriesDetails, OverviewElementDto>(seriesDetails => new OverviewElementDto
             {
@@ -153,13 +159,13 @@ namespace NxPlx.Services.Database
                 title = filmDetails.Title
             });
             
-            SetMapping<FilmFile, FilmInfoDto>(filmFilm => new FilmInfoDto
+            SetMapping<FilmFile, FilmDto>(filmFilm => new FilmDto
             {
                 id = filmFilm.FilmDetails.Id,
                 fid = filmFilm.Id,
+                library = filmFilm.PartOfLibraryId,
                 backdrop = filmFilm.FilmDetails.BackdropPath,
                 poster = filmFilm.FilmDetails.PosterPath,
-                subtitles = MapMany<SubtitleFile, SubtitleFileDto>(filmFilm.Subtitles),
                 title = filmFilm.FilmDetails.Title,
                 budget = filmFilm.FilmDetails.Budget,
                 genres = MapMany<Genre, GenreDto>(filmFilm.FilmDetails.Genres.Select(e => e.Entity2)).ToList(),
@@ -181,6 +187,37 @@ namespace NxPlx.Services.Database
                 belongsToCollection = Map<MovieCollection, MovieCollectionDto>(filmFilm.FilmDetails.BelongsInCollection),
             });
             
+            SetMapping<FilmFile, InfoDto>(filmFilm => new InfoDto
+            {
+                id = filmFilm.FilmDetails.Id,
+                fid = filmFilm.Id,
+                backdrop = filmFilm.FilmDetails.BackdropPath,
+                poster = filmFilm.FilmDetails.PosterPath,
+                title = filmFilm.FilmDetails.Title,
+                subtitles = filmFilm.Subtitles.Select(s => s.Language)
+            });
+            SetMapping<EpisodeFile, EpisodeFileDto>(episodeFile => new EpisodeFileDto
+            {
+                id = episodeFile.Id,
+                episodeNumber = episodeFile.EpisodeNumber,
+                seasonNumber = episodeFile.SeasonNumber,
+                subtitles = episodeFile.Subtitles.Select(s => s.Language)
+            });
+            SetMapping<EpisodeFile, InfoDto>(episodeFile => new InfoDto
+            {
+                id = episodeFile.SeriesDetails.Id,
+                fid = episodeFile.Id,
+                backdrop = episodeFile.SeriesDetails.BackdropPath,
+                poster = episodeFile.SeriesDetails.PosterPath,
+                title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}",
+                subtitles = episodeFile.Subtitles.Select(s => s.Language)
+            });
+            SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto
+            {
+                id = subtitleFile.Id,
+                language = subtitleFile.Language
+            });
+            
             SetMapping<Genre, GenreDto>(genre => new GenreDto
             {
                 id = genre.Id,
@@ -190,13 +227,13 @@ namespace NxPlx.Services.Database
             {
                 id = productionCompany.Id,
                 name = productionCompany.Name,
-                logoPath = productionCompany.LogoPath,
+                logo = productionCompany.LogoPath,
                 originCountry = productionCompany.OriginCountry
             });
             SetMapping<ProductionCountry, ProductionCountryDto>(productionCountry => new ProductionCountryDto
             {
                 iso3166_1 = productionCountry.Iso3166_1,
-                Name = productionCountry.Name
+                name = productionCountry.Name
             });
             SetMapping<SpokenLanguage, SpokenLanguageDto>(spokenLanguage => new SpokenLanguageDto
             {
@@ -207,13 +244,42 @@ namespace NxPlx.Services.Database
             {
                 id = movieCollection.Id,
                 name = movieCollection.Name,
-                backdropPath = movieCollection.BackdropPath,
-                posterPath = movieCollection.PosterPath
+                backdrop = movieCollection.BackdropPath,
+                poster = movieCollection.PosterPath
             });
-            SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto
+            SetMapping<Network, NetworkDto>(network => new NetworkDto
             {
-                id = subtitleFile.Id,
-                language = subtitleFile.Language
+                name = network.Name,
+                logo = network.LogoPath,
+                originCountry = network.OriginCountry
+            });
+            SetMapping<Creator, CreatorDto>(creator => new CreatorDto
+            {
+                name = creator.Name
+            });
+
+
+            SetMapping<User, UserDto>(user => new UserDto
+            {
+                username = user.Username,
+                isAdmin = user.Admin,
+                email = user.Email,
+                libraries = user.LibraryAccessIds
+            });
+            SetMapping<Library, LibraryDto>(library => new LibraryDto
+            {
+                id = library.Id,
+                name = library.Name,
+                language = library.Language,
+                kind = library.Kind.ToString()
+            });
+            SetMapping<Library, AdminLibraryDto>(library => new AdminLibraryDto
+            {
+                id = library.Id,
+                name = library.Name,
+                language = library.Language,
+                kind = library.Kind.ToString(),
+                path = library.Path
             });
         }
     }

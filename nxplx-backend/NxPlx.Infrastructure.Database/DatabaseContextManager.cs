@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NxPlx.Services.Database
 {
@@ -8,15 +9,19 @@ namespace NxPlx.Services.Database
         {
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<MediaContext>()
+                .AddDbContext<UserContext>()
                 .BuildServiceProvider();
-            
         }
 
-        public void Initialize()
+        public async Task Initialize()
         {
             using (var context = new MediaContext())
             {
-                context.Database.EnsureCreated();
+                await context.Database.EnsureCreatedAsync();
+            }
+            using (var context = new UserContext())
+            {
+                await context.Database.EnsureCreatedAsync();
             }
         }
     }
