@@ -1,9 +1,18 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions;
+using NxPlx.Infrastructure.IoC;
+using NxPlx.Infrastructure.Session;
+using NxPlx.Models.Database;
+using NxPlx.Models.Details.Series;
 using NxPlx.Models.Dto.Models;
+using NxPlx.Models.Dto.Models.Series;
+using NxPlx.Models.File;
 using NxPlx.Services.Database;
+using Red;
 using Red.Interfaces;
 
 namespace NxPlx.WebApi.Routers
@@ -12,68 +21,132 @@ namespace NxPlx.WebApi.Routers
     {
         public static void Register(IRouter router)
         {
-            router.Get("/:series_id", async (req, res) =>
-            {
-                var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
-                
-                using var ctx = new MediaContext();
-                var seriesDetails = await ctx.SeriesDetails.FindAsync(id);
-                var episodes = await ctx.EpisodeFiles
-                    .Where(e => e.SeriesDetailsId == id)
-                    .ToListAsync();
-                    
-                if (seriesDetails == null)
-                {
-                    return await res.SendStatus(HttpStatusCode.NotFound);
-                }
-                    
-                return await res.SendJson(new SeriesDto());
-            });
+            router.Get("/detail/:series_id", Authenticated.User, GetSeriesDetails);
+            router.Get("/detail/:series_id/:season_no", Authenticated.User, GetSeasonDetails);
             
-            router.Get("/:series_id/:season_no", async (req, res) =>
-            {
-                var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
-                var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
-                
-                using var ctx = new MediaContext();
-                var series = await ctx.SeriesDetails.FindAsync(id);
-                if (series == null)
-                {
-                    return await res.SendStatus(HttpStatusCode.NotFound);
-                }
-                    
-                var season = series.Seasons.FirstOrDefault(s => s.SeasonNumber == no);
-                if (season == null)
-                {
-                    return await res.SendStatus(HttpStatusCode.NotFound);
-                }
-
-                var episodes = await ctx.EpisodeFiles
-                    .Where(e => e.SeriesDetailsId == id && e.SeasonNumber == no)
-                    .ToListAsync();
-                    
-                return await res.SendJson(new { season, episodes });
-            });
+            router.Get("/episodes/:series_id", Authenticated.User, GetEpisodes);
+            router.Get("/episodes/:series_id/:season_no", Authenticated.User, GetEpisodesBySeason);
             
-            router.Get("/watch/:file_id", async (req, res) =>
-            {
-                var id = int.Parse(req.Context.ExtractUrlParameter("uuid"));
-                using (var ctx = new MediaContext())
-                {
-                    var episode = await ctx.EpisodeFiles.FindAsync(id);
-                    if (episode == null)
-                    {
-                        return await res.SendStatus(HttpStatusCode.NotFound);
-                    }
+            router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
+            router.Get("/watch/:file_id", Authenticated.User, StreamFile);
+        }
 
-                    return await res.SendFile(episode.Path);
-                    
-                    using (var mediaStream = File.Open(episode.Path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        return await res.SendStream(mediaStream, "video/mp4");
-                    }
-                }
-            });
+        private static async Task<HandlerType> StreamFile(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            await using var ctx = new MediaContext();
+            
+            var episode = await ctx.EpisodeFiles
+                .Where(ef => ef.Id == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .FirstOrDefaultAsync();
+            
+            if (episode == null || !File.Exists(episode.Path))
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            return await res.SendFile(episode.Path);
+        }
+
+        private static async Task<HandlerType> GetFileInfo(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+
+            var container = new ResolveContainer();
+            await using var ctx = container.Resolve<MediaContext>();
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+
+            var episode = await ctx.EpisodeFiles
+                .Where(ef => ef.Id == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .FirstOrDefaultAsync();
+
+            return await res.SendJson(dtoMapper.Map<EpisodeFile, InfoDto>(episode));
+        }
+
+        private static async Task<HandlerType> GetEpisodesBySeason(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+            var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
+
+            var container = new ResolveContainer();
+            await using var ctx = container.Resolve<MediaContext>();
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+
+            var episodes = await ctx.EpisodeFiles
+                .Where(ef =>
+                    ef.SeriesDetailsId == id && ef.SeasonNumber == no &&
+                    session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .ToListAsync();
+            
+            return await res.SendJson(dtoMapper.MapMany<EpisodeFile, EpisodeFileDto>(episodes));
+        }
+
+        private static async Task<HandlerType> GetEpisodes(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+
+            var container = new ResolveContainer();
+            await using var ctx = container.Resolve<MediaContext>();
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+
+            var episodes = await ctx.EpisodeFiles
+                .Where(ef => ef.SeriesDetailsId == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .ToListAsync();
+
+            return await res.SendJson(dtoMapper.MapMany<EpisodeFile, EpisodeFileDto>(episodes));
+        }
+
+        private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+            var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
+
+            var container = new ResolveContainer();
+            await using var ctx = container.Resolve<MediaContext>();
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+
+            var episodeFile = await ctx.EpisodeFiles
+                .Where(ef => ef.SeriesDetailsId == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .FirstOrDefaultAsync();
+            
+            if (episodeFile == null)
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            var season = episodeFile.SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == no);
+            if (season == null)
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            return await res.SendJson(dtoMapper.Map<SeasonDetails, SeasonDto>(season));
+        }
+
+        private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+
+            var container = new ResolveContainer();
+            await using var ctx = container.Resolve<MediaContext>();
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+            
+            var episodeFile = await ctx.EpisodeFiles
+                .Where(ef => ef.SeriesDetailsId == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .FirstOrDefaultAsync();
+            
+            if (episodeFile == null)
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            return await res.SendJson(dtoMapper.Map<DbSeriesDetails, SeriesDto>(episodeFile.SeriesDetails));
         }
     }
 }

@@ -2,22 +2,25 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
         <Nullable>disable</Nullable>
         <LangVersion>8</LangVersion>
         <RootNamespace>NxPlx.WebApi</RootNamespace>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Red.CookieSessions" Version="3.1.0" />
-      <PackageReference Include="RHttpServer" Version="4.0.0" />
-      <PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="2.6.13" />
+      <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
+      <PackageReference Include="Red.CookieSessions" Version="4.1.0" />
+      <PackageReference Include="Red.CookieSessions.EFCore" Version="1.2.0" />
+      <PackageReference Include="RHttpServer" Version="4.0.2" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Logging\NxPlx.Infrastructure.Logging.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
       <ProjectReference Include="..\NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Caching\NxPlx.Services.Caching.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
