@@ -22,6 +22,7 @@
     <ItemGroup>
       <PackageReference Include="LiteDB" Version="4.1.4" />
       <PackageReference Include="LiteDB.FSharp" Version="2.7.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
       <PackageReference Include="Red.CookieSessions.LiteDBStore" Version="1.0.0" />
       <PackageReference Include="RHttpServer" Version="4.0.0" />
       <PackageReference Include="TaskBuilder.fs" Version="2.1.0" />
