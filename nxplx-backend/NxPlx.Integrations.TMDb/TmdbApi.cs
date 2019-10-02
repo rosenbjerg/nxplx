@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Esendex.TokenBucket;
 using Newtonsoft.Json;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
@@ -14,6 +13,7 @@ using NxPlx.Integrations.TMDBApi.Models.TvSeason;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
+using TokenBucket;
 
 namespace NxPlx.Integrations.TMDBApi
 {
@@ -23,20 +23,18 @@ namespace NxPlx.Integrations.TMDBApi
         private const string BaseUrl = "https://api.themoviedb.org/3";
         
         private string _key;
-        private string _imageFolder;
 
-        public TmdbApi(ICachingService cachingService, IDetailsMapper mapper, ILogger logger) : base(cachingService, mapper, logger)
+        public TmdbApi(ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService) 
+            : base(ConfigurationService.Current.ImageFolder, cachingService, mapper, loggingService)
         {
-            var cfg = ConfigurationService.Current;
-            _key = cfg.TMDbApiKey;
-            _imageFolder = cfg.ImageFolder;
-            Directory.CreateDirectory(_imageFolder);
+            _key = ConfigurationService.Current.TMDbApiKey;
         }
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
             .WithCapacity(10)
             .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(3))
             .Build();
+        
         private async Task<string> Fetch(string url)
         {
             {
@@ -48,7 +46,7 @@ namespace NxPlx.Integrations.TMDBApi
             
             var (content, cached) = await FetchInternal(url);
             
-            if (content.StartsWith("{\"status_code\":25"))
+            if (string.IsNullOrEmpty(content) || content.StartsWith("{\"status_code\":25"))
             {
                 return await Fetch(url);
             }
@@ -87,9 +85,9 @@ namespace NxPlx.Integrations.TMDBApi
             return mapped;
         }
 
-        public override async Task<FilmDetails> FetchMovieDetails(int id)
+        public override async Task<FilmDetails> FetchMovieDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/movie/{id}?api_key={_key}";
+            var url = $"{BaseUrl}/movie/{id}?language={language}&api_key={_key}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<MovieDetails>(content);
@@ -97,23 +95,23 @@ namespace NxPlx.Integrations.TMDBApi
             return Mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
         }
         
-        public override async Task<SeriesDetails> FetchTvDetails(int id)
+        public override async Task<SeriesDetails> FetchTvDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}?api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}?language={language}&api_key={_key}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = Mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber));
+            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             
             return mapped;
         }
         
-        public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season)
+        public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}/season/{season}?api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}&api_key={_key}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvSeasonDetails>(content);
@@ -125,8 +123,7 @@ namespace NxPlx.Integrations.TMDBApi
             if (string.IsNullOrEmpty(imageUrl)) return;
             
             var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
-            var outputPath = Path.Combine(Path.Combine(_imageFolder, $"{imageName}-{size}.jpg"));
-            await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", outputPath);
+            await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", size, imageName);
         }
     }
 }
