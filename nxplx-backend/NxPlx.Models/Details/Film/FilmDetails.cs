@@ -8,6 +8,7 @@ namespace NxPlx.Models.Details.Film
         public bool Adult { get; set; }
         public long Budget { get; set; }
         public string ImdbId { get; set; }
+        public int BelongsToCollectionId { get; set; }
         public virtual MovieCollection BelongsToCollection { get; set; }
         public string OriginalTitle { get; set; }
         public virtual List<ProductionCountry> ProductionCountries { get; set; }

@@ -10,6 +10,6 @@ namespace NxPlx.Models.Details.Series
         public string Overview { get; set; }
         public string PosterPath { get; set; }
         public int SeasonNumber { get; set; }
-        public List<EpisodeDetails> Episodes { get; set; }
+        public virtual List<EpisodeDetails> Episodes { get; set; }
     }
 }

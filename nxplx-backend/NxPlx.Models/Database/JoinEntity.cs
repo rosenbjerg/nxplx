@@ -1,6 +1,4 @@
-using NxPlx.Models;
-
-namespace NxPlx.Services.Database.Models
+namespace NxPlx.Models.Database
 {
     public class JoinEntity<TEntity1, TEntity2>
         where TEntity1 : EntityBase
@@ -23,4 +21,5 @@ namespace NxPlx.Services.Database.Models
         public virtual TEntity2 Entity2 { get; set; }
         public TEntity2Key Entity2Id { get; set; }
     }
+    
 }

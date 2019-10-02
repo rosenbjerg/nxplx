@@ -4,7 +4,7 @@ namespace NxPlx.Models.File
 {
     public abstract class PhysicalFileBase
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public long FileSizeBytes { get; set; }
         
         public string Path { get; set; }

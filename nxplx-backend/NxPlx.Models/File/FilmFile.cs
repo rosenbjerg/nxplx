@@ -1,4 +1,4 @@
-using NxPlx.Services.Database.Models;
+using NxPlx.Models.Database;
 
 namespace NxPlx.Models.File
 {
@@ -8,10 +8,13 @@ namespace NxPlx.Models.File
 
         public virtual DbFilmDetails FilmDetails { get; set; }
         
-        public int FilmDetailsId { get; set; }
+        public int? FilmDetailsId { get; set; }
         
         public int Year { get; set; }
+        public virtual Library PartOfLibrary { get; set; }
         
+        public int PartOfLibraryId { get; set; }
+
         public override string ToString()
         {
             return $"{Title} ({Year})";
