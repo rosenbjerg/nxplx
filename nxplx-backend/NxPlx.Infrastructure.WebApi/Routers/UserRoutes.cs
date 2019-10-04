@@ -50,10 +50,8 @@ namespace NxPlx.WebApi.Routers
             router.Get("/verify", Authenticated.User, Verify);
             router.Post("/logout", Authenticated.User, Logout);
             router.Post("/changepassword", Authenticated.User, ChangePassword);
-            router.Get("/libraries", Authenticated.User, ListLibraries);
             
             router.Get("/list", Authenticated.Admin, ListUsers);
-            router.Post("/librarypermissions", Authenticated.Admin, SetUserLibraryPermissions);
             router.Post("/create", Authenticated.Admin, CreateUser);
             router.Delete("/remove", Authenticated.Admin, RemoveUser);
         }
@@ -92,54 +90,7 @@ namespace NxPlx.WebApi.Routers
             var mapper = container.Resolve<IDatabaseMapper>();
             return await res.SendJson(mapper.MapMany<User, UserDto>(users));
         }
-        private static async Task<HandlerType> ListLibraries(Request req, Response res)
-        {
-            var session = req.GetData<UserSession>();
-            var container = new ResolveContainer();
-            await using var context = container.Resolve<MediaContext>();
-            var libraries = await context.Libraries.ToListAsync();
-
-            var mapper = container.Resolve<IDatabaseMapper>();
-            
-            if (session.IsAdmin)
-                return await res.SendJson(mapper.MapMany<Library, AdminLibraryDto>(libraries));
-            else
-                return await res.SendJson(mapper.MapMany<Library, LibraryDto>(libraries));
-        }
-        private static async Task<HandlerType> SetUserLibraryPermissions(Request req, Response res)
-        {
-            var form = await req.GetFormDataAsync();
-
-            var userId = int.Parse(form["userId"]);
-            var libraryIds = form["libraries"].Select(int.Parse).ToList();
-            
-            var container = new ResolveContainer();
-            await using var context = container.Resolve<UserContext>();
-            await using var mediaContext = container.Resolve<MediaContext>();
-            
-            var user = await context.Users.FindAsync(userId);
-
-            if (user == default)
-            {
-                return await res.SendStatus(HttpStatusCode.BadRequest);
-            }
-            
-            var libraries = await mediaContext.Libraries
-                .Where(l => libraryIds.Contains(l.Id))
-                .ToListAsync();
-            
-            if (libraryIds.Count != libraries.Count)
-            {
-                return await res.SendStatus(HttpStatusCode.BadRequest);
-            }
-
-            user.LibraryAccessIds.Clear();
-            user.LibraryAccessIds.AddRange(libraryIds);
-            await context.SaveChangesAsync();
-            
-            var mapper = container.Resolve<IDatabaseMapper>();
-            return await res.SendJson(mapper.MapMany<Library, LibraryDto>(libraries));
-        }
+        
         private static async Task<HandlerType> CreateUser(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();

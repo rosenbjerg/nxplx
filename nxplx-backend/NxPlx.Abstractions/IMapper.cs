@@ -5,11 +5,11 @@ namespace NxPlx.Abstractions
 {
     public interface IMapper
     {
-        void SetMapping<TFrom, TTo>(Func<TFrom, TTo> mapping);
+        void SetMapping<TFrom, TTo>(Func<TFrom, TTo> mapping)
+            where TFrom : class;
 
         TTo Map<TFrom, TTo>(TFrom instance)
             where TFrom : class;
-        
         
         IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
             where TFrom : class;

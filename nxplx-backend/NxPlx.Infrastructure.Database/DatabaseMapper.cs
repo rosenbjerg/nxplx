@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NxPlx.Abstractions;
 using NxPlx.Models;
@@ -113,15 +114,6 @@ namespace NxPlx.Services.Database
                 createdBy = MapMany<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)),
                 productionCompanies = MapMany<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)),
                 overview = seriesDetails.Overview,
-                seasons = MapMany<SeasonDetails, SeasonLiteDto>(seriesDetails.Seasons)
-            });
-            SetMapping<SeasonDetails, SeasonLiteDto>(seasonDetails => new SeasonLiteDto
-            {
-                name = seasonDetails.Name,
-                number = seasonDetails.SeasonNumber,
-                airDate = seasonDetails.AirDate,
-                poster = seasonDetails.PosterPath,
-                overview = seasonDetails.Overview
             });
             SetMapping<SeasonDetails, SeasonDto>(seasonDetails => new SeasonDto
             {
@@ -130,20 +122,7 @@ namespace NxPlx.Services.Database
                 airDate = seasonDetails.AirDate,
                 poster = seasonDetails.PosterPath,
                 overview = seasonDetails.Overview,
-                episodes = MapMany<EpisodeDetails, EpisodeDto>(seasonDetails.Episodes)
             });
-            SetMapping<EpisodeDetails, EpisodeDto>(episodeDetails => new EpisodeDto
-            {
-                name = episodeDetails.Name,
-                seasonNumber = episodeDetails.SeasonNumber,
-                airDate = episodeDetails.AirDate,
-                overview = episodeDetails.Overview,
-                episodeNumber = episodeDetails.EpisodeNumber,
-                still = episodeDetails.StillPath,
-                voteAverage = episodeDetails.VoteAverage,
-                voteCount = episodeDetails.VoteCount
-            });
-            
             SetMapping<DbSeriesDetails, OverviewElementDto>(seriesDetails => new OverviewElementDto
             {
                 id = seriesDetails.Id,

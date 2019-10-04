@@ -38,20 +38,19 @@ export default class Home extends Component<Props, State> {
                 <Helmet title="NxPlx" />
                 <div class={style.top}>
                     <input tabIndex={0} autofocus class={style.search} placeholder="search here" type="search" onInput={linkState(this, 'search')} />
-                    <button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>
+                    {/*<button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>*/}
                 </div>
 
                 {overview === undefined ? (
                     <Loading />
                 ) : (
                     <div class={style.entryContainer}>
-                        {overview && overview
+                        {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
                                     <Link key={entry.id} href={`/${entry.kind}/${entry.id}`}>
                                         <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 154)} title={entry.title} alt={entry.title} />
                                     </Link>
-
                                 )
                             )}
                     </div>
@@ -78,18 +77,18 @@ export default class Home extends Component<Props, State> {
             })
     };
 
-    private scan = () => {
-        const scanning = createSnackbar('Scanning library...', { timeout: 1500 });
-        http.post('/api/scan', '', false).then(response => {
-            if (!response.ok) {
-                scanning.destroy();
-                createSnackbar('Scanning failed :/', { timeout: 1500 });
-            }
-            else {
-                scanning.destroy();
-                createSnackbar('Scan completed', { timeout: 1500 });
-                this.load();
-            }
-        })
-    }
+    // private scan = () => {
+    //     const scanning = createSnackbar('Scanning library...', { timeout: 1500 });
+    //     http.post('/api/scan', '', false).then(response => {
+    //         if (!response.ok) {
+    //             scanning.destroy();
+    //             createSnackbar('Scanning failed :/', { timeout: 1500 });
+    //         }
+    //         else {
+    //             scanning.destroy();
+    //             createSnackbar('Scan completed', { timeout: 1500 });
+    //             this.load();
+    //         }
+    //     })
+    // }
 }

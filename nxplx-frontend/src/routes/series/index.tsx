@@ -16,19 +16,10 @@ interface State { details:SeriesDetails, bg:string }
 
 export default class Series extends Component<Props, State> {
     public componentDidMount() : void {
-        Promise.all([
-            http.get(`/api/series/detail/${this.props.id}`).then(response => response.json()),
-            http.get(`/api/series/episodes/${this.props.id}`).then(response => response.json())
-        ])
+        http.get(`/api/series/detail/${this.props.id}`)
+            .then(response => response.json())
             .then(results => {
                 const details:SeriesDetails = results[0];
-                const episodes = results[1];
-                const availableSeasons = episodes.reduce((acc, e) => {
-                    acc[e.seasonNumber] = true;
-                    return acc;
-                }, {});
-                // console.log(availableSeasons);
-                details.seasons = details.seasons.filter(s => availableSeasons[s.number]);
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
                 this.setState({ details, bg });
             });

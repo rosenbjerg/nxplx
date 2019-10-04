@@ -100,8 +100,8 @@ export interface SeasonDetails extends SeasonLiteDetails {
 
 export interface EpisodeDetails {
     name: string
-    seasonNumber: number
-    episodeNumber: number
+    fileId: number
+    number: number
     overview: string;
     airDate: string;
     still: string;

@@ -18,9 +18,7 @@ export default class Season extends Component<Props, State> {
     public componentDidMount() : void {
         Promise.all(
             [
-                http.get(`/api/series/detail/${this.props.id}`).then(response => response.json()),
                 http.get(`/api/series/detail/${this.props.id}/${this.props.season}`).then(response => response.json()),
-                http.get(`/api/series/episodes/${this.props.id}/${this.props.season}`).then(response => response.json())
             ])
             .then(results => {
                 const seasonNumber = parseInt(this.props.season);

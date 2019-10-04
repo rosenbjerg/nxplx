@@ -163,16 +163,12 @@ export default class Admin extends Component<Props, State> {
             this.setState({ users, libraries });
         })
     }
-    private checkLoggedIn = async () => {
-        const response = await http.get('/api/user/verify');
-        if (response.ok) {
-            const isAdmin = (await response.text()) === 'True';
-            if (!isAdmin) {
-                route('/', true);
-            }
-        }
-        else {
-            route('/login', true);
-        }
+
+    private submitNewLibrary = async (ev:Event) => {
+        const form = new FormData(ev.target);
+        http.post('/api/')
+    };
+    private submitNewUser = async (ev:Event) => {
+
     };
 }

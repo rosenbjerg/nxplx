@@ -25,6 +25,6 @@ namespace NxPlx.Models.Dto.Models.Series
         public IEnumerable<ProductionCompanyDto> productionCompanies { get; set; }
 
         public string overview { get; set; }
-        public IEnumerable<SeasonLiteDto> seasons { get; set; }
+        public IEnumerable<SeasonDto> seasons { get; set; }
     }
 }
