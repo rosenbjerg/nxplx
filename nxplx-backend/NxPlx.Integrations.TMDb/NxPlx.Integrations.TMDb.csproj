@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>default</LangVersion>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
+      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Caching\NxPlx.Services.Caching.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+      <PackageReference Include="TokenBucket" Version="2.0.0" />
+    </ItemGroup>
+
+</Project>
