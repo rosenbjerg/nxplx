@@ -8,7 +8,7 @@ using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Logging;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Integrations.TMDb;
+using NxPlx.Integrations.TMDBApi;
 using NxPlx.Models;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
