@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.Session;
@@ -17,6 +18,7 @@ namespace NxPlx.Services.Database
         public DbSet<FilmFile> FilmFiles { get; set; }
         public DbSet<EpisodeFile> EpisodeFiles { get; set; }
         public DbSet<Library> Libraries { get; set; }
+        public DbSet<SubtitleFile> SubtitleFiles { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +70,26 @@ namespace NxPlx.Services.Database
                 .UseLazyLoadingProxies()
                 .UseNpgsql($"Host={cfg.SqlHost};Database={cfg.SqlMediaDatabase};Username={cfg.SqlUsername};Password={cfg.SqlPassword}");
             
+        }
+    }
+
+    public static class DatabaseUtils
+    {
+        public static async Task UpsertAsync<TEntity>(this DbContext ctx, int key, Action<TEntity> entityUpdater)
+            where TEntity : EntityBase, new()
+        {
+            var instance = await ctx.Set<TEntity>().FindAsync(key);
+            if (instance == default)
+            {
+                instance = new TEntity
+                {
+                    Id = key
+                };
+                ctx.Add(instance);
+            }
+
+            entityUpdater(instance);
+            await ctx.SaveChangesAsync();
         }
     }
 }

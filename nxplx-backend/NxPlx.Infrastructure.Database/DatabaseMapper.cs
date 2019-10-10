@@ -243,6 +243,7 @@ namespace NxPlx.Services.Database
                 username = user.Username,
                 isAdmin = user.Admin,
                 email = user.Email,
+                passwordChanged = user.HasChangedPassword,
                 libraries = user.LibraryAccessIds
             });
             SetMapping<Library, LibraryDto>(library => new LibraryDto

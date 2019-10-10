@@ -11,7 +11,7 @@
     <ItemGroup>
       <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
       <PackageReference Include="Red.CookieSessions" Version="4.1.0" />
-      <PackageReference Include="Red.CookieSessions.EFCore" Version="1.2.0" />
+      <PackageReference Include="Red.CookieSessions.EFCore" Version="1.2.1" />
       <PackageReference Include="RHttpServer" Version="4.0.2" />
     </ItemGroup>
 
@@ -24,6 +24,12 @@
       <ProjectReference Include="..\NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Caching\NxPlx.Services.Caching.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="config.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

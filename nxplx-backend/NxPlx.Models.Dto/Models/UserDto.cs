@@ -7,6 +7,7 @@ namespace NxPlx.Models.Dto.Models
         public string username { get; set; }
         public string email { get; set; }
         public bool isAdmin { get; set; }
+        public bool passwordChanged { get; set; }
         public List<int> libraries { get; set; }
     }
 }

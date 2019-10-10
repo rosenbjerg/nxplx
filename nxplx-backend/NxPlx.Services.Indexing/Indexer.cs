@@ -30,7 +30,7 @@ namespace NxPlx.Services.Index
 
 //        public async Task IndexAllLibraries()
 //        {
-//            var container = new ResolveContainer();
+//            var container = ResolveContainer.Default();
 //            
 //            IEnumerable<Library> libraries;
 //            using (var ctx = new DatabaseContext())
@@ -44,7 +44,7 @@ namespace NxPlx.Services.Index
 //        }
         public async Task IndexLibraries(IEnumerable<Library> libraries)
         {
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             var cacher = container.Resolve<ICachingService>();
             foreach (var library in libraries)
             {
