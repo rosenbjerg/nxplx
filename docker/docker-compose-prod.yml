@@ -12,7 +12,7 @@ services:
     ports:
       - "5432:5432"
       
-  nxplx-database:
+  nxplx-cache:
     image: redis:5.0.6-alpine
     command: redis-server --requirepass 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
     restart: always

@@ -4,7 +4,6 @@ services:
 
   nxplx-database:
     image: postgres:12-alpine
-    restart: always
     environment:
       POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
     ports:
@@ -13,6 +12,5 @@ services:
   nxplx-cache:
     image: redis:5.0.6-alpine
     command: redis-server --requirepass 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
-    restart: always
     ports:
       - "6379:6379"
