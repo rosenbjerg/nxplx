@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NxPlx.Abstractions;
-using NxPlx.Integrations.TMDBApi.Models.Movie;
-using NxPlx.Integrations.TMDBApi.Models.Search;
-using NxPlx.Integrations.TMDBApi.Models.Tv;
-using NxPlx.Integrations.TMDBApi.Models.TvSeason;
+using NxPlx.Integrations.TMDb.Models.Movie;
+using NxPlx.Integrations.TMDb.Models.Search;
+using NxPlx.Integrations.TMDb.Models.Tv;
+using NxPlx.Integrations.TMDb.Models.TvSeason;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
@@ -16,7 +16,7 @@ using ProductionCountry = NxPlx.Models.Details.Film.ProductionCountry;
 using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 using SpokenLanguage = NxPlx.Models.Details.Film.SpokenLanguage;
 
-namespace NxPlx.Integrations.TMDBApi
+namespace NxPlx.Integrations.TMDb
 {
     public class TMDbMapper : MapperBase, IDetailsMapper
     {

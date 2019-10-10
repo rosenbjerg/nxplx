@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NxPlx.Integrations.TMDBApi.Models.TvSeason
+namespace NxPlx.Integrations.TMDb.Models.TvSeason
 {
     public class TvSeasonDetails
     {

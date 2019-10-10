@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NxPlx.Integrations.TMDBApi.Models.Tv
+namespace NxPlx.Integrations.TMDb.Models.Tv
 {
     public class TvDetails : DetailsBase
     {

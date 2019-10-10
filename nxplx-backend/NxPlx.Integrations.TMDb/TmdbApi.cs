@@ -6,25 +6,25 @@ using System.Web;
 using Newtonsoft.Json;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
-using NxPlx.Integrations.TMDBApi.Models.Movie;
-using NxPlx.Integrations.TMDBApi.Models.Search;
-using NxPlx.Integrations.TMDBApi.Models.Tv;
-using NxPlx.Integrations.TMDBApi.Models.TvSeason;
+using NxPlx.Integrations.TMDb.Models.Movie;
+using NxPlx.Integrations.TMDb.Models.Search;
+using NxPlx.Integrations.TMDb.Models.Tv;
+using NxPlx.Integrations.TMDb.Models.TvSeason;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
 using TokenBucket;
 
-namespace NxPlx.Integrations.TMDBApi
+namespace NxPlx.Integrations.TMDb
 {
-    public class TmdbApi : DetailsApiBase
+    public class TMDbApi : DetailsApiBase
     {
         private const int ThrottlingMs = 10000 / 40;
         private const string BaseUrl = "https://api.themoviedb.org/3";
         
         private string _key;
 
-        public TmdbApi(ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService) 
+        public TMDbApi(ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService) 
             : base(ConfigurationService.Current.ImageFolder, cachingService, mapper, loggingService)
         {
             _key = ConfigurationService.Current.TMDbApiKey;

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NxPlx.Models;
 
-namespace NxPlx.Integrations.TMDBApi.Models
+namespace NxPlx.Integrations.TMDb.Models
 {
     public abstract class DetailsBase : EntityBase
     {

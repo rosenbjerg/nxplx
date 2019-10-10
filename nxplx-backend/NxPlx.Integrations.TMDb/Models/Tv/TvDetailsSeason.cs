@@ -1,6 +1,6 @@
 using System;
 
-namespace NxPlx.Integrations.TMDBApi.Models.Tv
+namespace NxPlx.Integrations.TMDb.Models.Tv
 {
     public class TvDetailsSeason
     {

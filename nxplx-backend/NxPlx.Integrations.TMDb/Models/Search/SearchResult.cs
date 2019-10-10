@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NxPlx.Integrations.TMDBApi.Models.Search
+namespace NxPlx.Integrations.TMDb.Models.Search
 {
     public class SearchResult<TResult> where TResult : ResultBase
     {

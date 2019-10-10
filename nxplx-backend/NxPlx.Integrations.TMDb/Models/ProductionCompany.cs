@@ -1,4 +1,4 @@
-namespace NxPlx.Integrations.TMDBApi.Models
+namespace NxPlx.Integrations.TMDb.Models
 {
     public class ProductionCompany
     {

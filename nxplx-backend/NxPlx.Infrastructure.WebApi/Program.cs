@@ -33,7 +33,7 @@ namespace NxPlx.WebApi
                 registration.Register<ILoggingService, NLoggingService>();
                 registration.Register<IDatabaseMapper, DatabaseMapper>();
                 registration.Register<IDetailsMapper, TMDbMapper>(false);
-                registration.Register<IDetailsApi, TmdbApi>(false);
+                registration.Register<IDetailsApi, TMDbApi>(false);
                 registration.Register<Indexer>(false);
                 registration.Register<MediaContext>(false);
                 registration.Register<UserContext>(false);

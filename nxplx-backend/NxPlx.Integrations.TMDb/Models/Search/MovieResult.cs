@@ -1,6 +1,6 @@
 using System;
 
-namespace NxPlx.Integrations.TMDBApi.Models.Search
+namespace NxPlx.Integrations.TMDb.Models.Search
 {
     public class MovieResult : ResultBase
     {
