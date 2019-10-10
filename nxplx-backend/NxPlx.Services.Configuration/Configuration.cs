@@ -2,6 +2,12 @@
 {
     public class Configuration
     {
+#if DEBUG
+        public readonly bool Production = false;
+#else
+        public readonly bool Production = true;
+#endif
+        
         public int HttpPort { get; set; }
         public int JobServerPort { get; set; }
 

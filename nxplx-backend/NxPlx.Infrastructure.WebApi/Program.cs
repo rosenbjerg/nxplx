@@ -8,7 +8,7 @@ using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Logging;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Integrations.TMDBApi;
+using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
@@ -50,7 +50,7 @@ namespace NxPlx.WebApi
             var server = new RedHttpServer(cfg.HttpPort);
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
             {
-                Secure = false,
+                Secure = cfg.Production,
                 Path = "/",
                 Store = new EntityFrameworkSessionStore<UserSession>(container.Resolve<UserContext>)
             });
