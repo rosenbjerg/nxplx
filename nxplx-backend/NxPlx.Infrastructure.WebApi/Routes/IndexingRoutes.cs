@@ -18,16 +18,15 @@ namespace NxPlx.WebApi.Routers
     {
         public static void Register(IRouter router)
         {
-            router.Post("/", Authenticated.Admin, IndexLibraries);
+            router.Post("", Authenticated.Admin, IndexLibraries);
             router.Post("/all", Authenticated.Admin, IndexAllLibraries);
         }
 
         private static async Task<HandlerType> IndexLibraries(Request req, Response res)
         {
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
 
-            var libIds = req.ParseBody<int[]>();
-            await res.SendStatus(HttpStatusCode.OK);
+            var libIds = req.ParseBody<JsonValue<int[]>>().value;
             
             IEnumerable<Library> libraries;
             await using (var ctx = container.Resolve<MediaContext>())
@@ -35,14 +34,14 @@ namespace NxPlx.WebApi.Routers
                 libraries = await ctx.Libraries.Where(l => libIds.Contains(l.Id)).ToArrayAsync();
             }
 
+            await res.SendStatus(HttpStatusCode.OK);
             await IndexAndBroadcast(container, libIds, libraries);
             return HandlerType.Final;
         }
 
         private static async Task<HandlerType> IndexAllLibraries(Request req, Response res)
         {
-            var container = new ResolveContainer();
-            await res.SendStatus(HttpStatusCode.OK);
+            var container = ResolveContainer.Default();
 
             IEnumerable<Library> libraries;
             await using (var ctx = container.Resolve<MediaContext>())
@@ -51,6 +50,7 @@ namespace NxPlx.WebApi.Routers
             }
             var libIds = libraries.Select(l => l.Id).ToArray();
             
+            await res.SendStatus(HttpStatusCode.OK);
             await IndexAndBroadcast(container, libIds, libraries);
             return HandlerType.Final;
         }
@@ -62,19 +62,6 @@ namespace NxPlx.WebApi.Routers
             await broadcaster.BroadcastAll(new Broadcast<int[]>("indexing:started", libIds));
             await indexer.IndexLibraries(libraries);
             await broadcaster.BroadcastAll(new Broadcast<int[]>("indexing:completed", libIds));
-            await container.Resolve<ICachingService>().RemoveAsync("OVERVIEW:*");
         }
     }
-
-    class Broadcast<T>
-    {
-        public Broadcast(string @event, T data)
-        {
-            Event = @event;
-            Data = data;
-        }
-        public string Event { get; set; }
-        public T Data { get; set; }
-    }
-
 }

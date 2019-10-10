@@ -25,9 +25,13 @@ namespace NxPlx.WebApi.Routers
         private static async Task<HandlerType> GetOverview(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var overviewCacheKey = "OVERVIEW:" + string.Join(',', session.LibraryAccess.OrderBy(i => i));
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
+            await using var ctx = container.Resolve<MediaContext>();
+            
+            var libs = !session.IsAdmin ? session.LibraryAccess : ctx.Libraries.Select(l => l.Id).ToList();
+            var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
+
             var cacher = container.Resolve<ICachingService>();
 
             var cached = await cacher.GetAsync(overviewCacheKey);
@@ -37,17 +41,16 @@ namespace NxPlx.WebApi.Routers
             }
             
             var dtoMapper = container.Resolve<IDatabaseMapper>();
-            await using var ctx = container.Resolve<MediaContext>();
 
             var seriesDetails = await ctx.EpisodeFiles
                 .Include(ef => ef.SeriesDetails)
-                .Where(ef => ef.SeriesDetailsId != null && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .Where(ef => ef.SeriesDetailsId != null && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
                 .Select(ef => ef.SeriesDetails)
                 .Distinct()
                 .ToListAsync();
 
             var filmDetails = await ctx.FilmFiles
-                .Where(ff =>  ff.FilmDetailsId != null && session.LibraryAccess.Contains(ff.PartOfLibraryId))
+                .Where(ff =>  ff.FilmDetailsId != null && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)))
                 .Select(ff => ff.FilmDetails)
                 .Distinct()
                 .ToListAsync();
@@ -56,7 +59,7 @@ namespace NxPlx.WebApi.Routers
             overview.AddRange(dtoMapper.MapMany<DbSeriesDetails, OverviewElementDto>(seriesDetails));
             overview.AddRange(dtoMapper.MapMany<DbFilmDetails, OverviewElementDto>(filmDetails));
 
-            cached = JsonConvert.SerializeObject(overview);
+            cached = System.Text.Json.JsonSerializer.Serialize(overview);
             await cacher.SetAsync(overviewCacheKey, cached, CacheKind.JsonResponse);
 
             return await res.SendString(cached, "application/json");

@@ -28,7 +28,7 @@ namespace NxPlx.WebApi.Routers
 
             var session = req.GetData<UserSession>();
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var context = container.Resolve<UserContext>();
 
             var progress = await context.WatchingProgresses.Where(wp => wp.UserId == session.UserId && wp.FileId == fileId)
@@ -53,7 +53,7 @@ namespace NxPlx.WebApi.Routers
 
             var session = req.GetData<UserSession>();
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<UserContext>();
 
             var progress = await ctx.WatchingProgresses.Where(wp => wp.UserId == session.UserId && wp.FileId == fileId)

@@ -17,21 +17,22 @@ namespace NxPlx.WebApi.Routers
     {
         public static void Register(IRouter router)
         {
-            router.Get("/languages/:file_id", Authenticated.User, GetSubtitleLanguagesByFileId);
+            router.Get("/languages/:kind/:file_id", Authenticated.User, GetSubtitleLanguagesByFileId);
             
             router.Get("/preference/:file_id", Authenticated.User, GetLanguagePreferenceByFileId);
             
             router.Put("/preference/:file_id", Authenticated.User, SetLanguagePreferenceByFileId);
             
-            router.Get("/:file_id/:lang", Authenticated.User, GetSubtitleByFileId);
+            router.Get("/:file_id/:kind/:lang", Authenticated.User, GetSubtitleByFileId);
         }
 
         private static async Task<HandlerType> GetSubtitleByFileId(Request req, Response res)
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var lang = req.Context.ExtractUrlParameter("lang");
+            var kind = req.Context.ExtractUrlParameter("kind");
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
 
             MediaFileBase file = await ctx.FilmFiles.FindAsync(id);
@@ -61,7 +62,7 @@ namespace NxPlx.WebApi.Routers
             var language = req.ParseBody<JsonValue<string>>();
             var session = req.GetData<UserSession>();
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<UserContext>();
 
             var preference = await ctx.SubtitlePreferences
@@ -85,7 +86,7 @@ namespace NxPlx.WebApi.Routers
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var session = req.GetData<UserSession>();
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<UserContext>();
 
             var preference = await ctx.SubtitlePreferences
@@ -100,9 +101,9 @@ namespace NxPlx.WebApi.Routers
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
-
+            
             MediaFileBase file = await ctx.FilmFiles.FindAsync(id);
             if (file == default)
             {

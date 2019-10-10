@@ -37,7 +37,7 @@ namespace NxPlx.WebApi.Routers
             await using var ctx = new MediaContext();
             
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .Where(ef => ef.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
                 .FirstOrDefaultAsync();
             
             if (episode == null || !File.Exists(episode.Path))
@@ -53,15 +53,14 @@ namespace NxPlx.WebApi.Routers
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
-            var dtoMapper = container.Resolve<IDatabaseMapper>();
 
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                .Where(ef => ef.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
                 .FirstOrDefaultAsync();
 
-            return await res.SendJson(dtoMapper.Map<EpisodeFile, InfoDto>(episode));
+            return await res.SendMapped<EpisodeFile, InfoDto>(container.Resolve<IDatabaseMapper>(), episode);
         }
         
         private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)
@@ -70,42 +69,13 @@ namespace NxPlx.WebApi.Routers
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
             var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
-            var dtoMapper = container.Resolve<IDatabaseMapper>();
-            
+
             var episodes = await ctx.EpisodeFiles
                 .Where(ef =>
                     ef.SeriesDetailsId == id && ef.SeasonNumber == no &&
-                    session.LibraryAccess.Contains(ef.PartOfLibraryId))
-                .ToListAsync();
-            
-            if (!episodes.Any())
-            {
-                return await res.SendStatus(HttpStatusCode.NotFound);
-            }
-
-            var season = episodes.First().SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == no);
-            if (season == null)
-            {
-                return await res.SendStatus(HttpStatusCode.NotFound);
-            }
-            
-            var dto = MergeEpisodes(dtoMapper, season, episodes);
-            
-            return await res.SendJson(dto);
-        }
-
-        private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
-        {
-            var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
-
-            var container = new ResolveContainer();
-            await using var ctx = container.Resolve<MediaContext>();
-            
-            var episodes = await ctx.EpisodeFiles
-                .Where(ef => ef.SeriesDetailsId == id && session.LibraryAccess.Contains(ef.PartOfLibraryId))
+                    (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
                 .ToListAsync();
             
             if (!episodes.Any())
@@ -116,9 +86,30 @@ namespace NxPlx.WebApi.Routers
             var dtoMapper = container.Resolve<IDatabaseMapper>();
             var seriesDetails = episodes.First().SeriesDetails;
 
-            var dto = MergeEpisodes(dtoMapper, seriesDetails, episodes);
+            return await res.SendJson(MergeEpisodes(dtoMapper, seriesDetails, episodes));
+        }
+
+        private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+
+            var container = ResolveContainer.Default();
+            await using var ctx = container.Resolve<MediaContext>();
             
-            return await res.SendJson(dto);
+            var episodes = await ctx.EpisodeFiles
+                .Where(ef => ef.SeriesDetailsId == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                .ToListAsync();
+            
+            if (!episodes.Any())
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            var dtoMapper = container.Resolve<IDatabaseMapper>();
+            var seriesDetails = episodes.First().SeriesDetails;
+
+            return await res.SendJson(MergeEpisodes(dtoMapper, seriesDetails, episodes));
         }
         
         private static SeriesDto MergeEpisodes(IMapper mapper, DbSeriesDetails series, IReadOnlyCollection<EpisodeFile> files)

@@ -19,7 +19,7 @@ namespace NxPlx.WebApi.Routers
         {
             var session = req.GetData<UserSession>();
 
-            var container = new ResolveContainer();
+            var container = ResolveContainer.Default();
             var broadcaster = container.Resolve<IBroadcaster<string, WebSocketDialog>>();
 
             if (session.IsAdmin)
