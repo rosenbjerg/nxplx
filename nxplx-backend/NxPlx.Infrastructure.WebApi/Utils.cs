@@ -14,6 +14,7 @@ namespace NxPlx.WebApi
         }
         
         public static Task<HandlerType> SendMapped<TFrom, TTo>(this Response res, IMapper mapper, TFrom dto)
+            where TTo : class
             where TFrom : class
         {
             return res.SendJson(mapper.Map<TFrom, TTo>(dto));

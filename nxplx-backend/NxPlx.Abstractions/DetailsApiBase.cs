@@ -30,7 +30,7 @@ namespace NxPlx.Abstractions
             _imageFolder = imageFolder;
         }
         
-        protected async Task<(string content, bool cached)> FetchInternal(string url)
+        protected async Task<(string? content, bool cached)> FetchInternal(string url)
         {
             var cached = true;
             var content = await CachingService.GetAsync(url);

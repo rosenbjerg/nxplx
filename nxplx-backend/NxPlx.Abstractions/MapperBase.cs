@@ -13,10 +13,11 @@ namespace NxPlx.Abstractions
         {
             _dictionary[(typeof(TFrom), typeof(TTo))] = mapping;
         }
-        public TTo Map<TFrom, TTo>(TFrom instance)
+        public TTo? Map<TFrom, TTo>(TFrom instance)
+            where TTo : class
             where TFrom : class
         {
-            if (instance == null) return default;
+            if (instance == default) return default;
             
             if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
             {
@@ -29,7 +30,7 @@ namespace NxPlx.Abstractions
         public IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
             where TFrom : class
         {
-            if (instances == null) return new TTo[0];
+            if (instances == null) return Enumerable.Empty<TTo>();
             
             if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
             {

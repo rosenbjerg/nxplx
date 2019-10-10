@@ -8,7 +8,8 @@ namespace NxPlx.Abstractions
         void SetMapping<TFrom, TTo>(Func<TFrom, TTo> mapping)
             where TFrom : class;
 
-        TTo Map<TFrom, TTo>(TFrom instance)
+        TTo? Map<TFrom, TTo>(TFrom instance)
+            where TTo : class
             where TFrom : class;
         
         IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
