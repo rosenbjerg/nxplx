@@ -25,8 +25,8 @@ export function formatProgress (time:number){
 export function  formatInfoPair (ib:InfoPair):JSX.Element {
     return (
         <tr>
-            <td className={style.infoKey}>{ib.title}</td>
-            <td className={style.infoValue}>{ib.value}</td>
+            <td class={style.infoKey}>{ib.title}</td>
+            <td class={style.infoValue}>{ib.value}</td>
         </tr>
     );
 }

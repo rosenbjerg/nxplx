@@ -44,7 +44,7 @@ button.material-icons {
     background: none;
     transition: border-color 150ms, color 150ms;
     border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 2px;
     cursor: pointer;
     color: var(--faded-text);
 }
@@ -85,4 +85,19 @@ button.material-icons:hover {
 }
 .video-js .vjs-captions {
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
+}
+
+.inline-edit {
+    background-color: var(--secondary-color);
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+    color: var(--focused-text);
+    height: 30px;
+    padding-left: 4px;
+}
+.fullwidth {
+    width: 100%;
+}
+table {
+    border-collapse: collapse;
 }

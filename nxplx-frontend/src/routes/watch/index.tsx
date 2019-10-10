@@ -6,6 +6,8 @@ import Helmet from 'preact-helmet';
 import  { Store } from 'unistore';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.min.css';
+// import videojsChromecast from '@silvermine/videojs-chromecast';
+// import '@silvermine/videojs-chromecast/dist/silvermine-videojs-chromecast.css';
 import {formatProgress} from '../../commonFilmInfo';
 import Loading from '../../components/loading';
 import { formatSubtitleName } from '../../components/Subtitles';
@@ -30,6 +32,7 @@ export default class Watch extends Component<Props, State> {
 
     public render({ kind, fid }:Props, { info }:State) {
         if (!info) { return <Loading /> }
+
         setTimeout(this.loadVideo, 0);
         return (
             <div class={style.container}>
@@ -85,7 +88,19 @@ export default class Watch extends Component<Props, State> {
     };
 
     private loadVideo = () => {
-        const video : videojs.Player = videojs('video');
+        // videojsChromecast(videojs, { preloadWebComponents: true });
+        const video : videojs.Player = videojs('video', {
+            // techOrder: [ 'chromecast', 'html5' ],
+            // plugins: {
+            //     chromecast: {
+            //         appId: "chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID",
+            //         metadata: {
+            //             title: this.state.info.title,
+            //             subtitle: "Subtitle"
+            //         }
+            //     }
+            // }
+        });
         this.video = video;
 
         const { fid } = this.state.info;

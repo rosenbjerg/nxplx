@@ -9,11 +9,6 @@ import http from "../../Http";
 import * as style from "./style.css";
 
 export default class Login extends Component {
-    // @ts-ignore
-    public state : State = {
-        time: Date.now(),
-        count: 10
-    };
 
     public render() {
         return (
@@ -42,7 +37,7 @@ export default class Login extends Component {
     private login = async (ev:any) => {
         ev.preventDefault();
         const formdata = new FormData(ev.target);
-        const response = await http.post('/api/user/login', formdata, false);
+        const response = await http.post('/api/authentication/login', formdata, false);
         ev.target.reset();
         if (response.ok) {
             route('/', true);

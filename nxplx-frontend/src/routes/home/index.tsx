@@ -1,5 +1,4 @@
 import { createSnackbar } from '@egoist/snackbar'
-import '@egoist/snackbar/dist/snackbar.css'
 import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
@@ -10,14 +9,12 @@ import Loading from '../../components/loading';
 import { imageUrl } from "../../Details";
 import http from '../../Http';
 import * as style from './style.css';
+import { Info } from "../../models";
 
-interface Info { id:number; title:string; poster:string; kind:'film'|'series' }
 
 interface Props {}
 
 interface State { overview?: Info[]; progress?: object; search:string }
-
-interface Progress { id:number; uid:number; eid:number; progress:number; duration:number }
 
 export default class Home extends Component<Props, State> {
 

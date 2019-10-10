@@ -27,7 +27,7 @@ export default class Video extends Component {
         return (
             <div>
                 <div data-vjs-player>
-                    <video ref={this.setRef} className="video-js"/>
+                    <video ref={this.setRef} class="video-js"/>
                 </div>
             </div>
         )

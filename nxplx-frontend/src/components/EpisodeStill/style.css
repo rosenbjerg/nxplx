@@ -18,9 +18,7 @@
 }
 .playPosterContainer:hover .episode {
     opacity: 0.9;
-    border: #1565c0 solid 3px;
-    border-radius: 5px;
-    outline: none;
+    outline: #1565c0 solid 3px;
 }
 .playPosterContainer:hover .play {
     opacity: 1;
@@ -36,9 +34,9 @@
     transition: top 90ms, left 90ms;
 }
 .playPosterContainer:hover .number {
-    top: -21px;
-    left: calc(-8% - 2px);
-}
+     /*top: -21px;*/
+     /*left: calc(-8% - 2px);*/
+ }
 .episode {
     width: 230px;
     box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);

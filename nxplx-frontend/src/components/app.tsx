@@ -12,7 +12,7 @@ import Season from "../routes/season";
 import Series from "../routes/series";
 import Watch from "../routes/watch";
 import Header from "./header";
-
+import '@egoist/snackbar/dist/snackbar.css'
 // if ((module as any).hot) {
 //     // tslint:disable-next-line:no-var-requires
 //     require("preact/debug");
@@ -54,7 +54,7 @@ export default class App extends Component {
         this.checkLoggedIn();
     }
     private checkLoggedIn = async () => {
-        const response = await http.get('/api/user/verify');
+        const response = await http.get('/api/authentication/verify');
         if (response.ok) {
             const isAdmin = (await response.text()) === 'True';
             console.log('is admin', isAdmin);

@@ -1,23 +1,20 @@
 
-export const imageUrl = (url:string, width:154|185|342|1280) => `/api/images/w${width}${url}`;
+export const imageUrl = (url:string, width:154|185|342|1280) => `/api/image/w${width}${url}`;
 
 export interface Genre {
     id: number;
     name: string;
 }
-
 export interface ProductionCompany {
     id: number;
     logoPath: string;
     name: string;
     originCountry: string;
 }
-
 export interface ProductionCountry {
     iso3166_1: string;
     name: string;
 }
-
 export interface SpokenLanguage {
     iso639_1: string;
     name: string;
@@ -57,14 +54,12 @@ export interface MovieCollection {
     poster:string
     backdrop:string
 }
-
 export interface Creator {
     id: number
     creditId: string
     name: string
     profilePath: string
 }
-
 export interface Network {
     name: string
     id: number
@@ -84,20 +79,17 @@ export interface SeriesDetails {
     createdBy: Creator[];
     productionCompanies: ProductionCompany[];
     overview: string;
-    seasons: SeasonLiteDetails[];
+    seasons: SeasonDetails[];
 }
-export interface SeasonLiteDetails {
+export interface SeasonDetails {
     airDate: string
     id: number
     name: string
     overview: string
     poster: string
     number: number
+    episodes?: EpisodeDetails[]
 }
-export interface SeasonDetails extends SeasonLiteDetails {
-    episodes: EpisodeDetails[]
-}
-
 export interface EpisodeDetails {
     name: string
     fileId: number
@@ -107,14 +99,6 @@ export interface EpisodeDetails {
     still: string;
     voteAverage: number;
     voteCount: number;
-}
-export interface Info {
-    id:number
-    fid:number
-    title:string
-    poster:string
-    backdrop:string
-    subtitles:string[]
 }
 
 export const round = (num:number) => Math.round(num * 100) / 100;

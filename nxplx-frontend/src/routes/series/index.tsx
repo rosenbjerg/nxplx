@@ -18,8 +18,7 @@ export default class Series extends Component<Props, State> {
     public componentDidMount() : void {
         http.get(`/api/series/detail/${this.props.id}`)
             .then(response => response.json())
-            .then(results => {
-                const details:SeriesDetails = results[0];
+            .then((details:SeriesDetails) => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
                 this.setState({ details, bg });
             });

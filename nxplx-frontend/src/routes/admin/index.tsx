@@ -3,33 +3,20 @@ import { route } from "preact-router";
 import Loading from "../../components/loading"
 import http from "../../Http";
 import * as style from "./style.css";
+import { createSnackbar } from '@egoist/snackbar'
+import IconButton from 'preact-material-components/IconToggle';
+import { Library, User } from "../../models";
+// import 'preact-material-components/IconToggle/index';
 
 interface Props {}
-interface Library {
-    id:number
-    name:string
-    kind:string
-    language:string
-}
-interface User {
-    username:string
-    email:string
-    isAdmin:boolean
-    libraries:number[]
-}
-interface EnrichedUser {
-    username:string
-    email:string
-    isAdmin:boolean
-    libraries:Library[]
-}
 interface State {
-    users: EnrichedUser[];
+    users: User[];
     libraries: Library[];
 }
+
 export default class Admin extends Component<Props, State> {
     public state = {
-        EnrichedUser: [],
+        users: [],
         libraries: []
     };
 
@@ -39,104 +26,110 @@ export default class Admin extends Component<Props, State> {
                 <h1>Admin stuff</h1>
 
                 <h2>Libraries</h2>
-                <form>
-                    <table>
+                <form onSubmit={this.submitNewLibrary}>
+                    <table class="fullwidth">
                         <thead>
                             <tr>
-                                <td>Name</td>
-                                <td>Kind</td>
-                                <td>Language</td>
-                                <td>Path</td>
+                                <td class={style.td}>Name</td>
+                                <td class={style.td}>Kind</td>
+                                <td class={style.td}>Language</td>
+                                <td class={style.td}>Path</td>
                             </tr>
                         </thead>
                         <tbody>
                             {
                                 !libraries ? (<Loading />) : libraries.map(l => (
-                                    <tr key={l.id}>
-                                        <td>{l.name}</td>
-                                        <td>{l.kind}</td>
-                                        <td>{l.language}</td>
-                                        <td>{l.path || 'not specified'}</td>
+                                    <tr class={style.tr} key={l.id}>
+                                        <td class={style.td}>{l.name}</td>
+                                        <td class={style.td}>{l.kind}</td>
+                                        <td class={style.td}>{l.language}</td>
+                                        <td class={style.td}>{l.path || 'not specified'}</td>
                                         <td>
-                                            <button>Delete</button>
+                                            <button type="button" onClick={() => http.post('/api/indexing', { value: [ l.id ] })} class="material-icons">refresh</button>
+                                            <button type="button" onClick={() => http.delete('/api/library', { value: l.id })} class="material-icons">close</button>
                                         </td>
                                     </tr>
                                 ))
                             }
                             <tr>
                                 <td>
-                                    <input name="name" placeholder="Name" type="text"/>
+                                    <input class="inline-edit fullwidth" name="name" placeholder="Name" type="text" required/>
                                 </td>
                                 <td>
-                                    <select name="kind">
+                                    <select class="inline-edit fullwidth" name="kind" required>
                                         <option value="film">Film</option>
                                         <option value="series">Series</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <select name="language">
+                                    <select class="inline-edit fullwidth" name="language" required>
                                         <option value="en-UK">en-UK</option>
                                         <option value="da-DK">da-DK</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input name="path" placeholder="Path" type="text"/>
+                                    <input class="inline-edit fullwidth" name="path" placeholder="Path" type="text" required/>
                                 </td>
                                 <td>
-                                    <button>Create</button>
+                                    <button class="material-icons">done</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </form>
-                <button onClick={() => http.post('/api/index/all')}>Index all libraries</button>
+                <button onClick={this.indexAllLibraries}>Index all libraries</button>
 
                 <h2>Users</h2>
-                <form>
-                    <table>
+                <form onSubmit={this.submitNewUser}>
+                    <table class="fullwidth">
                         <thead>
                         <tr>
-                            <td>Username</td>
-                            <td>Email</td>
-                            <td>Privileges</td>
-                            <td>Has changed password</td>
+                            <td class={style.td}>Username</td>
+                            <td class={style.td}>Email</td>
+                            <td class={style.td}>Privileges</td>
+                            <td class={style.td}>Has changed password</td>
                         </tr>
                         </thead>
                         <tbody>
                             {
                                 !users ? (<Loading />) : users.map(u => (
-                                    <tr key={u.username}>
-                                        <td>{u.username}</td>
-                                        <td>{u.email}</td>
-                                        <td>{u.isAdmin ? 'admin' : 'user'}</td>
-                                        <td colSpan={2}>{u.passwordChanged ? 'Yes' : 'No'}</td>
+                                    <tr class={style.tr} key={u.username}>
+                                        <td class={style.td}>{u.username}</td>
+                                        <td class={style.td}>{u.email || 'none'}</td>
+                                        <td class={style.td}>{u.isAdmin ? 'admin' : 'user'}</td>
+                                        <td class={style.td} colSpan={2}>{u.passwordChanged ? 'Yes' : 'No'}</td>
                                         <td>
-                                            <button>Delete</button>
+                                            {!u.isAdmin && (
+                                                <span>
+                                                    <button type="button" class="material-icons">video_library</button>
+                                                    <button type="button" onClick={() => http.delete('/api/user', { value: u.username })} class="material-icons">close</button>
+                                                </span>
+                                            )}
                                         </td>
                                     </tr>
                                 ))
                             }
                             <tr>
                                 <td>
-                                    <input name="username" placeholder="Username" type="text"/>
+                                    <input class="inline-edit fullwidth" name="username" placeholder="Username" type="text" required/>
                                 </td>
                                 <td>
-                                    <input name="email" placeholder="Email" type="email"/>
+                                    <input class="inline-edit fullwidth" name="email" placeholder="Email" type="email"/>
                                 </td>
                                 <td>
-                                    <select name="privileges">
+                                    <select class="inline-edit fullwidth" name="privileges" required>
                                         <option value="user">User</option>
                                         <option value="admin">Admin</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input name="password1" placeholder="Initial password" type="password"/>
+                                    <input class="inline-edit fullwidth" name="password1" placeholder="Initial password" type="password" required/>
                                 </td>
                                 <td>
-                                    <input name="password2" placeholder="Initial password (repeat)" type="password"/>
+                                    <input class="inline-edit fullwidth" name="password2" placeholder="Initial password (repeat)" type="password" required/>
                                 </td>
                                 <td>
-                                    <button>Create</button>
+                                    <button class="material-icons">done</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -148,27 +141,41 @@ export default class Admin extends Component<Props, State> {
         );
     }
     public componentDidMount() {
-        this.checkLoggedIn();
         Promise.all([
             http.get('/api/user/list').then(res => res.json()),
-            http.get('/api/user/libraries').then(res => res.json())
+            http.get('/api/library/list').then(res => res.json())
         ]).then(results => {
-            const simpleUsers:User[] = results[0];
+            const users:User[] = results[0];
             const libraries:Library[] = results[1];
-            const libraryMap = libraries.reduce((acc, curr) => {
-                acc[curr.id] = curr;
-                return acc;
-            }, {});
-            const users:EnrichedUser[] = simpleUsers.map(u => Object.assign({}, u, { libraries: u.libraries.map(l => libraryMap[l]) }));
             this.setState({ users, libraries });
         })
     }
 
+    private indexAllLibraries = async () => {
+        const response = await http.post('/api/index/all');
+        if (response.ok) {
+            createSnackbar('Indexing all libraries...', { timeout: 1500 });
+        }
+    };
     private submitNewLibrary = async (ev:Event) => {
+        ev.preventDefault();
         const form = new FormData(ev.target);
-        http.post('/api/')
+        const response = await http.post('/api/library', form, false);
+        if (response.ok) {
+            createSnackbar('Library added!', { timeout: 1500 });
+            const library:Library = await response.json();
+            this.setState(s => { s.libraries.push(library) });
+            ev.target.reset();
+        }
     };
     private submitNewUser = async (ev:Event) => {
-
+        ev.preventDefault();
+        const form = new FormData(ev.target);
+        const response = await http.post('/api/user', form, false);
+        if (response.ok) {
+            createSnackbar('User added!', { timeout: 1500 });
+            const user:User = await response.json();
+            this.setState(s => { s.users.push(user) })
+        }
     };
 }
