@@ -8,7 +8,6 @@ using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Logging;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Integrations.TMDBApi;
 using NxPlx.Models;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
@@ -32,8 +31,8 @@ namespace NxPlx.WebApi
                 registration.Register<ICachingService, RedisCachingService>();
                 registration.Register<ILoggingService, NLoggingService>();
                 registration.Register<IDatabaseMapper, DatabaseMapper>();
-                registration.Register<IDetailsMapper, TMDbMapper>(false);
-                registration.Register<IDetailsApi, TMDbApi>(false);
+//                registration.Register<IDetailsMapper, TMDbMapper>(false);
+//                registration.Register<IDetailsApi, TMDbApi>(false);
                 registration.Register<Indexer>(false);
                 registration.Register<MediaContext>(false);
                 registration.Register<UserContext>(false);
