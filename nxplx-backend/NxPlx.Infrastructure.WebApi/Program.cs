@@ -47,7 +47,7 @@ namespace NxPlx.WebApi
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
 
-            var server = new RedHttpServer(cfg.HttpPort);
+            var server = new RedHttpServer(cfg.HttpPort, "public");
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
             {
                 Secure = cfg.Production,
