@@ -77,7 +77,7 @@ namespace NxPlx.WebApi
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
             
-            await server.RunAsync();
+            await server.RunAsync(cfg.Production ? "*" : "localhost");
         }
     }
 }
