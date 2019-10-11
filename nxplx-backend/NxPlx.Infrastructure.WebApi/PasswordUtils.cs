@@ -36,7 +36,7 @@ namespace NxPlx.WebApi
         {
             var started = DateTime.UtcNow;
             var bcrypted = Crypt.HashPassword(Salt(password), workFactor);
-            return DateTime.UtcNow.Subtract(started).TotalMilliseconds;
+            return (bcrypted.Length + DateTime.UtcNow.Subtract(started).TotalMilliseconds) - bcrypted.Length;
         }
 
         public static string Hash(string password)
