@@ -1,12 +1,9 @@
+import { createSnackbar } from '@egoist/snackbar'
 import { Component, h } from "preact";
-import { route } from "preact-router";
 import Loading from "../../components/loading"
 import http from "../../Http";
-import * as style from "./style.css";
-import { createSnackbar } from '@egoist/snackbar'
-import IconButton from 'preact-material-components/IconToggle';
 import { Library, User } from "../../models";
-// import 'preact-material-components/IconToggle/index';
+import * as style from "./style.css";
 
 interface Props {}
 interface State {
@@ -39,7 +36,7 @@ export default class Admin extends Component<Props, State> {
                         <tbody>
                             {
                                 !libraries ? (<Loading />) : libraries.map(l => (
-                                    <tr class={style.tr} key={l.id}>
+                                    <tr key={l.id}>
                                         <td class={style.td}>{l.name}</td>
                                         <td class={style.td}>{l.kind}</td>
                                         <td class={style.td}>{l.language}</td>
@@ -93,7 +90,7 @@ export default class Admin extends Component<Props, State> {
                         <tbody>
                             {
                                 !users ? (<Loading />) : users.map(u => (
-                                    <tr class={style.tr} key={u.username}>
+                                    <tr key={u.username}>
                                         <td class={style.td}>{u.username}</td>
                                         <td class={style.td}>{u.email || 'none'}</td>
                                         <td class={style.td}>{u.isAdmin ? 'admin' : 'user'}</td>
@@ -159,23 +156,26 @@ export default class Admin extends Component<Props, State> {
     };
     private submitNewLibrary = async (ev:Event) => {
         ev.preventDefault();
-        const form = new FormData(ev.target);
+        const formElement = ev.target as HTMLFormElement;
+        const form = new FormData(formElement);
         const response = await http.post('/api/library', form, false);
         if (response.ok) {
             createSnackbar('Library added!', { timeout: 1500 });
             const library:Library = await response.json();
             this.setState(s => { s.libraries.push(library) });
-            ev.target.reset();
+            formElement.reset();
         }
     };
     private submitNewUser = async (ev:Event) => {
         ev.preventDefault();
-        const form = new FormData(ev.target);
+        const formElement = ev.target as HTMLFormElement;
+        const form = new FormData(formElement);
         const response = await http.post('/api/user', form, false);
         if (response.ok) {
             createSnackbar('User added!', { timeout: 1500 });
             const user:User = await response.json();
-            this.setState(s => { s.users.push(user) })
+            this.setState(s => { s.users.push(user) });
+            formElement.reset();
         }
     };
 }

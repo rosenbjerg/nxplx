@@ -13,4 +13,13 @@ export interface User {
     libraries:number[]
 }
 
-export interface Info { id:number; title:string; poster:string; kind:'film'|'series' }
+export interface OverviewElement { id:number; title:string; poster:string; kind:'film'|'series' }
+
+export interface FileInfo {
+    id:number
+    fid:number
+    title:string
+    poster:string
+    backdrop:string
+    subtitles:string[]
+}

@@ -11,13 +11,14 @@ import 'video.js/dist/video-js.min.css';
 import {formatProgress} from '../../commonFilmInfo';
 import Loading from '../../components/loading';
 import { formatSubtitleName } from '../../components/Subtitles';
-import { imageUrl, Info } from "../../Details";
+import { imageUrl } from "../../Details";
 import http from "../../Http";
+import { FileInfo } from "../../models";
 import * as style from "./style.css";
 
 interface Props { store:Store<object>; kind:string; fid:string }
 
-interface State { time:number; count:number, info:Info }
+interface State { time:number; count:number, info:FileInfo }
 
 export default class Watch extends Component<Props, State> {
     // @ts-ignore
@@ -76,9 +77,9 @@ export default class Watch extends Component<Props, State> {
 
         const tracks = this.video.textTracks();
         let subtitleLang = 'none';
-        for (let i = 0; i < tracks.length; i++) {
-            if (tracks[i].mode === 'showing') {
-                subtitleLang = tracks[i].language;
+        for (const track of Array.from(tracks)) {
+            if (track.mode === 'showing') {
+                subtitleLang = track.language;
                 break;
             }
         }
@@ -127,10 +128,9 @@ export default class Watch extends Component<Props, State> {
                 video.play();
             });
             const tracks = video.textTracks();
-            // @ts-ignore
-            for (let i = 0; i < tracks.length; i++) {
-                if (tracks[i].language === defaultLang) {
-                    tracks[i].mode = 'showing';
+            for (const track of Array.from(tracks)) {
+                if (track.language === defaultLang) {
+                    track.mode = 'showing';
                     break;
                 }
             }

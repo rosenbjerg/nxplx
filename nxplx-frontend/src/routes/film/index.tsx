@@ -30,17 +30,6 @@ export default class Home extends Component<Props, State> {
         });
     }
 
-    public playPoster(details:FilmDetails) {
-        return (
-            <div class={style.playPosterContainer}>
-                <img class={style.poster} src={imageUrl(details.poster, 342)} alt=""/>
-                <Link class={style.play} href={`/watch/film/${details.fid}`} >
-                    <i class="material-icons">play_arrow</i>
-                </Link>
-            </div>
-        );
-    }
-
     public render(props:Props, { details, bg, subtitle }:State) {
         if (!details) {
             return (<Loading />);

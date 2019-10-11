@@ -9,12 +9,12 @@ import Loading from '../../components/loading';
 import { imageUrl } from "../../Details";
 import http from '../../Http';
 import * as style from './style.css';
-import { Info } from "../../models";
+import { OverviewElement } from "../../models";
 
 
 interface Props {}
 
-interface State { overview?: Info[]; progress?: object; search:string }
+interface State { overview?: OverviewElement[]; progress?: object; search:string }
 
 export default class Home extends Component<Props, State> {
 
@@ -55,7 +55,7 @@ export default class Home extends Component<Props, State> {
             </div>
         );
     }
-    private entrySearch = (search:string) => (entry:Info) => {
+    private entrySearch = (search:string) => (entry:OverviewElement) => {
         const lowercaseSearch = search.toLowerCase();
         return  entry.kind.includes(lowercaseSearch) ||
                 entry.title.toLowerCase().includes(lowercaseSearch);

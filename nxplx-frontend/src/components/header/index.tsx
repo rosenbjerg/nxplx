@@ -3,8 +3,8 @@ import { Link } from "preact-router";
 import { connect } from 'unistore/preact'
 import * as style from "./style.css";
 
-
 const Header = connect('isAdmin')(
+    // @ts-ignore
     ({ isAdmin }) => (
         <header class={style.header}>
             <Link href={'/'}>
