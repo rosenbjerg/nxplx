@@ -50,7 +50,7 @@ namespace NxPlx.WebApi
             var server = new RedHttpServer(cfg.HttpPort, "public");
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
             {
-                Secure = cfg.Production,
+                Secure = false,
                 Path = "/",
                 Store = new EntityFrameworkSessionStore<UserSession>(container.Resolve<UserContext>)
             });
