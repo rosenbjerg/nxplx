@@ -71,7 +71,7 @@ namespace NxPlx.WebApi
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
-                Console.WriteLine(eventArgs);
+                Console.WriteLine(eventArgs.Exception.Message);
             }; 
             
             var databaseContextManager = new DatabaseContextManager();

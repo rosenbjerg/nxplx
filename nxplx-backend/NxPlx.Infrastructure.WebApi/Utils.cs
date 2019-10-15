@@ -41,7 +41,7 @@ namespace NxPlx.WebApi
 
         public static Task<HandlerType> SendSPA(Request req, Response res)
         {
-            return res.SendFile("index", "index.html");
+            return res.SendFile("public", "index.html");
         }
 
     }
