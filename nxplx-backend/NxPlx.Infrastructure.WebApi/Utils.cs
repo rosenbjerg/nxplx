@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
@@ -41,7 +42,7 @@ namespace NxPlx.WebApi
 
         public static Task<HandlerType> SendSPA(Request req, Response res)
         {
-            return res.SendFile("public", "index.html");
+            return res.SendFile(Path.Combine("public", "index.html"));
         }
 
     }
