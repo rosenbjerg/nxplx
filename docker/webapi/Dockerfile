@@ -3,7 +3,7 @@ RUN apk --update add git less openssh && \
     rm -rf /var/lib/apt/lists/* && \
     rm /var/cache/apk/*
 WORKDIR /project
-RUN git clone https://rosenbjerg:d5ac2fb5af17b030d7ea855ebb53573f870f7b6e@github.com/rosenbjerg/NxPlx.git
+RUN git clone https://github.com/rosenbjerg/NxPlx.git
 
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS backendBuilder
