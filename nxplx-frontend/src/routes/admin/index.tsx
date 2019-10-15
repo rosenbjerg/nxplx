@@ -4,6 +4,7 @@ import Loading from "../../components/loading"
 import http from "../../Http";
 import { Library, User } from "../../models";
 import * as style from "./style.css";
+import DirectoryBrowser from "../../components/DirectoryBrowser";
 
 interface Props {}
 interface State {
@@ -75,6 +76,8 @@ export default class Admin extends Component<Props, State> {
                     </table>
                 </form>
                 <button onClick={this.indexAllLibraries}>Index all libraries</button>
+
+                <DirectoryBrowser/>
 
                 <h2>Users</h2>
                 <form onSubmit={this.submitNewUser}>
@@ -149,7 +152,7 @@ export default class Admin extends Component<Props, State> {
     }
 
     private indexAllLibraries = async () => {
-        const response = await http.post('/api/index/all');
+        const response = await http.post('/api/indexing/all');
         if (response.ok) {
             createSnackbar('Indexing all libraries...', { timeout: 1500 });
         }
