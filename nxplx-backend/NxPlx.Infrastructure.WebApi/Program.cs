@@ -67,8 +67,6 @@ namespace NxPlx.WebApi
             await databaseContextManager.Initialize();
             
             CreateAdminAccount(container);
-
-            server.Get("/*", Utils.SendSPA);
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
@@ -82,6 +80,8 @@ namespace NxPlx.WebApi
             SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
+            
+            server.Get("/*", Utils.SendSPA);
             
             
             await server.RunAsync(cfg.Production ? "*" : "localhost");
