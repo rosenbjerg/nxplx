@@ -48,20 +48,7 @@ namespace NxPlx.WebApi
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
             
-            using var ctx = container.Resolve<UserContext>();
-            if (ctx.Users.FirstOrDefault() == null)
-            {
-                var admin = new User
-                {
-                    Username = "admin",
-                    Admin = true,
-                    Email = "",
-                    PasswordHash = PasswordUtils.Hash("changemebaby")
-                };
-                ctx.Add(admin);
-                ctx.SaveChanges();
-            }
-
+        
             var server = new RedHttpServer(cfg.HttpPort, "public");
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
             {
@@ -79,6 +66,8 @@ namespace NxPlx.WebApi
             server.ConfigureServices = databaseContextManager.Register;
             await databaseContextManager.Initialize();
             
+            CreateAdminAccount(container);
+
             server.Get("/*", Utils.SendSPA);
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
@@ -96,6 +85,23 @@ namespace NxPlx.WebApi
             
             
             await server.RunAsync(cfg.Production ? "*" : "localhost");
+        }
+
+        private static void CreateAdminAccount(ResolveContainer container)
+        {
+            using var ctx = container.Resolve<UserContext>();
+            if (ctx.Users.FirstOrDefault() == null)
+            {
+                var admin = new User
+                {
+                    Username = "admin",
+                    Admin = true,
+                    Email = "",
+                    PasswordHash = PasswordUtils.Hash("changemebaby")
+                };
+                ctx.Add(admin);
+                ctx.SaveChanges();
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace NxPlx.WebApi
             var (workFactor, timeUsed) = DetermineWorkFactor();
             {
                 WorkFactor = workFactor;
-                Console.WriteLine($"BCrypt workfactor set to {workFactor}, taking {timeUsed:2}ms");
+                Console.WriteLine($"BCrypt workfactor set to {workFactor}, taking {timeUsed}ms");
             }
         }
         
