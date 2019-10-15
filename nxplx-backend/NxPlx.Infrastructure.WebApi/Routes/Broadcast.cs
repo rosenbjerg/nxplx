@@ -1,4 +1,4 @@
-﻿namespace NxPlx.WebApi.Routers
+﻿namespace NxPlx.WebApi.Routes
 {
     class Broadcast<T>
     {

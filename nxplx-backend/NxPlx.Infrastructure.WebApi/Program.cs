@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
 using NxPlx.Abstractions;
@@ -13,7 +14,7 @@ using NxPlx.Models;
 using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
 using NxPlx.Services.Index;
-using NxPlx.WebApi.Routers;
+using NxPlx.WebApi.Routes;
 using Red;
 using Red.CookieSessions;
 using Red.CookieSessions.EFCore;
@@ -46,6 +47,20 @@ namespace NxPlx.WebApi
             var container = ResolveContainer.Default();
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
+            
+            using var ctx = container.Resolve<UserContext>();
+            if (ctx.Users.FirstOrDefault() == null)
+            {
+                var admin = new User
+                {
+                    Username = "admin",
+                    Admin = true,
+                    Email = "",
+                    PasswordHash = PasswordUtils.Hash("changemebaby")
+                };
+                ctx.Add(admin);
+                ctx.SaveChanges();
+            }
 
             var server = new RedHttpServer(cfg.HttpPort, "public");
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
@@ -64,6 +79,8 @@ namespace NxPlx.WebApi
             server.ConfigureServices = databaseContextManager.Register;
             await databaseContextManager.Initialize();
             
+            server.Get("/*", Utils.SendSPA);
+            
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
             LibraryRoutes.Register(server.CreateRouter("/api/library"));
@@ -76,6 +93,7 @@ namespace NxPlx.WebApi
             SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
+            
             
             await server.RunAsync(cfg.Production ? "*" : "localhost");
         }

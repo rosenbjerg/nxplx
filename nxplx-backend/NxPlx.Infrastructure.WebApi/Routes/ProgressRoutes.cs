@@ -11,7 +11,7 @@ using Red;
 using Red.Extensions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class ProgressRoutes
     {

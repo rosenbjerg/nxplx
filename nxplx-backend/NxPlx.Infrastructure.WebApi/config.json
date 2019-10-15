@@ -1,0 +1,21 @@
+﻿{
+  "HttpPort": 5353,
+  "JobServerPort": 8553,
+  
+  "ImageFolder": "C:\\Users\\maro\\Desktop\\nxplx-stuff\\images",
+  "LogFolder": "C:\\Users\\maro\\Desktop\\nxplx-stuff\\logs",
+  
+  "SqlHost": "localhost",
+  "SqlMediaDatabase": "nxplx_media_db",
+  "SqlUserDatabase": "nxplx_user_db",
+  "SqlJobDatabase": "nxplx_job_db",
+  "SqlUsername": "postgres",
+  "SqlPassword": "o8e4v7wjnt39w82380947n5v209",
+  
+  "RedisHost": "localhost",
+  "RedisPassword": "4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b",
+  
+  "TMDbApiKey": "f836aa3b6499b5e85d83b7adea1e5b56",
+  
+  "ProbeToken": "45nv8239457w34589vnkfu7gh5p83490n57v3057bn4pty7erb6c34785y345gb7839b7v3452v903458457eg"
+}

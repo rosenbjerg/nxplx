@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Core.Validation\NxPlx.Core.Validation.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using NxPlx.Abstractions;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
@@ -17,7 +16,7 @@ using NxPlx.Services.Database;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class EpisodeRoutes
     {

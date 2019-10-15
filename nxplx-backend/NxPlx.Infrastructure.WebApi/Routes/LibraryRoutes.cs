@@ -1,24 +1,20 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Newtonsoft.Json;
 using NxPlx.Abstractions;
+using NxPlx.Core.Validation;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
-using NxPlx.Models.Database;
 using NxPlx.Models.Dto.Models;
-using NxPlx.Models.File;
 using NxPlx.Services.Database;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class LibraryRoutes
     {
@@ -27,13 +23,13 @@ namespace NxPlx.WebApi.Routers
             router.Get("/list", Authenticated.User, ListLibraries);
             router.Post("", Authenticated.User, CreateLibrary);
             router.Delete("", Authenticated.User, RemoveLibrary);
-            router.Post("/librarypermissions", Authenticated.Admin, SetUserLibraryPermissions);
+            router.Post("/librarypermissions", Utils.Validate(Forms.SetPermisssions), Authenticated.Admin, SetUserLibraryPermissions);
             router.Get("/browse", Authenticated.Admin, BrowseForDirectory);
         }
         
         
         private static Task<HandlerType> BrowseForDirectory(Request req, Response res)
-        {
+        { 
             string cwd = req.Queries["cwd"];
             if (string.IsNullOrEmpty(cwd))
             {

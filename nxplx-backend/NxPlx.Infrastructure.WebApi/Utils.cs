@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
+using NxPlx.Core.Validation;
 using Red;
+using Validation;
 
 namespace NxPlx.WebApi
 {
@@ -19,5 +23,26 @@ namespace NxPlx.WebApi
         {
             return res.SendJson(mapper.Map<TFrom, TTo>(dto));
         }
+
+        public static Func<Request, Response, Task<HandlerType>> Validate(Forms formEnum)
+        {
+            return async (req, res) =>
+            {
+                var validator = Validators.Select(formEnum);
+                var form = await req.GetFormDataAsync();
+                if (!validator.Validate(form))
+                {
+                    return await res.SendStatus(HttpStatusCode.BadRequest);
+                }
+
+                return HandlerType.Continue;
+            };
+        }
+
+        public static Task<HandlerType> SendSPA(Request req, Response res)
+        {
+            return res.SendFile("index", "index.html");
+        }
+
     }
 }

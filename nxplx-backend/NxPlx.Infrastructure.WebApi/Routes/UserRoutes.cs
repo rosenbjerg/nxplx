@@ -1,31 +1,28 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Core.Validation;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Services.Database;
 using Red;
-using Red.CookieSessions;
 using Red.Extensions;
 using Red.Interfaces;
-using Crypt = BCrypt.Net.BCrypt;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class UserRoutes
     {
         public static void Register(IRouter router)
         {
-            router.Post("/changepassword", Authenticated.User, ChangePassword);
+            router.Post("/changepassword", Utils.Validate(Forms.ChangePassword), Authenticated.User, ChangePassword);
             router.Get("", Authenticated.User, GetUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
-            router.Post("", Authenticated.Admin, CreateUser);
+            router.Post("", Utils.Validate(Forms.CreateUser), Authenticated.Admin, CreateUser);
             router.Delete("", Authenticated.Admin, RemoveUser);
         }
 
@@ -117,6 +114,7 @@ namespace NxPlx.WebApi.Routers
             }
 
             user.PasswordHash = PasswordUtils.Hash(password1);
+            user.HasChangedPassword = true;
             await context.SaveChangesAsync();
             
             container.Resolve<ILoggingService>()

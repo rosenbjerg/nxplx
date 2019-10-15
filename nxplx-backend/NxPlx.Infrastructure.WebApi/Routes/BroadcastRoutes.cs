@@ -5,7 +5,7 @@ using NxPlx.Infrastructure.Session;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class BroadcastRoutes
     {

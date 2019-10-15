@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public class ImageRoutes
     {

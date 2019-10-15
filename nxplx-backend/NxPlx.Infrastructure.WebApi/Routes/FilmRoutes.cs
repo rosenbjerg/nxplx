@@ -12,7 +12,7 @@ using NxPlx.Services.Database;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routers
+namespace NxPlx.WebApi.Routes
 {
     public static class FilmRoutes
     {
