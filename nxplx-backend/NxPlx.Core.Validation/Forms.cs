@@ -21,7 +21,7 @@ namespace NxPlx.Core.Validation
             .RequiresString("username", s => s.Length > MinUsernameLength && s.Length < MaxUsernameLength)
             .RequiresString("password", s => s.Length > MinPasswordLength && s.Length < MaxPasswordLength)
             .CanHaveStringWithPattern("email", new Regex("[^@]+@[^.]+(\\.[^.]+)+", RegexOptions.Compiled))
-            .RequiresString("admin", s => s == "true" || s == "false")
+            .RequiresString("privileges", s => s == "admin" || s == "user")
             .CanHaveIntegers("libraries", 0, 100)
             .Build();
 
