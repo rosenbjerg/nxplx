@@ -42,7 +42,7 @@ export default class Watch extends Component<Props, State> {
                 <video id="video" class="video-js vjs-default-skin vjs-big-play-centered" controls muted preload="metadata">
                     <source src={`/api/${kind}/watch/${fid}`} type="video/mp4" />
                     {info.subtitles.map(lang => (
-                        <track key={lang} src={`/api/subtitle/${fid}/${lang}`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
+                        <track key={lang} src={`/api/subtitle/${kind}/${fid}/${lang}`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
                         ))}
                 </video>
             </div>

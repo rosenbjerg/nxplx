@@ -2,7 +2,7 @@ import {Component, h} from "preact";
 import http from "../../Http";
 import * as style from "./style.css";
 
-interface Props { file_id:string }
+interface Props { kind:'film'|'series', file_id:string }
 
 interface State { selected?:string, languages?:string[] }
 
@@ -30,7 +30,7 @@ export function formatSubtitleName(name:string) : string {
 export default class SubtitleSelector extends Component<Props, State> {
 
     public componentDidMount(): void {
-        http.get(`/api/subtitle/languages/${this.props.file_id}`)
+        http.get(`/api/subtitle/languages/${this.props.kind}/${this.props.file_id}`)
             .then(response => response.json())
             .then(langs => this.setState({languages: langs}));
 
