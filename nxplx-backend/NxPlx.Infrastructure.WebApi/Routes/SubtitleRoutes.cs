@@ -23,7 +23,7 @@ namespace NxPlx.WebApi.Routes
             
             router.Put("/preference/:file_id", Authenticated.User, SetLanguagePreferenceByFileId);
             
-            router.Get("/:file_id/:kind/:lang", Authenticated.User, GetSubtitleByFileId);
+            router.Get("/:kind/:file_id/:lang", Authenticated.User, GetSubtitleByFileId);
         }
 
         private static async Task<HandlerType> GetSubtitleByFileId(Request req, Response res)
@@ -35,12 +35,10 @@ namespace NxPlx.WebApi.Routes
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
 
-            MediaFileBase file = await ctx.FilmFiles.FindAsync(id);
-            if (file == default)
-            {
-                file = await ctx.EpisodeFiles.FindAsync(id);
-            }
-
+            var file = kind == "film"
+                ? (MediaFileBase) await ctx.FilmFiles.FindAsync(id)
+                : await ctx.EpisodeFiles.FindAsync(id);
+            
             if (file == default)
             {
                 return await res.SendStatus(HttpStatusCode.NotFound);
@@ -71,7 +69,7 @@ namespace NxPlx.WebApi.Routes
 
             if (preference == null)
             {
-                preference = new SubtitlePreference {UserId = session.UserId, FileId = fileId,};
+                preference = new SubtitlePreference {UserId = session.UserId, FileId = fileId};
                 await ctx.AddAsync(preference);
             }
 
