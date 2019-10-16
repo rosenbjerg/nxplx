@@ -57,7 +57,7 @@ export default class Home extends Component<Props, State> {
                                 {title: 'Original languages', value: details.spokenLanguages.map(sl => `${sl.name} (${sl.iso639_1})`).join(", ")},
                                 {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
                                 {title: 'Production countries', value: details.productionCountries.map(pc => pc.name).join(", ")},
-                                {title: 'Subtitles', value: <Subtitles file_id={details.fid.toString()} />}
+                                {title: 'Subtitles', value: <Subtitles kind="film" file_id={details.fid.toString()} />}
                             ].map(formatInfoPair)
                         }
                     </div>
