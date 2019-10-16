@@ -6,7 +6,11 @@ namespace NxPlx.Configuration
 {
     public static class ConfigurationService
     {
+#if DEBUG
+        public static readonly Configuration Current = LoadFromFile();
+#else
         public static readonly Configuration Current = LoadFromEnvironment();
+#endif
 
         private static Configuration LoadFromEnvironment()
         {
