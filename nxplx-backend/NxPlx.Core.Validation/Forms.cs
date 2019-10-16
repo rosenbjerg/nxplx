@@ -19,10 +19,10 @@ namespace NxPlx.Core.Validation
 
         private static readonly Validator RegisterForm = ValidatorBuilder.New()
             .RequiresString("username", s => s.Length > MinUsernameLength && s.Length < MaxUsernameLength)
-            .RequiresString("password", s => s.Length > MinPasswordLength && s.Length < MaxPasswordLength)
+            .RequiresString("password1", s => s.Length > MinPasswordLength && s.Length < MaxPasswordLength)
+            .RequiresString("password2", s => s.Length > MinPasswordLength && s.Length < MaxPasswordLength)
             .CanHaveStringWithPattern("email", new Regex("[^@]+@[^.]+(\\.[^.]+)+", RegexOptions.Compiled))
             .RequiresString("privileges", s => s == "admin" || s == "user")
-            .CanHaveIntegers("libraries", 0, 100)
             .Build();
 
         private static readonly Validator SetUserPermissionsForm = ValidatorBuilder.New()
