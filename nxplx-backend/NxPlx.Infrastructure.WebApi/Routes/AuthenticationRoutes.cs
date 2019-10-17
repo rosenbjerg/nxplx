@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Core.Validation;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -18,7 +17,7 @@ namespace NxPlx.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
-            router.Post("/login", Utils.Validate(Forms.Login), Login);
+            router.Post("/login", Validated.LoginForm, Login);
             router.Get("/verify", Authenticated.User, Verify);
             router.Post("/logout", Authenticated.User, Logout);
         }

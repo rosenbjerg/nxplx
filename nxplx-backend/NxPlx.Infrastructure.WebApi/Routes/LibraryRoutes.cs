@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
-using NxPlx.Core.Validation;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -23,7 +22,8 @@ namespace NxPlx.WebApi.Routes
             router.Get("/list", Authenticated.User, ListLibraries);
             router.Post("", Authenticated.User, CreateLibrary);
             router.Delete("", Authenticated.User, RemoveLibrary);
-            router.Post("/librarypermissions", Utils.Validate(Forms.SetPermisssions), Authenticated.Admin, SetUserLibraryPermissions);
+            router.Get("/permissions", Validated.GetUserPermissionsForm, Authenticated.Admin, GetUserLibraryPermissions);
+            router.Post("/permissions", Validated.SetUserPermissionsForm, Authenticated.Admin, SetUserLibraryPermissions);
             router.Get("/browse", Authenticated.Admin, BrowseForDirectory);
         }
         
@@ -34,6 +34,11 @@ namespace NxPlx.WebApi.Routes
             if (string.IsNullOrEmpty(cwd))
             {
                 cwd = "/";
+            }
+
+            if (!Directory.Exists(cwd))
+            {
+                return res.SendStatus(HttpStatusCode.BadRequest);
             }
 
             return res.SendJson(Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
@@ -163,6 +168,22 @@ namespace NxPlx.WebApi.Routes
                 .Info("Updated library permissions for user {Username}: ", user.Username, string.Join(' ', user.LibraryAccessIds));
 
             return await res.SendStatus(HttpStatusCode.OK);
+        }
+        private static async Task<HandlerType> GetUserLibraryPermissions(Request req, Response res)
+        {
+            string userId = req.Queries["userId"];
+            
+            var container = ResolveContainer.Default();
+            await using var context = container.Resolve<UserContext>();
+            
+            var user = await context.Users.FindAsync(userId);
+
+            if (user == default)
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
+            return await res.SendJson(user.LibraryAccessIds);
         }
     }
 

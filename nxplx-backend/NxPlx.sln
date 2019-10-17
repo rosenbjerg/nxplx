@@ -32,8 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Sessio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDb", "NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj", "{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Core.Validation", "NxPlx.Core.Validation\NxPlx.Core.Validation.csproj", "{4B61DAAE-0454-4D31-A0F4-80C70E6EAE34}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,9 +102,5 @@ Global
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B61DAAE-0454-4D31-A0F4-80C70E6EAE34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B61DAAE-0454-4D31-A0F4-80C70E6EAE34}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B61DAAE-0454-4D31-A0F4-80C70E6EAE34}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B61DAAE-0454-4D31-A0F4-80C70E6EAE34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

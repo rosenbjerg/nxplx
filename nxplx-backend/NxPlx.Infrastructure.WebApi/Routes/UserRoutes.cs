@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
-using NxPlx.Core.Validation;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -19,10 +18,10 @@ namespace NxPlx.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
-            router.Post("/changepassword", Utils.Validate(Forms.ChangePassword), Authenticated.User, ChangePassword);
+            router.Post("/changepassword", Validated.ChangePasswordForm, Authenticated.User, ChangePassword);
             router.Get("", Authenticated.User, GetUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
-            router.Post("", Utils.Validate(Forms.CreateUser), Authenticated.Admin, CreateUser);
+            router.Post("", Validated.CreateUserForm, Authenticated.Admin, CreateUser);
             router.Delete("", Authenticated.Admin, RemoveUser);
         }
 
