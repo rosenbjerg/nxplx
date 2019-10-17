@@ -53,10 +53,8 @@
   },
   "dependencies": {
     "@egoist/snackbar": "^1.2.0",
-    "@silvermine/videojs-chromecast": "^1.2.0",
     "@types/got": "^9.4.4",
     "@types/lodash": "^4.14.123",
-    "@types/video.js": "^7.2.10",
     "got": "^9.6.0",
     "linkstate": "^1.1.1",
     "lodash": "^4.17.11",
@@ -66,8 +64,8 @@
     "preact-helmet": "^4.0.0-alpha-3",
     "preact-material-components": "^1.5.7",
     "preact-router": "^2.6.1",
-    "unistore": "^3.4.1",
-    "video.js": "^6.12.1"
+    "shaka-player": "^2.5.5",
+    "unistore": "^3.4.1"
   },
   "peerDependencies": {
     "prettier": ">1.0.0",

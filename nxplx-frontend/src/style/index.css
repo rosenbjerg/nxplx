@@ -53,38 +53,12 @@ button.material-icons:hover {
     outline: none;
     color: var(--focused-text);
 }
-.vjs-tech {
-    position: unset !important;
-}
-.video-js {
+
+.video {
     height: calc(100vh - 56px) !important;
     width: 100% !important;
     margin: auto !important;
     background-color: black !important;
-}
-.video-js:active,
-.vjs-tech:active,
-.vjs-big-play-button:active,
-.video-js:focus,
-.vjs-tech:focus,
-.vjs-big-play-button:focus {
-    outline: none;
-}
-.video-js .vjs-big-play-button {
-    font-size: 32px !important;
-    line-height: 1.9em !important;
-    height: 2em !important;
-    width: 2em !important;
-    border-radius: 1em !important;
-}
-.vjs-poster {
-    background-position: center !important;
-    background-size: cover !important;
-}
-.video-js .vjs-paused {
-}
-.video-js .vjs-captions {
-    font-family: "Lato", "Helvetica Neue", arial, sans-serif;
 }
 
 .inline-edit {

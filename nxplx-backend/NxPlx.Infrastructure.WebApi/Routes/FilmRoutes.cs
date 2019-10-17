@@ -30,8 +30,8 @@ namespace NxPlx.WebApi.Routes
             var container = ResolveContainer.Default();
             var session = req.GetData<UserSession>();
             
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-
+            var id = int.Parse(req.Context.ExtractUrlParameter("file_id").Replace(".mp4", ""));
+            
             await using var ctx = container.Resolve<MediaContext>();
             var filmFile = await ctx.FilmFiles
                 .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)));
