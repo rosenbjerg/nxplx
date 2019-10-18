@@ -14,6 +14,7 @@ NxPlx is designed with deployment using Docker in mind
 * [ ] ffmpeg transcode profile generation
 * [ ] transcode servers
 * [ ] ffprobe file analysis
+* [ ] shaka-player
 * [ ] chromecast support
 
 ### Non-goals
