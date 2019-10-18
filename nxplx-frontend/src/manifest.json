@@ -1,11 +1,10 @@
 {
-  "name": "nxplx-frontend",
-  "short_name": "nxplx-frontend",
+  "name": "NxPlx",
+  "short_name": "NxPlx",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#fff",
-  "theme_color": "#673ab8",
+  "background_color": "#212121",
+  "theme_color": "#424242",
   "icons": [
     {
       "src": "/assets/icons/android-chrome-192x192.png",
