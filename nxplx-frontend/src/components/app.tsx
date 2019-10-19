@@ -1,3 +1,6 @@
+import '@egoist/snackbar/dist/snackbar.css'
+import LiquidRoute, {FadeAnimation, PopAnimation} from 'liquid-route';
+import 'liquid-route/style.css';
 import { Component, h } from "preact";
 import { route, Route, Router, RouterOnChangeArgs } from "preact-router";
 import createStore from 'unistore'
@@ -12,7 +15,6 @@ import Season from "../routes/season";
 import Series from "../routes/series";
 import Watch from "../routes/watch";
 import Header from "./header";
-import '@egoist/snackbar/dist/snackbar.css'
 // if ((module as any).hot) {
 //     // tslint:disable-next-line:no-var-requires
 //     require("preact/debug");
@@ -36,15 +38,15 @@ export default class App extends Component {
                 <div id="app">
                     <Header />
                     <Router onChange={this.handleRoute}>
-                        <Route path="/" component={Home} default />
-                        <Route path="/login" component={Login} />
-                        <Route path="/admin" component={Admin} />
-                        <Route path="/film/:id" component={Film} />
-                        <Route path="/series/:id" component={Series} />
-                        <Route path="/series/:id/:season" component={Season} />
-                        <Route path="/watch/:kind/:fid" component={Watch} />
+                        <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
+                        <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
+                        <LiquidRoute animator={FadeAnimation} path="/admin" component={Admin}/>
+                        <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
+                        <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
+                        <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
+                        <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" component={Watch}/>
+                        <LiquidRoute animator={FadeAnimation} path="/profile" component={Profile}/>
                         {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
-                        <Route path="/profile" component={Profile} />
                     </Router>
                 </div>
             </Provider>

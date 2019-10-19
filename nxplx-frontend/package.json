@@ -59,6 +59,7 @@
     "@types/video.js": "^7.2.10",
     "got": "^9.6.0",
     "linkstate": "^1.1.1",
+    "liquid-route": "^1.1.0",
     "lodash": "^4.17.11",
     "preact": "^8.3.1",
     "preact-cli-plugin-async": "^2.0.0",
