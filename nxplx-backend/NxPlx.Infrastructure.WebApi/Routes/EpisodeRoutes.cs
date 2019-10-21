@@ -134,8 +134,7 @@ namespace NxPlx.WebApi.Routes
                 {
                     details = new EpisodeDetails
                     {
-                        Name = "",
-                        StillPath = "notfound.jpg"
+                        Name = ""
                     };
                 }
 

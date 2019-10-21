@@ -2,18 +2,21 @@ import { Component, h } from "preact";
 import "shaka-player/dist/controls.css";
 import shaka from "shaka-player/dist/shaka-player.ui.js";
 
+interface PlayerEvent {
+    type:'state_changed'|'volume_changed'|'subtitle_changed'|'muted'
+    value:string|number
+}
+
 const uiConfig = {
     controlPanelElements: [
         "play_pause",
-        "trick",
-        "down",
         "time_and_duration",
         "mute",
         "volume",
         "fullscreen",
         "overflow_menu"
     ],
-    overflowMenuButtons: ["captions", "cast", "quality", "picture_in_picture"]
+    overflowMenuButtons: ["captions", "cast"]
 };
 
 const initPlayer = async (
@@ -22,7 +25,7 @@ const initPlayer = async (
     setPlayer: (p: any) => void,
     setOffStorage: (p: any) => void,
     setUI: (p: any) => void,
-    props: IShakaProps) => {
+    props: Props) => {
     if (!shaka.Player.isBrowserSupported()) {
         console.error("Browser not suport");
         return;
@@ -43,19 +46,14 @@ const initPlayer = async (
             );
         }
     });
-    props.onProgress &&
-    pVideoRef.addEventListener("timeupdate", (p: any) =>
-        props.onProgress(pVideoRef.currentTime)
-    );
-
-    props.onPause &&
-    pVideoRef.addEventListener("pause", (p: any) =>
-        props.onPause(pVideoRef.currentTime)
-    );
-
+    if (props.onProgress) {
+        pVideoRef.addEventListener("timeupdate", (p: any) => props.onProgress(pVideoRef.currentTime));
+    }
+    if (props.onPause) {
+        pVideoRef.addEventListener("pause", (p: any) => props.onPause(pVideoRef.currentTime));
+    }
     try {
-        await player.load(props.manifest, props.initialTime);
-        console.log("The video has now been loaded!");
+        await player.load(props.src, props.initialTime);
         setUI(ui);
         setPlayer(player);
         setOffStorage(offStorage);
@@ -63,6 +61,7 @@ const initPlayer = async (
         console.log("TCL: err", err);
         onError(err);
     }
+    player.
 };
 
 const onError = (event: any) => {
@@ -70,68 +69,77 @@ const onError = (event: any) => {
     console.error("Error code", event.code, "object", event);
 };
 
-interface IShakaProps {
-    id?: string;
-    manifest: string;
-    autoPlay?: boolean;
-    width?: string;
-    poster?: string;
+interface Props {
+    src: string;
+    time?: number;
+    autoPlay: boolean;
+    muted: boolean;
+    poster: string;
     title?: string;
-    initialTime?: number; //seconds
-    onDownloadEnd?: (uri: string) => any;
-    onProgress?: (currentTime: number) => any;
-    onPause?: (currentTime: number) => any;
+    preferredSubtitle: string;
+    onEvent: (ev:EventBroker) => void
 }
 
-const ShakaReact = (props: IShakaProps) => {
-    const videoRef = React.createRef<HTMLVideoElement>();
-    const containerRef = React.createRef<HTMLDivElement>();
-    const [player, setPlayer] = useState<any>(null);
-    const [uiObj, setUIObj] = React.useState<any>(null);
-    const [shakaStorage, setShakaStorage] = React.useState<any>(null);
+export default class ShakaPlayer extends Component<Props> {
+    public static defaultProps = {
+        autoPlay: true,
+        title: null,
+        time: 0
+    };
 
-    React.useEffect(() => {
-        initPlayer(
-            videoRef.current,
-            containerRef.current,
-            setPlayer,
-            setShakaStorage,
-            setUIObj,
-            { ...props }
+    private player:any;
+    private uiObj:any;
+    private shakaStorage:any;
+    private didInit = false;
+
+    private videoRef:HTMLVideoElement;
+    private containerRef:HTMLDivElement;
+
+    public render(props:Props) {
+        if (!this.didInit) {
+            this.didInit = true;
+            setTimeout(() => {
+                initPlayer(
+                    this.videoRef,
+                    this.containerRef,
+                    this.setPlayer,
+                    this.setShakaStorage,
+                    this.setUIObj,
+                    { ...props }
+                );
+            }, 0);
+        }
+
+        console.log(this.props.children);
+        return (
+            <div
+                data-shaka-player-cast-receiver-id="7B25EC44"
+                ref={this.setContainerRef}
+            >
+                <video
+                    ref={this.setVideoRef}
+                    poster={props.poster ? props.poster : undefined}
+                    autoPlay={props.autoPlay}>
+                    {this.props.children}
+                </video>
+            </div>
         );
+    }
+    public shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
+        return false;
+    }
 
-        return () => {
-            player.destroy();
-            uiObj.destroy();
-            shakaStorage.destroy();
-        };
-    }, []);
+    public componentWillUnmount(): void {
 
-    return (
-        <div
-            data-shaka-player-cast-receiver-id="7B25EC44"
-            style={{ maxWidth: props.width }}
-            ref={containerRef}
-        >
-            <video
-                ref={videoRef}
-                style={{ width: "100%", height: "100%" }}
-                poster={props.poster ? props.poster : undefined}
-                autoPlay={props.autoPlay}
-            ></video>
-        </div>
-    );
-};
+        this.player.destroy();
+        this.uiObj.destroy();
+        this.shakaStorage.destroy();
+    }
 
-ShakaReact.defaultProps = {
-    id: "video",
-    width: "40em",
-    autoPlay: true,
-    title: null,
-    initialTime: 0,
-    onDownloadEnd: null,
-    onProgress: null,
-    onPause: null
-};
+    private setPlayer = p => this.player = p;
+    private setUIObj = u => this.uiObj = u;
+    private setShakaStorage = s => this.shakaStorage = s;
 
-export default ShakaReact;
+    private setVideoRef = ref => this.videoRef = ref;
+    private setContainerRef = ref => this.containerRef = ref;
+}

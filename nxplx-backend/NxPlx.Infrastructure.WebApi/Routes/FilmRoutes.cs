@@ -29,8 +29,9 @@ namespace NxPlx.WebApi.Routes
         {
             var container = ResolveContainer.Default();
             var session = req.GetData<UserSession>();
-            
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id").Replace(".mp4", ""));
+
+            var fileId = req.Context.ExtractUrlParameter("file_id").Replace(".mp4", "");
+            var id = int.Parse(fileId);
             
             await using var ctx = container.Resolve<MediaContext>();
             var filmFile = await ctx.FilmFiles
