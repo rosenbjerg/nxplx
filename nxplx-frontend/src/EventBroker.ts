@@ -1,6 +1,6 @@
 import { h } from "preact";
 
-type ShakaMessage = 'state_changed'|'volume_changed'|'muted'|'subtitle_changed'
+type ShakaMessage = 'state_changed'|'volume_changed'|'muted'|'subtitle_changed'|'time_changed'
 
 function CreateEventBroker() : EventBroker {
     const allHandlers:{} = {};
@@ -24,7 +24,7 @@ function CreateEventBroker() : EventBroker {
     return publish;
 }
 
-interface EventBroker {
+export interface EventBroker {
     (event:ShakaMessage, data:any):void
     subscribe(event:ShakaMessage, handler:(data:any)=>void):void
 }

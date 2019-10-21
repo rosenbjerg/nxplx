@@ -1,6 +1,7 @@
 import { Component, h } from "preact";
 import "shaka-player/dist/controls.css";
 import shaka from "shaka-player/dist/shaka-player.ui.js";
+import { EventBroker } from "../../EventBroker";
 
 interface PlayerEvent {
     type:'state_changed'|'volume_changed'|'subtitle_changed'|'muted'
@@ -46,14 +47,10 @@ const initPlayer = async (
             );
         }
     });
-    if (props.onProgress) {
-        pVideoRef.addEventListener("timeupdate", (p: any) => props.onProgress(pVideoRef.currentTime));
-    }
-    if (props.onPause) {
-        pVideoRef.addEventListener("pause", (p: any) => props.onPause(pVideoRef.currentTime));
-    }
+    pVideoRef.addEventListener("timeupdate", (p: any) => props.events('time_changed', {time:pVideoRef.currentTime}));
+    pVideoRef.addEventListener("pause", (p: any) => props.events('state_changed', {state:'paused', time:pVideoRef.currentTime}));
     try {
-        await player.load(props.src, props.initialTime);
+        await player.load(props.src, props.time);
         setUI(ui);
         setPlayer(player);
         setOffStorage(offStorage);
@@ -61,7 +58,6 @@ const initPlayer = async (
         console.log("TCL: err", err);
         onError(err);
     }
-    player.
 };
 
 const onError = (event: any) => {
@@ -70,6 +66,7 @@ const onError = (event: any) => {
 };
 
 interface Props {
+    events:EventBroker;
     src: string;
     time?: number;
     autoPlay: boolean;
@@ -77,7 +74,6 @@ interface Props {
     poster: string;
     title?: string;
     preferredSubtitle: string;
-    onEvent: (ev:EventBroker) => void
 }
 
 export default class ShakaPlayer extends Component<Props> {
@@ -92,7 +88,10 @@ export default class ShakaPlayer extends Component<Props> {
     private shakaStorage:any;
     private didInit = false;
 
+
+    // @ts-ignore
     private videoRef:HTMLVideoElement;
+    // @ts-ignore
     private containerRef:HTMLDivElement;
 
     public render(props:Props) {

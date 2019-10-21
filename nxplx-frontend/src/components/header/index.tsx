@@ -11,7 +11,7 @@ const Header = connect('isAdmin')(
                 <img src="/assets/images/nxplx-cropped-h120-light.png" alt=""/>
             </Link>
             <nav class={style.menu}>
-                <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
+                {/*<i class={['material-icons', style.menuOpener].join(' ')}>menu</i>*/}
 
                 {isAdmin && (
                     <Link href="/admin">
@@ -24,9 +24,9 @@ const Header = connect('isAdmin')(
                 <Link href="/profile">
                     <i class="material-icons">account_circle</i>
                 </Link>
-                <Link href="/settings">
-                    <i class="material-icons">settings</i>
-                </Link>
+                {/*<Link href="/settings">*/}
+                {/*    <i class="material-icons">settings</i>*/}
+                {/*</Link>*/}
             </nav>
         </header>
     )

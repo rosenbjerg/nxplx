@@ -13,12 +13,12 @@ import Login from "../routes/login";
 import Profile from "../routes/profile";
 import Season from "../routes/season";
 import Series from "../routes/series";
-import Watch from "../routes/watch";
 import Header from "./header";
-// if ((module as any).hot) {
-//     // tslint:disable-next-line:no-var-requires
-//     require("preact/debug");
-// }
+
+if ((module as any).hot) {
+    // tslint:disable-next-line:no-var-requires
+    require("preact/debug");
+}
 
 
 
@@ -44,7 +44,7 @@ export default class App extends Component {
                         <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
                         <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
                         <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
-                        <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" component={Watch}/>
+                        <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" getComponent={() => import('../routes/watch').then(module => module.default)}/>
                         <LiquidRoute animator={FadeAnimation} path="/profile" component={Profile}/>
                         {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
                     </Router>

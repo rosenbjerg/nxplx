@@ -3,7 +3,6 @@ import { Component, h } from "preact";
 // @ts-ignore
 import Helmet from 'preact-helmet';
 import  { Store } from 'unistore';
-import {formatProgress} from '../../commonFilmInfo';
 import Loading from '../../components/loading';
 import { formatSubtitleName } from '../../components/Subtitles';
 import { imageUrl } from "../../Details";
