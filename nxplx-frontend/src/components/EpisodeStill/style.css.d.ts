@@ -3,4 +3,3 @@ export const play: string;
 export const playPosterContainer: string;
 export const episode: string;
 export const num: string;
-export const number: string;

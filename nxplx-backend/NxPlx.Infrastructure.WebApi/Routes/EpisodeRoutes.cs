@@ -32,7 +32,7 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> StreamFile(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            var id = int.Parse(req.Context.ExtractUrlParameter("file_id").Replace(".mp4", ""));
             await using var ctx = new MediaContext();
             
             var episode = await ctx.EpisodeFiles
@@ -134,8 +134,7 @@ namespace NxPlx.WebApi.Routes
                 {
                     details = new EpisodeDetails
                     {
-                        Name = "",
-                        StillPath = "notfound.jpg"
+                        Name = ""
                     };
                 }
 
