@@ -1,5 +1,8 @@
 
-export const imageUrl = (url:string, width:154|185|342|1280) => `/api/image/w${width}${url}`;
+export const imageUrl = (url:string, width:154|185|342|1280) => {
+    if (!url) return `/assets/images/w${width}.jpg`;
+    return `/api/image/w${width}${url}`;
+}
 
 export interface Genre {
     id: number;
@@ -19,6 +22,7 @@ export interface SpokenLanguage {
     iso639_1: string;
     name: string;
 }
+
 export interface FilmDetails {
     id:number
     fid:number

@@ -2,10 +2,12 @@
 
 :root {
     --border-color: #585858;
-    --hover-border-color: #1565c0;
+    --hover-border-color: #80CFF7;
     --faded-text: #9e9e9e;
     --focused-text: #e0e0e0;
     --secondary-color: #424242;
+    --header-color: #212121;
+    --background-color: #424242;
 }
 
 html,
@@ -14,7 +16,7 @@ body {
     width: 100%;
     padding: 0;
     margin: 0;
-    background: #424242;
+    background: var(--background-color);
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
     font-weight: 400;
     color: #fafafa;
@@ -32,6 +34,7 @@ body::-webkit-scrollbar-thumb {
     background-color: #212121;
     outline: 1px solid var(--secondary-color);
 }
+
 * {
     box-sizing: border-box;
 }
@@ -43,22 +46,27 @@ body::-webkit-scrollbar-thumb {
 button.material-icons {
     background: none;
     transition: border-color 150ms, color 150ms;
-    border: 2px solid var(--border-color);
-    border-radius: 2px;
     cursor: pointer;
     color: var(--faded-text);
 }
 button.material-icons:hover {
-    border-color: var(--hover-border-color);
-    outline: none;
     color: var(--focused-text);
 }
+button.material-icons.bordered {
+    border: 2px solid var(--border-color);
+    border-radius: 2px;
+}
 
-.video {
-    height: calc(100vh - 56px) !important;
-    width: 100% !important;
-    margin: auto !important;
-    background-color: black !important;
+button.material-icons.bordered:hover {
+    border-color: var(--hover-border-color);
+    outline: none;
+}
+
+video.shaka-video {
+    height: calc(100vh - 56px);
+    width: 100%;
+    margin: auto;
+    background-color: black;
 }
 
 .inline-edit {
