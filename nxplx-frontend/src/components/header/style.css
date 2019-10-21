@@ -7,9 +7,15 @@
     width: 100%;
     height: 56px;
     padding: 0;
-    background: #212121;
+    background: var(--header-color);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
     z-index: 50;
+}
+
+.header img {
+    max-height: 48px;
+    margin: 4px;
+    margin-left: 6px;
 }
 
 .header h1 {

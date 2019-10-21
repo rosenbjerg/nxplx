@@ -8,7 +8,7 @@ const Header = connect('isAdmin')(
     ({ isAdmin }) => (
         <header class={style.header}>
             <Link href={'/'}>
-                <h1>NxPlx</h1>
+                <img src="/assets/images/nxplx-cropped-h120-light.png" alt=""/>
             </Link>
             <nav class={style.menu}>
                 <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
