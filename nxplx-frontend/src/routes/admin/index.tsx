@@ -1,24 +1,27 @@
 import { createSnackbar } from '@egoist/snackbar'
 import { Component, h } from "preact";
+import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Loading from "../../components/loading"
+import UserPermissions from "../../components/UserPermissions";
 import http from "../../Http";
 import { Library, User } from "../../models";
 import * as style from "./style.css";
-import DirectoryBrowser from "../../components/DirectoryBrowser";
 
 interface Props {}
 interface State {
-    users: User[];
-    libraries: Library[];
+    users: User[]
+    libraries: Library[]
+    selectedUser?:User
 }
 
 export default class Admin extends Component<Props, State> {
     public state = {
         users: [],
-        libraries: []
+        libraries: [],
+        selectedUser:undefined
     };
 
-    public render(props:Props, { users, libraries }:State) {
+    public render(props:Props, { users, libraries, selectedUser }:State) {
         return (
             <div class={style.profile}>
                 <h1>Admin stuff</h1>
@@ -76,7 +79,6 @@ export default class Admin extends Component<Props, State> {
                     </table>
                 </form>
                 <button class="bordered" onClick={this.indexAllLibraries}>Index all libraries</button>
-
                 <DirectoryBrowser/>
 
                 <h2>Users</h2>
@@ -101,7 +103,7 @@ export default class Admin extends Component<Props, State> {
                                         <td>
                                             {!u.isAdmin && (
                                                 <span>
-                                                    <button type="button" class="material-icons bordered">video_library</button>
+                                                    <button type="button" onClick={() => this.setState({ selectedUser:u })} class="material-icons bordered">video_library</button>
                                                     <button type="button" onClick={() => http.delete('/api/user', { value: u.username })} class="material-icons bordered">close</button>
                                                 </span>
                                             )}
@@ -135,7 +137,10 @@ export default class Admin extends Component<Props, State> {
                         </tbody>
                     </table>
                 </form>
-
+                <div>
+                    {selectedUser && (<h3>Libraries that {selectedUser.username} have access to</h3>)}
+                    <UserPermissions userId={selectedUser && selectedUser.id}/>
+                </div>
             </div>
         );
     }

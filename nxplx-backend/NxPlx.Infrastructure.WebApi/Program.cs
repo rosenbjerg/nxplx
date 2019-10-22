@@ -72,6 +72,7 @@ namespace NxPlx.WebApi
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
+            SessionRoutes.Register(server.CreateRouter("/api/session"));
             LibraryRoutes.Register(server.CreateRouter("/api/library"));
             OverviewRoutes.Register(server.CreateRouter("/api/overview"));
             EpisodeRoutes.Register(server.CreateRouter("/api/series"));

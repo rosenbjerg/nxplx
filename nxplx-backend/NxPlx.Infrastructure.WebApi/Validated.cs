@@ -33,7 +33,7 @@ namespace NxPlx.WebApi
             .RequiresString("password2", s => CorrectLength(s, MinPasswordLength, MaxPasswordLength))
             .BuildRedFormMiddleware();
 
-        public static readonly Func<Request, Response, Task<HandlerType>> GetUserPermissionsForm = ValidatorBuilder.New()
+        public static readonly Func<Request, Response, Task<HandlerType>> RequireUserIdQuery = ValidatorBuilder.New()
             .RequiresInteger("userId")
             .BuildRedQueryMiddleware();
         

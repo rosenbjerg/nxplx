@@ -8,6 +8,9 @@
     --secondary-color: #424242;
     --header-color: #212121;
     --background-color: #424242;
+    --mdc-theme-primary: var(--focused-text);
+    --mdc-theme-primary-bg: var(--background-color);
+    --mdc-theme-text-primary-on-background: var(--focused-text);
 }
 
 html,

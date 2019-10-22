@@ -1,6 +1,7 @@
 import { Component, h } from "preact";
 import http from "../../Http";
 import * as style from './style.css'
+import linkState from "linkstate";
 
 interface Props {
 
@@ -9,6 +10,9 @@ interface State {
     cwd:string,
     dirs: string[]
 }
+
+const getDirs = cwd => http.get(`/api/library/browse?cwd=${cwd}`)
+    .then(res => res.json());
 
 export default class DirectoryBrowser extends Component<Props, State> {
 
@@ -22,9 +26,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
     }
 
     public setCwd(cwd:string){
-        http.get(`/api/library/browse?cwd=${cwd}`)
-            .then(res => res.json())
-            .then(dirs => this.setState({ cwd, dirs }));
+        getDirs(cwd).then(dirs => this.setState({ cwd, dirs }));
     }
 
     public up(cwd:string) {
@@ -42,8 +44,8 @@ export default class DirectoryBrowser extends Component<Props, State> {
             <div class={style.container}>
                 <div>
                     <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
-                    <span>{cwd}</span>
-                    <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>Copy current directory to c</button>
+                    <input type="text" value={cwd} onChange={this.changeCwd}/>
+                    <button disabled={cwd === '/'} class="bordered">Copy current directory to c</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
                     {dirs.map(d => (
@@ -51,5 +53,10 @@ export default class DirectoryBrowser extends Component<Props, State> {
                     ))}
                 </ul>
             </div>);
+    }
+
+    public changeCwd = (ev) => {
+        const value = ev.target.value;
+        getDirs(value).then(dirs => this.setState({ cwd:value, dirs }));
     }
 }

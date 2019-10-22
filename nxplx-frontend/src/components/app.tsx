@@ -2,6 +2,7 @@ import '@egoist/snackbar/dist/snackbar.css'
 import LiquidRoute, {FadeAnimation, PopAnimation} from 'liquid-route';
 import 'liquid-route/style.css';
 import { Component, h } from "preact";
+import 'preact-material-components/FormField/style.css';
 import { route, Route, Router, RouterOnChangeArgs } from "preact-router";
 import createStore from 'unistore'
 import { connect, Provider } from 'unistore/preact'

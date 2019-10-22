@@ -22,8 +22,8 @@ namespace NxPlx.WebApi.Routes
             router.Get("/list", Authenticated.User, ListLibraries);
             router.Post("", Authenticated.User, CreateLibrary);
             router.Delete("", Authenticated.User, RemoveLibrary);
-            router.Get("/permissions", Validated.GetUserPermissionsForm, Authenticated.Admin, GetUserLibraryPermissions);
-            router.Post("/permissions", Validated.SetUserPermissionsForm, Authenticated.Admin, SetUserLibraryPermissions);
+            router.Get("/permissions", Validated.RequireUserIdQuery, Authenticated.Admin, GetUserLibraryPermissions);
+            router.Put("/permissions", Validated.SetUserPermissionsForm, Authenticated.Admin, SetUserLibraryPermissions);
             router.Get("/browse", Authenticated.Admin, BrowseForDirectory);
         }
         
@@ -160,18 +160,17 @@ namespace NxPlx.WebApi.Routes
                 return await res.SendStatus(HttpStatusCode.BadRequest);
             }
 
-            user.LibraryAccessIds.Clear();
-            user.LibraryAccessIds.AddRange(libraryIds);
+            user.LibraryAccessIds = libraryIds;
             await context.SaveChangesAsync();
             
             container.Resolve<ILoggingService>()
-                .Info("Updated library permissions for user {Username}: ", user.Username, string.Join(' ', user.LibraryAccessIds));
+                .Info("Updated library permissions for user {Username}: {Permissions}", user.Username, string.Join(' ', user.LibraryAccessIds));
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
         private static async Task<HandlerType> GetUserLibraryPermissions(Request req, Response res)
         {
-            string userId = req.Queries["userId"];
+            var userId = int.Parse(req.Queries["userId"]);
             
             var container = ResolveContainer.Default();
             await using var context = container.Resolve<UserContext>();

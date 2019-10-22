@@ -240,6 +240,7 @@ namespace NxPlx.Services.Database
 
             SetMapping<User, UserDto>(user => new UserDto
             {
+                id = user.Id,
                 username = user.Username,
                 isAdmin = user.Admin,
                 email = user.Email,

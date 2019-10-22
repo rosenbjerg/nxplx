@@ -50,7 +50,7 @@ export default class Watch extends Component<Props, State> {
                     time={state.time}
                     muted={state.muted}
                     autoPlay={state.autoplay}
-                    src={`/api/${this.props.kind}/watch/${this.state.info.fid}.mp4`}
+                    src={`/api/${this.props.kind}/watch/${this.state.info.fid}`}
                     preferredSubtitle={state.preferredSubtitle}
                     poster={imageUrl(this.state.info.backdrop, 1280)}>
                     {state.info.subtitles.map(lang => (

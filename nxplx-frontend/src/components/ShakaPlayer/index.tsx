@@ -50,7 +50,7 @@ const initPlayer = async (
     pVideoRef.addEventListener("timeupdate", (p: any) => props.events('time_changed', {time:pVideoRef.currentTime}));
     pVideoRef.addEventListener("pause", (p: any) => props.events('state_changed', {state:'paused', time:pVideoRef.currentTime}));
     try {
-        await player.load(props.src, props.time);
+        await player.load(props.src, props.time, 'video/mp4');
         setUI(ui);
         setPlayer(player);
         setOffStorage(offStorage);
