@@ -23,6 +23,19 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+.nx-scroll::-webkit-scrollbar {
+    width: 0.5em;
+    background-color: var(--secondary-color);
+}
+.nx-scroll::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.nx-scroll::-webkit-scrollbar-thumb {
+    background-color: #212121;
+    outline: 1px solid var(--secondary-color);
+}
+
 body::-webkit-scrollbar {
     width: 0.5em;
     background-color: var(--secondary-color);
@@ -43,23 +56,24 @@ body::-webkit-scrollbar-thumb {
     height: 100%;
 }
 
-button.material-icons {
+button.material-icons, button.bordered {
     background: none;
-    transition: border-color 150ms, color 150ms;
-    cursor: pointer;
     color: var(--faded-text);
+    transition: border-color 150ms, color 150ms;
 }
-button.material-icons:hover {
+button.material-icons:not(:disabled):hover {
     color: var(--focused-text);
+    cursor: pointer;
 }
-button.material-icons.bordered {
+button.bordered {
     border: 2px solid var(--border-color);
     border-radius: 2px;
 }
-
-button.material-icons.bordered:hover {
+button.bordered:not(:disabled):hover {
+    color: var(--focused-text);
     border-color: var(--hover-border-color);
     outline: none;
+    cursor: pointer;
 }
 
 video.shaka-video {
