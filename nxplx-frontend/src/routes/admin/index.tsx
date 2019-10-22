@@ -43,8 +43,8 @@ export default class Admin extends Component<Props, State> {
                                         <td class={style.td}>{l.language}</td>
                                         <td class={style.td}>{l.path || 'not specified'}</td>
                                         <td>
-                                            <button type="button" onClick={() => http.post('/api/indexing', { value: [ l.id ] })} class="material-icons">refresh</button>
-                                            <button type="button" onClick={() => http.delete('/api/library', { value: l.id })} class="material-icons">close</button>
+                                            <button type="button" onClick={() => http.post('/api/indexing', { value: [ l.id ] })} class="material-icons bordered">refresh</button>
+                                            <button type="button" onClick={() => http.delete('/api/library', { value: l.id })} class="material-icons bordered">close</button>
                                         </td>
                                     </tr>
                                 ))
@@ -69,13 +69,13 @@ export default class Admin extends Component<Props, State> {
                                     <input class="inline-edit fullwidth" name="path" placeholder="Path" type="text" required/>
                                 </td>
                                 <td>
-                                    <button class="material-icons">done</button>
+                                    <button class="material-icons bordered">done</button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </form>
-                <button onClick={this.indexAllLibraries}>Index all libraries</button>
+                <button class="bordered" onClick={this.indexAllLibraries}>Index all libraries</button>
 
                 <DirectoryBrowser/>
 
@@ -101,8 +101,8 @@ export default class Admin extends Component<Props, State> {
                                         <td>
                                             {!u.isAdmin && (
                                                 <span>
-                                                    <button type="button" class="material-icons">video_library</button>
-                                                    <button type="button" onClick={() => http.delete('/api/user', { value: u.username })} class="material-icons">close</button>
+                                                    <button type="button" class="material-icons bordered">video_library</button>
+                                                    <button type="button" onClick={() => http.delete('/api/user', { value: u.username })} class="material-icons bordered">close</button>
                                                 </span>
                                             )}
                                         </td>
@@ -129,11 +129,10 @@ export default class Admin extends Component<Props, State> {
                                     <input class="inline-edit fullwidth" name="password2" placeholder="Initial password (repeat)" type="password" required/>
                                 </td>
                                 <td>
-                                    <button class="material-icons">done</button>
+                                    <button class="material-icons bordered">done</button>
                                 </td>
                             </tr>
                         </tbody>
-
                     </table>
                 </form>
 
