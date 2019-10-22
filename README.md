@@ -18,9 +18,10 @@ NxPlx is designed with deployment using Docker in mind
 * [ ] chromecast support
 
 ### Non-goals
-- On-the-fly transcoding - low-power devices 
+- On-the-fly transcoding - low-power devices are not good at on-the-fly transcoding
 
 #### Technologies used
+- Docker
 - RedHttpServer (ASP.NET Core)
 - Postgres /w Entity Framework Core
 - Redis
