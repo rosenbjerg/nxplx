@@ -52,7 +52,7 @@ namespace NxPlx.WebApi
             var server = new RedHttpServer(cfg.HttpPort, "public");
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
             {
-                Secure = false,
+                Secure = cfg.Production,
                 Path = "/",
                 Store = new EntityFrameworkSessionStore<UserSession>(container.Resolve<UserContext>)
             });
@@ -68,7 +68,7 @@ namespace NxPlx.WebApi
             
             CreateAdminAccount(container);
             
-            server.Get("/api/version", Authenticated.User, (req, res) => res.SendString("alpha-19.10.17"));
+            server.Get("/api/version", Authenticated.User, (req, res) => res.SendString("alpha-19.10.22"));
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
