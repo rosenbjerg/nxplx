@@ -1,5 +1,6 @@
 import { Component, h } from "preact";
 import http from "../../Http";
+import * as style from './style.css'
 
 interface Props {
 
@@ -38,12 +39,13 @@ export default class DirectoryBrowser extends Component<Props, State> {
 
     public render(props:Props, {cwd, dirs}:State) {
         return (
-            <div>
+            <div class={style.container}>
                 <div>
-                    <button onClick={() => this.up(cwd)}>up</button>
+                    <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
                     <span>{cwd}</span>
+                    <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>Copy current directory to c</button>
                 </div>
-                <ul>
+                <ul class={[style.directories, 'nx-scroll'].join(" ")}>
                     {dirs.map(d => (
                         <li onClick={() => this.setCwd(`${cwd}${d}/`)} key={d}>{d}</li>
                     ))}
