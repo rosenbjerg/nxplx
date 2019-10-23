@@ -35,6 +35,11 @@ namespace NxPlx.WebApi.Routes
             var user = await context.Users.Where(u => u.Username == username)
                 .FirstOrDefaultAsync();
 
+            if (user == default)
+            {
+                return await res.SendStatus(HttpStatusCode.NotFound);
+            }
+
             context.Remove(user);
             await context.SaveChangesAsync();
 
@@ -74,7 +79,7 @@ namespace NxPlx.WebApi.Routes
                 Email = form["email"],
                 Admin = form["admin"] == "true",
                 LibraryAccessIds = form["libraries"].Select(int.Parse).ToList(),
-                PasswordHash = PasswordUtils.Hash(form["password"])
+                PasswordHash = PasswordUtils.Hash(form["password1"])
             };
 
             var container = ResolveContainer.Default();
