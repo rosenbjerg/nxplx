@@ -15,7 +15,14 @@ NxPlx is designed with deployment using Docker in mind
 * [ ] ffmpeg transcode profile generation
 * [ ] transcode servers
 * [ ] ffprobe file analysis
-* [ ] chromecast support
+* [ ] chromecast support (through shaka-player)
+
+### Goals
+- (Very) low CPU usage during playback on multiple clients - fit for an SBC
+- Fully responsive design for enjoyable use on everything from a smartphone to a laptop or desktop
+- Automated transcoding of video files that are in a format that cannot be played directly on target device(s)
+- Support for remote transcode servers, to offload the SBC
+
 
 ### Non-goals
 - On-the-fly transcoding - low-power devices are not good at on-the-fly transcoding
