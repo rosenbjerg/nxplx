@@ -40,12 +40,12 @@ export default class App extends Component {
                     <Router onChange={this.handleRoute}>
                         <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
                         <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
-                        <LiquidRoute animator={FadeAnimation} path="/admin" component={Admin}/>
+                        <LiquidRoute animator={FadeAnimation} path="/admin" getComponent={() => import('../routes/admin').then(module => module.default)}/>
                         <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
                         <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
                         <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
                         <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" getComponent={() => import('../routes/watch').then(module => module.default)}/>
-                        <LiquidRoute animator={FadeAnimation} path="/profile" component={Profile}/>
+                        <LiquidRoute animator={FadeAnimation} path="/profile" getComponent={() => import('../routes/profile').then(module => module.default)}/>
                         {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
                     </Router>
                 </div>
