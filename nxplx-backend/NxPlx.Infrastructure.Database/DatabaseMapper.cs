@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NxPlx.Abstractions;
+using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details;
@@ -261,6 +262,14 @@ namespace NxPlx.Services.Database
                 language = library.Language,
                 kind = library.Kind.ToString(),
                 path = library.Path
+            });
+            
+            
+            SetMapping<UserSession, UserSessionDto>(userSession => new UserSessionDto
+            {
+                id = userSession.Id,
+                userAgent = userSession.UserAgent,
+                expiration = userSession.Expiration
             });
         }
     }

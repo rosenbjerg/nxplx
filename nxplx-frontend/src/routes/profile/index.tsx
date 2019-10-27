@@ -6,6 +6,7 @@ import * as style from "./style.css";
 import FormField from 'preact-material-components/FormField';
 import 'preact-material-components/FormField/style.css';
 import { createSnackbar } from "@snackbar/core";
+import SessionManager from "../../components/SessionManager";
 
 interface Props {
 }
@@ -30,7 +31,7 @@ export default class Profile extends Component<Props, State> {
                 <h1>Account settings for {user.username}</h1>
 
                 <form ref={this.setDetailsFormRef} onSubmit={this.saveDetails}>
-                    <h3>Account details</h3>
+                    <h3>Your account details</h3>
                     <table>
                         <tbody>
                         <tr>
@@ -49,7 +50,7 @@ export default class Profile extends Component<Props, State> {
                 </form>
 
                 <form ref={this.setChangePasswordFormRef} onSubmit={this.changePassword}>
-                    <h3>Change password</h3>
+                    <h3>Change your password</h3>
                     <table>
                         <tbody>
                             <tr>
@@ -80,6 +81,9 @@ export default class Profile extends Component<Props, State> {
                     </table>
                     <button class="bordered">Change password</button>
                 </form>
+
+                <h3>Your active sessions</h3>
+                <SessionManager/>
             </div>
         );
     }

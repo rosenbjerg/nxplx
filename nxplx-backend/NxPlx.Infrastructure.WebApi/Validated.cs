@@ -37,6 +37,10 @@ namespace NxPlx.WebApi
             .RequiresInteger("userId")
             .BuildRedQueryMiddleware();
         
+        public static readonly Func<Request, Response, Task<HandlerType>> RequireSessionIdQuery = ValidatorBuilder.New()
+            .RequiresString("sessionId")
+            .BuildRedQueryMiddleware();
+        
         public static readonly Func<Request, Response, Task<HandlerType>> SetUserPermissionsForm = ValidatorBuilder.New()
             .RequiresInteger("userId")
             .CanHaveIntegers("libraries", 0, 100)
@@ -49,7 +53,7 @@ namespace NxPlx.WebApi
             .BuildRedFormMiddleware();
         
         public static readonly Func<Request, Response, Task<HandlerType>> UpdateUserDetailsForm = ValidatorBuilder.New()
-            .CanHaveStringWithPattern("email", new Regex("[^@]+@[^.]+(\\.[^.]+)+", RegexOptions.Compiled))
+            .CanHaveStringWithPattern("email", new Regex("(^$)|([^@]+@[^.]+(\\.[^.]+)+)", RegexOptions.Compiled))
             .BuildRedFormMiddleware();
     }
 }
