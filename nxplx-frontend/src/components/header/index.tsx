@@ -35,22 +35,22 @@ const Header = connect(['isLoggedIn', 'isAdmin'], actions)(
     // @ts-ignore
     ({ isLoggedIn, isAdmin, logout }) => (
         <header class={style.header}>
-            <Link href={'/'}>
-                <img src="/assets/images/nxplx-cropped-h120-light.png" alt=""/>
+            <Link title="Go to overview" href={'/'}>
+                <img src="/assets/images/nxplx-cropped-h120-light.png" alt="NxPlx"/>
             </Link>
             {isLoggedIn && (
                 <nav class={style.menu}>
                     <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
 
                     <span class={style.menuContent}>
+                        <Link title="Go to overview" href="/">
+                            <i class="material-icons">home</i>
+                        </Link>
                         {isAdmin && (
                             <Link title="Go to administrator view" href="/admin">
                                 <i class="material-icons">supervisor_account</i>
                             </Link>
                         )}
-                        <Link title="Go to overview" href="/">
-                            <i class="material-icons">home</i>
-                        </Link>
                         <Link title="View or edit account settings" href="/profile">
                             <i class="material-icons">account_circle</i>
                         </Link>

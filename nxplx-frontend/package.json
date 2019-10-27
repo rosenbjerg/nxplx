@@ -55,6 +55,7 @@
     "@snackbar/core": "^1.7.0",
     "@types/got": "^9.4.4",
     "@types/lodash": "^4.14.123",
+    "@types/ua-parser-js": "^0.7.33",
     "got": "^9.6.0",
     "linkstate": "^1.1.1",
     "liquid-route": "^1.1.0",
@@ -66,6 +67,7 @@
     "preact-material-components": "^1.5.7",
     "preact-router": "^2.6.1",
     "shaka-player": "^2.5.5",
+    "timeago.js": "^4.0.1",
     "ua-parser-js": "^0.7.20",
     "unistore": "^3.4.1"
   },

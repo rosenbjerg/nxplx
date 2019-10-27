@@ -121,3 +121,13 @@ table {
     border-collapse: collapse;
     overflow-x: auto;
 }
+td {
+    padding-left: 13px;
+    padding-right: 13px;
+}
+td:first-child {
+    padding-left: 0;
+}
+td:last-child {
+    padding-right: 0;
+}
