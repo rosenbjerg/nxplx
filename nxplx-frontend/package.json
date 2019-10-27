@@ -52,7 +52,6 @@
     "typings-for-css-modules-loader": "^1.7.0"
   },
   "dependencies": {
-    "@egoist/snackbar": "^1.2.0",
     "@snackbar/core": "^1.7.0",
     "@types/got": "^9.4.4",
     "@types/lodash": "^4.14.123",
