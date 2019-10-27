@@ -20,9 +20,31 @@ namespace NxPlx.WebApi.Routes
         {
             router.Post("/changepassword", Validated.ChangePasswordForm, Authenticated.User, ChangePassword);
             router.Get("", Authenticated.User, GetUser);
+            router.Put("", Validated.UpdateUserDetailsForm, Authenticated.User, UpdateUser);
+            
+            router.Delete("", Authenticated.Admin, RemoveUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
             router.Post("", Validated.CreateUserForm, Authenticated.Admin, CreateUser);
-            router.Delete("", Authenticated.Admin, RemoveUser);
+            
+        }
+
+        private static async Task<HandlerType> UpdateUser(Request req, Response res)
+        {
+            var form = await req.GetFormDataAsync();
+
+            var session = req.GetData<UserSession>();
+            
+            var container = ResolveContainer.Default();
+            await using var context = container.Resolve<UserContext>();
+            var user = await context.Users.FindAsync(session.UserId);
+
+            if (form.TryGetValue("email", out var email))
+            {
+                user.Email = email;
+            }
+
+            await context.SaveChangesAsync();
+            return await res.SendStatus(HttpStatusCode.OK);
         }
 
         private static async Task<HandlerType> RemoveUser(Request req, Response res)
@@ -48,6 +70,7 @@ namespace NxPlx.WebApi.Routes
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
+        
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
             var container = ResolveContainer.Default();

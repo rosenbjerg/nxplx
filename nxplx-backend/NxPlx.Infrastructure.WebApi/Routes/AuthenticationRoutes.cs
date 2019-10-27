@@ -59,11 +59,13 @@ namespace NxPlx.WebApi.Routes
 
             await res.OpenSession(new UserSession
             {
-                UserAgent = req.Headers["User-Agent"], IsAdmin = user.Admin, UserId = user.Id,
+                UserAgent = req.Headers["User-Agent"], 
+                IsAdmin = user.Admin, 
+                UserId = user.Id,
                 LibraryAccess = user.LibraryAccessIds ?? new List<int>(0)
             });
 
-            return await res.SendStatus(HttpStatusCode.OK);
+            return await res.SendString(user.Admin.ToString());
         }
 
     }

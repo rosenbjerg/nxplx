@@ -47,5 +47,9 @@ namespace NxPlx.WebApi
             .RequiresString("password1", s => CorrectLength(s, MinPasswordLength, MaxPasswordLength))
             .RequiresString("password2", s => CorrectLength(s, MinPasswordLength, MaxPasswordLength))
             .BuildRedFormMiddleware();
+        
+        public static readonly Func<Request, Response, Task<HandlerType>> UpdateUserDetailsForm = ValidatorBuilder.New()
+            .CanHaveStringWithPattern("email", new Regex("[^@]+@[^.]+(\\.[^.]+)+", RegexOptions.Compiled))
+            .BuildRedFormMiddleware();
     }
 }

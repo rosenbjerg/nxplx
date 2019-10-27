@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -20,8 +21,8 @@ namespace NxPlx.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Get("/list", Authenticated.User, ListLibraries);
-            router.Post("", Authenticated.User, CreateLibrary);
-            router.Delete("", Authenticated.User, RemoveLibrary);
+            router.Post("", Authenticated.Admin, CreateLibrary);
+            router.Delete("", Authenticated.Admin, RemoveLibrary);
             router.Get("/permissions", Validated.RequireUserIdQuery, Authenticated.Admin, GetUserLibraryPermissions);
             router.Put("/permissions", Validated.SetUserPermissionsForm, Authenticated.Admin, SetUserLibraryPermissions);
             router.Get("/browse", Authenticated.Admin, BrowseForDirectory);
@@ -33,9 +34,9 @@ namespace NxPlx.WebApi.Routes
             string cwd = req.Queries["cwd"];
             if (string.IsNullOrEmpty(cwd))
             {
-                cwd = "/";
+                cwd = Path.GetPathRoot("/");
             }
-
+            
             if (!Directory.Exists(cwd))
             {
                 return res.SendStatus(HttpStatusCode.BadRequest);
