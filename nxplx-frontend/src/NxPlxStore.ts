@@ -1,1 +1,4 @@
-interface NxPlxStore { isAdmin:boolean }
+interface NxPlxStore {
+    isLoggedIn:boolean
+    isAdmin:boolean
+}

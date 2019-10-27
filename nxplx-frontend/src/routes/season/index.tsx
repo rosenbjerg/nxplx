@@ -19,9 +19,7 @@ export default class Season extends Component<Props, State> {
         http.get(`/api/series/detail/${this.props.id}/${this.props.season}`)
             .then(response => response.json())
             .then((seriesDetails:SeriesDetails) => {
-                console.log(seriesDetails);
                 const seasonDetails:SeasonDetails = seriesDetails.seasons[0];
-
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(seriesDetails.backdrop, 1280)}");`;
                 this.setState({ series: seriesDetails, season: seasonDetails, bg, bgImg: seriesDetails.backdrop });
             });
@@ -35,12 +33,13 @@ export default class Season extends Component<Props, State> {
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>
                 <Helmet title={`Season ${season.number} - ${series.name} - NxPlx`} />
-                <div>
-                    <h2 class={[style.title, style.marked].join(" ")}>{series.name} - Season {season.number}</h2>
-                </div>
-                <img class={style.poster} src={imageUrl(season.poster, 342)}
-                     alt=""/>
-                <span class={[style.info, style.marked].join(" ")}>
+                <div class={`nx-scroll ${style.content}`}>
+                    <div>
+                        <h2 class={[style.title, style.marked].join(" ")}>{series.name} - Season {season.number}</h2>
+                    </div>
+                    <img class={style.poster} src={imageUrl(season.poster, 342)}
+                         alt=""/>
+                    <span class={[style.info, style.marked].join(" ")}>
                     <div>
                         {
                             [
@@ -50,11 +49,12 @@ export default class Season extends Component<Props, State> {
                         }
                     </div>
                 </span>
-                <div>
-                    {orderBy(season.episodes, ['number'], ['asc'])
-                        .map(episode =>
-                            <EpisodeStill key={episode.number} episode={episode} />
-                        )}
+                    <div>
+                        {orderBy(season.episodes, ['number'], ['asc'])
+                            .map(episode =>
+                                <EpisodeStill key={episode.number} episode={episode} />
+                            )}
+                    </div>
                 </div>
             </div>
         );

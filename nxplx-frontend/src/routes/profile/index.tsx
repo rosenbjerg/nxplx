@@ -5,6 +5,7 @@ import { Library, User } from "../../models";
 import * as style from "./style.css";
 import FormField from 'preact-material-components/FormField';
 import 'preact-material-components/FormField/style.css';
+import { createSnackbar } from "@snackbar/core";
 
 interface Props {
 }
@@ -12,40 +13,104 @@ interface State {
     user:User
 }
 export default class Profile extends Component<Props, State> {
+
+    private detailsForm?:HTMLFormElement;
+    private changePasswordForm?:HTMLFormElement;
+
     public componentDidMount() {
         http.get('/api/user')
             .then(res => res.json())
             .then(user => this.setState({ user }));
     }
-
+    
     public render(props:Props, { user }:State) {
         if (!user) { return (<Loading/>); }
         return (
             <div class={style.profile}>
-                <h1>Profile: {user.username}</h1>
+                <h1>Account settings for {user.username}</h1>
 
-                <label>
-                    Email
-                    <input class="inline-edit" type="email" value={user.email}/>
-                </label>
-                <button class="material-icons">save</button>
+                <form ref={this.setDetailsFormRef} onSubmit={this.saveDetails}>
+                    <h3>Account details</h3>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <label>Email</label>
+                            </td>
+                            <td>
+                                <input class="inline-edit" name="email" type="email" value={user.email}/>
+                            </td>
+                            <td>
+                                <button class="material-icons bordered">save</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
 
-                <form>
+                <form ref={this.setChangePasswordFormRef} onSubmit={this.changePassword}>
                     <h3>Change password</h3>
-                    <label>
-                        New password
-                        <input class="inline-edit" type="password" name="password1"/>
-                    </label>
-                    <div/>
-                    <div>
-                        <label>
-                            New password (again)
-                            <input class="inline-edit" type="password" name="password2"/>
-                        </label>
-                    </div>
-                    <button class="material-icons">save</button>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label>Old password</label>
+                                </td>
+                                <td>
+                                    <input class="inline-edit" type="password" name="oldPassword" required minLength={6} maxLength={50}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>New password</label>
+                                </td>
+                                <td>
+                                    <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label>New password (again)</label>
+                                </td>
+                                <td>
+                                    <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="bordered">Change password</button>
                 </form>
             </div>
         );
     }
+
+
+    private async saveDetails(ev) {
+        ev.preventDefault();
+        const formdata = new FormData(ev.target);
+        const response = await http.put('/api/user', formdata, false);
+        if (response.ok) {
+            createSnackbar('Your account details was saved!', { timeout: 2000 });
+            ev.target.reset();
+        }
+        else {
+            createSnackbar('Unable to save your account details :/', { timeout: 3000 });
+        }
+    }
+    private async changePassword(ev) {
+        ev.preventDefault();
+        const formdata = new FormData(ev.target);
+        const response = await http.post('/api/user/changepassword', formdata, false);
+        if (response.ok) {
+            createSnackbar('Your password has been changed!', { timeout: 2000 });
+            ev.target.reset();
+        }
+        else {
+            createSnackbar('Unable to change your password :/', { timeout: 3000 });
+        }
+    }
+
+
+    private setDetailsFormRef = ref => this.detailsForm = ref;
+    private setChangePasswordFormRef = ref => this.changePasswordForm = ref;
 }

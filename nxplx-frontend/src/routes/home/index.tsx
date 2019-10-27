@@ -1,4 +1,4 @@
-import { createSnackbar } from '@egoist/snackbar'
+import { createSnackbar } from '@snackbar/core'
 import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
@@ -8,8 +8,8 @@ import {Link, route} from "preact-router";
 import Loading from '../../components/loading';
 import { imageUrl } from "../../Details";
 import http from '../../Http';
-import * as style from './style.css';
 import { OverviewElement } from "../../models";
+import * as style from './style.css';
 
 
 interface Props {}
@@ -34,19 +34,19 @@ export default class Home extends Component<Props, State> {
             <div class={style.home}>
                 <Helmet title="NxPlx" />
                 <div class={style.top}>
-                    <input tabIndex={0} autofocus class={style.search} placeholder="search here" type="search" onInput={linkState(this, 'search')} />
+                    <input tabIndex={0} autofocus class={style.search} placeholder="search here" type="search" value={this.state.search} onInput={linkState(this, 'search')} />
                     {/*<button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>*/}
                 </div>
 
                 {overview === undefined ? (
                     <Loading />
                 ) : (
-                    <div class={style.entryContainer}>
+                    <div class={`${style.entryContainer} nx-scroll`}>
                         {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
                                     <Link key={entry.id} href={`/${entry.kind}/${entry.id}`}>
-                                        <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 154)} title={entry.title} alt={entry.title} />
+                                        <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 154)} alt={entry.title} />
                                     </Link>
                                 )
                             )}

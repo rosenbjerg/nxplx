@@ -57,20 +57,32 @@
 }
 .menu {
 }
+.menuContent {
+
+}
 .menuOpener {
-    display: none;
+    display: none !important;
 }
 @media only screen and (max-width: 400px) {
     .menu {
         width: 56px;
         height: 56px;
+        background-color: rgba(0,0,0,0.75);
+        border-bottom-left-radius: 16px;
+        display: inline-table;
+    }
+    .menuContent {
+        display: none;
+    }
+    .menu:hover .menuContent {
+        display: inline-block;
     }
     .menuOpener {
-        display: inline-block;
+        display: inline-block !important;
         height: 56px;
         line-height: 56px;
         padding: 0 15px;
-        min-width: 50px;
+        width: 56px;
         text-align: center;
     }
 }

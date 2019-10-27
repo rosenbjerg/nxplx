@@ -1,29 +1,19 @@
 .login {
     width: 400px;
     max-width: 98%;
-    margin: 15vh auto auto;
+    margin: 15vh auto;
 }
 
-.login form span {
-    width: 25%;
-    display: inline-block;
+.login form {
     color: var(--faded-text);
 }
 
 .login form input {
-    border: var(--border-color) solid 1px;
-    border-radius: 3px;
-    background-color: var(--secondary-color);
-    color: var(--focused-text);
-    line-height: 1.5em;
-    padding-left: 3px;
+    font-size: 14pt;
     margin-bottom: 5px;
-    width: 75%;
+    width: 100%;
 }
-.login button {
+.login form button {
     float: right;
-    border: var(--border-color) solid 1px;
-    background-color: var(--secondary-color);
-    color: var(--focused-text);
-    line-height: 1.5em;
+    font-size: 16pt;
 }

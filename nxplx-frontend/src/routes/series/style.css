@@ -1,12 +1,15 @@
 .bg {
-    padding: 15px 15px;
-    height: 100vh;
+    padding: 5px 5px;
+    height: calc(100vh - 56px);
     width: 100%;
     background-size: cover;
     background-repeat: repeat-y;
     background-position-x: center;
 }
-
+.content {
+    height: calc(100vh - 61px);
+    overflow: auto;
+}
 .poster {
     max-height: 340px;
     display: inline-block;

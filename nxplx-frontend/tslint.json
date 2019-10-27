@@ -39,6 +39,7 @@
         "no-collapsible-if": { "severity": "warning" },
         "no-unnecessary-else": { "severity": "warning" },
         "no-accessor-recursion": { "severity": "warning" },
+        "experimentalDecorators": true,
         "no-else-after-return": {
             "severity": "warning",
             "options": "allow-else-if"

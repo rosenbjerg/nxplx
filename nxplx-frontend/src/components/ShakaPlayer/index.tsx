@@ -1,6 +1,6 @@
-import { Component, h } from "preact";
+import { Component, h } from 'preact';
 import "shaka-player/dist/controls.css";
-import shaka from "shaka-player/dist/shaka-player.ui.js";
+import shaka from "shaka-player/dist/shaka-player.ui";
 import { EventBroker } from "../../EventBroker";
 
 interface PlayerEvent {
@@ -31,9 +31,9 @@ const initPlayer = async (
         console.error("Browser not suport");
         return;
     }
-    const player = new shaka.Player(pVideoRef);
-    const ui = new shaka.ui.Overlay(player, pContainerRef, pVideoRef);
-    const offStorage = new shaka.offline.Storage();
+    const player:shaka.Player = new shaka.Player(pVideoRef);
+    const ui:shaka.ui.Overlay = new shaka.ui.Overlay(player, pContainerRef, pVideoRef);
+    const offStorage:shaka.offline.Storage = new shaka.offline.Storage();
 
     ui.configure(uiConfig);
 
@@ -47,9 +47,15 @@ const initPlayer = async (
             );
         }
     });
-    pVideoRef.addEventListener("timeupdate", (p: any) => props.events('time_changed', {time:pVideoRef.currentTime}));
-    pVideoRef.addEventListener("pause", (p: any) => props.events('state_changed', {state:'paused', time:pVideoRef.currentTime}));
+
+    pVideoRef.onvolumechange = () => props.events('volume_changed', {volume: pVideoRef.volume, muted: pVideoRef.muted});
+    pVideoRef.ontimeupdate = () => props.events('time_changed', {time:pVideoRef.currentTime});
+    pVideoRef.onplay = () => props.events('state_changed', {state:'playing', time:pVideoRef.currentTime});
+    pVideoRef.onpause = () => props.events('state_changed', {state:'paused', time:pVideoRef.currentTime});
+    pVideoRef.muted = props.muted;
+    pVideoRef.volume = props.volume;
     try {
+        // await player.load(props.mpd, props.time);
         await player.load(props.src, props.time, 'video/mp4');
         setUI(ui);
         setPlayer(player);
@@ -71,14 +77,15 @@ interface Props {
     time?: number;
     autoPlay: boolean;
     muted: boolean;
+    volume: number;
     poster: string;
     title?: string;
     preferredSubtitle: string;
+    mpd?: string;
 }
 
 export default class ShakaPlayer extends Component<Props> {
     public static defaultProps = {
-        autoPlay: true,
         title: null,
         time: 0
     };
@@ -109,7 +116,6 @@ export default class ShakaPlayer extends Component<Props> {
             }, 0);
         }
 
-        console.log(this.props.children);
         return (
             <div
                 data-shaka-player-cast-receiver-id="7B25EC44"
@@ -129,10 +135,9 @@ export default class ShakaPlayer extends Component<Props> {
     }
 
     public componentWillUnmount(): void {
-
-        this.player.destroy();
-        this.uiObj.destroy();
-        this.shakaStorage.destroy();
+        if (this.player) this.player.destroy();
+        if (this.uiObj) this.uiObj.destroy();
+        if (this.shakaStorage) this.shakaStorage.destroy();
     }
 
     private setPlayer = p => this.player = p;

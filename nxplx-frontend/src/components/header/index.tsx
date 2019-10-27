@@ -1,33 +1,68 @@
+import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
-import { Link } from "preact-router";
+import { Link, route } from "preact-router";
+import { Store } from "unistore";
 import { connect } from 'unistore/preact'
+import http from "../../Http";
 import * as style from "./style.css";
 
-const Header = connect('isAdmin')(
+
+
+const actions = (store:Store<NxPlxStore>) => (
+    {
+        logout(state) {
+            if (state.isLoggedIn) {
+                http.post('/api/authentication/logout').then(response => {
+                    if (response.ok) {
+                        store.setState({
+                            isLoggedIn: false,
+                            isAdmin: false
+                        });
+                        route('/login')
+                    }
+                    else {
+                        createSnackbar('Could not log out', { timeout: 3000 });
+                    }
+                });
+            }
+        }
+    });
+
+
+
+
+const Header = connect(['isLoggedIn', 'isAdmin'], actions)(
     // @ts-ignore
-    ({ isAdmin }) => (
+    ({ isLoggedIn, isAdmin, logout }) => (
         <header class={style.header}>
             <Link href={'/'}>
                 <img src="/assets/images/nxplx-cropped-h120-light.png" alt=""/>
             </Link>
-            <nav class={style.menu}>
-                {/*<i class={['material-icons', style.menuOpener].join(' ')}>menu</i>*/}
+            {isLoggedIn && (
+                <nav class={style.menu}>
+                    <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
 
-                {isAdmin && (
-                    <Link href="/admin">
-                        <i class="material-icons">supervisor_account</i>
-                    </Link>
-                )}
-                <Link href="/">
-                    <i class="material-icons">home</i>
-                </Link>
-                <Link href="/profile">
-                    <i class="material-icons">account_circle</i>
-                </Link>
-                {/*<Link href="/settings">*/}
-                {/*    <i class="material-icons">settings</i>*/}
-                {/*</Link>*/}
-            </nav>
+                    <span class={style.menuContent}>
+                        {isAdmin && (
+                            <Link title="Go to administrator view" href="/admin">
+                                <i class="material-icons">supervisor_account</i>
+                            </Link>
+                        )}
+                        <Link title="Go to overview" href="/">
+                            <i class="material-icons">home</i>
+                        </Link>
+                        <Link title="View or edit account settings" href="/profile">
+                            <i class="material-icons">account_circle</i>
+                        </Link>
+                        <Link title="Logout" onClick={logout}>
+                            <i class="material-icons">exit_to_app</i>
+                        </Link>
+                        {/*<Link href="/settings">*/}
+                        {/*    <i class="material-icons">settings</i>*/}
+                        {/*</Link>*/}
+                    </span>
+                </nav>
+            )}
         </header>
     )
 );

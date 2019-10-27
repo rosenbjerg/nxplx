@@ -1,11 +1,14 @@
 .home {
     padding: 10px 10px;
-    height: 100vh;
+    height: calc(100vh - 56px);
     width: 100%;
 }
 
 .entryContainer {
-    padding-top: 10px;
+    margin-top: 10px;
+    height: calc(100vh - 110px);
+    overflow: auto;
+    margin-right: -8px;
 }
 .entryContainer:empty::after {
     padding-left: 10px;
@@ -48,7 +51,8 @@
     transition: color 250ms;
 }
 .search:focus {
-    transition: border-color 150ms;
+    transition: border-color 200ms, box-shadow 200ms;
+    box-shadow: 0 0 5px 0 var(--hover-border-color);
     border-color: var(--hover-border-color);
     outline: none;
 }

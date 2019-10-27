@@ -1,7 +1,8 @@
-import {h} from "preact";
+import { h, JSX } from "preact";
 import * as style from "./routes/series/style.css";
 
 interface InfoPair { title:string, value:any }
+
 
 
 export function formatRunTime (time?:number[]|number) : string {

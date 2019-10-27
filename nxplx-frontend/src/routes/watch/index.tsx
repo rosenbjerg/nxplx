@@ -1,5 +1,5 @@
-import { Action, createSnackbar, Snackbar, SnackOptions } from '@egoist/snackbar'
-import { Component, h } from "preact";
+import { Action, createSnackbar, Snackbar, SnackOptions } from '@snackbar/core'
+import { Component, h } from 'preact';
 // @ts-ignore
 import Helmet from 'preact-helmet';
 import  { Store } from 'unistore';
@@ -10,48 +10,60 @@ import http from "../../Http";
 import { FileInfo } from "../../models";
 import * as style from "./style.css";
 
-import shaka from 'shaka-player/'
 import ShakaPlayer from "../../components/ShakaPlayer";
 import CreateEventBroker from "../../EventBroker";
 
 interface Props { store:Store<object>; kind:string; fid:string }
 
 interface State {
-    time:number
-    count:number
     info:FileInfo
-    volume:number
-    autoplay:boolean
-    muted:boolean
-    preferredSubtitle:string
+    playerState: 'playing' | 'paused' | 'loading';
+}
+
+const generateMpd = (kind, fid, subs) => {
+    let id = 0;
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd" xmlns:cenc="urn:mpeg:cenc:2013" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011">
+  <Period id="${id}">${subs.map(lang => `
+    <AdaptationSet id="${id++}" contentType="text" lang="${lang}">
+        <BaseURL>${location.protocol}//${location.host}/api/subtitle/${kind}/${fid}/${lang}</BaseURL>
+      </Representation>
+    </AdaptationSet>
+`)}    <AdaptationSet id="${id}" contentType="video">
+      <Representation id="${id}" mimeType="video/mp4">
+        <BaseURL>${location.protocol}//${location.host}/api/${kind}/watch/${fid}/</BaseURL>
+      </Representation>
+    </AdaptationSet>
+  </Period>
+</MPD>`
 }
 
 export default class Watch extends Component<Props, State> {
-    // @ts-ignore
-    public state : State = {
-        time: Date.now(),
-        count: 10,
-        volume: parseFloat(localStorage.getItem('player_volume') || '1.0'),
-        autoplay: localStorage.getItem('player_autoplay') === 'true',
-        muted: localStorage.getItem('player_muted') === 'true',
-    };
+
+    private playerVolume = parseFloat(localStorage.getItem('player_volume') || '1.0') || 1.0;
+    private playerAutoplay = localStorage.getItem('player_autoplay') === 'true';
+    private playerMuted = localStorage.getItem('player_muted') === 'true';
 
     private shakaComm = CreateEventBroker();
     private previousUnload?: any;
+    private playerTime = 0;
+    private subtitleLanguage = 'none';
 
     public render({ kind, fid }:Props, state:State) {
         if (!state.info) { return <Loading /> }
         return (
             <div class={style.container}>
-                <Helmet title={`▶ ${state.info.title} - NxPlx`} />
+                <Helmet title={`${this.state.playerState === 'playing' ? '▶' : '❚❚'} ${state.info.title} - NxPlx`} />
 
                 <ShakaPlayer
                     events={this.shakaComm}
-                    time={state.time}
-                    muted={state.muted}
-                    autoPlay={state.autoplay}
-                    src={`/api/${this.props.kind}/watch/${this.state.info.fid}`}
-                    preferredSubtitle={state.preferredSubtitle}
+                    time={this.playerTime}
+                    muted={this.playerMuted}
+                    volume={this.playerVolume}
+                    autoPlay={this.playerAutoplay}
+                    // mpd={generateMpd(kind, fid, state.info.subtitles)}
+                    src={`/api/${kind}/watch/${fid}`}
+                    preferredSubtitle={this.subtitleLanguage}
                     poster={imageUrl(this.state.info.backdrop, 1280)}>
                     {state.info.subtitles.map(lang => (
                         <track key={lang} src={`/api/subtitle/${kind}/${fid}/${lang}`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
@@ -62,7 +74,6 @@ export default class Watch extends Component<Props, State> {
     }
 
     public componentWillUnmount() : void {
-        window.onbeforeunload = this.previousUnload;
         this.saveProgress();
     }
 
@@ -71,6 +82,19 @@ export default class Watch extends Component<Props, State> {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
 
+        this.shakaComm.subscribe<{state:'playing'|'paused', time:number}>('state_changed', data => {
+            this.playerTime = data.time;
+            this.playerAutoplay = data.state === 'playing';
+            this.setState({ playerState: data.state });
+        });
+        this.shakaComm.subscribe<{time:number}>('time_changed', data => {
+            this.playerTime = data.time;
+        });
+        this.shakaComm.subscribe<{volume:number, muted:boolean}>('volume_changed', data => {
+            this.playerVolume = data.volume;
+            this.playerMuted = data.muted;
+        });
+
         const { kind, fid } = this.props;
         Promise.all([
             http.get(`/api/${kind}/info/${fid}`).then(response => response.json()),
@@ -78,18 +102,23 @@ export default class Watch extends Component<Props, State> {
             http.get(`/api/progress/${fid}`).then(response => response.text()),
         ]).then(results => {
             const info = results[0];
-            const preferredSubtitle = results[1];
-            const time = parseFloat(results[2]);
-            console.log(results);
-            this.setState({ info, preferredSubtitle, time })
+            this.subtitleLanguage = results[1];
+            this.playerTime = parseFloat(results[2]);
+            this.setState({ info })
         });
     }
 
     private saveProgress = () => {
         if (!this.state.info) { return; }
-        if (this.state.time > 5) {
-            http.put('/api/progress/' + this.state.info.fid, { value: this.state.time });
+        if (this.playerTime > 5) {
+            console.log("saved progress", this.playerTime);
+            http.put('/api/progress/' + this.state.info.fid, { value: this.playerTime });
         }
+        localStorage.setItem('player_volume', this.playerVolume.toString());
+        localStorage.setItem('player_autoplay', this.playerAutoplay.toString());
+        localStorage.setItem('player_muted', this.playerMuted.toString());
+
+        window.onbeforeunload = this.previousUnload;
     };
 
 

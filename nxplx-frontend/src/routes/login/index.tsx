@@ -1,35 +1,67 @@
-import { Action, createSnackbar, Snackbar, SnackOptions } from '@egoist/snackbar'
-import '@egoist/snackbar/dist/snackbar.css'
+import { Action, createSnackbar, Snackbar, SnackOptions } from '@snackbar/core'
 import { Component, h } from "preact";
-// @ts-ignore
 import Helmet from 'preact-helmet';
-import Formfield from "preact-material-components/FormField";
 import { route } from "preact-router";
 import http from "../../Http";
 import * as style from "./style.css";
 
-export default class Login extends Component {
+import Typography from 'preact-material-components/Typography';
+import 'preact-material-components/Typography/style.css';
+import { connect } from "unistore/preact";
+import { Store } from "unistore";
+
+const actions = (store:Store<NxPlxStore>) => (
+    {
+        async login(state, ev:any) {
+            if (state.isLoggedIn) return;
+            ev.preventDefault();
+            const formdata = new FormData(ev.target);
+            const response = await http.post('/api/authentication/login', formdata, false);
+            if (response.ok) {
+                const isAdmin = (await response.text()) === 'True';
+                route('/', true);
+                store.setState({
+                    isLoggedIn: true,
+                    isAdmin
+                })
+            }
+            else {
+                ev.target.reset();
+            }
+        }
+    });
+
+const Login = connect(['isLoggedIn', 'isAdmin'], actions)(
+    // @ts-ignore
+    ({ login }) => {
+        return (<div class={style.login}>
+            <Helmet title={`Login at NxPlx`} />
+            <Typography headline5>NxPlx Login</Typography>
+            <form onSubmit={login}>
+                <div>
+                    <input class="inline-edit" placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required/>
+                    <input class="inline-edit" placeholder="Password" type="password" name={'password'} minLength={6} maxLength={50} required/>
+                </div>
+                <button class="bordered">Login</button>
+            </form>
+        </div>)
+    }
+);
+export default Login;
+
+export class Login2 extends Component {
 
     public render() {
         return (
             <div class={style.login}>
                 <Helmet title={`Login at NxPlx`} />
-                <h2>Login</h2>
+                <Typography headline5>NxPlx Login</Typography>
                 <form onSubmit={this.login}>
-                    <Formfield>
-                        <label>
-                            <span>Username</span>
-                            <input type="text" name={'username'} minLength={5} maxLength={50} required/>
-                        </label>
-                    </Formfield>
-
-                    <Formfield>
-                        <label>
-                            <span>Password</span>
-                            <input type="password" name={'password'} minLength={8} maxLength={50} required/>
-                        </label>
-                    </Formfield>
-                    <button>Login</button>
+                    <div>
+                        <input placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required/>
+                        <input placeholder="Password" type="password" name={'password'} minLength={6} maxLength={50} required/>
+                    </div>
+                    <button class="bordered">Login</button>
                 </form>
             </div>
         );

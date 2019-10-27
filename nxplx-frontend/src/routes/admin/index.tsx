@@ -1,4 +1,4 @@
-import { createSnackbar } from '@egoist/snackbar'
+import { createSnackbar } from '@snackbar/core'
 import { Component, h } from "preact";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Loading from "../../components/loading"
@@ -47,7 +47,7 @@ export default class Admin extends Component<Props, State> {
                                         <td class={style.td}>{l.path || 'not specified'}</td>
                                         <td>
                                             <button type="button" onClick={() => http.post('/api/indexing', { value: [ l.id ] })} class="material-icons bordered">refresh</button>
-                                            <button type="button" onClick={() => http.delete('/api/library', { value: l.id })} class="material-icons bordered">close</button>
+                                            <button type="button" onClick={this.deleteLibrary(l)} class="material-icons bordered">close</button>
                                         </td>
                                     </tr>
                                 ))
@@ -101,10 +101,10 @@ export default class Admin extends Component<Props, State> {
                                         <td class={style.td}>{u.isAdmin ? 'admin' : 'user'}</td>
                                         <td class={style.td} colSpan={2}>{u.passwordChanged ? 'Yes' : 'No'}</td>
                                         <td>
-                                            {!u.isAdmin && (
+                                            {u.username !== 'admin' && (
                                                 <span>
                                                     <button type="button" onClick={() => this.setState({ selectedUser:u })} class="material-icons bordered">video_library</button>
-                                                    <button type="button" onClick={() => http.delete('/api/user', { value: u.username })} class="material-icons bordered">close</button>
+                                                    <button type="button" onClick={this.deleteUser(u)} class="material-icons bordered">close</button>
                                                 </span>
                                             )}
                                         </td>
@@ -113,7 +113,7 @@ export default class Admin extends Component<Props, State> {
                             }
                             <tr>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="username" placeholder="Username" type="text" required/>
+                                    <input class="inline-edit fullwidth" name="username" minLength={4} maxLength={20} placeholder="Username" type="text" required/>
                                 </td>
                                 <td>
                                     <input class="inline-edit fullwidth" name="email" placeholder="Email" type="email"/>
@@ -125,10 +125,10 @@ export default class Admin extends Component<Props, State> {
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="password1" placeholder="Initial password" type="password" required/>
+                                    <input class="inline-edit fullwidth" name="password1" placeholder="Initial password" minLength={6} maxLength={50} type="password" required/>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="password2" placeholder="Initial password (repeat)" type="password" required/>
+                                    <input class="inline-edit fullwidth" name="password2" placeholder="Initial password (repeat)" minLength={6} maxLength={50} type="password" required/>
                                 </td>
                                 <td>
                                     <button class="material-icons bordered">done</button>
@@ -155,6 +155,29 @@ export default class Admin extends Component<Props, State> {
         })
     }
 
+    private deleteUser = (user:User) => async () => {
+        const response = await http.delete('/api/user', { value: user.username });
+        if (response.ok) {
+            this.setState(s => {
+                s.users.splice(s.users.indexOf(user), 1);
+            });
+        }
+        else {
+            createSnackbar('Unable to remove that user :/', { timeout: 1500 });
+        }
+    };
+    private deleteLibrary = (library:Library) => async () => {
+        const response = await http.delete('/api/library', { value: library.id });
+        if (response.ok) {
+            this.setState(s => {
+                s.libraries.splice(s.libraries.indexOf(library), 1);
+            });
+        }
+        else {
+            createSnackbar('Unable to remove that library :/', { timeout: 1500 });
+        }
+    };
+
     private indexAllLibraries = async () => {
         const response = await http.post('/api/indexing/all');
         if (response.ok) {
@@ -172,6 +195,9 @@ export default class Admin extends Component<Props, State> {
             this.setState(s => { s.libraries.push(library) });
             formElement.reset();
         }
+        else {
+            createSnackbar('Unable to create new library :/', { timeout: 1500 });
+        }
     };
     private submitNewUser = async (ev:Event) => {
         ev.preventDefault();
@@ -183,6 +209,9 @@ export default class Admin extends Component<Props, State> {
             const user:User = await response.json();
             this.setState(s => { s.users.push(user) });
             formElement.reset();
+        }
+        else {
+            createSnackbar('Unable to create new user :/', { timeout: 1500 });
         }
     };
 }

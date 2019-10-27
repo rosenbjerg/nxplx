@@ -44,7 +44,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
             <div class={style.container}>
                 <div>
                     <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
-                    <input type="text" value={cwd} onChange={this.changeCwd}/>
+                    <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
                     <button disabled={cwd === '/'} class="bordered">Copy current directory to c</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>

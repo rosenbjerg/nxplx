@@ -29,43 +29,44 @@ export default class Series extends Component<Props, State> {
         if (!details) {
             return (<Loading/>);
         }
-        // console.log("details", details);
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>
-                <Helmet title={`${details.name} - NxPlx`} />
-                <div>
-                    <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
-                </div>
-                <img class={style.poster} src={imageUrl(details.poster, 342)}
-                     alt=""/>
-                <span class={[style.info, style.marked].join(" ")}>
+                <div class={`nx-scroll ${style.content}`}>
+                    <Helmet title={`${details.name} - NxPlx`} />
                     <div>
-                        {
-                            [
-                                // {title: 'Released', value: details.seasons[0].airDate.substr(0, 4)},
-                                // {title: 'Episode run time', value: formatRunTime(details.e)},
-                                {title: 'Rating', value: `${round(details.voteAverage)}/10 from ${details.voteCount} votes`},
-                                {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},
-                                {title: 'Networks', value: details.networks.map(n => n.name).join(", ")},
-                                {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
-                                {title: 'Seasons', value: details.seasons.length.toString()},
-                                // {title: 'Episodes', value: details.seasons.reduce((acc, s) => acc + s.episodes.length, 0).toString()},
-                            ].map(formatInfoPair)
-                        }
+                        <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                     </div>
-                </span>
-                <div>
-                    {orderBy(details.seasons, ['number'], ['asc'])
-                        .map(season => (
-                            <span class={style.seasonContainer}>
-                                <Link href={`/series/${details.id}/${season.number}`}>
-                                    <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154)} title={`Season ${season.number}`} alt={season.number.toString()} />
-                                </Link>
-                                <b class={style.number}>S{season.number}</b>
-                            </span>
+                    <img class={style.poster} src={imageUrl(details.poster, 342)}
+                         alt=""/>
+                    <span class={[style.info, style.marked].join(" ")}>
+                        <div>
+                            {
+                                [
+                                    // {title: 'Released', value: details.seasons[0].airDate.substr(0, 4)},
+                                    // {title: 'Episode run time', value: formatRunTime(details.e)},
+                                    {title: 'Rating', value: `${round(details.voteAverage)}/10 from ${details.voteCount} votes`},
+                                    {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},
+                                    {title: 'Networks', value: details.networks.map(n => n.name).join(", ")},
+                                    {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
+                                    {title: 'Seasons', value: details.seasons.length.toString()},
+                                    // {title: 'Episodes', value: details.seasons.reduce((acc, s) => acc + s.episodes.length, 0).toString()},
+                                ].map(formatInfoPair)
+                            }
+                        </div>
+                    </span>
+                    <div>
+                        {orderBy(details.seasons, ['number'], ['asc'])
+                            .map(season => (
+                                    <span class={style.seasonContainer}>
+                                    <Link href={`/series/${details.id}/${season.number}`}>
+                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154)} title={`Season ${season.number}`} alt={season.number.toString()} />
+                                    </Link>
+                                    <b class={style.number}>S{season.number}</b>
+                                </span>
 
-                            )
-                        )}
+                                )
+                            )}
+                    </div>
                 </div>
             </div>
         );

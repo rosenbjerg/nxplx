@@ -37,16 +37,17 @@ export default class Home extends Component<Props, State> {
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>
                 <Helmet title={`${details.title} - NxPlx`} />
-                <div>
-                    <h2 class={[style.title, style.marked].join(" ")}>{details.title}</h2>
-                </div>
-                {details.tagline && (
+                <div class={`nx-scroll ${style.content}`}>
                     <div>
-                        <h4 class={[style.tag, style.marked].join(" ")}>{details.tagline}</h4>
+                        <h2 class={[style.title, style.marked].join(" ")}>{details.title}</h2>
                     </div>
-                )}
-                <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
-                <span class={[style.info, style.marked].join(" ")}>
+                    {details.tagline && (
+                        <div>
+                            <h4 class={[style.tag, style.marked].join(" ")}>{details.tagline}</h4>
+                        </div>
+                    )}
+                    <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
+                    <span class={[style.info, style.marked].join(" ")}>
                     <div>
                         {
                             [
@@ -62,13 +63,14 @@ export default class Home extends Component<Props, State> {
                         }
                     </div>
                 </span>
-                <span class={[style.info, style.marked].join(" ")}>
+                    <span class={[style.info, style.marked].join(" ")}>
                     {
                         [
                             {title: 'Overview', value: details.overview},
                         ].map(formatInfoPair)
                     }
                 </span>
+                </div>
             </div>
         );
     }

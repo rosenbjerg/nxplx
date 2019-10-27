@@ -1,7 +1,7 @@
-import '@egoist/snackbar/dist/snackbar.css'
+import '@snackbar/core/dist/snackbar.min.css'
 import LiquidRoute, {FadeAnimation, PopAnimation} from 'liquid-route';
 import 'liquid-route/style.css';
-import { Component, h } from "preact";
+import { Component, h } from 'preact';
 import 'preact-material-components/FormField/style.css';
 import { route, Route, Router, RouterOnChangeArgs } from "preact-router";
 import createStore from 'unistore'
@@ -21,10 +21,9 @@ if ((module as any).hot) {
     require("preact/debug");
 }
 
-
-
 const store = createStore<NxPlxStore>({
-    isAdmin: true
+    isLoggedIn: false,
+    isAdmin: false
 });
 
 export default class App extends Component {
@@ -60,8 +59,7 @@ export default class App extends Component {
         const response = await http.get('/api/authentication/verify');
         if (response.ok) {
             const isAdmin = (await response.text()) === 'True';
-            console.log('is admin', isAdmin);
-            store.setState({ isAdmin });
+            store.setState({ isLoggedIn: true, isAdmin });
             if (location.pathname === '/login') {
                 route('/', true);
             }
