@@ -9,6 +9,7 @@ interface PlayerEvent {
 }
 
 const uiConfig = {
+    addBigPlayButton: false,
     controlPanelElements: [
         "play_pause",
         "time_and_duration",
@@ -21,8 +22,8 @@ const uiConfig = {
 };
 
 const initPlayer = async (
-    pVideoRef: HTMLVideoElement,
-    pContainerRef: HTMLDivElement,
+    videoRef: HTMLVideoElement,
+    containerRef: HTMLDivElement,
     setPlayer: (p: any) => void,
     setOffStorage: (p: any) => void,
     setUI: (p: any) => void,
@@ -41,19 +42,19 @@ const initPlayer = async (
     player.addEventListener("buffering", ({ buffering }: any) => {
         if (!buffering) {
             // @ts-ignore
-            pContainerRef.childNodes[2].setAttribute(
-                "class",
-                "shaka-spinner-container shaka-hidden"
-            );
+            containerRef.childNodes[2].setAttribute("class", "shaka-spinner-container shaka-hidden");
         }
     });
 
-    pVideoRef.onvolumechange = () => props.events('volume_changed', {volume: pVideoRef.volume, muted: pVideoRef.muted});
-    pVideoRef.ontimeupdate = () => props.events('time_changed', {time:pVideoRef.currentTime});
-    pVideoRef.onplay = () => props.events('state_changed', {state:'playing', time:pVideoRef.currentTime});
-    pVideoRef.onpause = () => props.events('state_changed', {state:'paused', time:pVideoRef.currentTime});
-    pVideoRef.muted = props.muted;
-    pVideoRef.volume = props.volume;
+    videoRef.onvolumechange = () => props.events("volume_changed", {
+        volume: videoRef.volume,
+        muted: videoRef.muted
+    });
+    videoRef.ontimeupdate = () => props.events("time_changed", { time: videoRef.currentTime });
+    videoRef.onplay = () => props.events("state_changed", { state: "playing", time: videoRef.currentTime });
+    videoRef.onpause = () => props.events("state_changed", { state: "paused", time: videoRef.currentTime });
+    videoRef.muted = props.muted;
+    videoRef.volume = props.volume;
     try {
         // await player.load(props.mpd, props.time);
         await player.load(props.src, props.time, 'video/mp4');
@@ -61,7 +62,7 @@ const initPlayer = async (
         setPlayer(player);
         setOffStorage(offStorage);
     } catch (err) {
-        console.log("TCL: err", err);
+        console.log("Error :/", err);
         onError(err);
     }
 };
@@ -72,16 +73,16 @@ const onError = (event: any) => {
 };
 
 interface Props {
-    events:EventBroker;
-    src: string;
-    time?: number;
-    autoPlay: boolean;
-    muted: boolean;
-    volume: number;
-    poster: string;
-    title?: string;
-    preferredSubtitle: string;
-    mpd?: string;
+    events: EventBroker;
+    src: string
+    time: number
+    autoPlay: boolean
+    muted: boolean
+    volume: number
+    poster: string
+    title: string
+    preferredTextLanguage: string
+    textTracks: TextTrack[]
 }
 
 export default class ShakaPlayer extends Component<Props> {
@@ -90,18 +91,18 @@ export default class ShakaPlayer extends Component<Props> {
         time: 0
     };
 
-    private player:any;
-    private uiObj:any;
-    private shakaStorage:any;
+    private player: any;
+    private uiObj: any;
+    private shakaStorage: any;
     private didInit = false;
 
 
     // @ts-ignore
-    private videoRef:HTMLVideoElement;
+    private videoRef: HTMLVideoElement;
     // @ts-ignore
-    private containerRef:HTMLDivElement;
+    private containerRef: HTMLDivElement;
 
-    public render(props:Props) {
+    public render(props: Props) {
         if (!this.didInit) {
             this.didInit = true;
             setTimeout(() => {
@@ -118,10 +119,11 @@ export default class ShakaPlayer extends Component<Props> {
 
         return (
             <div
+                data-shaka-player-container
                 data-shaka-player-cast-receiver-id="7B25EC44"
                 ref={this.setContainerRef}
             >
-                <video
+                <video data-shaka-player
                     ref={this.setVideoRef}
                     poster={props.poster ? props.poster : undefined}
                     autoPlay={props.autoPlay}>
@@ -130,6 +132,7 @@ export default class ShakaPlayer extends Component<Props> {
             </div>
         );
     }
+
     public shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
         return false;
     }
