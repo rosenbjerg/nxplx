@@ -32,9 +32,16 @@ const initPlayer = async (
         console.error("Browser not suport");
         return;
     }
-    const player:shaka.Player = new shaka.Player(pVideoRef);
-    const ui:shaka.ui.Overlay = new shaka.ui.Overlay(player, pContainerRef, pVideoRef);
-    const offStorage:shaka.offline.Storage = new shaka.offline.Storage();
+
+    SimpleManifestParser.register();
+
+    const player: shaka.Player = new shaka.Player(videoRef);
+    const ui: shaka.ui.Overlay = new shaka.ui.Overlay(player, containerRef, videoRef);
+    const offStorage: shaka.offline.Storage = new shaka.offline.Storage();
+    const controls = ui.getControls();
+    controls.addEventListener('caststatuschanged', (event) => {
+        console.log('The new cast status is: ' + event.newStatus);
+    });
 
     ui.configure(uiConfig);
 
