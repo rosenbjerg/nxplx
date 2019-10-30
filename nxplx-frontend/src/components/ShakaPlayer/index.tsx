@@ -7,7 +7,11 @@ interface PlayerEvent {
     type:'state_changed'|'volume_changed'|'subtitle_changed'|'muted'
     value:string|number
 }
-
+interface TextTrack {
+    displayName: string
+    language: string
+    path: string
+}
 const uiConfig = {
     addBigPlayButton: false,
     controlPanelElements: [
