@@ -3,6 +3,8 @@ name: Build multi-arch docker images
 on:
   pull_request:
     branches: release
+  push:
+    branches: release
 
 jobs:
   buildx:
@@ -25,6 +27,6 @@ jobs:
         run: |
           docker buildx build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
-            --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 \
+            --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64 \
             --output "type=image,push=false" \
             --file ./docker/gh-build/Dockerfile ./docker/gh-build
