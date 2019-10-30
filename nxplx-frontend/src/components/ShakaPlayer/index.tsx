@@ -37,8 +37,6 @@ const initPlayer = async (
         return;
     }
 
-    SimpleManifestParser.register();
-
     const player: shaka.Player = new shaka.Player(videoRef);
     const ui: shaka.ui.Overlay = new shaka.ui.Overlay(player, containerRef, videoRef);
     const offStorage: shaka.offline.Storage = new shaka.offline.Storage();
