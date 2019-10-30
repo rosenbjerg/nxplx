@@ -8,7 +8,7 @@ namespace NxPlx.WebApi.Routes
 {
     public class ImageRoutes
     {
-        private const int ImageMaxCacheAge = 60 * 60 * 24 * 14;
+        private const int ImageMaxCacheAge = 60 * 60 * 24 * 3;
         
         public static void Register(IRouter router)
         {
