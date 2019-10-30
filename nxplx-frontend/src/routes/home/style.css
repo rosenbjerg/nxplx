@@ -22,7 +22,6 @@
     box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
     border-radius: 2px;
     cursor: pointer;
-    height: 190px;
     width: 126px;
     transition: border 100ms;
 }
@@ -71,43 +70,36 @@
 
 @media only screen and (max-width: 1969px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 14) - 4px);
     }
 }
 @media only screen and (max-width: 1839px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 13) - 4px);
     }
 }
 @media only screen and (max-width: 1709px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 12) - 4px);
     }
 }
 @media only screen and (max-width: 1579px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 11) - 4px);
     }
 }
 @media only screen and (max-width: 1449px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 10) - 4px);
     }
 }
 @media only screen and (max-width: 1319px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 9) - 4px);
     }
 }
 @media only screen and (max-width: 1189px) {
     .entryTile {
-        height: unset;
         min-width: calc((100% / 8) - 4px);
     }
 }

@@ -11,7 +11,6 @@
     overflow: auto;
 }
 .poster {
-    max-height: 340px;
     display: inline-block;
     box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);
     border-radius: 4px;
@@ -50,7 +49,7 @@
     box-shadow: 5px 5px 5px 0 rgba(21, 21, 21, 0.6);
     border-radius: 4px;
     transition: opacity 100ms ease, border 200ms;
-    width: 160px;
+    width: 144px;
     cursor: pointer;
 }
 .number {
@@ -59,8 +58,9 @@
     position: absolute;
     top: -20px;
     left: 0;
-    width: 160px;
+    width: 100%;
     text-align: right;
+    padding-right: 16px;
     transition: top 90ms, left 90ms;
 }
 
@@ -70,4 +70,60 @@
     box-shadow: 0 0 5px 0 var(--hover-border-color);
     border-radius: 5px;
     outline: none;
+}
+
+@media only screen and (max-width: 1985px) {
+    .season {
+        width: calc((100% / 11) - 20px);
+    }
+}
+@media only screen and (max-width: 1821px) {
+    .season {
+        width: calc((100% / 10) - 20px);
+    }
+}
+@media only screen and (max-width: 1657px) {
+    .season {
+        width: calc((100% / 9) - 20px);
+    }
+}
+@media only screen and (max-width: 1493px) {
+    .season {
+        width: calc((100% / 8) - 20px);
+    }
+}
+@media only screen and (max-width: 1329px) {
+    .season {
+        width: calc((100% / 7) - 20px);
+    }
+}
+@media only screen and (max-width: 1165px) {
+    .season {
+        width: calc((100% / 6) - 20px);
+    }
+}
+@media only screen and (max-width: 1001px) {
+    .season {
+        width: calc((100% / 5) - 20px);
+    }
+}
+@media only screen and (max-width: 837px) {
+    .season {
+        width: calc((100% / 4) - 20px);
+    }
+}
+@media only screen and (max-width: 673px) {
+    .season {
+        width: calc((100% / 3) - 20px);
+    }
+}
+@media only screen and (max-width: 509px) {
+    .season {
+        min-width: calc((100% / 2) - 20px);
+    }
+}
+@media only screen and (max-width: 346px) {
+    .season {
+        width: calc((100% / 1) - 20px);
+    }
 }

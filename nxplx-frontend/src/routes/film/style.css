@@ -22,7 +22,6 @@
     font-size: 14pt;
 }
 .info {
-    width: calc(100% - 270px);
     display: inline-block;
     font-size: 16pt;
 }

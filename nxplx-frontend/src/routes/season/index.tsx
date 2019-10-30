@@ -51,9 +51,7 @@ export default class Season extends Component<Props, State> {
                 </span>
                     <div>
                         {orderBy(season.episodes, ['number'], ['asc'])
-                            .map(episode =>
-                                <EpisodeStill key={episode.number} episode={episode} />
-                            )}
+                            .map(episode => (<EpisodeStill key={episode.number} episode={episode} />))}
                     </div>
                 </div>
             </div>
