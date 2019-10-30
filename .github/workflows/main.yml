@@ -3,8 +3,6 @@ name: Build multi-arch docker images
 on:
   pull_request:
     branches: release
-  push:
-    branches: release
 
 jobs:
   buildx:
