@@ -4,7 +4,7 @@ WORKDIR /project
 RUN git clone https://github.com/rosenbjerg/NxPlx.git
 
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS backendBuilder
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0-alpine AS backendBuilder
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
 RUN dotnet publish NxPlx.Infrastructure.WebApi/NxPlx.Infrastructure.WebApi.csproj -c Release -o build
@@ -18,8 +18,11 @@ RUN npm install --no-progress --silent
 RUN npm run build
 
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine AS runtime
 ARG tmdbApiKey
+LABEL maintainer="Malte Rosenbjerg"
+LABEL description="NxPlx on dotnet 3.0"
+LABEL repository="github.com/rosenbjerg/NxPlx"
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
