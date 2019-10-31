@@ -40,4 +40,4 @@ jobs:
           docker buildx build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=false" \
-            --file ./docker/gh-build/arm64/Dockerfile ./docker/gh-build/arm64
+            --file ./docker/gh-build/arm64v8/Dockerfile ./docker/gh-build/arm64v8
