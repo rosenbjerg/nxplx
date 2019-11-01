@@ -34,3 +34,8 @@ NxPlx is designed with deployment using Docker in mind
 - Postgres /w Entity Framework Core
 - Redis
 - Preact
+
+
+### Contribute
+If you find this project interesting, please star it :)
+Contributions in the form of PRs are welcome!
