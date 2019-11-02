@@ -44,7 +44,7 @@ export default class Season extends Component<Props, State> {
                         {
                             [
                                 // {title: 'Overview', value: season.overview},
-                                {title: 'Released', value: season.airDate.substr(0, 4)}
+                                {title: 'Released', value: season.airDate && season.airDate.substr(0, 4) || '?'}
                             ].map(formatInfoPair)
                         }
                     </div>
