@@ -18,7 +18,7 @@ RUN npm install --no-progress --silent
 RUN npm run build
 
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim-arm64v8 AS runtime
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine-arm64v8 AS runtime
 ARG tmdbApiKey
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx on dotnet 3.0"
