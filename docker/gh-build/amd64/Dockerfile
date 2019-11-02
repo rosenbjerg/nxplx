@@ -19,13 +19,11 @@ RUN npm run build
 
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-alpine AS runtime
-ARG tmdbApiKey
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx on dotnet 3.0"
 LABEL repository="github.com/rosenbjerg/NxPlx"
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
-ENV TMDB_API_KEY=$tmdbApiKey
 EXPOSE 5353
 ENTRYPOINT ["dotnet", "NxPlx.Infrastructure.WebApi.dll"]
