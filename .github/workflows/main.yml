@@ -18,10 +18,11 @@ jobs:
         with:
           version: latest
       -
-        name: Available platforms
-        run: echo ${{ steps.buildx.outputs.platforms }}
+        name: Login to Docker
+        run: |
+          docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
       -
-        name: Build AMD64
+        name: Build AMD64 image
         run: |
           docker buildx build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
@@ -29,7 +30,7 @@ jobs:
             --tag nxplx/webapi:amd64 \
             --file ./docker/gh-build/amd64/Dockerfile ./docker/gh-build/amd64
       -
-        name: Build ARM32v7
+        name: Build ARM32v7 image
         run: |
           docker buildx build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
@@ -37,7 +38,7 @@ jobs:
             --tag nxplx/webapi:arm32v7 \
             --file ./docker/gh-build/arm32v7/Dockerfile ./docker/gh-build/arm32v7
       -
-        name: Build ARM64v8
+        name: Build ARM64v8 image
         run: |
           docker buildx build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
