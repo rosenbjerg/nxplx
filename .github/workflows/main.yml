@@ -50,12 +50,6 @@ jobs:
             --squash \
             ./docker/gh-build/arm32v7
       -
-        name: Flatten images
-        run: |
-          docker create mrosenbjerg/nxplx-webapi:amd64 | docker export | docker import - mrosenbjerg/nxplx-webapi:amd64 && \
-          docker create mrosenbjerg/nxplx-webapi:arm64v8 | docker export | docker import - mrosenbjerg/nxplx-webapi:arm64v8 && \
-          docker create mrosenbjerg/nxplx-webapi:arm32v7 | docker export | docker import - mrosenbjerg/nxplx-webapi:arm32v7
-      -
         name: Push new images
         run: |
           docker push mrosenbjerg/nxplx-webapi:amd64 && \
