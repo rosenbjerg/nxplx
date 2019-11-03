@@ -26,10 +26,12 @@ namespace NxPlx.Configuration
                 RedisHost = Environment.GetEnvironmentVariable("REDIS_HOST") ?? "nxplx-cache",
                 SqlHost = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "nxplx-database",
                 SqlUsername = Environment.GetEnvironmentVariable("POSTGRES_USERNAME") ?? "postgres",
-                RedisPassword = Environment.GetEnvironmentVariable("REDIS_PASSWORD"),
-                SqlPassword = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD"),
-                ProbeToken = Environment.GetEnvironmentVariable("NXPLX_PROBE_TOKEN"),
-                TMDbApiKey = Environment.GetEnvironmentVariable("TMDB_API_KEY")
+                RedisPassword = Environment.GetEnvironmentVariable("REDIS_PASSWORD") ?? throw new Exception("No Redis password provided"),
+                SqlPassword = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? throw new Exception("No Postgres password provided"),
+                ProbeToken = Environment.GetEnvironmentVariable("NXPLX_PROBE_TOKEN") ?? throw new Exception("No probe token provided"),
+                TMDbApiKey = (File.Exists("/run/secrets/TMDB_API_KEY") 
+                    ? File.ReadAllText("/run/secrets/TMDB_API_KEY").Trim() 
+                    : Environment.GetEnvironmentVariable("TMDB_API_KEY")) ?? throw new Exception("No TMDb api key provided")
             };
         }
         private static Configuration LoadFromFile()
