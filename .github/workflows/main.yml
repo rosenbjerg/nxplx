@@ -13,6 +13,8 @@ jobs:
         uses: actions/checkout@v1
       -
         name: Enable experimental Docker features
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
           echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart
       -
@@ -53,7 +55,13 @@ jobs:
             --squash \
             ./docker/gh-build/arm64v8
       -
-        name: Create Docker manifest
+        name: Push new images
+        run: |
+          docker push mrosenbjerg/nxplx-webapi:amd64 && \
+          docker push mrosenbjerg/nxplx-webapi:arm32v7 && \
+          docker push mrosenbjerg/nxplx-webapi:arm64v8
+      -
+        name: Create and push Docker manifest
         run: |
           docker manifest create mrosenbjerg/nxplx-webapi:latest \
             mrosenbjerg/nxplx-webapi:amd64 \
@@ -61,11 +69,5 @@ jobs:
             mrosenbjerg/nxplx-webapi:arm32v7 && \
           docker manifest annotate mrosenbjerg/nxplx-webapi:latest mrosenbjerg/nxplx-webapi:amd64 --arch amd64 --os linux && \
           docker manifest annotate mrosenbjerg/nxplx-webapi:latest mrosenbjerg/nxplx-webapi:arm64v8 --arch arm64 --os linux && \
-          docker manifest annotate mrosenbjerg/nxplx-webapi:latest mrosenbjerg/nxplx-webapi:arm32v7 --arch arm --os linux
-      -
-        name: Push new images
-        run: |
-          docker push mrosenbjerg/nxplx-webapi:amd64 && \
-          docker push mrosenbjerg/nxplx-webapi:arm32v7 && \
-          docker push mrosenbjerg/nxplx-webapi:arm64v8 && \
+          docker manifest annotate mrosenbjerg/nxplx-webapi:latest mrosenbjerg/nxplx-webapi:arm32v7 --arch arm --os linux && \
           docker manifest push mrosenbjerg/nxplx-webapi:latest
