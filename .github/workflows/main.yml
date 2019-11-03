@@ -33,8 +33,8 @@ jobs:
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/amd64/Dockerfile ./docker/gh-build/amd64 \
-            --squash
+            --squash \
+            ./docker/gh-build/amd64
       -
         name: Build and push ARM32v7 image
         run: |
@@ -43,8 +43,8 @@ jobs:
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm32v7 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/arm32v7/Dockerfile ./docker/gh-build/arm32v7 \
-            --squash
+            --squash \
+            ./docker/gh-build/arm32v7
       -
         name: Build and push ARM64v8 image
         run: |
@@ -53,5 +53,5 @@ jobs:
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/arm64v8/Dockerfile ./docker/gh-build/arm64v8 \
-             --squash
+            --squash \
+            ./docker/gh-build/arm64v8
