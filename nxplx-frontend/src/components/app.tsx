@@ -3,15 +3,13 @@ import LiquidRoute, {FadeAnimation, PopAnimation} from 'liquid-route';
 import 'liquid-route/style.css';
 import { Component, h } from 'preact';
 import 'preact-material-components/FormField/style.css';
-import { route, Route, Router, RouterOnChangeArgs } from "preact-router";
+import { route, Router } from "preact-router";
 import createStore from 'unistore'
-import { connect, Provider } from 'unistore/preact'
+import { Provider } from 'unistore/preact'
 import http from "../Http";
-import Admin from "../routes/admin";
 import Film from "../routes/film";
 import Home from "../routes/home";
 import Login from "../routes/login";
-import Profile from "../routes/profile";
 import Season from "../routes/season";
 import Series from "../routes/series";
 import Header from "./header";
@@ -27,17 +25,13 @@ const store = createStore<NxPlxStore>({
 });
 
 export default class App extends Component {
-    public currentUrl?: string;
-    public handleRoute = (e: RouterOnChangeArgs) => {
-        this.currentUrl = e.url;
-    };
 
     public render() {
         return (
             <Provider store={store}>
                 <div id="app">
                     <Header />
-                    <Router onChange={this.handleRoute}>
+                    <Router>
                         <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
                         <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
                         <LiquidRoute animator={FadeAnimation} path="/admin" getComponent={() => import('../routes/admin').then(module => module.default)}/>

@@ -48,9 +48,9 @@ export default class Watch extends Component<Props, State> {
                     time={this.playerTime}
                     muted={this.playerMuted}
                     volume={this.playerVolume}
-                    autoPlay={this.playerAutoplay}
+                    autoPlay={this.playerAutoplay || this.playerTime < 3}
                     title={state.info.title}
-                    src={`/api/${kind}/watch/${fid}`}
+                    videoTrack={`/api/${kind}/watch/${fid}`}
                     preferredTextLanguage={this.subtitleLanguage}
                     poster={imageUrl(this.state.info.backdrop, 1280)}
                     textTracks={state.info.subtitles.map(lang => ({
@@ -102,7 +102,6 @@ export default class Watch extends Component<Props, State> {
             return;
         }
         if (this.playerTime > 5) {
-            console.log("saved progress", this.playerTime);
             http.put("/api/progress/" + this.state.info.fid, { value: this.playerTime });
         }
         localStorage.setItem("player_volume", this.playerVolume.toString());
