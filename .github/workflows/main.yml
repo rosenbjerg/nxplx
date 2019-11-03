@@ -38,7 +38,7 @@ jobs:
         name: Build ARM64v8 image
         run: |
           docker build \
-            --buildArg build=$NXPLX_BUILD \
+            --build-arg build=$NXPLX_BUILD \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
             --squash \
