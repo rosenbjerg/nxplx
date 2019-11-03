@@ -15,7 +15,8 @@ jobs:
         name: Enable experimental Docker features
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
-        run: sudo service docker restart
+        run: |
+          echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart
       -
         name: Set up Docker Buildx
         id: buildx
