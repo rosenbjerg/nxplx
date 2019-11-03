@@ -28,5 +28,7 @@
         public string ProbeToken { get; set; }
         
         public string TMDbApiKey { get; set; }
+        
+        public string Build { get; set; }
     }
 }

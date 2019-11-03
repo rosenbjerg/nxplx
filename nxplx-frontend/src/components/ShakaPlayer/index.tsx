@@ -66,7 +66,7 @@ const initPlayer = async (
     videoRef.volume = props.volume;
     try {
         // await player.load(props.mpd, props.time);
-        await player.load(props.src, props.time, 'video/mp4');
+        await player.load(props.videoTrack, props.time, 'video/mp4');
         setUI(ui);
         setPlayer(player);
         setOffStorage(offStorage);
@@ -83,7 +83,7 @@ const onError = (event: any) => {
 
 interface Props {
     events: EventBroker;
-    src: string
+    videoTrack: string
     time: number
     autoPlay: boolean
     muted: boolean

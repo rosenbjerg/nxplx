@@ -68,7 +68,7 @@ namespace NxPlx.WebApi
             
             CreateAdminAccount(container);
             
-            server.Get("/api/version", Authenticated.User, (req, res) => res.SendString("alpha-19.10.23"));
+            server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));

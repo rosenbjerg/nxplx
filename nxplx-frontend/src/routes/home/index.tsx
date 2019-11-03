@@ -68,9 +68,6 @@ export default class Home extends Component<Props, State> {
                     const overview = await response.json();
                     this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
                 }
-                else {
-                    route('/login');
-                }
             })
     };
 
