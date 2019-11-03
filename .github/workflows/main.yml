@@ -24,12 +24,12 @@ jobs:
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Set build tag
-        run: NXPLX_BUILD=`printf '%(%y.%m.%d)T-alpha' -1` && echo $NXPLX_BUILD
+        run: NXPLX_BUILD=`printf '%(%y.%m.%d)T-alpha' -1`
       -
         name: Build AMD64 image
         run: |
           docker build \
-            --buildArg build=$NXPLX_BUILD \
+            --build-arg build=$NXPLX_BUILD \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
             --squash \
@@ -47,7 +47,7 @@ jobs:
         name: Build ARM32v7 image
         run: |
           docker build \
-            --buildArg build=$NXPLX_BUILD \
+            --build-arg build=$NXPLX_BUILD \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:arm32v7 \
             --squash \
