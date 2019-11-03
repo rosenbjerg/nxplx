@@ -12,9 +12,12 @@ jobs:
         name: Checkout
         uses: actions/checkout@v1
       -
-        name: Enable experimental Docker features and prepare Docker environment
+        name: Enable experimental Docker features
         run: |
-          echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart &&
+          echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart
+      -
+        name: Prepare Docker environment
+        run: |
           echo "${{ secrets.TMDB_API_KEY }}" | docker secret create TMDB_API_KEY -
       -
         name: Set up Docker Buildx
