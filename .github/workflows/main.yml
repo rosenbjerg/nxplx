@@ -13,8 +13,6 @@ jobs:
         uses: actions/checkout@v1
       -
         name: Enable experimental Docker features
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
           echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart
       -
