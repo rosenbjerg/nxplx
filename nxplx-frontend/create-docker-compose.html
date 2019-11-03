@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a NxPlx docker-compose.yml</title>
+    <style>
+        :root {
+            --border-color: #585858;
+            --hover-border-color: #80CFF7;
+            --faded-text: #9e9e9e;
+            --focused-text: #e0e0e0;
+            --primary-color: #0D47A1;
+            --secondary-color: #1976D2;
+            --header-color: #212121;
+            --background-color: #424242;
+            --secondary-background-color: #616161;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: #dcdcdc;
+            font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        }
+
+        .code {
+            border: 2px solid var(--border-color);
+            border-radius: 2px;
+            display: inline-block;
+            padding: 4px 8px 4px 8px;
+            margin-top: 10px;
+        }
+        button {
+            height: 30px;
+            background: none;
+            color: var(--faded-text);
+            transition: border-color 200ms, color 150ms, box-shadow 200ms;
+            border: 2px solid var(--border-color);
+            border-radius: 2px;
+        }
+        button:not(:disabled):hover {
+            color: var(--focused-text);
+            border-color: var(--hover-border-color);
+            box-shadow: 0 0 5px 0 var(--hover-border-color);
+            outline: none;
+            cursor: pointer;
+        }
+        input {
+            width: 450px;
+            font-size: 13pt;
+            background-color: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: 2px;
+            color: var(--focused-text);
+            height: 30px;
+            padding-left: 4px;
+            transition: border-color 200ms, box-shadow 200ms;
+        }
+        input:focus {
+            border-color: var(--hover-border-color);
+            box-shadow: 0 0 5px 0 var(--hover-border-color);
+            outline: none;
+        }
+        input:invalid {
+            border-color: darkred;
+            box-shadow: 0 0 5px 0 darkred;
+        }
+        table {
+            margin-bottom: 10px;
+        }
+        body::-webkit-scrollbar {
+            width: 0.5em;
+            background-color: var(--secondary-background-color);
+        }
+        body::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: var(--header-color);
+            outline: 1px solid var(--secondary-background-color);
+        }
+    </style>
+</head>
+<body>
+<h1>NxPlx</h1>
+<h4>docker-compose.yml generator</h4>
+<table>
+    <tbody>
+    <tr>
+        <td>
+            <label for="dataDir">NxPlx data directory</label>
+        </td>
+        <td>
+            <input id="dataDir" type="text" value="/srv/nxplx" required>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="mediaRoot">Media root directory</label>
+        </td>
+        <td>
+            <input id="mediaRoot" type="text" required>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="port">Port</label>
+        </td>
+        <td>
+            <input id="port" type="number" value="5353" required min="1024" max="65536">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="postgresPassword">Postgres password</label>
+        </td>
+        <td>
+            <input id="postgresPassword" type="text" required minlength="20" maxlength="60" pattern="[a-zA-Z0-9]+">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="redisPassword">Redis password</label>
+        </td>
+        <td>
+            <input id="redisPassword" type="text" required minlength="20" maxlength="60" pattern="[a-zA-Z0-9]+">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="probeToken">Probe token</label>
+        </td>
+        <td>
+            <input id="probeToken" type="text" required minlength="20" maxlength="60" pattern="[a-zA-Z0-9]+">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="tmdbApiKey">TMDb api key</label>
+        </td>
+        <td>
+            <input id="tmdbApiKey" type="text" required minlength="32" maxlength="32" pattern="[a-zA-Z0-9]+">
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+    <button id="randomize">Randomize</button>
+    <button id="download">Download</button>
+</div>
+<div class="code">
+    <code style="white-space: pre;" id="compose"></code>
+</div>
+</body>
+<script>
+    function getRandom() {
+        return window.crypto && (window.crypto.getRandomValues(new Uint32Array(1))[0] / 4294967295) || Math.random();
+    }
+
+    function makeid(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(getRandom() * charactersLength));
+        }
+        return result;
+    }
+
+    const compose = document.getElementById('compose');
+    const randomize = document.getElementById('randomize');
+    const download = document.getElementById('download');
+    const values = {
+        postgresPassword: "",
+        redisPassword: "",
+        probeToken: "",
+        tmdbApiKey: "",
+        port: 5353,
+        dataDir: "",
+        mediaRoot: ""
+    };
+    const write = [];
+    let currentDockerCompose = '';
+
+    const updateDockerCompose = () => {
+        currentDockerCompose = generate(values);
+        compose.innerText = currentDockerCompose;
+    };
+    const downloadDockerCompose = () => {
+        const uri = window.URL.createObjectURL(new Blob([currentDockerCompose], {type: 'text/plain'}));
+        const a = document.createElement('a');
+        a.download = 'docker-compose.yml';
+        a.href = uri;
+        document.body.append(a);
+        a.click();
+        a.remove();
+    };
+
+    const generate = (args) => {
+        return `﻿version: '3.1'
+services:
+
+  nxplx-database:
+    image: postgres:12-alpine
+    volumes:
+      - ${args.dataDir}/database:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${args.postgresPassword}
+
+  nxplx-cache:
+    image: redis:5.0.6-alpine
+    command: redis-server --requirepass ${args.redisPassword}
+
+  nxplx-webapi:
+    image: mrosenbjerg/nxplx-webapi
+    environment:
+      REDIS_PASSWORD: ${args.redisPassword}
+      POSTGRES_PASSWORD: ${args.postgresPassword}
+      NXPLX_PROBE_TOKEN: ${args.probeToken}
+      TMDB_API_KEY: ${args.tmdbApiKey}
+    volumes:
+      - ${args.dataDir}/webapi:/app/data
+      - ${args.mediaRoot}:/media:ro
+    depends_on:
+      - nxplx-database
+      - nxplx-cache
+    ports:
+      - "${args.port}:5353"`;
+    };
+
+
+    const fillRandom = () => {
+        values.postgresPassword = makeid(42);
+        values.redisPassword = makeid(42);
+        values.probeToken = makeid(42);
+        values.tmdbApiKey = '';
+        values.port = 5353;
+        values.dataDir = "/srv/nxplx";
+        values.mediaRoot = "/mymediadir";
+        write.forEach(w => w());
+        updateDockerCompose();
+    };
+    const bind = (id) => {
+        const element = document.getElementById(id);
+        write.push(() => element.value = values[id]);
+        element.addEventListener('input', ev => {
+            values[id] = ev.target.value;
+            updateDockerCompose();
+        });
+    };
+    bind('dataDir');
+    bind('mediaRoot');
+    bind('port');
+    bind('postgresPassword');
+    bind('redisPassword');
+    bind('probeToken');
+    bind('tmdbApiKey');
+
+    fillRandom();
+
+    randomize.onclick = fillRandom;
+    download.onclick = downloadDockerCompose;
+
+
+</script>
+</html>
