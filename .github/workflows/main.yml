@@ -12,12 +12,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v1
       -
-        name: Set env for Docker
+        name: Enable experimental Docker features
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
-        run: |
-          echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json &&\
-          sudo service docker restart
+        run: sudo service docker restart
       -
         name: Set up Docker Buildx
         id: buildx
@@ -31,27 +29,30 @@ jobs:
       -
         name: Build and push AMD64 image
         run: |
-          docker build --squash \
+          docker build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/amd64/Dockerfile ./docker/gh-build/amd64
+            --file ./docker/gh-build/amd64/Dockerfile ./docker/gh-build/amd64 \
+            --squash
       -
         name: Build and push ARM32v7 image
         run: |
-          docker build --squash \
+          docker build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm32v7 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/arm32v7/Dockerfile ./docker/gh-build/arm32v7
+            --file ./docker/gh-build/arm32v7/Dockerfile ./docker/gh-build/arm32v7 \
+            --squash
       -
         name: Build and push ARM64v8 image
         run: |
-          docker build --squash \
+          docker build \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
             --tag mrosenbjerg/nxplx-webapi:latest \
-            --file ./docker/gh-build/arm64v8/Dockerfile ./docker/gh-build/arm64v8
+            --file ./docker/gh-build/arm64v8/Dockerfile ./docker/gh-build/arm64v8 \
+             --squash
