@@ -24,7 +24,7 @@ jobs:
       -
         name: Build and push AMD64 image
         run: |
-          docker build --squash \
+          DOCKER_CLI_EXPERIMENTAL=enabled docker build --squash \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
@@ -33,7 +33,7 @@ jobs:
       -
         name: Build and push ARM32v7 image
         run: |
-          docker build --squash \
+          DOCKER_CLI_EXPERIMENTAL=enabled docker build --squash \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm32v7 \
@@ -42,7 +42,7 @@ jobs:
       -
         name: Build and push ARM64v8 image
         run: |
-          docker build --squash \
+          DOCKER_CLI_EXPERIMENTAL=enabled docker build --squash \
             --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=true" \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
