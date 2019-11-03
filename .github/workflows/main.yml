@@ -26,14 +26,10 @@ jobs:
         run: |
           docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
       -
-        name: Prepare Docker environment
-        run: |
-          echo "${{ secrets.TMDB_API_KEY }}" | docker secret create TMDB_API_KEY -
-      -
         name: Build AMD64 image
         run: |
           docker build \
-            --secret="TMDB_API_KEY"
+            --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
             --squash \
@@ -42,7 +38,7 @@ jobs:
         name: Build ARM64v8 image
         run: |
           docker build \
-            --secret="TMDB_API_KEY"
+            --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
             --squash \
@@ -51,7 +47,7 @@ jobs:
         name: Build ARM32v7 image
         run: |
           docker build \
-            --secret="TMDB_API_KEY"
+            --build-arg tmdbApiKey=${{ secrets.TMDB_API_KEY }} \
             --output "type=image,push=false" \
             --tag mrosenbjerg/nxplx-webapi:arm32v7 \
             --squash \
