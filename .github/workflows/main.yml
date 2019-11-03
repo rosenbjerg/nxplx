@@ -13,8 +13,6 @@ jobs:
         uses: actions/checkout@v1
       -
         name: Enable experimental Docker features
-        env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
           echo $'{\n    "experimental": true\n}' | sudo tee /etc/docker/daemon.json && sudo service docker restart
       -
@@ -62,6 +60,8 @@ jobs:
           docker push mrosenbjerg/nxplx-webapi:arm64v8
       -
         name: Create and push Docker manifest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
         run: |
           docker manifest create mrosenbjerg/nxplx-webapi:latest \
             mrosenbjerg/nxplx-webapi:amd64 \
