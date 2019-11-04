@@ -1,13 +1,20 @@
-name: Main Workflow
-on: push
+name: SonarCloud Scan
+
+on: 
+  push:
+    branches: main
+
 jobs:
-  sonarCloudTrigger:
+  sonarScan:
     name: SonarCloud Trigger
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
+    - 
+      name: Checkout
+      uses: actions/checkout@master
+    -
+      name: SonarCloud Scan
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      uses: sonarsource/sonarcloud-github-action@master
