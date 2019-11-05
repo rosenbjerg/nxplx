@@ -29,13 +29,14 @@ namespace NxPlx.WebApi.Routes
         {
             var container = ResolveContainer.Default();
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
 
             var fileId = req.Context.ExtractUrlParameter("file_id").Replace(".mp4", "");
             var id = int.Parse(fileId);
             
             await using var ctx = container.Resolve<MediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)));
+                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
             
             if (filmFile == default || !File.Exists(filmFile.Path))
             {
@@ -48,13 +49,14 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetFilmDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var container = ResolveContainer.Default();
             
             var id = int.Parse(req.Context.ExtractUrlParameter("film_id"));
 
             await using var ctx = container.Resolve<MediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.FilmDetailsId == id && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)));
+                .FirstOrDefaultAsync(ff => ff.FilmDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
             
             if (filmFile == default)
             {
@@ -67,13 +69,14 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var container = ResolveContainer.Default();
             
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
             await using var ctx = container.Resolve<MediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)));
+                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
 
             if (filmFile == default)
             {

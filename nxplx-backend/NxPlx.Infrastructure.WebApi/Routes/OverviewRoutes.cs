@@ -27,7 +27,7 @@ namespace NxPlx.WebApi.Routes
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
             
-            var libs = !session.IsAdmin ? session.LibraryAccess : ctx.Libraries.Select(l => l.Id).ToList();
+            var libs = !session.IsAdmin ? session.User.LibraryAccessIds : ctx.Libraries.Select(l => l.Id).ToList();
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
 
             var cacher = container.Resolve<ICachingService>();
@@ -42,13 +42,13 @@ namespace NxPlx.WebApi.Routes
 
             var seriesDetails = await ctx.EpisodeFiles
                 .Include(ef => ef.SeriesDetails)
-                .Where(ef => ef.SeriesDetailsId != null && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
                 .Select(ef => ef.SeriesDetails)
                 .Distinct()
                 .ToListAsync();
 
             var filmDetails = await ctx.FilmFiles
-                .Where(ff =>  ff.FilmDetailsId != null && (session.IsAdmin || session.LibraryAccess.Contains(ff.PartOfLibraryId)))
+                .Where(ff =>  ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId))
                 .Select(ff => ff.FilmDetails)
                 .Distinct()
                 .ToListAsync();

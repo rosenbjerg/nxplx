@@ -116,6 +116,7 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> ListLibraries(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var container = ResolveContainer.Default();
             await using var context = container.Resolve<MediaContext>();
 
@@ -129,7 +130,7 @@ namespace NxPlx.WebApi.Routes
             else
             {
                 var libraries = await context.Libraries
-                    .Where(l => session.LibraryAccess.Contains(l.Id))
+                    .Where(l => libraryAccess.Contains(l.Id))
                     .ToListAsync();
                 return await res.SendMapped<Library, LibraryDto>(mapper, libraries);
             }

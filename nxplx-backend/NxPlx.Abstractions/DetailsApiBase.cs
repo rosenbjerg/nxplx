@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -10,11 +12,10 @@ namespace NxPlx.Abstractions
     public abstract class DetailsApiBase : IDetailsApi
     {
         protected readonly ICachingService CachingService;
-        protected IDetailsMapper Mapper;
         protected ILoggingService LoggingService;
         private string _imageFolder;
         
-        private readonly HttpClient Client = new HttpClient
+        protected readonly HttpClient Client = new HttpClient
         {
             DefaultRequestHeaders =
             {
@@ -22,11 +23,10 @@ namespace NxPlx.Abstractions
             }
         };
 
-        protected DetailsApiBase(string imageFolder, ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService)
+        protected DetailsApiBase(string imageFolder, ICachingService cachingService, ILoggingService loggingService)
         {
             CachingService = cachingService;
             LoggingService = loggingService;
-            Mapper = mapper;
             _imageFolder = imageFolder;
         }
         
@@ -60,21 +60,16 @@ namespace NxPlx.Abstractions
             if (!File.Exists(outputPath))
             {
                 var response = await Client.GetAsync(url);
-                using (var imageStream = await response.Content.ReadAsStreamAsync())
+                using var imageStream = await response.Content.ReadAsStreamAsync();
+                try
                 {
-                    try
-                    {
-                        using (var outputStream = File.OpenWrite(outputPath))
-                        {
-                            await imageStream.CopyToAsync(outputStream);
-                        }
-                    }
-                    catch (IOException)
-                    {
-                        LoggingService.Trace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
-                    }
+                    using var outputStream = File.OpenWrite(outputPath);
+                    await imageStream.CopyToAsync(outputStream);
                 }
-                
+                catch (IOException)
+                {
+                    LoggingService.Trace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
+                }
             }
         }
         

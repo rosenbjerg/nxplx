@@ -72,24 +72,4 @@ namespace NxPlx.Services.Database
             
         }
     }
-
-    public static class DatabaseUtils
-    {
-        public static async Task UpsertAsync<TEntity>(this DbContext ctx, int key, Action<TEntity> entityUpdater)
-            where TEntity : EntityBase, new()
-        {
-            var instance = await ctx.Set<TEntity>().FindAsync(key);
-            if (instance == default)
-            {
-                instance = new TEntity
-                {
-                    Id = key
-                };
-                ctx.Add(instance);
-            }
-
-            entityUpdater(instance);
-            await ctx.SaveChangesAsync();
-        }
-    }
 }

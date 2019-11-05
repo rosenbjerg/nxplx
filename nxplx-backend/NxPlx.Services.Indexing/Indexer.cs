@@ -17,31 +17,15 @@ namespace NxPlx.Services.Index
     {
         private IDetailsApi _detailsApi;
         private IDatabaseMapper _databaseMapper;
-        private IDetailsMapper _detailsMapper;
         private ILoggingService _loggingService;
 
-        public Indexer(IDetailsApi detailsApi, IDetailsMapper detailsMapper, IDatabaseMapper databaseMapper, ILoggingService loggingService)
+        public Indexer(IDetailsApi detailsApi, IDatabaseMapper databaseMapper, ILoggingService loggingService)
         {
             _detailsApi = detailsApi;
-            _detailsMapper = detailsMapper;
             _databaseMapper = databaseMapper;
             _loggingService = loggingService;
         }
 
-//        public async Task IndexAllLibraries()
-//        {
-//            var container = ResolveContainer.Default();
-//            
-//            IEnumerable<Library> libraries;
-//            using (var ctx = new DatabaseContext())
-//            {
-//                libraries = await ctx.Libraries.ToArrayAsync();
-//            }
-//
-//            await IndexLibraries(libraries);
-//            
-//            await container.Resolve<ICachingService>().RemoveAsync("OVERVIEW:*");
-//        }
         public async Task IndexLibraries(IEnumerable<Library> libraries)
         {
             var container = ResolveContainer.Default();
@@ -131,7 +115,7 @@ namespace NxPlx.Services.Index
         private Task<FilmDetails> FetchFilmDetails(int id, string language) => _detailsApi.FetchMovieDetails(id, language);
 
 
-        public async Task IndexSeriesLibrary(Library library)
+        private async Task IndexSeriesLibrary(Library library)
         {
             var startTime = DateTime.UtcNow;
             

@@ -33,11 +33,6 @@ namespace NxPlx.Services.Database
                 .HasConversion(
                     ls => string.Join(',', ls),
                     str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
-            modelBuilder.Entity<UserSession>()
-                .Property(sl => sl.LibraryAccess)
-                .HasConversion(
-                    ls => string.Join(',', ls),
-                    str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -46,7 +41,11 @@ namespace NxPlx.Services.Database
             optionsBuilder
                 .UseLazyLoadingProxies()
                 .UseNpgsql($"Host={cfg.SqlHost};Database={cfg.SqlUserDatabase};Username={cfg.SqlUsername};Password={cfg.SqlPassword}");
-            
         }
+    }
+
+    public interface IDatabaseContext : IAsyncDisposable
+    {
+        
     }
 }
