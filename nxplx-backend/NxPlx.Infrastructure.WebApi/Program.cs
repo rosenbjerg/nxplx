@@ -43,7 +43,7 @@ namespace NxPlx.WebApi
                 Console.WriteLine(eventArgs.Exception.Message);
             }; 
             
-            await databaseContextManager.Initialize();
+            await databaseContextManager.Initialize(logger);
             
             CreateAdminAccount(container);
             
