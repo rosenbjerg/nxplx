@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -42,10 +44,5 @@ namespace NxPlx.Services.Database
                 .UseLazyLoadingProxies()
                 .UseNpgsql($"Host={cfg.SqlHost};Database={cfg.SqlUserDatabase};Username={cfg.SqlUsername};Password={cfg.SqlPassword}");
         }
-    }
-
-    public interface IDatabaseContext : IAsyncDisposable
-    {
-        
     }
 }

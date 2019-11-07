@@ -1,8 +1,8 @@
 
-export const imageUrl = (url:string, width:154|185|342|1280) => {
-    if (!url) return `/assets/images/w${width}.jpg`;
-    return `/api/image/w${width}${url}`;
-}
+export const imageUrl = (url:string, width:154|185|342|1280, fallbackUrl?:string) => {
+    if (!url && !fallbackUrl) return `/assets/images/w${width}.jpg`;
+    return `/api/image/w${width}${url || fallbackUrl}`;
+};
 
 export interface Genre {
     id: number;

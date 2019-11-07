@@ -20,6 +20,7 @@ export default class Series extends Component<Props, State> {
             .then(response => response.json())
             .then((details:SeriesDetails) => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
+                console.log(details);
                 this.setState({ details, bg });
             });
     }
@@ -59,7 +60,7 @@ export default class Series extends Component<Props, State> {
                             .map(season => (
                                     <span class={style.seasonContainer}>
                                     <Link href={`/series/${details.id}/${season.number}`}>
-                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154)} title={`Season ${season.number}`} alt={season.number.toString()} />
+                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154, details.poster)} title={`Season ${season.number}`} alt={season.number.toString()} />
                                     </Link>
                                     <b class={style.number}>S{season.number}</b>
                                 </span>
