@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Services.Database.Migrations.Media
 {
     [DbContext(typeof(MediaContext))]
     partial class MediaContextModelSnapshot : ModelSnapshot

@@ -2,18 +2,16 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
 
-namespace NxPlx.Services.Database.Migrations.User
+namespace NxPlx.Services.Database.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20191107215303_Init_User_DB")]
-    partial class Init_User_DB
+    partial class UserContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +29,6 @@ namespace NxPlx.Services.Database.Migrations.User
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("LibraryAccess")
-                        .HasColumnType("text");
 
                     b.Property<string>("UserAgent")
                         .HasColumnType("text");

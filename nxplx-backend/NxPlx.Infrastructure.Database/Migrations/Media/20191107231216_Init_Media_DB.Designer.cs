@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Services.Database.Migrations.Media
 {
     [DbContext(typeof(MediaContext))]
-    [Migration("20191107215608_Refactor_MediaDetails")]
-    partial class Refactor_MediaDetails
+    [Migration("20191107231216_Init_Media_DB")]
+    partial class Init_Media_DB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

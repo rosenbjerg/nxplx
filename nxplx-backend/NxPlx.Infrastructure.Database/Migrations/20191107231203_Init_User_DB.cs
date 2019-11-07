@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace NxPlx.Services.Database.Migrations.User
+namespace NxPlx.Services.Database.Migrations
 {
     public partial class Init_User_DB : Migration
     {
@@ -61,8 +61,7 @@ namespace NxPlx.Services.Database.Migrations.User
                     Expiration = table.Column<DateTime>(nullable: false),
                     UserId = table.Column<int>(nullable: false),
                     IsAdmin = table.Column<bool>(nullable: false),
-                    UserAgent = table.Column<string>(nullable: true),
-                    LibraryAccess = table.Column<string>(nullable: true)
+                    UserAgent = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

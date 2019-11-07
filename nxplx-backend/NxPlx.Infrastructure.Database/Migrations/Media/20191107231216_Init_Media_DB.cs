@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Services.Database.Migrations.Media
 {
     public partial class Init_Media_DB : Migration
     {
@@ -53,16 +53,19 @@ namespace NxPlx.Services.Database.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     VideoCodec = table.Column<string>(nullable: true),
-                    VideoFrameRate = table.Column<int>(nullable: false),
+                    VideoFrameRate = table.Column<float>(nullable: false),
                     VideoBitrate = table.Column<int>(nullable: false),
                     VideoBitDepth = table.Column<int>(nullable: false),
                     VideoHeight = table.Column<int>(nullable: false),
                     VideoWidth = table.Column<int>(nullable: false),
                     AudioCodec = table.Column<string>(nullable: true),
                     AudioBitrate = table.Column<int>(nullable: false),
-                    AudioChannels = table.Column<int>(nullable: false),
-                    AudioSamplingRateHz = table.Column<int>(nullable: false),
-                    WebOptimized = table.Column<bool>(nullable: false)
+                    AudioChannelLayout = table.Column<string>(nullable: true),
+                    AudioCodecName = table.Column<string>(nullable: true),
+                    AudioStreamIndex = table.Column<int>(nullable: false),
+                    VideoCodecName = table.Column<string>(nullable: true),
+                    Duration = table.Column<float>(nullable: false),
+                    VideoAspectRatio = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

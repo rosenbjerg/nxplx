@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
 
-namespace NxPlx.Services.Database.Migrations.User
+namespace NxPlx.Services.Database.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20191107215503_Refactor_UserSession")]
-    partial class Refactor_UserSession
+    [Migration("20191107231203_Init_User_DB")]
+    partial class Init_User_DB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
