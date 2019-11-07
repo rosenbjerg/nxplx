@@ -1,15 +1,15 @@
 .play {
-    width: 185px;
     transition: border 180ms, opacity 180ms;
-    opacity: 0;
+    opacity: 1;
     position: absolute;
-    top: -95px;
     left: 0;
+    bottom: 25px;
+    width: 100%;
     text-align: center;
-    margin: 10px;
 }
 .play i {
     color: white;
+    line-height: 40px;
     font-size: 40px;
     padding: 15px;
 }

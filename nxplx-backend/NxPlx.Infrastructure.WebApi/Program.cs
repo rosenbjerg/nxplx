@@ -25,6 +25,11 @@ namespace NxPlx.WebApi
             var container = ResolveContainer.Default();
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
+
+            if (!cfg.Production)
+            {
+                logger.Trace("Running in DEBUG mode");
+            }
             
             var databaseContextManager = new DatabaseContextManager();
             var server = new RedHttpServer(cfg.HttpPort, "public")
@@ -40,13 +45,13 @@ namespace NxPlx.WebApi
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
-                Console.WriteLine(eventArgs.Exception.Message);
+                logger.Error("Exception on url {ExceptionUrl}: {ExceptionType} with message {ExceptionMessage} :: {Stacktrace}", 
+                    eventArgs.Exception, eventArgs.Exception.GetType().Name, eventArgs.Exception.Message, eventArgs.Exception.StackTrace);
             }; 
             
-            await databaseContextManager.Initialize();
-            
+            await databaseContextManager.Initialize(logger);
             CreateAdminAccount(container);
-            
+
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
             
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
@@ -65,12 +70,14 @@ namespace NxPlx.WebApi
             
             server.Get("/*", Utils.SendSPA);
             
+            logger.Trace("All routes registered, preparing to listen on port {Port}", cfg.HttpPort);
             
             await server.RunAsync(cfg.Production ? "*" : "localhost");
         }
 
         private static void CreateAdminAccount(ResolveContainer container)
         {
+            var logger = container.Resolve<ILoggingService>();
             using var ctx = container.Resolve<UserContext>();
             if (ctx.Users.FirstOrDefault() == null)
             {
@@ -83,6 +90,8 @@ namespace NxPlx.WebApi
                 };
                 ctx.Add(admin);
                 ctx.SaveChanges();
+                
+                logger.Trace("No users found. Default admin account created");
             }
         }
     }
