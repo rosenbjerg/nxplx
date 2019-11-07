@@ -20,19 +20,16 @@ namespace NxPlx.Services.Database
 
         public async Task Initialize(ILoggingService logger)
         {
-            await using (var context = new MediaContext())
-            {
-                await Migrate(logger, context, nameof(MediaContext));
-            }
-
-            await using (var context = new UserContext())
-            {
-                await Migrate(logger, context, nameof(UserContext));
-            }
+            await Initialize<MediaContext>(logger);
+            await Initialize<UserContext>(logger);
         }
 
-        private static async Task Migrate(ILoggingService logger, DbContext context, string databaseName)
+        private static async Task Initialize<TDbContext>(ILoggingService logger)
+            where TDbContext : DbContext, new()
         {
+            var databaseName = typeof(TDbContext).Name;
+            await using var context = new TDbContext();
+            
             var pendingMigrations = new List<string>(await context.Database.GetPendingMigrationsAsync());
 
             if (pendingMigrations.Any())
