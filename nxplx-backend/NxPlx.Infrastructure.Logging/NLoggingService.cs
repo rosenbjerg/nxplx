@@ -30,7 +30,8 @@ namespace NxPlx.Infrastructure.Logging
                             new JsonAttribute("Level", Layout.FromString("${level}")),
                             new JsonAttribute("Message", Layout.FromString("${message}")),
                             new JsonAttribute("Template", Layout.FromString("${template}")),
-                        }
+                        },
+                        IncludeAllProperties = true
                     },
                     FileName = Path.Combine(cfg.LogFolder, "log.current.json"),
                     ArchiveFileName = Path.Combine(cfg.LogFolder, "archives/log.${longdate}.json"),
