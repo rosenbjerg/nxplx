@@ -11,6 +11,5 @@ namespace NxPlx.Infrastructure.Session
         public virtual User User { get; set; }
         public bool IsAdmin { get; set; }
         public string UserAgent { get; set; }
-        public List<int> LibraryAccess { get; set; }
     }
 }

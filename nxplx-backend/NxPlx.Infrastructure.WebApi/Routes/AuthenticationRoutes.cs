@@ -61,8 +61,7 @@ namespace NxPlx.WebApi.Routes
             {
                 UserAgent = req.Headers["User-Agent"], 
                 IsAdmin = user.Admin, 
-                UserId = user.Id,
-                LibraryAccess = user.LibraryAccessIds ?? new List<int>(0)
+                UserId = user.Id
             });
 
             return await res.SendString(user.Admin.ToString());

@@ -32,11 +32,12 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> StreamFile(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id").Replace(".mp4", ""));
             await using var ctx = new MediaContext();
             
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                .Where(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
                 .FirstOrDefaultAsync();
             
             if (episode == null || !File.Exists(episode.Path))
@@ -50,13 +51,14 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
 
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                .Where(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
                 .FirstOrDefaultAsync();
 
             return await res.SendMapped<EpisodeFile, InfoDto>(container.Resolve<IDatabaseMapper>(), episode);
@@ -65,6 +67,7 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
             var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
 
@@ -74,7 +77,7 @@ namespace NxPlx.WebApi.Routes
             var episodes = await ctx.EpisodeFiles
                 .Where(ef =>
                     ef.SeriesDetailsId == id && ef.SeasonNumber == no &&
-                    (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                    (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
                 .ToListAsync();
             
             if (!episodes.Any())
@@ -91,13 +94,14 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
 
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<MediaContext>();
             
             var episodes = await ctx.EpisodeFiles
-                .Where(ef => ef.SeriesDetailsId == id && (session.IsAdmin || session.LibraryAccess.Contains(ef.PartOfLibraryId)))
+                .Where(ef => ef.SeriesDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
                 .ToListAsync();
             
             if (!episodes.Any())

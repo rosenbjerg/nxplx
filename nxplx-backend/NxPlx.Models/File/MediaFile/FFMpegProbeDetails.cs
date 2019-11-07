@@ -4,7 +4,7 @@ namespace NxPlx.Models.File
     {
         public string VideoCodec { get; set; }
         
-        public int VideoFrameRate { get; set; }
+        public float VideoFrameRate { get; set; }
         
         public int VideoBitrate { get; set; }
         
@@ -14,16 +14,15 @@ namespace NxPlx.Models.File
         
         public int VideoWidth { get; set; }
         
-        
         public string AudioCodec { get; set; }
         
         public int AudioBitrate { get; set; }
                 
-        public int AudioChannels { get; set; }
-        
-        public int AudioSamplingRateHz { get; set; }
-        
-        
-        public bool WebOptimized { get; set; }
+        public string AudioChannelLayout { get; set; }
+        public string AudioCodecName { get; set; }
+        public int AudioStreamIndex { get; set; }
+        public string VideoCodecName { get; set; }
+        public float Duration { get; set; }
+        public string VideoAspectRatio { get; set; }
     }
 }

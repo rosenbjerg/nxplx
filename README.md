@@ -2,6 +2,8 @@
 
 A home media vault designed for low-power devices such as Raspberry Pi 3/4, ODroid C2, ASUS TinkerBoard, and similar SBCs.
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/mrosenbjerg/nxplx-webapi)](https://hub.docker.com/r/mrosenbjerg/nxplx-webapi)
+
 NxPlx is designed with deployment using Docker in mind
 
 ### Features
@@ -40,3 +42,5 @@ NxPlx is designed with deployment using Docker in mind
 If you find this project interesting, please star it :)
 
 Contributions in the form of PRs are welcome!
+
+<img src="https://www.themoviedb.org/assets/2/v4/logos/408x161-powered-by-rectangle-blue-10d3d41d2a0af9ebcb85f7fb62ffb6671c15ae8ea9bc82a2c6941f223143409e.png"/>

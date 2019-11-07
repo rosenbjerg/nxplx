@@ -18,7 +18,7 @@ using SpokenLanguage = NxPlx.Models.Details.Film.SpokenLanguage;
 
 namespace NxPlx.Integrations.TMDb
 {
-    public class TMDbMapper : MapperBase, IDetailsMapper
+    public class TMDbMapper : MapperBase
     {
         public TMDbMapper()
         {

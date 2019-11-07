@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Logging\NxPlx.Infrastructure.Logging.csproj" />
+      <ProjectReference Include="..\NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
+    </ItemGroup>
+
+</Project>

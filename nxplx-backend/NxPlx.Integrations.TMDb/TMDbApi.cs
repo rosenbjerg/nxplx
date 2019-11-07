@@ -21,14 +21,15 @@ namespace NxPlx.Integrations.TMDb
     {
         private const int ThrottlingMs = 10000 / 40;
         private const string BaseUrl = "https://api.themoviedb.org/3";
+        private readonly TMDbMapper _mapper;
         
-        private string _key;
-
-        public TMDbApi(ICachingService cachingService, IDetailsMapper mapper, ILoggingService loggingService) 
-            : base(ConfigurationService.Current.ImageFolder, cachingService, mapper, loggingService)
+        public TMDbApi(ICachingService cachingService, ILoggingService loggingService) 
+            : base(ConfigurationService.Current.ImageFolder, cachingService,loggingService)
         {
-            _key = ConfigurationService.Current.TMDbApiKey;
+            _mapper = new TMDbMapper();
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ConfigurationService.Current.TMDbApiKey}");
         }
+
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
             .WithCapacity(10)
@@ -64,44 +65,44 @@ namespace NxPlx.Integrations.TMDb
             }
             
             var encodedYear = year < 2 ? "" : $"&year={year}";
-            var url = $"{BaseUrl}/search/movie?api_key={_key}&query={encodedTitle}{encodedYear}";
+            var url = $"{BaseUrl}/search/movie?query={encodedTitle}{encodedYear}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
             
-            return Mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
+            return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
         }
         
         public override async Task<SeriesResult[]> SearchTvShows(string name)
         {
             var encodedTitle = HttpUtility.UrlEncode(name);
-            var url = $"{BaseUrl}/search/tv?api_key={_key}&query={encodedTitle}";
+            var url = $"{BaseUrl}/search/tv?query={encodedTitle}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
 
-            var mapped = Mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
+            var mapped = _mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
             
             return mapped;
         }
 
         public override async Task<FilmDetails> FetchMovieDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/movie/{id}?language={language}&api_key={_key}";
+            var url = $"{BaseUrl}/movie/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<MovieDetails>(content);
             
-            return Mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
+            return _mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
         }
         
         public override async Task<SeriesDetails> FetchTvDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}?language={language}&api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
-            var mapped = Mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
+            var mapped = _mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
             var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
@@ -111,11 +112,11 @@ namespace NxPlx.Integrations.TMDb
         
         public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}&api_key={_key}";
+            var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvSeasonDetails>(content);
-            return Mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj);
+            return _mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj);
         }
         
         public override async Task DownloadImage(string size, string imageUrl)
