@@ -1,5 +1,5 @@
 ﻿FROM alpine AS gitCloner
-RUN apk --update --no-cache --quiet add git openssh && rm -rf /var/lib/apt/lists/*
+RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /project
 RUN git clone https://github.com/rosenbjerg/NxPlx.git
 
@@ -11,7 +11,7 @@ RUN dotnet publish NxPlx.Infrastructure.WebApi/NxPlx.Infrastructure.WebApi.cspro
 
 
 FROM node:12.10.0-alpine AS frontendBuilder
-RUN apk --update --no-cache --quiet add git openssh && rm -rf /var/lib/apt/lists/*
+RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
 RUN npm install --no-progress --silent
