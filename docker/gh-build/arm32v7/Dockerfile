@@ -14,8 +14,8 @@ FROM node:12.10.0-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
-RUN npm install --no-progress --silent
-RUN npm run build
+RUN yarn install --no-progress --silent
+RUN yarn build
 
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim-arm32v7 AS runtime
