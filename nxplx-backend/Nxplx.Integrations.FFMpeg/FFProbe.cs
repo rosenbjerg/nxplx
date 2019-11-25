@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
@@ -11,7 +10,7 @@ namespace Nxplx.Integrations.FFMpeg
     {
         public static FFMpegProbeDetails Analyse(string file)
         {
-            const string entries = "stream=index,avg_frame_rate,codec_name,codec_long_name,display_aspect_ratio,width,height,duration,codec_type," +
+            const string entries = "stream=index,avg_frame_rate,codec_name,display_aspect_ratio,width,height,duration,codec_type," +
                                    "bit_rate,bits_per_raw_sample,channel_layout";
             var arguments = $"-v error -show_entries {entries} -print_format json \"{file}\"";
 
@@ -31,9 +30,13 @@ namespace Nxplx.Integrations.FFMpeg
             process.WaitForExit();
             var parsedOutput = JsonSerializer.Deserialize<FFProbeOutput>(output);
 
-            var videoStream = parsedOutput.streams.First(stream => stream.codec_type == "video");
-            var audioStream = parsedOutput.streams.First(stream => stream.codec_type == "audio");
-            
+            var videoStream = parsedOutput?.streams?.FirstOrDefault(stream => stream.codec_type == "video");
+            var audioStream = parsedOutput?.streams?.FirstOrDefault(stream => stream.codec_type == "audio");
+
+            if (videoStream == null || audioStream == null)
+            {
+                return default;
+            }
             
             return new FFMpegProbeDetails
             {
@@ -42,11 +45,9 @@ namespace Nxplx.Integrations.FFMpeg
                 AudioBitrate = int.Parse(audioStream.bit_rate),
                 AudioChannelLayout = audioStream.channel_layout,
                 AudioCodec = audioStream.codec_name,
-                AudioCodecName = audioStream.codec_long_name,
                 
                 VideoBitrate = int.Parse(videoStream.bit_rate),
                 VideoCodec = videoStream.codec_name,
-                VideoCodecName = videoStream.codec_long_name,
                 VideoAspectRatio = videoStream.display_aspect_ratio,
                 VideoHeight = videoStream.height,
                 VideoWidth = videoStream.width,

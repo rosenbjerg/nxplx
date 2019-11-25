@@ -120,7 +120,7 @@ namespace NxPlx.Services.Index
             var startTime = DateTime.UtcNow;
             
             var fileIndexer = new FileIndexer();
-            using var ctx = new MediaContext();
+            await using var ctx = new MediaContext();
             
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);
@@ -140,8 +140,7 @@ namespace NxPlx.Services.Index
             await ctx.AddRangeAsync(creators);
             await ctx.AddRangeAsync(productionCompanies);
             var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details);
-            var newDetails = await databaseDetails.GetNew();
-            await ctx.AddRangeAsync(newDetails);
+            ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();
             _loggingService.Info("Finished saving new series, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
