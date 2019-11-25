@@ -16,7 +16,7 @@ namespace NxPlx.WebApi
             }
         }
         
-        private static string Salt(string password)
+        private static string Pepper(string password)
         {
             return $"Nx{password}Plx";
         }
@@ -35,18 +35,18 @@ namespace NxPlx.WebApi
         private static double TimeBCrypt(string password, int workFactor)
         {
             var started = DateTime.UtcNow;
-            var bcrypted = Crypt.HashPassword(Salt(password), workFactor);
+            var bcrypted = Crypt.HashPassword(Pepper(password), workFactor);
             return (bcrypted.Length + DateTime.UtcNow.Subtract(started).TotalMilliseconds) - bcrypted.Length;
         }
 
         public static string Hash(string password)
         {
-            return Crypt.HashPassword(Salt(password), WorkFactor);
+            return Crypt.HashPassword(Pepper(password), WorkFactor);
         }
 
         public static bool Verify(string password, string passwordHash)
         {
-            return Crypt.Verify(Salt(password), passwordHash);
+            return Crypt.Verify(Pepper(password), passwordHash);
         }
     }
 }

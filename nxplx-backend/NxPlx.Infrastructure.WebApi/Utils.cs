@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
+using NxPlx.Infrastructure.IoC;
 using Red;
-using Validation;
 
 namespace NxPlx.WebApi
 {
@@ -23,7 +21,7 @@ namespace NxPlx.WebApi
         {
             return res.SendJson(mapper.Map<TFrom, TTo>(dto));
         }
-        
+
         public static Task<HandlerType> SendSPA(Request req, Response res)
         {
             return res.SendFile(Path.Combine("public", "index.html"));

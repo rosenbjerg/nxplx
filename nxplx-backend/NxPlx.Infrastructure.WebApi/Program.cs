@@ -30,11 +30,11 @@ namespace NxPlx.WebApi
             {
                 logger.Trace("Running in DEBUG mode");
             }
-            
+
             var databaseContextManager = new DatabaseContextManager();
             var server = new RedHttpServer(cfg.HttpPort, "public")
             {
-                RespondWithExceptionDetails = !cfg.Production, 
+                RespondWithExceptionDetails = !cfg.Production,
                 ConfigureServices = databaseContextManager.Register
             };
             server.Use(new CookieSessions<UserSession>(TimeSpan.FromDays(14))
@@ -45,15 +45,17 @@ namespace NxPlx.WebApi
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
-                logger.Error("Exception on url {ExceptionUrl}: {ExceptionType} with message {ExceptionMessage} :: {Stacktrace}", 
-                    eventArgs.Exception, eventArgs.Exception.GetType().Name, eventArgs.Exception.Message, eventArgs.Exception.StackTrace);
-            }; 
-            
+                logger.Error(
+                    "Exception on url {ExceptionUrl}: {ExceptionType} with message {ExceptionMessage} :: {Stacktrace}",
+                    eventArgs.Exception, eventArgs.Exception.GetType().Name, eventArgs.Exception.Message,
+                    eventArgs.Exception.StackTrace);
+            };
+
             await databaseContextManager.Initialize(logger);
             CreateAdminAccount(container);
 
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
-            
+
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
             SessionRoutes.Register(server.CreateRouter("/api/session"));
@@ -61,17 +63,17 @@ namespace NxPlx.WebApi
             OverviewRoutes.Register(server.CreateRouter("/api/overview"));
             EpisodeRoutes.Register(server.CreateRouter("/api/series"));
             FilmRoutes.Register(server.CreateRouter("/api/film"));
-            
+
             IndexingRoutes.Register(server.CreateRouter("/api/indexing"));
             BroadcastRoutes.Register(server.CreateRouter("/api/broadcast"));
             SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
-            
+
             server.Get("/*", Utils.SendSPA);
-            
+
             logger.Trace("All routes registered, preparing to listen on port {Port}", cfg.HttpPort);
-            
+
             await server.RunAsync(cfg.Production ? "*" : "localhost");
         }
 
@@ -79,7 +81,7 @@ namespace NxPlx.WebApi
         {
             var logger = container.Resolve<ILoggingService>();
             using var ctx = container.Resolve<UserContext>();
-            if (ctx.Users.FirstOrDefault() == null)
+            if (ctx.Users.FirstOrDefault() == default)
             {
                 var admin = new User
                 {
@@ -90,7 +92,7 @@ namespace NxPlx.WebApi
                 };
                 ctx.Add(admin);
                 ctx.SaveChanges();
-                
+
                 logger.Trace("No users found. Default admin account created");
             }
         }
