@@ -1,9 +1,6 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
-using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details;
@@ -70,6 +67,25 @@ namespace NxPlx.Services.Database
                 .UseLazyLoadingProxies()
                 .UseNpgsql($"Host={cfg.SqlHost};Database={cfg.SqlMediaDatabase};Username={cfg.SqlUsername};Password={cfg.SqlPassword}");
             
+        }
+    }
+
+    public static class DbUtils
+    {
+        public static void AddOrUpdate(this DbContext context, EntityBase entity)
+        {
+            context.Entry(entity).State = entity.Id == 0 ?
+                EntityState.Added :
+                EntityState.Modified;
+        }
+        public static void AddOrUpdate(this DbContext context, IEnumerable<EntityBase> entities)
+        {
+            foreach (var entity in entities)
+            {
+                context.Entry(entity).State = entity.Id == 0 ?
+                    EntityState.Added :
+                    EntityState.Modified;
+            }
         }
     }
 }

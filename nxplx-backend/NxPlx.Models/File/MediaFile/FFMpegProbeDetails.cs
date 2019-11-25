@@ -19,9 +19,7 @@ namespace NxPlx.Models.File
         public int AudioBitrate { get; set; }
                 
         public string AudioChannelLayout { get; set; }
-        public string AudioCodecName { get; set; }
         public int AudioStreamIndex { get; set; }
-        public string VideoCodecName { get; set; }
         public float Duration { get; set; }
         public string VideoAspectRatio { get; set; }
     }
