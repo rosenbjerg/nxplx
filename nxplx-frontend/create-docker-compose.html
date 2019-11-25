@@ -201,6 +201,7 @@ services:
 
   nxplx-database:
     image: postgres:12-alpine
+    restart: always
     volumes:
       - ${args.dataDir}/database:/var/lib/postgresql/data
     environment:
@@ -208,10 +209,12 @@ services:
 
   nxplx-cache:
     image: redis:5.0.6-alpine
+    restart: always
     command: redis-server --requirepass ${args.redisPassword}
 
   nxplx-webapi:
     image: mrosenbjerg/nxplx-webapi
+    restart: always
     environment:
       REDIS_PASSWORD: ${args.redisPassword}
       POSTGRES_PASSWORD: ${args.postgresPassword}
