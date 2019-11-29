@@ -23,7 +23,7 @@ ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx on dotnet 3.0"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apk add --update ffmpeg
+RUN apt-get update && sudo apt-get install ffmpeg
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
