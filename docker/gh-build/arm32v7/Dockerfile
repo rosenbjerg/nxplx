@@ -23,7 +23,7 @@ ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx on dotnet 3.0"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apt-get update && apt-get install ffmpeg && apt-get autoremove && apt-get clean
+RUN apt-get update && apt-get install -y ffmpeg && apt-get autoremove && apt-get clean
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
