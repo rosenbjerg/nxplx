@@ -20,7 +20,7 @@ namespace NxPlx.Services.Index
             foreach (var (size, url) in imageDownloads
                 .Distinct()
                 .AsParallel()
-                .WithDegreeOfParallelism(Environment.ProcessorCount * 4))
+                .WithDegreeOfParallelism(Environment.ProcessorCount * 10))
             {
                 await detailsApi.DownloadImage(size, url);
             }

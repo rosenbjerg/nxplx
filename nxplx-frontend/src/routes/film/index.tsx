@@ -51,7 +51,7 @@ export default class Home extends Component<Props, State> {
                     <div>
                         {
                             [
-                                {title: 'Released', value: (details.releaseDate || '    ').substr(0, 4)},
+                                {title: 'Released', value: (details.releaseDate || '').substr(0, 4)},
                                 {title: 'Run time', value: formatRunTime(details.runtime)},
                                 {title: 'Rating', value: `${details.voteAverage}/10 from ${details.voteCount} votes`},
                                 {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},

@@ -1,6 +1,6 @@
 nxplx-backend/NxPlx/public/**
 nxplx-backend/NxPlx/database/**
-
+config.json
 *.dll
 **/.idea/**
 # Created by https://www.gitignore.io/api/node,rider,webstorm,visualstudio

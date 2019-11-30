@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Databa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Models", "NxPlx.Models\NxPlx.Models.csproj", "{92CA0DD6-FC93-4263-8CE1-C9201B6F86BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.JobServer", "NxPlx.Services.JobServer\NxPlx.Services.JobServer.csproj", "{A5574B57-E302-458B-BD03-19E06EE3A08B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Transcode", "NxPlx.Services.Transcode\NxPlx.Services.Transcode.csproj", "{A5574B57-E302-458B-BD03-19E06EE3A08B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.Jobs", "NxPlx.Integrations.Jobs\NxPlx.Integrations.Jobs.csproj", "{FB65BCE1-6326-45CE-A51A-5729D1E1A860}"
 EndProject
@@ -33,6 +33,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDb", "NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj", "{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.IoC.Conventions", "NxPlx.Infrastructure.IoC.Conventions\NxPlx.Infrastructure.IoC.Conventions.csproj", "{1DA2A15E-5E75-444C-8D23-D37C11D0DA92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing.Tests", "NxPlx.Services.Indexing.Tests\NxPlx.Services.Indexing.Tests.csproj", "{7474A643-73D2-4333-84DB-DDABB7318856}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,5 +110,9 @@ Global
 		{1DA2A15E-5E75-444C-8D23-D37C11D0DA92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DA2A15E-5E75-444C-8D23-D37C11D0DA92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DA2A15E-5E75-444C-8D23-D37C11D0DA92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7474A643-73D2-4333-84DB-DDABB7318856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7474A643-73D2-4333-84DB-DDABB7318856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7474A643-73D2-4333-84DB-DDABB7318856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7474A643-73D2-4333-84DB-DDABB7318856}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

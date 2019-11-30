@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Services.Database;
 using Red;
 using Red.CookieSessions;
-using Red.Extensions;
 using Red.Interfaces;
 
 namespace NxPlx.WebApi.Routes

@@ -33,11 +33,11 @@
 }
 
 .infoKey {
-    color: #cdcdcd;
+    color: var(--faded-text);
 }
 .infoValue {
     padding-left: 8px;
-    color: #e0e0e0;
+    color: var(--focused-text);
 }
 
 .seasonContainer {
@@ -53,8 +53,8 @@
     cursor: pointer;
 }
 .number {
-    opacity: 0.8;
-    text-shadow: 0 0 4px black;
+    opacity: 0.9;
+    text-shadow: 0 0 6px black;
     position: absolute;
     top: -20px;
     left: 0;

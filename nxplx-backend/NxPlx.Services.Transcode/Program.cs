@@ -34,7 +34,7 @@ namespace NxPlx.Jobs.Server
                 }
             };
             
-            Console.WriteLine("NxPlx.Services.JobServer starting...");
+            Console.WriteLine("NxPlx.Services.Transcode starting...");
             await server.RunAsync();
         }
     }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using NxPlx.Abstractions;
 using NxPlx.Infrastructure.Session;
@@ -114,7 +113,7 @@ namespace NxPlx.Services.Database
                 genres = MapMany<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)),
                 createdBy = MapMany<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)),
                 productionCompanies = MapMany<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)),
-                overview = seriesDetails.Overview,
+                overview = seriesDetails.Overview
             });
             SetMapping<SeasonDetails, SeasonDto>(seasonDetails => new SeasonDto
             {

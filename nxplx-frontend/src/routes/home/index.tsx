@@ -45,7 +45,7 @@ export default class Home extends Component<Props, State> {
                         {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
-                                    <Link key={entry.id} href={`/${entry.kind}/${entry.id}`}>
+                                    <Link key={entry.id} title={entry.title} href={`/${entry.kind}/${entry.id}`}>
                                         <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 154)} alt={entry.title} />
                                     </Link>
                                 )

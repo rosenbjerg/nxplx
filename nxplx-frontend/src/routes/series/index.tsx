@@ -58,7 +58,7 @@ export default class Series extends Component<Props, State> {
                     <div>
                         {orderBy(details.seasons, ['number'], ['asc'])
                             .map(season => (
-                                    <span class={style.seasonContainer}>
+                                <span class={style.seasonContainer}>
                                     <Link href={`/series/${details.id}/${season.number}`}>
                                         <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154, details.poster)} title={`Season ${season.number}`} alt={season.number.toString()} />
                                     </Link>

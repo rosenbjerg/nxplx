@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Nxplx.Integrations.FFMpeg;
 using NxPlx.Models;
 using NxPlx.Models.File;
 
@@ -10,10 +12,10 @@ namespace NxPlx.Services.Index
 {
     public class FileIndexer
     {
-        private IEnumerable<SubtitleFile> IndexSubtitles(string filepath)
+        private List<SubtitleFile> IndexSubtitles(string filepath)
         {
             var filename = Path.GetFileNameWithoutExtension(filepath);
-            var files = GetAllFiles(Path.GetDirectoryName(filepath), $"*{filename}.*", "srt", "vtt");
+            var files = FindFiles(Path.GetDirectoryName(filepath), $"*{filename}.*", "srt", "vtt");
             var uniqueSubs = new Dictionary<string, SubtitleFile>();
             
             foreach (var file in files)
@@ -46,76 +48,108 @@ namespace NxPlx.Services.Index
                 };
             }
 
-            return uniqueSubs.Values;
+            return uniqueSubs.Values.ToList();
         }
-        private static IEnumerable<string> GetAllFiles(string folder, string pattern, params string[] extensions)
+        private static IEnumerable<string> FindFiles(string folder, string pattern, params string[] extensions)
         {
             return extensions.SelectMany(ext => Directory.EnumerateFiles(folder, $"{pattern}.{ext}", SearchOption.AllDirectories));
         }
         
-        private Regex _seriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
-        private Regex _filmRegex = new Regex("^(?<title>.+?)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
-        private Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
+        private readonly Regex _seriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
+        private readonly Regex _filmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
+        private readonly Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
 
+        private readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
+        
         public List<EpisodeFile> IndexEpisodes(HashSet<string> existing, Library library)
         {
-            return GetAllFiles(library.Path, "*", "mp4")
-                .Where(mp4 => !existing.Contains(mp4) && _seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
-                .AsParallel()
-                .Select(episodePath =>
-                {
-                    var fileInfo = new FileInfo(episodePath);
-                    var match = _seriesRegex.Match(Path.GetFileNameWithoutExtension(episodePath));
-                    var subtitles = IndexSubtitles(episodePath).ToList();
-                    var nameGroup = match.Groups["name"];
-                    var seasonGroup = match.Groups["season"];
-                    var episodeGroup = match.Groups["episode"];
-                    var name = nameGroup.Value != "" ? nameGroup.Value : Path.GetFileNameWithoutExtension(episodePath);
+            var newFiles = FindFiles(library.Path, "*", "mp4").Where(filePath => !existing.Contains(filePath));
+            var episodes = IndexEpisodeFiles(newFiles);
 
-                    return new EpisodeFile
-                    {
-                        Added = DateTime.UtcNow,
-                        Created = fileInfo.CreationTimeUtc,
-                        LastWrite = fileInfo.LastWriteTimeUtc,
-                        Name = TitleCleanup(name),
-                        SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 0,
-                        EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,
-                        Path = episodePath,
-                        PartOfLibraryId = library.Id,
-                        FileSizeBytes = fileInfo.Length,
-                        Subtitles = subtitles
-                    };
+            return episodes
+                .AsParallel().WithDegreeOfParallelism(Environment.ProcessorCount * 3)
+                .Select(episode =>
+                {
+                    var fileInfo = new FileInfo(episode.Path);
+                    episode.Created = fileInfo.CreationTimeUtc;
+                    episode.LastWrite = fileInfo.LastWriteTimeUtc;
+                    episode.FileSizeBytes = fileInfo.Length;
+
+                    episode.PartOfLibraryId = library.Id;
+                    episode.MediaDetails = FFProbe.Analyse(episode.Path);
+                    episode.Subtitles = IndexSubtitles(episode.Path);
+                    
+                    return episode;
                 }).ToList();
+        }
+
+        public IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath)
+        {
+            return filesPath
+                .Where(mp4 => _seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
+                .Select(episodePath =>
+            {
+                var match = _seriesRegex.Match(Path.GetFileNameWithoutExtension(episodePath));
+                var nameGroup = match.Groups["name"];
+                var seasonGroup = match.Groups["season"];
+                var episodeGroup = match.Groups["episode"];
+                var name = nameGroup.Value != "" ? nameGroup.Value : Path.GetFileNameWithoutExtension(episodePath);
+
+                return new EpisodeFile
+                {
+                    Added = DateTime.UtcNow,
+                    Name = TitleCleanup(name),
+                    SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 0,
+                    EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,
+                    Path = episodePath
+                };
+            });
         }
         
         public List<FilmFile> IndexFilm(HashSet<string> existing, Library library)
         {
-            return GetAllFiles(library.Path, "*", "mp4")
-                .Where(mp4 => !existing.Contains(mp4) && !_seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
-                .AsParallel()
+            var newFiles = FindFiles(library.Path, "*", "mp4").Where(filePath => !existing.Contains(filePath));
+            var newFilm = IndexFilmFiles(newFiles);
+
+            return newFilm
+                .AsParallel().WithDegreeOfParallelism(Environment.ProcessorCount * 3)
+                .Select(film =>
+                {
+                    var fileInfo = new FileInfo(film.Path);
+                    film.Created = fileInfo.CreationTimeUtc;
+                    film.LastWrite = fileInfo.LastWriteTimeUtc;
+                    film.FileSizeBytes = fileInfo.Length;
+
+                    film.PartOfLibraryId = library.Id;
+                    film.MediaDetails = FFProbe.Analyse(film.Path);
+                    film.Subtitles = IndexSubtitles(film.Path);
+
+                    return film;
+                }).ToList();
+        }
+
+        public IEnumerable<FilmFile> IndexFilmFiles(IEnumerable<string> filesPath)
+        {
+            return filesPath
+                .Where(mp4 => !_seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
                 .Select(filmPath =>
                 {
-                    var fileInfo = new FileInfo(filmPath);
-                    var match = _filmRegex.Match(Path.GetFileNameWithoutExtension(filmPath));
+                    var filename = Path.GetFileNameWithoutExtension(filmPath);
+                    var trimmedName = StopWords.Aggregate(filename, (acc, stopword) => acc.Replace(stopword, ""));
+                    var match = _filmRegex.Match(trimmedName);
                     var titleGroup = match.Groups["title"];
                     var yearGroup = match.Groups["year"];
-                    var title = titleGroup.Value != "" ? titleGroup.Value : Path.GetFileNameWithoutExtension(filmPath);
+                    var title = titleGroup.Value != "" ? titleGroup.Value : Path.GetFileNameWithoutExtension(trimmedName);
 
                     return new FilmFile
                     {
                         Added = DateTime.UtcNow,
-                        Created = fileInfo.CreationTimeUtc,
-                        LastWrite = fileInfo.LastWriteTimeUtc,
                         Title = TitleCleanup(title),
                         Year = yearGroup.Success ? int.Parse(yearGroup.Value) : 1,
                         Path = filmPath,
-                        PartOfLibraryId = library.Id,
-                        FileSizeBytes = fileInfo.Length,
-                        Subtitles = IndexSubtitles(filmPath).ToList()
                     };
-                }).ToList();
+                });
         }
-
         private string TitleCleanup(string input)
         {
             var step1 = _whitespaceRegex.Replace(input, " ").Trim(' ');
