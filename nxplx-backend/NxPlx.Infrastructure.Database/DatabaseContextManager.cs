@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Services.Database.Wrapper;
 
 namespace NxPlx.Services.Database
 {
@@ -45,6 +46,14 @@ namespace NxPlx.Services.Database
             var elapsed = (int) DateTime.UtcNow.Subtract(startTime).TotalSeconds;
             logger.Info("Initialized and applied {AppliedPendingMigrationCount} migrations to {DatabaseName} in {ElapsedSeconds} second(s)", pendingMigrations.Count, databaseName, elapsed);
 
+        }
+    }
+
+    public static class DatabaseExtensions
+    {
+        public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source)
+        {
+            return EntityFrameworkQueryableExtensions.ToListAsync(source);
         }
     }
 }

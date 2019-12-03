@@ -13,6 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
       <ProjectReference Include="..\NxPlx.Models.Dto\NxPlx.Models.Dto.csproj" />
