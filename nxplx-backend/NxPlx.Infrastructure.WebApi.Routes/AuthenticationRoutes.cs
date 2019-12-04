@@ -1,15 +1,13 @@
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Services.Database;
 using Red;
 using Red.CookieSessions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class AuthenticationRoutes
     {
@@ -46,9 +44,8 @@ namespace NxPlx.WebApi.Routes
             }
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
-            var user = await context.Users.Where(u => u.Username == username)
-                .FirstOrDefaultAsync();
+            await using var context = container.Resolve<IReadUserContext>();
+            var user = await context.Users.One(u => u.Username == username);
 
             if (user == null || !PasswordUtils.Verify(password, user.PasswordHash))
             {

@@ -12,18 +12,18 @@ namespace NxPlx.Services.Database.Wrapper
     {
         private readonly IDbContextTransaction _transaction;
 
-        internal TransactionedMediaContext(ReadMediaContext readMediaContext) : base(readMediaContext.Context)
+        internal TransactionedMediaContext(MediaContext context) : base(context)
         {
-            _filmFiles = InitLazySet(readMediaContext.FilmFiles);
-            _episodeFiles = InitLazySet(readMediaContext.EpisodeFiles);
-            _libraries = InitLazySet(readMediaContext.Libraries);
-            _transaction = readMediaContext.Context.Database.BeginTransaction();
+            _filmFiles = InitLazySet(context, context.FilmFiles);
+            _episodeFiles = InitLazySet(context, context.EpisodeFiles);
+            _libraries = InitLazySet(context, context.Libraries);
+            _transaction = context.Database.BeginTransaction();
         }
         
-        private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(IReadEntitySet<TEntity> set)
+        private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)
             where TEntity : class
         {
-            return new Lazy<EntitySet<TEntity>>(() => new EntitySet<TEntity>(set as ReadEntitySet<TEntity>));
+            return new Lazy<EntitySet<TEntity>>(() => new EntitySet<TEntity>(context, set));
         }
         
         private readonly Lazy<EntitySet<FilmFile>> _filmFiles;

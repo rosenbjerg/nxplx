@@ -1,17 +1,15 @@
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models.Dto.Models;
-using NxPlx.Services.Database;
 using Red;
 using Red.CookieSessions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class SessionRoutes
     {
@@ -27,12 +25,9 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
             
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
 
-            var sessions = await context.UserSessions
-                .Where(s => s.UserId == session.UserId)
-                .OrderBy(s => s.Expiration)
-                .ToListAsync();
+            var sessions = await context.UserSessions.Many(s => s.UserId == session.UserId);
 
             return await res.SendMapped<UserSession, UserSessionDto>(container.Resolve<IDatabaseMapper>(), sessions);
         }
@@ -48,16 +43,17 @@ namespace NxPlx.WebApi.Routes
             }
             
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
 
-            var session = await context.UserSessions.FindAsync(sessionId);
+            var session = await transaction.UserSessions.OneById(sessionId);
             if (session.UserId != currentSession.UserId && !currentSession.IsAdmin)
             {
                 return await res.SendStatus(HttpStatusCode.BadRequest);
             }
 
-            context.UserSessions.Remove(session);
-            await context.SaveChangesAsync();
+            transaction.UserSessions.Remove(session);
+            await transaction.Commit();
             
             return await res.SendStatus(HttpStatusCode.OK);
         }
@@ -67,12 +63,9 @@ namespace NxPlx.WebApi.Routes
             var userId = int.Parse(req.Queries["userId"]);
             
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
 
-            var sessions = await context.UserSessions
-                .Where(s => s.UserId == userId)
-                .OrderBy(s => s.Expiration)
-                .ToListAsync();
+            var sessions = await context.UserSessions.Many(s => s.UserId == userId);
 
             return await res.SendMapped<UserSession, UserSessionDto>(container.Resolve<IDatabaseMapper>(), sessions);
         }

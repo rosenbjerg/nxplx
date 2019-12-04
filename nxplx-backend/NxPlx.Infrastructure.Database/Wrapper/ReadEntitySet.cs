@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -10,7 +11,6 @@ namespace NxPlx.Services.Database.Wrapper
     public class ReadEntitySet<TEntity> : IReadEntitySet<TEntity>
         where TEntity : class
     {
-        protected bool Tracked = false;
         internal readonly DbSet<TEntity> DbSet;
 
         public ReadEntitySet(DbSet<TEntity> dbSet)
@@ -18,24 +18,63 @@ namespace NxPlx.Services.Database.Wrapper
             DbSet = dbSet;
         }
 
-        private IQueryable<TEntity> ApplicableQueryable => Tracked ? DbSet : DbSet.AsNoTracking();
-        
-        public IQueryable<TEntity> Many(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+        private IQueryable<TEntity> ApplicableQueryable => DbSet;
+
+        public Task<List<TEntity>> Many(
+            Expression<Func<TEntity, bool>>? predicate, 
+            params Expression<Func<TEntity, object>>[] includes)
         {
-            return includes
-                .Aggregate(ApplicableQueryable, (current, expression) => current.Include(expression))
-                .Where(predicate);
+            var queryable = WithIncludes(includes);
+            if (predicate != null)
+            {
+                queryable = queryable.Where(predicate);
+            }
+
+            return queryable.ToListAsync();
         }
-        public Task<TEntity?> One(Expression<Func<TEntity, bool>> predicate, params Expression<Func<TEntity, object>>[] includes)
+
+        public Task<TEntity?> One(
+            Expression<Func<TEntity, bool>> predicate, 
+            params Expression<Func<TEntity, object>>[] includes)
         {
-            return includes
-                .Aggregate(ApplicableQueryable, (current, expression) => current.Include(expression))
-                .FirstOrDefaultAsync(predicate);
+            return WithIncludes(includes).FirstOrDefaultAsync(predicate);
         }
 
         public async ValueTask<TEntity> OneById(params object[] keys)
         {
             return await DbSet.FindAsync(keys);
+        }
+
+        private IQueryable<TEntity> WithIncludes(IEnumerable<Expression<Func<TEntity, object>>> includes)
+        {
+            return includes.Aggregate(ApplicableQueryable, (current, expression) => current.Include(expression));
+        }
+
+        public Task<int> Count(Expression<Func<TEntity, bool>>? predicate, params Expression<Func<TEntity, object>>[] includes)
+        {
+            return predicate != null ? ApplicableQueryable.CountAsync(predicate) : ApplicableQueryable.CountAsync();
+        }
+
+        public Task<TProjection> ProjectOne<TProjection>(
+            Expression<Func<TEntity, bool>> predicate, 
+            Expression<Func<TEntity, TProjection>> projection,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            return WithIncludes(includes).Where(predicate).Select(projection).Distinct().FirstOrDefaultAsync();
+        }
+
+        public Task<List<TProjection>> ProjectMany<TProjection>(
+            Expression<Func<TEntity, bool>>? predicate, 
+            Expression<Func<TEntity, TProjection>> projection,
+            params Expression<Func<TEntity, object>>[] includes)
+        {
+            var queryable = WithIncludes(includes);
+            if (predicate != null)
+            {
+                queryable = queryable.Where(predicate);
+            }
+
+            return queryable.Select(projection).Distinct().ToListAsync();
         }
     }
 }

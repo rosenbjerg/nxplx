@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using NxPlx.Infrastructure.Session;
 using Red;
 
-namespace NxPlx.WebApi
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class Authenticated
     {

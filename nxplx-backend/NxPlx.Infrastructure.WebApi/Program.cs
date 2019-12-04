@@ -2,16 +2,18 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.IoC.Conventions;
 using NxPlx.Infrastructure.Session;
+using NxPlx.Infrastructure.WebApi.Routes;
 using NxPlx.Models;
 using NxPlx.Services.Database;
-using NxPlx.WebApi.Routes;
 using Red;
 using Red.CookieSessions;
 using Red.CookieSessions.EFCore;
+using Utils = NxPlx.Infrastructure.WebApi.Routes.Utils;
 
 namespace NxPlx.WebApi
 {
@@ -41,7 +43,7 @@ namespace NxPlx.WebApi
             {
                 Secure = cfg.Production,
                 Path = "/",
-                Store = new EntityFrameworkSessionStore<UserSession>(container.Resolve<UserContext>)
+                Store = new EntityFrameworkSessionStore<UserSession>(() => new UserContext())
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
@@ -52,7 +54,7 @@ namespace NxPlx.WebApi
             };
 
             await databaseContextManager.Initialize(logger);
-            CreateAdminAccount(container);
+            await CreateAdminAccount(container);
 
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
 
@@ -77,11 +79,13 @@ namespace NxPlx.WebApi
             await server.RunAsync(cfg.Production ? "*" : "localhost");
         }
 
-        private static void CreateAdminAccount(ResolveContainer container)
+        
+        private static async Task CreateAdminAccount(ResolveContainer container)
         {
             var logger = container.Resolve<ILoggingService>();
-            using var ctx = container.Resolve<UserContext>();
-            if (ctx.Users.FirstOrDefault() == default)
+            await using var ctx = container.Resolve<IReadUserContext>();
+            await using var transaction = ctx.BeginTransactionedContext(); 
+            if (ctx.Users.Count() == default)
             {
                 var admin = new User
                 {
@@ -90,8 +94,8 @@ namespace NxPlx.WebApi
                     Email = "",
                     PasswordHash = PasswordUtils.Hash("changemebaby")
                 };
-                ctx.Add(admin);
-                ctx.SaveChanges();
+                transaction.Users.Add(admin);
+                await transaction.Commit();
 
                 logger.Trace("No users found. Default admin account created");
             }

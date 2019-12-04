@@ -1,17 +1,15 @@
 using System;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
-using NxPlx.Services.Database;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class ProgressRoutes
     {
@@ -29,21 +27,20 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
 
-            var progress = await context.WatchingProgresses.Where(wp => wp.UserId == session.UserId && wp.FileId == fileId)
-                .FirstOrDefaultAsync();
-
-            if (progress == null)
+            var progress = new WatchingProgress
             {
-                progress = new WatchingProgress {UserId = session.UserId, FileId = fileId};
-                await context.AddAsync(progress);
-            }
-            
-            progress.LastWatched = DateTime.UtcNow;
-            progress.Time = progressValue.value;
+                UserId = session.UserId,
+                FileId = fileId,
+                LastWatched = DateTime.UtcNow,
+                Time = progressValue.value
+            };
 
-            await context.SaveChangesAsync();
+            transaction.WatchingProgresses.AddOrUpdate(progress, p => (p.UserId, p.FileId));
+            await transaction.Commit();
+
             return await res.SendStatus(HttpStatusCode.OK);
         }
 
@@ -54,11 +51,9 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<UserContext>();
+            await using var ctx = container.Resolve<IReadUserContext>();
 
-            var progress = await ctx.WatchingProgresses.Where(wp => wp.UserId == session.UserId && wp.FileId == fileId)
-                .Select(wp => wp.Time)
-                .FirstOrDefaultAsync();
+            var progress = await ctx.WatchingProgresses.ProjectOne(wp => wp.UserId == session.UserId && wp.FileId == fileId, wp => wp.Time);
 
             return await res.SendJson(progress);
         }

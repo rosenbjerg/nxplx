@@ -2,23 +2,20 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.0</TargetFramework>
-        <RootNamespace>NxPlx.Services.Database</RootNamespace>
-        <LangVersion>default</LangVersion>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.0" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
-      <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
       <ProjectReference Include="..\NxPlx.Models.Dto\NxPlx.Models.Dto.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
+      <PackageReference Include="Red.Validation" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>

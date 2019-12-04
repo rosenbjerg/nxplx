@@ -12,19 +12,19 @@ namespace NxPlx.Services.Database.Wrapper
     {
         private readonly IDbContextTransaction _transaction;
 
-        internal TransactionedUserContext(ReadUserContext readUserContext) : base(readUserContext.Context)
+        internal TransactionedUserContext(UserContext context) : base(context)
         {
-            _subtitlePreferences = InitLazySet(readUserContext.SubtitlePreferences);
-            _watchingProgresses = InitLazySet(readUserContext.WatchingProgresses);
-            _users = InitLazySet(readUserContext.Users);
-            _userSessions = InitLazySet(readUserContext.UserSessions);
-            _transaction = readUserContext.Context.Database.BeginTransaction();
+            _subtitlePreferences = InitLazySet(context, context.SubtitlePreferences);
+            _watchingProgresses = InitLazySet(context, context.WatchingProgresses);
+            _users = InitLazySet(context, context.Users);
+            _userSessions = InitLazySet(context, context.UserSessions);
+            _transaction = context.Database.BeginTransaction();
         }
         
-        private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(IReadEntitySet<TEntity> set)
+        private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)
             where TEntity : class
         {
-            return new Lazy<EntitySet<TEntity>>(() => new EntitySet<TEntity>(set as ReadEntitySet<TEntity>));
+            return new Lazy<EntitySet<TEntity>>(() => new EntitySet<TEntity>(context, set));
         }
         
         private readonly Lazy<EntitySet<SubtitlePreference>> _subtitlePreferences;

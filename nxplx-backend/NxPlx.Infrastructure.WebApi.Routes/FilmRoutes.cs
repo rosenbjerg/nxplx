@@ -1,18 +1,17 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Models.Dto.Models.Film;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class FilmRoutes
     {
@@ -34,9 +33,9 @@ namespace NxPlx.WebApi.Routes
             var fileId = req.Context.ExtractUrlParameter("file_id").Replace(".mp4", "");
             var id = int.Parse(fileId);
             
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
+                .One(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
             
             if (filmFile == default || !File.Exists(filmFile.Path))
             {
@@ -53,10 +52,13 @@ namespace NxPlx.WebApi.Routes
             var container = ResolveContainer.Default();
             
             var id = int.Parse(req.Context.ExtractUrlParameter("film_id"));
-
-            await using var ctx = container.Resolve<MediaContext>();
+            
+            await using var ctx = container.Resolve<IReadMediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.FilmDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
+                .One(ff => ff.FilmDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)),
+                    ff => ff.FilmDetails, ff => ff.FilmDetails.Genres, ff => ff.FilmDetails.ProductionCompanies,
+                    ff => ff.FilmDetails.ProductionCountries, ff => ff.FilmDetails.SpokenLanguages,
+                    ff => ff.FilmDetails.BelongsInCollection);
             
             if (filmFile == default)
             {
@@ -74,9 +76,9 @@ namespace NxPlx.WebApi.Routes
             
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
             var filmFile = await ctx.FilmFiles
-                .FirstOrDefaultAsync(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
+                .One(ff => ff.Id == id && (session.IsAdmin || libraryAccess.Contains(ff.PartOfLibraryId)), ff => ff.FilmDetails);
 
             if (filmFile == default)
             {

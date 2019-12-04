@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
@@ -13,7 +14,7 @@ using NxPlx.Services.Database;
 
 namespace NxPlx.Services.Index
 {
-    public class Indexer
+    public class Indexer : IIndexer
     {
         private IDetailsApi _detailsApi;
         private IDatabaseMapper _databaseMapper;
@@ -121,8 +122,15 @@ namespace NxPlx.Services.Index
             
             var fileIndexer = new FileIndexer();
             await using var ctx = new MediaContext();
+            await using var transaction = ctx.Database.BeginTransaction();
             
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
+            
+            var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
+            var deletedEpisodes = ctx.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path));
+            ctx.EpisodeFiles.RemoveRange(deletedEpisodes);
+            await transaction.CommitAsync();
+            
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);
             if (newEpisodes.Any()) _loggingService.Info("Found {NewAmount} new episode files in {LibraryName} after {ScanTime} seconds", newEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
@@ -174,8 +182,6 @@ namespace NxPlx.Services.Index
             return allDetails.ToList();
         }
         private Task<SeriesDetails> FetchSeriesDetails(int id, string language) => _detailsApi.FetchTvDetails(id, language);
-
- 
 
     }
 }

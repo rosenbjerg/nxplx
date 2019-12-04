@@ -9,7 +9,7 @@ namespace NxPlx.Services.Database.Wrapper
 {
     public class ReadMediaContext : IReadMediaContext
     {
-        internal readonly MediaContext Context;
+        protected readonly MediaContext Context;
 
         public ReadMediaContext() : this(new MediaContext())
         {
@@ -32,7 +32,7 @@ namespace NxPlx.Services.Database.Wrapper
         
         public IMediaContext BeginTransactionedContext()
         {
-            return new TransactionedMediaContext(this);
+            return new TransactionedMediaContext(Context);
         }
         
         protected ReadMediaContext(MediaContext mediaContext)

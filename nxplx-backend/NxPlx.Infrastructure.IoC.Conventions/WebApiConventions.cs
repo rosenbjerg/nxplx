@@ -20,7 +20,7 @@ namespace NxPlx.Infrastructure.IoC.Conventions
             registration.Register<ILoggingService, NLoggingService>();
             registration.Register<IDatabaseMapper, DatabaseMapper>();
             registration.Register<IDetailsApi, TMDbApi>(false);
-            registration.Register<Indexer>(false);
+            registration.Register<IIndexer, Indexer>(false);
             registration.Register<IReadUserContext, ReadUserContext>(false);
             registration.Register<IReadMediaContext, ReadMediaContext>(false);
         }

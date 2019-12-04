@@ -3,8 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models.Database;
@@ -12,11 +12,10 @@ using NxPlx.Models.Details.Series;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Models.Dto.Models.Series;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class EpisodeRoutes
     {
@@ -34,11 +33,12 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
             var libraryAccess = session.User.LibraryAccessIds;
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id").Replace(".mp4", ""));
-            await using var ctx = new MediaContext();
             
+            var container = ResolveContainer.Default();
+            await using var ctx = container.Resolve<IReadMediaContext>();
+
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
-                .FirstOrDefaultAsync();
+                .One(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)));
             
             if (episode == null || !File.Exists(episode.Path))
             {
@@ -55,11 +55,10 @@ namespace NxPlx.WebApi.Routes
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
 
             var episode = await ctx.EpisodeFiles
-                .Where(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
-                .FirstOrDefaultAsync();
+                .One(ef => ef.Id == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Subtitles);
 
             return await res.SendMapped<EpisodeFile, InfoDto>(container.Resolve<IDatabaseMapper>(), episode);
         }
@@ -72,13 +71,12 @@ namespace NxPlx.WebApi.Routes
             var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
 
             var episodes = await ctx.EpisodeFiles
-                .Where(ef =>
+                .Many(ef =>
                     ef.SeriesDetailsId == id && ef.SeasonNumber == no &&
-                    (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
-                .ToListAsync();
+                    (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)));
             
             if (!episodes.Any())
             {
@@ -98,11 +96,10 @@ namespace NxPlx.WebApi.Routes
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
             
             var episodes = await ctx.EpisodeFiles
-                .Where(ef => ef.SeriesDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)))
-                .ToListAsync();
+                .Many(ef => ef.SeriesDetailsId == id && (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)));
             
             if (!episodes.Any())
             {

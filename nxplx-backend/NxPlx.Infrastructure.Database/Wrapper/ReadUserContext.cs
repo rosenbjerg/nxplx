@@ -9,7 +9,7 @@ namespace NxPlx.Services.Database.Wrapper
 {
     public class ReadUserContext : IReadUserContext
     {
-        internal readonly UserContext Context;
+        protected readonly UserContext Context;
 
         public ReadUserContext() : this(new UserContext())
         {
@@ -33,7 +33,7 @@ namespace NxPlx.Services.Database.Wrapper
 
         public IUserContext BeginTransactionedContext()
         {
-            return new TransactionedUserContext(this);
+            return new TransactionedUserContext(Context);
         }
         
         protected ReadUserContext(UserContext userContext)

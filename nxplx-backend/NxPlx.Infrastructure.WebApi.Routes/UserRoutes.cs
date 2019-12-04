@@ -1,18 +1,17 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
-using NxPlx.Services.Database;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class UserRoutes
     {
@@ -35,15 +34,17 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
             
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
-            var user = await context.Users.FindAsync(session.UserId);
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
+            
+            var user = await transaction.Users.OneById(session.UserId);
 
             if (form.TryGetValue("email", out var email))
             {
                 user.Email = email;
             }
 
-            await context.SaveChangesAsync();
+            await transaction.Commit();
             return await res.SendStatus(HttpStatusCode.OK);
         }
 
@@ -52,18 +53,18 @@ namespace NxPlx.WebApi.Routes
             var username = req.ParseBody<JsonValue<string>>().value;
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
 
-            var user = await context.Users.Where(u => u.Username == username)
-                .FirstOrDefaultAsync();
+            var user = await transaction.Users.One(u => u.Username == username);
 
             if (user == default)
             {
                 return await res.SendStatus(HttpStatusCode.NotFound);
             }
 
-            context.Remove(user);
-            await context.SaveChangesAsync();
+            transaction.Users.Remove(user);
+            await transaction.Commit();
 
             container.Resolve<ILoggingService>()
                 .Info("Deleted user {Username}", user.Username);
@@ -74,8 +75,8 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
-            var users = await context.Users.ToListAsync();
+            await using var context = container.Resolve<IReadUserContext>();
+            var users = await context.Users.Many();
 
             var mapper = container.Resolve<IDatabaseMapper>();
             return await res.SendMapped<User, UserDto>(mapper, users);
@@ -84,10 +85,10 @@ namespace NxPlx.WebApi.Routes
         private static async Task<HandlerType> GetUser(Request req, Response res)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
+            await using var context = container.Resolve<IReadUserContext>();
             var session = req.GetData<UserSession>();
             
-            var user = await context.Users.FindAsync(session.UserId);
+            var user = await context.Users.OneById(session.UserId);
 
             return await res.SendMapped<User, UserDto>(container.Resolve<IDatabaseMapper>(), user);
         }
@@ -106,9 +107,11 @@ namespace NxPlx.WebApi.Routes
             };
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
-            await context.AddAsync(user);
-            await context.SaveChangesAsync();
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
+            
+            transaction.Users.Add(user);
+            await transaction.Commit();
 
             container.Resolve<ILoggingService>()
                 .Info("Created user {Username}", user.Username);
@@ -132,8 +135,9 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<UserContext>();
-            var user = await context.Users.FindAsync(session.UserId);
+            await using var context = container.Resolve<IReadUserContext>();
+            await using var transaction = context.BeginTransactionedContext();
+            var user = await transaction.Users.OneById(session.UserId);
 
             if (user == null || !PasswordUtils.Verify(oldPassword, user.PasswordHash))
             {
@@ -142,7 +146,7 @@ namespace NxPlx.WebApi.Routes
 
             user.PasswordHash = PasswordUtils.Hash(password1);
             user.HasChangedPassword = true;
-            await context.SaveChangesAsync();
+            await transaction.Commit();
             
             container.Resolve<ILoggingService>()
                 .Info("User {Username} changed password", user.Username);
