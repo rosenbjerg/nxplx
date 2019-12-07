@@ -37,22 +37,13 @@ namespace NxPlx.Services.Database.Wrapper
         public new IEntitySet<User> Users => _users.Value;
         public new IEntitySet<UserSession> UserSessions => _userSessions.Value;
 
-        public Task Commit()
+        public Task SaveChanges()
         {
-            return _transaction.CommitAsync();
+            return Context.SaveChangesAsync();
         }
 
         public override async ValueTask DisposeAsync()
         {
-            try
-            {
-                await Context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                await _transaction.RollbackAsync();
-            }
-
             await _transaction.DisposeAsync();
             await base.DisposeAsync();
         }

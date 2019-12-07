@@ -34,7 +34,7 @@ namespace NxPlx.Services.Database.Wrapper
         public new IEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
         public new IEntitySet<Library> Libraries => _libraries.Value;
 
-        public Task Commit()
+        public Task SaveChanges()
         {
             return _transaction.CommitAsync();
         }

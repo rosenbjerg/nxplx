@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace NxPlx.Abstractions.Database
 {
@@ -8,8 +10,8 @@ namespace NxPlx.Abstractions.Database
         void Add(TEntity entity);
         void Add(IEnumerable<TEntity> entities);
 
-        void AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector);
-        void AddOrUpdate<TPrimaryKey>(IEnumerable<TEntity> entities, Func<TEntity, TPrimaryKey> keySelector);
+        Task AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector);
+        Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Expression<Func<TEntity, TPrimaryKey>> keySelector);
         
         void Remove(TEntity entity);
         void Remove(IEnumerable<TEntity> entities);

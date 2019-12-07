@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Configuration;
 using NxPlx.Models;
@@ -72,20 +74,16 @@ namespace NxPlx.Services.Database
 
     public static class DbUtils
     {
-        public static void AddOrUpdate(this DbContext context, EntityBase entity)
+        public static async Task AddOrUpdate<TEntity>(this DbContext context, IList<TEntity> entities)
+            where TEntity : EntityBase
         {
-            context.Entry(entity).State = entity.Id == 0 ?
-                EntityState.Added :
-                EntityState.Modified;
-        }
-        public static void AddOrUpdate(this DbContext context, IEnumerable<EntityBase> entities)
-        {
-            foreach (var entity in entities)
-            {
-                context.Entry(entity).State = entity.Id == 0 ?
-                    EntityState.Added :
-                    EntityState.Modified;
-            }
+            var set = context.Set<TEntity>();
+            var ids = entities.Select(e => e.Id).ToList();
+            var existingIds = await set.Where(e => ids.Contains(e.Id)).Select(e => e.Id).ToListAsync();
+
+            var existingEntities = entities.Where(e => existingIds.Contains(e.Id)).ToList();
+            set.AddRange(entities.Except(existingEntities));
+            set.UpdateRange(existingEntities);
         }
     }
 }

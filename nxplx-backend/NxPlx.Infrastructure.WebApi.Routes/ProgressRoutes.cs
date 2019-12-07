@@ -30,16 +30,23 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             await using var context = container.Resolve<IReadUserContext>();
             await using var transaction = context.BeginTransactionedContext();
 
-            var progress = new WatchingProgress
-            {
-                UserId = session.UserId,
-                FileId = fileId,
-                LastWatched = DateTime.UtcNow,
-                Time = progressValue.value
-            };
+            var progress =
+                await transaction.WatchingProgresses.One(wp => wp.UserId == session.UserId && wp.FileId == fileId);
 
-            transaction.WatchingProgresses.AddOrUpdate(progress, p => (p.UserId, p.FileId));
-            await transaction.Commit();
+            if (progress == null)
+            {
+                progress = new WatchingProgress
+                {
+                    UserId = session.UserId,
+                    FileId = fileId
+                };
+                transaction.WatchingProgresses.Add(progress);
+            }
+
+            progress.LastWatched = DateTime.UtcNow;
+            progress.Time = progressValue.value;
+
+            await transaction.SaveChanges();
 
             return await res.SendStatus(HttpStatusCode.OK);
         }

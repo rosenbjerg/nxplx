@@ -5,6 +5,6 @@ namespace NxPlx.Abstractions.Database
 {
     public interface IContext : IAsyncDisposable
     {
-        Task Commit();
+        Task SaveChanges();
     }
 }

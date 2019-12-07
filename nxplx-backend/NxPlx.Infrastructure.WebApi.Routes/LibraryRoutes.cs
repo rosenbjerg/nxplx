@@ -63,7 +63,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             await using var transaction = context.BeginTransactionedContext();
             
             transaction.Libraries.Add(lib);
-            await transaction.Commit();
+            await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>()
                 .Info("Created library {Name} with {Path}", lib.Name, lib.Path);
@@ -87,7 +87,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 {
                     user.LibraryAccessIds.Remove(libraryId);
                 }
-                await transaction.Commit();
+                await transaction.SaveChanges();
             }
             
             await using (var context = container.Resolve<IReadMediaContext>())
@@ -107,7 +107,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 }
                 
                 transaction.Libraries.Remove(library);
-                await transaction.Commit();
+                await transaction.SaveChanges();
             }
             
             container.Resolve<ILoggingService>()
@@ -163,7 +163,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             }
 
             user.LibraryAccessIds = libraryIds;
-            await transaction.Commit();
+            await transaction.SaveChanges();
             
             container.Resolve<ILoggingService>()
                 .Info("Updated library permissions for user {Username}: {Permissions}", user.Username, string.Join(' ', user.LibraryAccessIds));

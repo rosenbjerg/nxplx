@@ -62,16 +62,22 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<IReadUserContext>();
             await using var transaction = ctx.BeginTransactionedContext();
+            
+            var preference =
+                await transaction.SubtitlePreferences.One(wp => wp.UserId == session.UserId && wp.FileId == fileId);
 
-            var preference = new SubtitlePreference
+            if (preference == null)
             {
-                UserId = session.UserId,
-                FileId = fileId,
-                Language = language.value
-            };
+                preference = new SubtitlePreference
+                {
+                    UserId = session.UserId,
+                    FileId = fileId
+                };
+                transaction.SubtitlePreferences.Add(preference);
+            }
 
-            transaction.SubtitlePreferences.AddOrUpdate(preference, sp => (sp.UserId, sp.FileId));
-            await transaction.Commit();
+            preference.Language = language.value;
+            await transaction.SaveChanges();
             
             return await res.SendStatus(HttpStatusCode.OK);
         }

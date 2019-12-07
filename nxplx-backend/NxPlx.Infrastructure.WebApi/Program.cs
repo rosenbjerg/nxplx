@@ -1,22 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.IoC.Conventions;
+using NxPlx.Infrastructure.Logging;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes;
 using NxPlx.Models;
+using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
+using NxPlx.Services.Index;
 using Red;
 using Red.CookieSessions;
 using Red.CookieSessions.EFCore;
+using BindingFlags = System.Reflection.BindingFlags;
 using Utils = NxPlx.Infrastructure.WebApi.Routes.Utils;
 
 namespace NxPlx.WebApi
 {
+
+    
     class Program
     {
         static async Task Main(string[] args)
@@ -95,7 +104,7 @@ namespace NxPlx.WebApi
                     PasswordHash = PasswordUtils.Hash("changemebaby")
                 };
                 transaction.Users.Add(admin);
-                await transaction.Commit();
+                await transaction.SaveChanges();
 
                 logger.Trace("No users found. Default admin account created");
             }

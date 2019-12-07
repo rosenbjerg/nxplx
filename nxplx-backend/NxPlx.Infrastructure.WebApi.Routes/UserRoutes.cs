@@ -44,7 +44,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 user.Email = email;
             }
 
-            await transaction.Commit();
+            await transaction.SaveChanges();
             return await res.SendStatus(HttpStatusCode.OK);
         }
 
@@ -64,7 +64,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             }
 
             transaction.Users.Remove(user);
-            await transaction.Commit();
+            await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>()
                 .Info("Deleted user {Username}", user.Username);
@@ -111,7 +111,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             await using var transaction = context.BeginTransactionedContext();
             
             transaction.Users.Add(user);
-            await transaction.Commit();
+            await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>()
                 .Info("Created user {Username}", user.Username);
@@ -146,7 +146,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
             user.PasswordHash = PasswordUtils.Hash(password1);
             user.HasChangedPassword = true;
-            await transaction.Commit();
+            await transaction.SaveChanges();
             
             container.Resolve<ILoggingService>()
                 .Info("User {Username} changed password", user.Username);

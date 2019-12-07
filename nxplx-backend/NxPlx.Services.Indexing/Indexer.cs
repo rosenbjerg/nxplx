@@ -16,21 +16,25 @@ namespace NxPlx.Services.Index
 {
     public class Indexer : IIndexer
     {
-        private IDetailsApi _detailsApi;
-        private IDatabaseMapper _databaseMapper;
-        private ILoggingService _loggingService;
+        private readonly IDetailsApi _detailsApi;
+        private readonly IDatabaseMapper _databaseMapper;
+        private readonly ILoggingService _loggingService;
+        private readonly ICachingService _cachingService;
 
-        public Indexer(IDetailsApi detailsApi, IDatabaseMapper databaseMapper, ILoggingService loggingService)
+        public Indexer(
+            IDetailsApi detailsApi,
+            IDatabaseMapper databaseMapper,
+            ILoggingService loggingService,
+            ICachingService cachingService)
         {
             _detailsApi = detailsApi;
             _databaseMapper = databaseMapper;
             _loggingService = loggingService;
+            _cachingService = cachingService;
         }
 
         public async Task IndexLibraries(IEnumerable<Library> libraries)
         {
-            var container = ResolveContainer.Default();
-            var cacher = container.Resolve<ICachingService>();
             foreach (var library in libraries)
             {
                 switch (library.Kind)
@@ -44,7 +48,7 @@ namespace NxPlx.Services.Index
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                await cacher.RemoveAsync("OVERVIEW:*");
+                await _cachingService.RemoveAsync("OVERVIEW:*");
             }
         }
 
@@ -54,7 +58,7 @@ namespace NxPlx.Services.Index
             var startTime = DateTime.UtcNow;
             
             var fileIndexer = new FileIndexer();
-            using var ctx = new MediaContext();
+            await using var ctx = new MediaContext();
 
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
             var newFilm = fileIndexer.IndexFilm(currentFilm, library);
@@ -69,12 +73,12 @@ namespace NxPlx.Services.Index
             var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
             var movieCollections = await details.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection).GetUniqueNew();
             
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(productionCountries);
-            await ctx.AddRangeAsync(spokenLanguages);
-            await ctx.AddRangeAsync(productionCompanies);
-            await ctx.AddRangeAsync(movieCollections);
-            await ctx.AddRangeAsync(newFilm);
+            ctx.AddRange(genres);
+            ctx.AddRange(productionCountries);
+            ctx.AddRange(spokenLanguages);
+            ctx.AddRange(productionCompanies);
+            ctx.AddRange(movieCollections);
+            ctx.AddRange(newFilm);
             var databaseDetails = _databaseMapper.MapMany<FilmDetails, DbFilmDetails>(details);
             var newDetails = await databaseDetails.GetUniqueNew();
             await ctx.AddRangeAsync(newDetails);
@@ -142,13 +146,13 @@ namespace NxPlx.Services.Index
             var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew();
             var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
             
-            await ctx.AddRangeAsync(newEpisodes);
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(networks);
-            await ctx.AddRangeAsync(creators);
-            await ctx.AddRangeAsync(productionCompanies);
-            var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details);
-            ctx.AddOrUpdate(databaseDetails);
+            ctx.AddRange(newEpisodes);
+            ctx.AddRange(genres);
+            ctx.AddRange(networks);
+            ctx.AddRange(creators);
+            ctx.AddRange(productionCompanies);
+            var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details).ToList();
+            await ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();
             _loggingService.Info("Finished saving new series, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));

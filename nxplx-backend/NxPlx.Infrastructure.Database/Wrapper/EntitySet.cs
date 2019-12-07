@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions.Database;
 
@@ -23,19 +26,25 @@ namespace NxPlx.Services.Database.Wrapper
             DbSet.AddRange(entities);
         }
 
-        public void AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector)
+        public async Task AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector)
         {
-            _context.Entry(entity).State = keySelector(entity).Equals(default) ?
-                EntityState.Added :
-                EntityState.Modified;
+            var set = _context.Set<TEntity>();
+            var existing = await set.FindAsync(keySelector(entity));
+            
+            if (existing == null) set.Add(entity);
+            else set.Update(entity);
         }
 
-        public void AddOrUpdate<TPrimaryKey>(IEnumerable<TEntity> entities, Func<TEntity, TPrimaryKey> keySelector)
+        public async Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Expression<Func<TEntity, TPrimaryKey>> keySelector)
         {
-            foreach (var entity in entities)
-            {
-                AddOrUpdate(entity, keySelector);
-            }
+            var set = _context.Set<TEntity>();
+            var keySelectorFunc = keySelector.Compile();
+            var ids = entities.Select(keySelectorFunc).ToList();
+            var existingIds = await set.Where(e => ids.Contains(keySelectorFunc(e))).Select(keySelector).ToListAsync();
+
+            var existingEntities = entities.Where(e => existingIds.Contains(keySelectorFunc(e))).ToList();
+            set.AddRange(entities.Except(existingEntities));
+            set.UpdateRange(existingEntities);
         }
 
         public void Remove(TEntity entity)

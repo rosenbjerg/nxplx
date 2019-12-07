@@ -53,7 +53,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             }
 
             transaction.UserSessions.Remove(session);
-            await transaction.Commit();
+            await transaction.SaveChanges();
             
             return await res.SendStatus(HttpStatusCode.OK);
         }
