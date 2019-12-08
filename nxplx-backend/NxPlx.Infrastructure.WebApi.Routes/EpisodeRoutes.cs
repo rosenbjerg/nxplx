@@ -26,8 +26,37 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
             router.Get("/watch/:file_id", Authenticated.User, StreamFile);
+            router.Get("/next/:file_id", Authenticated.User, GetNext);
         }
 
+        private static async Task<HandlerType> GetNext(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var libraryAccess = session.User.LibraryAccessIds;
+            
+            var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            
+            var container = ResolveContainer.Default();
+            await using var ctx = container.Resolve<IReadMediaContext>();
+            var current = await ctx.EpisodeFiles.OneById(fileId);
+
+            var season = await ctx.EpisodeFiles.Many(ef =>
+                (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)) &&
+                ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
+                ef.EpisodeNumber > current.EpisodeNumber);
+            var next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
+
+            if (next == null)
+            {
+                season = await ctx.EpisodeFiles.Many(ef =>
+                    (session.IsAdmin || libraryAccess.Contains(ef.PartOfLibraryId)) &&
+                    ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1);
+                next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
+            }
+
+            return await res.SendMapped<EpisodeFile, NextEpisodeDto>(container.Resolve<IDatabaseMapper>(), next);
+        }
+        
         private static async Task<HandlerType> StreamFile(Request req, Response res)
         {
             var session = req.GetData<UserSession>();

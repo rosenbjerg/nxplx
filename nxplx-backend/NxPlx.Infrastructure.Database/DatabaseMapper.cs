@@ -191,6 +191,12 @@ namespace NxPlx.Services.Database
                 title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}",
                 subtitles = episodeFile.Subtitles.Select(s => s.Language)
             });
+            SetMapping<EpisodeFile, NextEpisodeDto>(episodeFile => new NextEpisodeDto
+            {
+                fid = episodeFile.Id,
+                poster = episodeFile.SeriesDetails.PosterPath,
+                title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}"
+            });
             SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto
             {
                 id = subtitleFile.Id,

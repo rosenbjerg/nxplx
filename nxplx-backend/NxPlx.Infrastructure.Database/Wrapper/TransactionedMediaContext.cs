@@ -36,14 +36,14 @@ namespace NxPlx.Services.Database.Wrapper
 
         public Task SaveChanges()
         {
-            return _transaction.CommitAsync();
+            return Context.SaveChangesAsync();
         }
 
         public override async ValueTask DisposeAsync()
         {
             try
             {
-                await Context.SaveChangesAsync();
+                await _transaction.CommitAsync();
             }
             catch (DbUpdateException)
             {

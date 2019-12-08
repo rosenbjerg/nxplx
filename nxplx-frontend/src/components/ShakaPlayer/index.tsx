@@ -62,6 +62,7 @@ const initPlayer = async (
     videoRef.ontimeupdate = () => props.events("time_changed", { time: videoRef.currentTime });
     videoRef.onplay = () => props.events("state_changed", { state: "playing", time: videoRef.currentTime });
     videoRef.onpause = () => props.events("state_changed", { state: "paused", time: videoRef.currentTime });
+    videoRef.onended = () => props.events("state_changed", { state: "ended", time: videoRef.currentTime });
     videoRef.muted = props.muted;
     videoRef.volume = props.volume;
     try {

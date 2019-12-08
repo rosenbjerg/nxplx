@@ -44,6 +44,15 @@ namespace NxPlx.Services.Database.Wrapper
 
         public override async ValueTask DisposeAsync()
         {
+            try
+            {
+                await _transaction.CommitAsync();
+            }
+            catch (DbUpdateException)
+            {
+                await _transaction.RollbackAsync();
+            }
+
             await _transaction.DisposeAsync();
             await base.DisposeAsync();
         }

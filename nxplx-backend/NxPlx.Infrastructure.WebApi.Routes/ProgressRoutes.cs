@@ -44,8 +44,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             }
 
             progress.LastWatched = DateTime.UtcNow;
+                
+            await transaction.SaveChanges();
             progress.Time = progressValue.value;
-
+                
             await transaction.SaveChanges();
 
             return await res.SendStatus(HttpStatusCode.OK);
