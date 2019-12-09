@@ -60,7 +60,7 @@ namespace NxPlx.Services.Database.Wrapper
             Expression<Func<TEntity, TProjection>> projection,
             params Expression<Func<TEntity, object>>[] includes)
         {
-            return WithIncludes(includes).Where(predicate).Select(projection).Distinct().FirstOrDefaultAsync();
+            return WithIncludes(includes).Where(predicate).Select(projection).FirstOrDefaultAsync();
         }
 
         public Task<List<TProjection>> ProjectMany<TProjection>(

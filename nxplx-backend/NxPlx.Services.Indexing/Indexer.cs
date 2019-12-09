@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
@@ -131,8 +132,9 @@ namespace NxPlx.Services.Index
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
             
             var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
-            var deletedEpisodes = ctx.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path));
+            var deletedEpisodes = await ctx.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
             ctx.EpisodeFiles.RemoveRange(deletedEpisodes);
+            if (deletedEpisodes.Any()) _loggingService.Info("Deleted {DeletedAmount} episodes from {LibraryName} because files were remove, after {ScanTime} seconds", deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             await transaction.CommitAsync();
             
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);

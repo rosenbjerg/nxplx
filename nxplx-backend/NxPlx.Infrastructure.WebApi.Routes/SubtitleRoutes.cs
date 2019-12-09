@@ -103,11 +103,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var container = ResolveContainer.Default();
             await using var ctx = container.Resolve<IReadMediaContext>();
             
-            MediaFileBase file = await ctx.FilmFiles.OneById(id);
-            if (file == default)
-            {
-                file = await ctx.EpisodeFiles.OneById(id);
-            }
+            var file = await ctx.FilmFiles.OneById(id) ?? (MediaFileBase) await ctx.EpisodeFiles.OneById(id);
 
             if (file == default)
             {
