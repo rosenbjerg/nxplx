@@ -1,17 +1,16 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class SubtitleRoutes
     {
@@ -33,11 +32,11 @@ namespace NxPlx.WebApi.Routes
             var kind = req.Context.ExtractUrlParameter("kind");
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
 
             var file = kind == "film"
-                ? (MediaFileBase) await ctx.FilmFiles.FindAsync(id)
-                : await ctx.EpisodeFiles.FindAsync(id);
+                ? (MediaFileBase) await ctx.FilmFiles.OneById(id)
+                : await ctx.EpisodeFiles.OneById(id);
             
             if (file == default)
             {
@@ -61,21 +60,25 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<UserContext>();
-
-            var preference = await ctx.SubtitlePreferences
-                .Where(sp => sp.UserId == session.UserId && sp.FileId == fileId)
-                .FirstOrDefaultAsync();
+            await using var ctx = container.Resolve<IReadUserContext>();
+            await using var transaction = ctx.BeginTransactionedContext();
+            
+            var preference =
+                await transaction.SubtitlePreferences.One(wp => wp.UserId == session.UserId && wp.FileId == fileId);
 
             if (preference == null)
             {
-                preference = new SubtitlePreference {UserId = session.UserId, FileId = fileId};
-                await ctx.AddAsync(preference);
+                preference = new SubtitlePreference
+                {
+                    UserId = session.UserId,
+                    FileId = fileId
+                };
+                transaction.SubtitlePreferences.Add(preference);
             }
 
             preference.Language = language.value;
-
-            await ctx.SaveChangesAsync();
+            await transaction.SaveChanges();
+            
             return await res.SendStatus(HttpStatusCode.OK);
         }
 
@@ -85,12 +88,10 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<UserContext>();
+            await using var ctx = container.Resolve<IReadUserContext>();
 
             var preference = await ctx.SubtitlePreferences
-                .Where(sp => sp.UserId == session.UserId && sp.FileId == id)
-                .Select(sp => sp.Language)
-                .FirstOrDefaultAsync();
+                .ProjectOne(sp => sp.UserId == session.UserId && sp.FileId == id, sp => sp.Language);
 
             return await res.SendString(preference ?? "none");
         }
@@ -100,12 +101,12 @@ namespace NxPlx.WebApi.Routes
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
+            await using var ctx = container.Resolve<IReadMediaContext>();
             
-            MediaFileBase file = await ctx.FilmFiles.FindAsync(id);
+            MediaFileBase file = await ctx.FilmFiles.OneById(id);
             if (file == default)
             {
-                file = await ctx.EpisodeFiles.FindAsync(id);
+                file = await ctx.EpisodeFiles.OneById(id);
             }
 
             if (file == default)

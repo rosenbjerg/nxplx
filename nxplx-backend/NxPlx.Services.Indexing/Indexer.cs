@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
@@ -13,23 +14,27 @@ using NxPlx.Services.Database;
 
 namespace NxPlx.Services.Index
 {
-    public class Indexer
+    public class Indexer : IIndexer
     {
-        private IDetailsApi _detailsApi;
-        private IDatabaseMapper _databaseMapper;
-        private ILoggingService _loggingService;
+        private readonly IDetailsApi _detailsApi;
+        private readonly IDatabaseMapper _databaseMapper;
+        private readonly ILoggingService _loggingService;
+        private readonly ICachingService _cachingService;
 
-        public Indexer(IDetailsApi detailsApi, IDatabaseMapper databaseMapper, ILoggingService loggingService)
+        public Indexer(
+            IDetailsApi detailsApi,
+            IDatabaseMapper databaseMapper,
+            ILoggingService loggingService,
+            ICachingService cachingService)
         {
             _detailsApi = detailsApi;
             _databaseMapper = databaseMapper;
             _loggingService = loggingService;
+            _cachingService = cachingService;
         }
 
         public async Task IndexLibraries(IEnumerable<Library> libraries)
         {
-            var container = ResolveContainer.Default();
-            var cacher = container.Resolve<ICachingService>();
             foreach (var library in libraries)
             {
                 switch (library.Kind)
@@ -43,7 +48,7 @@ namespace NxPlx.Services.Index
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-                await cacher.RemoveAsync("OVERVIEW:*");
+                await _cachingService.RemoveAsync("OVERVIEW:*");
             }
         }
 
@@ -53,7 +58,7 @@ namespace NxPlx.Services.Index
             var startTime = DateTime.UtcNow;
             
             var fileIndexer = new FileIndexer();
-            using var ctx = new MediaContext();
+            await using var ctx = new MediaContext();
 
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
             var newFilm = fileIndexer.IndexFilm(currentFilm, library);
@@ -68,12 +73,12 @@ namespace NxPlx.Services.Index
             var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
             var movieCollections = await details.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection).GetUniqueNew();
             
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(productionCountries);
-            await ctx.AddRangeAsync(spokenLanguages);
-            await ctx.AddRangeAsync(productionCompanies);
-            await ctx.AddRangeAsync(movieCollections);
-            await ctx.AddRangeAsync(newFilm);
+            ctx.AddRange(genres);
+            ctx.AddRange(productionCountries);
+            ctx.AddRange(spokenLanguages);
+            ctx.AddRange(productionCompanies);
+            ctx.AddRange(movieCollections);
+            ctx.AddRange(newFilm);
             var databaseDetails = _databaseMapper.MapMany<FilmDetails, DbFilmDetails>(details);
             var newDetails = await databaseDetails.GetUniqueNew();
             await ctx.AddRangeAsync(newDetails);
@@ -121,8 +126,15 @@ namespace NxPlx.Services.Index
             
             var fileIndexer = new FileIndexer();
             await using var ctx = new MediaContext();
+            await using var transaction = ctx.Database.BeginTransaction();
             
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
+            
+            var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
+            var deletedEpisodes = ctx.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path));
+            ctx.EpisodeFiles.RemoveRange(deletedEpisodes);
+            await transaction.CommitAsync();
+            
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);
             if (newEpisodes.Any()) _loggingService.Info("Found {NewAmount} new episode files in {LibraryName} after {ScanTime} seconds", newEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
@@ -134,13 +146,13 @@ namespace NxPlx.Services.Index
             var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew();
             var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
             
-            await ctx.AddRangeAsync(newEpisodes);
-            await ctx.AddRangeAsync(genres);
-            await ctx.AddRangeAsync(networks);
-            await ctx.AddRangeAsync(creators);
-            await ctx.AddRangeAsync(productionCompanies);
-            var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details);
-            ctx.AddOrUpdate(databaseDetails);
+            ctx.AddRange(newEpisodes);
+            ctx.AddRange(genres);
+            ctx.AddRange(networks);
+            ctx.AddRange(creators);
+            ctx.AddRange(productionCompanies);
+            var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details).ToList();
+            await ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();
             _loggingService.Info("Finished saving new series, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
@@ -174,8 +186,6 @@ namespace NxPlx.Services.Index
             return allDetails.ToList();
         }
         private Task<SeriesDetails> FetchSeriesDetails(int id, string language) => _detailsApi.FetchTvDetails(id, language);
-
- 
 
     }
 }

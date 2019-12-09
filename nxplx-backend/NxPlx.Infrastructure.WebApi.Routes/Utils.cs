@@ -2,10 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
-using NxPlx.Infrastructure.IoC;
 using Red;
 
-namespace NxPlx.WebApi
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class Utils
     {

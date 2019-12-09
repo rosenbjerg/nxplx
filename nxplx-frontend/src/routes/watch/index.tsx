@@ -12,6 +12,7 @@ import * as style from "./style.css";
 
 import ShakaPlayer from "../../components/ShakaPlayer";
 import CreateEventBroker from "../../EventBroker";
+import { route } from "preact-router";
 
 interface Props {
     store: Store<object>;
@@ -19,9 +20,10 @@ interface Props {
     fid: string
 }
 
+type PlayerStates = "playing" | "paused" | "ended" | "loading";
 interface State {
     info: FileInfo
-    playerState: "playing" | "paused" | "loading";
+    playerState: PlayerStates;
 }
 
 export default class Watch extends Component<Props, State> {
@@ -29,6 +31,8 @@ export default class Watch extends Component<Props, State> {
     private playerVolume = parseFloat(localStorage.getItem("player_volume") || "1.0") || 1.0;
     private playerAutoplay = localStorage.getItem("player_autoplay") === "true";
     private playerMuted = localStorage.getItem("player_muted") === "true";
+
+    private playNextMode = "default";
 
     private shakaComm = CreateEventBroker();
     private previousUnload?: any;
@@ -71,10 +75,16 @@ export default class Watch extends Component<Props, State> {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
 
-        this.shakaComm.subscribe<{ state: "playing" | "paused", time: number }>("state_changed", data => {
+        this.shakaComm.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
             this.playerTime = data.time;
             this.playerAutoplay = data.state === "playing";
             this.setState({ playerState: data.state });
+            if (data.state === 'ended') {
+                http.get(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(res => res.json()).then(next => {
+                    // console.log(next);
+                    route(`/watch/${this.props.kind}/${next.fid}`);
+                })
+            }
         });
         this.shakaComm.subscribe<{ time: number }>("time_changed", data => {
             this.playerTime = data.time;

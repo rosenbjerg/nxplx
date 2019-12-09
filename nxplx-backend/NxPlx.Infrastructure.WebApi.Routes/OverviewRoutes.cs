@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models.Database;
 using NxPlx.Models.Dto.Models;
-using NxPlx.Services.Database;
 using Red;
 using Red.Interfaces;
 
-namespace NxPlx.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class OverviewRoutes
     {
@@ -25,9 +24,13 @@ namespace NxPlx.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<MediaContext>();
-            
-            var libs = !session.IsAdmin ? session.User.LibraryAccessIds : ctx.Libraries.Select(l => l.Id).ToList();
+            await using var ctx = container.Resolve<IReadMediaContext>();
+
+            var libs = session.User.LibraryAccessIds;
+            if (session.IsAdmin)
+            {
+                libs = await ctx.Libraries.ProjectMany(null, l => l.Id);
+            }
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
 
             var cacher = container.Resolve<ICachingService>();
@@ -40,18 +43,11 @@ namespace NxPlx.WebApi.Routes
             
             var dtoMapper = container.Resolve<IDatabaseMapper>();
 
-            var seriesDetails = await ctx.EpisodeFiles
-                .Include(ef => ef.SeriesDetails)
-                .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
-                .Select(ef => ef.SeriesDetails)
-                .Distinct()
-                .ToListAsync();
+            var seriesDetails = await ctx.EpisodeFiles.ProjectMany(
+                ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId), ef => ef.SeriesDetails, ef => ef.SeriesDetails);
 
             var filmDetails = await ctx.FilmFiles
-                .Where(ff =>  ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId))
-                .Select(ff => ff.FilmDetails)
-                .Distinct()
-                .ToListAsync();
+                .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), ff => ff.FilmDetails, ff => ff.FilmDetails);
             
             var overview = new List<OverviewElementDto>(filmDetails.Count + seriesDetails.Count);
             overview.AddRange(dtoMapper.MapMany<DbSeriesDetails, OverviewElementDto>(seriesDetails));

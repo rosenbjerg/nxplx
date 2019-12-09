@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <LangVersion>8</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
+      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -5,7 +5,7 @@ using Red;
 using Red.Validation;
 using Validation;
 
-namespace NxPlx.WebApi
+namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class Validated
     {
