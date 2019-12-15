@@ -10,9 +10,9 @@ import http from "../../Http";
 import { FileInfo } from "../../models";
 import * as style from "./style.css";
 
+import { route } from "preact-router";
 import ShakaPlayer from "../../components/ShakaPlayer";
 import CreateEventBroker from "../../EventBroker";
-import { route } from "preact-router";
 
 interface Props {
     store: Store<object>;
@@ -62,6 +62,9 @@ export default class Watch extends Component<Props, State> {
                         language: lang,
                         path: `/api/subtitle/${kind}/${fid}/${lang}`
                     }))}/>
+                {state.info.subtitles.map(lang => (
+                    <track src={`/api/subtitle/${kind}/${fid}/${lang}.vtt`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
+                ))}
             </div>
         );
     }

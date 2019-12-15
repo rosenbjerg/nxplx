@@ -11,7 +11,6 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
-            
             router.WebSocket("/", Authenticated.User, Connect);
         }
 
@@ -19,17 +18,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var session = req.GetData<UserSession>();
 
-            var container = ResolveContainer.Default();
-            var broadcaster = container.Resolve<IBroadcaster<string, WebSocketDialog>>();
-
-            if (session.IsAdmin)
-            {
-                broadcaster.SubscribeAdmin(session.Id, wsd);
-            }
-            else
-            {
-                broadcaster.SubscribeAll(session.Id, wsd);
-            }
+            var broadcaster = ResolveContainer.Default().Resolve<IBroadcaster<WebSocketDialog>>();
+            broadcaster.Subscribe(session.UserId, session.IsAdmin, wsd);
 
             return wsd.Continue();
         }

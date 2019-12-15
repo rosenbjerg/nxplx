@@ -122,8 +122,8 @@ table {
     overflow-x: auto;
 }
 td {
-    padding-left: 13px;
-    padding-right: 13px;
+    padding-left: 3px;
+    padding-right: 3px;
 }
 td:first-child {
     padding-left: 0;

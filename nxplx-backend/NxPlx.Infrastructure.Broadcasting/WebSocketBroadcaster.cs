@@ -1,4 +1,7 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -7,45 +10,59 @@ using Red;
 
 namespace NxPlx.Infrastructure.Broadcasting
 {
-    public class WebSocketBroadcaster : IBroadcaster<string, WebSocketDialog>, IBroadcaster
+    public class WebSocketBroadcaster : IBroadcaster<WebSocketDialog>
     {
-        private ConcurrentDictionary<string, WebSocketDialog> _all = new ConcurrentDictionary<string, WebSocketDialog>();
-        private ConcurrentDictionary<string, WebSocketDialog> _admin = new ConcurrentDictionary<string, WebSocketDialog>();
+        private readonly List<WebsocketSession> _all = new List<WebsocketSession>();
+        private readonly object _lock = new object();
         
-        public Task BroadcastAdmin<T>(T obj)
+        public Task BroadcastAdmin(object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return Task.WhenAll(_admin.Values.Select(channel => channel.SendText(message)));
+            return Task.WhenAll(GetSessions(s => s.Admin).Select(dialog => dialog.SendText(message)));
         }
 
-        public Task BroadcastAll<T>(T obj)
+        public Task BroadcastAll(object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return Task.WhenAll(_all.Values.Select(channel => channel.SendText(message)));
+            return Task.WhenAll(GetSessions().Select(dialog => dialog.SendText(message)));
         }
 
-        public Task BroadcastTo<T>(string key, T obj)
+        public Task BroadcastTo(int key, object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return _all[key].SendText(message);
+            return Task.WhenAll(GetSessions(s => s.UserId == key).Select(dialog => dialog.SendText(message)));
         }
 
-        public void Unsubscribe(string key)
+        private IEnumerable<WebSocketDialog> GetSessions(Func<WebsocketSession, bool> predicate = null)
         {
-            _all.TryRemove(key, out _);
-            _admin.TryRemove(key, out _);
+            IList<WebsocketSession> receivers;
+            lock (_lock)
+            {
+                receivers = predicate == null ? _all.ToList() : _all.Where(predicate).ToList();
+            }
+            return receivers.Select(r => r.WebSocketDialog);
         }
 
-        public void SubscribeAdmin(string key, WebSocketDialog channel)
+        public void Subscribe(int key, bool admin, WebSocketDialog channel)
         {
-            _admin[key] = channel;
-            _all[key] = channel;
-            channel.OnClosed += (sender, args) => Unsubscribe(key);
+            var session = new WebsocketSession
+            {
+                UserId = key,
+                WebSocketDialog = channel,
+                Admin = admin
+            };
+            lock (_lock) _all.Add(session);
+            channel.OnClosed += (sender, args) =>
+            {
+                lock (_lock) _all.Remove(session);
+            };
         }
+    }
 
-        public void SubscribeAll(string key, WebSocketDialog channel)
-        {
-            _all[key] = channel;
-        }
+    class WebsocketSession
+    {
+        public bool Admin;
+        public int UserId;
+        public WebSocketDialog WebSocketDialog;
     }
 }
