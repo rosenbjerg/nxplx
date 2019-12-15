@@ -24,21 +24,20 @@ const uiConfig = {
     ],
     overflowMenuButtons: ["captions", "cast"]
 };
-
 const initPlayer = async (
-    videoRef: HTMLVideoElement,
+    video: HTMLVideoElement,
     containerRef: HTMLDivElement,
     setPlayer: (p: any) => void,
     setOffStorage: (p: any) => void,
     setUI: (p: any) => void,
     props: Props) => {
     if (!shaka.Player.isBrowserSupported()) {
-        console.error("Browser not suport");
+        console.error("Browser not supported");
         return;
     }
 
-    const player: shaka.Player = new shaka.Player(videoRef);
-    const ui: shaka.ui.Overlay = new shaka.ui.Overlay(player, containerRef, videoRef);
+    const player: shaka.Player = new shaka.Player(video);
+    const ui: shaka.ui.Overlay = new shaka.ui.Overlay(player, containerRef, video);
     const offStorage: shaka.offline.Storage = new shaka.offline.Storage();
     const controls = ui.getControls();
     controls.addEventListener('caststatuschanged', (event) => {
@@ -55,16 +54,13 @@ const initPlayer = async (
         }
     });
 
-    videoRef.onvolumechange = () => props.events("volume_changed", {
-        volume: videoRef.volume,
-        muted: videoRef.muted
-    });
-    videoRef.ontimeupdate = () => props.events("time_changed", { time: videoRef.currentTime });
-    videoRef.onplay = () => props.events("state_changed", { state: "playing", time: videoRef.currentTime });
-    videoRef.onpause = () => props.events("state_changed", { state: "paused", time: videoRef.currentTime });
-    videoRef.onended = () => props.events("state_changed", { state: "ended", time: videoRef.currentTime });
-    videoRef.muted = props.muted;
-    videoRef.volume = props.volume;
+    video.onvolumechange = () => props.events("volume_changed", { volume: video.volume, muted: video.muted });
+    video.ontimeupdate = () => props.events("time_changed", { time: video.currentTime });
+    video.onplay = () => props.events("state_changed", { state: "playing", time: video.currentTime });
+    video.onpause = () => props.events("state_changed", { state: "paused", time: video.currentTime });
+    video.onended = () => props.events("state_changed", { state: "ended", time: video.currentTime });
+    video.muted = props.muted;
+    video.volume = props.volume;
     try {
         // await player.load(props.mpd, props.time);
         await player.load(props.videoTrack, props.time, 'video/mp4');

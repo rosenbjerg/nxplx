@@ -37,7 +37,7 @@ export default class Season extends Component<Props, State> {
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{series.name} - Season {season.number}</h2>
                     </div>
-                    <img class={style.poster} src={imageUrl(season.poster, 342)}
+                    <img class={style.poster} src={imageUrl(season.poster, 500)}
                          alt=""/>
                     <span class={[style.info, style.marked].join(" ")}>
                     <div>

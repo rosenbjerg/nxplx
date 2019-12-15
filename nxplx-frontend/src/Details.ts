@@ -1,5 +1,5 @@
 
-export const imageUrl = (url:string, width:154|185|342|1280, fallbackUrl?:string) => {
+export const imageUrl = (url:string, width:154|300|342|500|1280, fallbackUrl?:string) => {
     if (!url && !fallbackUrl) return `/assets/images/w${width}.jpg`;
     return `/api/image/w${width}${url || fallbackUrl}`;
 };

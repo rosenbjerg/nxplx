@@ -37,7 +37,7 @@ export default class Series extends Component<Props, State> {
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                     </div>
-                    <img class={style.poster} src={imageUrl(details.poster, 342)}
+                    <img class={style.poster} src={imageUrl(details.poster, 500)}
                          alt=""/>
                     <span class={[style.info, style.marked].join(" ")}>
                         <div>
@@ -60,7 +60,7 @@ export default class Series extends Component<Props, State> {
                             .map(season => (
                                 <span class={style.seasonContainer}>
                                     <Link href={`/series/${details.id}/${season.number}`}>
-                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 154, details.poster)} title={`Season ${season.number}`} alt={season.number.toString()} />
+                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 342, details.poster)} title={`Season ${season.number}`} alt={season.number.toString()} />
                                     </Link>
                                     <b class={style.number}>S{season.number}</b>
                                 </span>
