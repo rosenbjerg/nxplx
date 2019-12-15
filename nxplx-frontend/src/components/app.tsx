@@ -21,7 +21,8 @@ if ((module as any).hot) {
 
 const store = createStore<NxPlxStore>({
     isLoggedIn: false,
-    isAdmin: false
+    isAdmin: false,
+    build: ''
 });
 
 export default class App extends Component {
@@ -48,6 +49,9 @@ export default class App extends Component {
     }
     public componentDidMount() {
         this.checkLoggedIn();
+        http.get('/api/build')
+            .then(response => response.text())
+            .then(text => store.setState({ build: text }))
     }
     private checkLoggedIn = async () => {
         const response = await http.get('/api/authentication/verify');
