@@ -35,9 +35,7 @@ export default class SessionManager extends Component<Props, State> {
                         expiration: exp,
                         expires: format(exp, 'en_UK'),
                         browser: parser.getBrowser(),
-                        device: parser.getDevice(),
                         os: parser.getOS(),
-                        arch: parser.getCPU(),
                     }
                 });
                 this.setState({ sessions: parsed });
@@ -51,9 +49,6 @@ export default class SessionManager extends Component<Props, State> {
                 <table>
                     <thead>
                         <tr>
-                            <td>Browser</td>
-                            <td>OS</td>
-                            <td>Architecture</td>
                             <td>Device</td>
                             <td>Expires</td>
                             <td/>
@@ -61,11 +56,8 @@ export default class SessionManager extends Component<Props, State> {
                     </thead>
                     <tbody>
                         {sessions.map(session => (
-                            <tr key={session.id}>
-                                <td>{session.browser.name} {session.browser.version}</td>
-                                <td>{session.os.name} {session.os.version}</td>
-                                <td>{session.arch.architecture}</td>
-                                <td>{session.device.vendor} {session.device.model} {session.device.type}</td>
+                            <tr key={session.id} title={`${session.browser.name} (${session.browser.version}) on ${session.os.name} ${session.os.version}`}>
+                                <td>{session.browser.name} on {session.os.name} {session.os.version}</td>
                                 <td title={session.expiration.toLocaleString()}>{session.expires}</td>
                                 <td>
                                     <button title="Close this session" onClick={this.closeSession(session.id)} class="material-icons bordered">close</button>
