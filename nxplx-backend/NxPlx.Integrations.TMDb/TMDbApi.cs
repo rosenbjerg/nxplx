@@ -35,6 +35,10 @@ namespace NxPlx.Integrations.TMDb
             .WithCapacity(10)
             .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(3))
             .Build();
+        private readonly ITokenBucket _imageBucket = TokenBuckets.Construct()
+            .WithCapacity(60)
+            .WithFixedIntervalRefillStrategy(60, TimeSpan.FromSeconds(3))
+            .Build();
         
         private async Task<string> Fetch(string url)
         {
@@ -123,6 +127,7 @@ namespace NxPlx.Integrations.TMDb
         {
             if (string.IsNullOrEmpty(imageUrl)) return;
             
+            _imageBucket.Consume(1);
             var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
             await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", size, imageName);
         }
