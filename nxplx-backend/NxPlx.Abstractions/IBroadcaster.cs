@@ -4,15 +4,12 @@ namespace NxPlx.Abstractions
 {
     public interface IBroadcaster
     {
-        Task BroadcastAdmin<T>(T obj);
-        Task BroadcastAll<T>(T obj);
+        Task BroadcastAdmin(object obj);
+        Task BroadcastAll(object obj);
+        Task BroadcastTo(int key, object obj);
     }
-    public interface IBroadcaster<TKey, TChannel> : IBroadcaster
+    public interface IBroadcaster<TChannel> : IBroadcaster
     {
-        Task BroadcastTo<T>(TKey key, T obj);
-
-        void Unsubscribe(TKey key);
-        void SubscribeAdmin(TKey key, TChannel channel);
-        void SubscribeAll(TKey key, TChannel channel);
+        void Subscribe(int key, bool admin, TChannel channel);
     }
 }

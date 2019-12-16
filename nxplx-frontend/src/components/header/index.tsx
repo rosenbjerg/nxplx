@@ -28,14 +28,11 @@ const actions = (store:Store<NxPlxStore>) => (
         }
     });
 
-
-
-
-const Header = connect(['isLoggedIn', 'isAdmin'], actions)(
+const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
     // @ts-ignore
-    ({ isLoggedIn, isAdmin, logout }) => (
+    ({ isLoggedIn, isAdmin, build, logout }) => (
         <header class={style.header}>
-            <Link title="Go to overview" href={'/'}>
+            <Link title={`NxPlx - v.${build}`} href={'/'}>
                 <img src="/assets/images/nxplx-cropped-h120-light.png" alt="NxPlx"/>
             </Link>
             {isLoggedIn && (

@@ -78,12 +78,15 @@ namespace NxPlx.Services.Database
             where TEntity : EntityBase
         {
             var set = context.Set<TEntity>();
-            var ids = entities.Select(e => e.Id).ToList();
-            var existingIds = await set.Where(e => ids.Contains(e.Id)).Select(e => e.Id).ToListAsync();
-
-            var existingEntities = entities.Where(e => existingIds.Contains(e.Id)).ToList();
-            set.AddRange(entities.Except(existingEntities));
-            set.UpdateRange(existingEntities);
+            var ids = entities.Where(e => e.Id != default).Select(e => e.Id).ToList();
+            var existing = await set.Where(e => ids.Contains(e.Id)).ToDictionaryAsync(e => e.Id);
+            foreach (var entity in entities)
+            {
+                if (existing.TryGetValue(entity.Id, out var existingEntity))
+                    context.Entry(existingEntity).CurrentValues.SetValues(entity);
+                else
+                    set.Add(entity);
+            }
         }
     }
 }

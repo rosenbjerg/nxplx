@@ -33,23 +33,23 @@ namespace NxPlx.Services.Index
             foreach (var seriesDetails in details)
             {
                 if (!string.IsNullOrEmpty(seriesDetails.PosterPath))
-                    imageDownloads.AddRange(ImageInMultipleSizes(seriesDetails.PosterPath, "w154", "w342"));
+                    imageDownloads.AddRange(ImageInMultipleSizes(seriesDetails.PosterPath, "w342", "w500"));
                 if (!string.IsNullOrEmpty(seriesDetails.BackdropPath))
                     imageDownloads.Add(("w1280", seriesDetails.BackdropPath));
                 foreach (var season in seriesDetails.Seasons)
                 {
-                    imageDownloads.AddRange(ImageInMultipleSizes(season.PosterPath, "w154", "w342"));
-                    imageDownloads.AddRange(season.Episodes.Select(episode => ("w185", episode.StillPath)));
+                    imageDownloads.AddRange(ImageInMultipleSizes(season.PosterPath, "w342", "w500"));
+                    imageDownloads.AddRange(season.Episodes.Select(episode => ("w300", episode.StillPath)));
                 }
             }
 
             imageDownloads.AddRange(networks
                 .Where(network => !string.IsNullOrEmpty(network.LogoPath))
-                .Select(network => ("w92", network.LogoPath)));
+                .Select(network => ("w154", network.LogoPath)));
             
             imageDownloads.AddRange(productionCompanies
                 .Where(productionCompany => !string.IsNullOrEmpty(productionCompany.LogoPath))
-                .Select(productionCompany => ("w92", productionCompany.LogoPath)));
+                .Select(productionCompany => ("w154", productionCompany.LogoPath)));
             
             return imageDownloads;
         }
@@ -60,19 +60,19 @@ namespace NxPlx.Services.Index
             foreach (var filmDetails in details)
             {
                 if (!string.IsNullOrEmpty(filmDetails.PosterPath))
-                    imageDownloads.AddRange(ImageInMultipleSizes(filmDetails.PosterPath, "w154", "w342"));
+                    imageDownloads.AddRange(ImageInMultipleSizes(filmDetails.PosterPath, "w342", "w500"));
                 if (!string.IsNullOrEmpty(filmDetails.BackdropPath))
                     imageDownloads.Add(("w1280", filmDetails.BackdropPath));
             }
 
             imageDownloads.AddRange(productionCompanies
                 .Where(productionCompany => !string.IsNullOrEmpty(productionCompany.LogoPath))
-                .Select(productionCompany => ("w92", productionCompany.LogoPath)));
+                .Select(productionCompany => ("w154", productionCompany.LogoPath)));
 
             foreach (var movieCollection in movieCollections)
             {
                 if (!string.IsNullOrEmpty(movieCollection.PosterPath))
-                    imageDownloads.AddRange(ImageInMultipleSizes(movieCollection.PosterPath, "w154", "w342"));
+                    imageDownloads.AddRange(ImageInMultipleSizes(movieCollection.PosterPath, "w342", "w500"));
                 if (!string.IsNullOrEmpty(movieCollection.BackdropPath))
                     imageDownloads.Add(("w1280", movieCollection.BackdropPath));
             }

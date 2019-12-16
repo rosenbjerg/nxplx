@@ -1,4 +1,5 @@
 import { createSnackbar } from '@snackbar/core'
+import pull from 'lodash/pull';
 import { Component, h } from "preact";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Loading from "../../components/loading"
@@ -46,7 +47,7 @@ export default class Admin extends Component<Props, State> {
                                         <td class={style.td}>{l.language}</td>
                                         <td class={style.td}>{l.path || 'not specified'}</td>
                                         <td>
-                                            <button type="button" onClick={() => http.post('/api/indexing', { value: [ l.id ] })} class="material-icons bordered">refresh</button>
+                                            <button type="button" onClick={this.indexLibrary(l)} class="material-icons bordered">refresh</button>
                                             <button type="button" onClick={this.deleteLibrary(l)} class="material-icons bordered">close</button>
                                         </td>
                                     </tr>
@@ -155,34 +156,46 @@ export default class Admin extends Component<Props, State> {
         })
     }
 
-    private deleteUser = (user:User) => async () => {
-        const response = await http.delete('/api/user', { value: user.username });
-        if (response.ok) {
-            this.setState(s => {
-                s.users.splice(s.users.indexOf(user), 1);
-            });
-        }
-        else {
-            createSnackbar('Unable to remove that user :/', { timeout: 1500 });
-        }
+    private deleteUser = (user:User) => () => {
+        this.actionStuff(
+            http.delete('/api/user', { value: user.username }),
+            () => this.setState(s => { pull(s.users, user) }),
+            `${user.username} deleted!`,
+            'Unable to remove the user :/'
+        );
     };
-    private deleteLibrary = (library:Library) => async () => {
-        const response = await http.delete('/api/library', { value: library.id });
+    private indexLibrary = (library:Library) => () => {
+        this.actionStuff(
+            http.post('/api/indexing', { value: [ library.id ] }),
+            () => { },
+            `Indexing ${library.name}..`,
+            'Unable to start indexing :/'
+        );
+    };
+    private deleteLibrary = (library:Library) => () => {
+        this.actionStuff(
+            http.delete('/api/library', { value: library.id }),
+            () => this.setState(s => { pull(s.libraries, library) }),
+            `${library.name} deleted!`,
+            'Unable to remove the library :/'
+        );
+    };
+    private actionStuff = async (httpPromise, callback, onSuccessMsg, onFailMsg) => {
+        const response = await httpPromise;
         if (response.ok) {
-            this.setState(s => {
-                s.libraries.splice(s.libraries.indexOf(library), 1);
-            });
+            createSnackbar(onSuccessMsg, { timeout: 1500 });
+            callback();
         }
-        else {
-            createSnackbar('Unable to remove that library :/', { timeout: 1500 });
-        }
+        else createSnackbar(onFailMsg, { timeout: 1500 });
     };
 
-    private indexAllLibraries = async () => {
-        const response = await http.post('/api/indexing/all');
-        if (response.ok) {
-            createSnackbar('Indexing all libraries...', { timeout: 1500 });
-        }
+    private indexAllLibraries = () => {
+        this.actionStuff(
+            http.post('/api/indexing/all'),
+            () => { },
+            `Indexing all libraries..`,
+            'Unable to remove the library :/'
+        );
     };
     private submitNewLibrary = async (ev:Event) => {
         ev.preventDefault();

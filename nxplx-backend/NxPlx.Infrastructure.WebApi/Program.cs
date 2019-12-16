@@ -63,7 +63,6 @@ namespace NxPlx.WebApi
             };
 
             await databaseContextManager.Initialize(logger);
-            await CreateAdminAccount(container);
 
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
 
@@ -85,6 +84,8 @@ namespace NxPlx.WebApi
 
             logger.Trace("All routes registered, preparing to listen on port {Port}", cfg.HttpPort);
 
+            await CreateAdminAccount(container);
+            
             await server.RunAsync(cfg.Production ? "*" : "localhost");
         }
 
@@ -93,8 +94,8 @@ namespace NxPlx.WebApi
         {
             var logger = container.Resolve<ILoggingService>();
             await using var ctx = container.Resolve<IReadUserContext>();
-            await using var transaction = ctx.BeginTransactionedContext(); 
-            if (ctx.Users.Count() == default)
+            await using var transaction = ctx.BeginTransactionedContext();
+            if (await ctx.Users.Count() == default)
             {
                 var admin = new User
                 {
