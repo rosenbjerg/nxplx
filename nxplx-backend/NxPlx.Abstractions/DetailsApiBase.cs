@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ namespace NxPlx.Abstractions
             return (content, cached);
         }
 
-        protected async Task DownloadImageInternal(string url, string size, string imageName)
+        protected async Task DownloadImageInternal(string url, string size, string imageName, bool first = true)
         {
             var sizeDir = Path.Combine(_imageFolder, size);
             var outputPath = Path.Combine(Path.Combine(sizeDir, $"{imageName}.jpg"));
@@ -57,12 +58,19 @@ namespace NxPlx.Abstractions
             
             if (!File.Exists(outputPath))
             {
-                var response = await Client.GetAsync(url);
-                using var imageStream = await response.Content.ReadAsStreamAsync();
                 try
                 {
+                    var response = await Client.GetAsync(url);
+                    using var imageStream = await response.Content.ReadAsStreamAsync();
                     using var outputStream = File.OpenWrite(outputPath);
                     await imageStream.CopyToAsync(outputStream);
+                }
+                catch (HttpRequestException)
+                {
+                    if (first)
+                        await DownloadImageInternal(url, size, imageName, false);
+                    else 
+                        LoggingService.Warn("Failed to download image {ImagePath} twice. Connection issues", outputPath);
                 }
                 catch (IOException)
                 {
