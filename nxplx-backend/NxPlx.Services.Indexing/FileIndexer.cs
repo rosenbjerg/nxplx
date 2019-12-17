@@ -98,7 +98,7 @@ namespace NxPlx.Services.Index
                 {
                     Added = DateTime.UtcNow,
                     Name = TitleCleanup(name),
-                    SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 0,
+                    SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 1,
                     EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,
                     Path = episodePath
                 };
