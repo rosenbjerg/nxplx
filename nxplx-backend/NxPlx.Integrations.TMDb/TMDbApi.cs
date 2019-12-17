@@ -19,7 +19,6 @@ namespace NxPlx.Integrations.TMDb
 {
     public class TMDbApi : DetailsApiBase
     {
-        private const int ThrottlingMs = 10000 / 40;
         private const string BaseUrl = "https://api.themoviedb.org/3";
         private readonly TMDbMapper _mapper;
         
@@ -36,8 +35,8 @@ namespace NxPlx.Integrations.TMDb
             .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(3))
             .Build();
         private readonly ITokenBucket _imageBucket = TokenBuckets.Construct()
-            .WithCapacity(60)
-            .WithFixedIntervalRefillStrategy(60, TimeSpan.FromSeconds(3))
+            .WithCapacity(100)
+            .WithFixedIntervalRefillStrategy(100, TimeSpan.FromSeconds(3))
             .Build();
         
         private async Task<string> Fetch(string url)
