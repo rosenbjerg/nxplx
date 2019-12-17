@@ -105,6 +105,7 @@ namespace NxPlx.Services.Index
             {
                 var deletedFilm = await mediaContext.FilmFiles.Where(ef => deletedFilmPaths.Contains(ef.Path)).ToListAsync();
                 await RemovePrefsAndProgressesFromDeleted(deletedFilm.Select(df => df.Id));
+                mediaContext.SubtitleFiles.RemoveRange(deletedFilm.SelectMany(e => e.Subtitles));
                 mediaContext.FilmFiles.RemoveRange(deletedFilm);
 
                 await mediaContext.SaveChangesAsync();
@@ -121,6 +122,7 @@ namespace NxPlx.Services.Index
             {
                 var deletedEpisodes = await mediaContext.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
                 await RemovePrefsAndProgressesFromDeleted(deletedEpisodes.Select(df => df.Id));
+                mediaContext.SubtitleFiles.RemoveRange(deletedEpisodes.SelectMany(e => e.Subtitles));
                 mediaContext.EpisodeFiles.RemoveRange(deletedEpisodes);
 
                 await mediaContext.SaveChangesAsync();
