@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "@types/webpack-env": "^1.13.9",
-    "css-loader": "^1.0.1",
+    "css-loader": "^3.4.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.6.0",
     "lint-staged": "^9.5.0",
@@ -56,7 +56,7 @@
     "@types/got": "^9.4.4",
     "@types/lodash": "^4.14.123",
     "@types/ua-parser-js": "^0.7.33",
-    "got": "^9.6.0",
+    "got": "^10.0.4",
     "linkstate": "^1.1.1",
     "liquid-route": "^1.1.0",
     "lodash": "^4.17.11",
