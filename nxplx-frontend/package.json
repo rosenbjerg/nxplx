@@ -33,7 +33,7 @@
   "devDependencies": {
     "@types/jest": "^23.3.10",
     "@types/webpack-env": "^1.13.9",
-    "css-loader": "^1.0.1",
+    "css-loader": "^3.4.0",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^23.6.0",
     "lint-staged": "^8.1.0",
