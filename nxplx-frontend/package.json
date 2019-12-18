@@ -31,7 +31,7 @@
     "build/*"
   ],
   "devDependencies": {
-    "@types/jest": "^23.3.10",
+    "@types/jest": "^24.0.24",
     "@types/webpack-env": "^1.13.9",
     "css-loader": "^3.4.0",
     "identity-obj-proxy": "^3.0.0",
