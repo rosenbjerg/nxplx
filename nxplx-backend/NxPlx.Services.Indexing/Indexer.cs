@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NxPlx.Abstractions;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
@@ -62,6 +63,9 @@ namespace NxPlx.Services.Index
             await using var ctx = new MediaContext();
 
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
+            
+            await RemoveDeletedMovies(library, currentFilm, ctx, startTime);
+
             var newFilm = fileIndexer.IndexFilm(currentFilm, library);
             if (newFilm.Any()) _loggingService.Info("Found {NewAmount} new film files in {LibraryName} after {ScanTime} seconds", newFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
@@ -91,6 +95,54 @@ namespace NxPlx.Services.Index
             await IndexingHelperFunctions.DownloadImages(_detailsApi, imageDownloads);
             
             _loggingService.Info("Indexing film in {LibraryName} took {Elapsed} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+        }
+
+        private async Task RemoveDeletedMovies(
+            Library library, HashSet<string> currentFilm, MediaContext mediaContext, DateTime startTime)
+        {
+            var deletedFilmPaths = currentFilm.Where(path => !File.Exists(path)).ToList();
+            if (deletedFilmPaths.Any())
+            {
+                var deletedFilm = await mediaContext.FilmFiles.Where(ef => deletedFilmPaths.Contains(ef.Path)).ToListAsync();
+                await RemovePrefsAndProgressesFromDeleted(deletedFilm.Select(df => df.Id));
+                mediaContext.SubtitleFiles.RemoveRange(deletedFilm.SelectMany(e => e.Subtitles));
+                mediaContext.FilmFiles.RemoveRange(deletedFilm);
+
+                await mediaContext.SaveChangesAsync();
+                _loggingService.Info(
+                    "Deleted {DeletedAmount} film from {LibraryName} because files were removed, after {ScanTime} seconds",
+                    deletedFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            }
+        }
+        private async Task RemoveDeletedEpisodes(
+            Library library, HashSet<string> currentEpisodes, MediaContext mediaContext, DateTime startTime)
+        {
+            var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
+            if (deletedEpisodePaths.Any())
+            {
+                var deletedEpisodes = await mediaContext.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
+                await RemovePrefsAndProgressesFromDeleted(deletedEpisodes.Select(df => df.Id));
+                mediaContext.SubtitleFiles.RemoveRange(deletedEpisodes.SelectMany(e => e.Subtitles));
+                mediaContext.EpisodeFiles.RemoveRange(deletedEpisodes);
+
+                await mediaContext.SaveChangesAsync();
+                _loggingService.Info(
+                    "Deleted {DeletedAmount} episodes from {LibraryName} because files were removed, after {ScanTime} seconds",
+                    deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            }
+        }
+
+        private static async Task RemovePrefsAndProgressesFromDeleted(IEnumerable<int> deletedIds)
+        {
+            await using var userContext = new UserContext();
+
+            var subtitlePreferences = userContext.SubtitlePreferences.Where(sp => deletedIds.Contains(sp.FileId));
+            userContext.SubtitlePreferences.RemoveRange(subtitlePreferences);
+
+            var watchingProgresses = userContext.WatchingProgresses.Where(wp => deletedIds.Contains(wp.FileId));
+            userContext.WatchingProgresses.RemoveRange(watchingProgresses);
+
+            await userContext.SaveChangesAsync();
         }
 
 
@@ -131,11 +183,7 @@ namespace NxPlx.Services.Index
             
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
             
-            var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
-            var deletedEpisodes = await ctx.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
-            ctx.EpisodeFiles.RemoveRange(deletedEpisodes);
-            if (deletedEpisodes.Any()) _loggingService.Info("Deleted {DeletedAmount} episodes from {LibraryName} because files were remove, after {ScanTime} seconds", deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
-            await transaction.CommitAsync();
+            await RemoveDeletedEpisodes(library, currentEpisodes, ctx, startTime);
             
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);
             if (newEpisodes.Any()) _loggingService.Info("Found {NewAmount} new episode files in {LibraryName} after {ScanTime} seconds", newEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));

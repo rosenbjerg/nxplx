@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -79,35 +80,39 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
             Library library;
 
-            await using (var readUserContext = container.Resolve<IReadUserContext>())
-            await using (var transaction = readUserContext.BeginTransactionedContext())
+            await using var readUserContext = container.Resolve<IReadUserContext>();
+            await using var userTransaction = readUserContext.BeginTransactionedContext();
+            foreach (var user in await userTransaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)))
             {
-                var users = await transaction.Users.Many();
-                foreach (var user in users)
-                {
-                    user.LibraryAccessIds.Remove(libraryId);
-                }
-                await transaction.SaveChanges();
+                user.LibraryAccessIds.Remove(libraryId);
             }
-            
+            await userTransaction.SaveChanges();
+
             await using (var context = container.Resolve<IReadMediaContext>())
-            await using (var transaction = context.BeginTransactionedContext())
+            await using (var mediaTransaction = context.BeginTransactionedContext())
             {
-                library = await transaction.Libraries.OneById(libraryId);
+                library = await mediaTransaction.Libraries.OneById(libraryId);
 
                 if (library.Kind == LibraryKind.Film)
                 {
-                    var film = await transaction.FilmFiles.Many(f => f.PartOfLibraryId == libraryId);
-                    transaction.FilmFiles.Remove(film);
+                    var film = await mediaTransaction.FilmFiles.Many(f => f.PartOfLibraryId == libraryId);
+                    var ids = film.Select(f => f.Id).ToList();
+                    userTransaction.WatchingProgresses.Remove(await userTransaction.WatchingProgresses.Many(wp => ids.Contains(wp.FileId)));
+                    userTransaction.SubtitlePreferences.Remove(await userTransaction.SubtitlePreferences.Many(wp => ids.Contains(wp.FileId)));
+                    mediaTransaction.FilmFiles.Remove(film);
                 }
                 else
                 {
-                    var episodes = await transaction.EpisodeFiles.Many(f => f.PartOfLibraryId == libraryId);
-                    transaction.EpisodeFiles.Remove(episodes);
+                    var episodes = await mediaTransaction.EpisodeFiles.Many(f => f.PartOfLibraryId == libraryId);
+                    var ids = episodes.Select(f => f.Id).ToList();
+                    userTransaction.WatchingProgresses.Remove(await userTransaction.WatchingProgresses.Many(wp => ids.Contains(wp.FileId)));
+                    userTransaction.SubtitlePreferences.Remove(await userTransaction.SubtitlePreferences.Many(wp => ids.Contains(wp.FileId)));
+                    mediaTransaction.EpisodeFiles.Remove(episodes);
                 }
                 
-                transaction.Libraries.Remove(library);
-                await transaction.SaveChanges();
+                await userTransaction.SaveChanges();
+                mediaTransaction.Libraries.Remove(library);
+                await mediaTransaction.SaveChanges();
             }
             
             container.Resolve<ILoggingService>()
