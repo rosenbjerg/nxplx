@@ -3,7 +3,7 @@ using NxPlx.Models.Dto.Models.Film;
 
 namespace NxPlx.Models.Dto.Models.Series
 {
-    public class SeriesDto
+    public class SeriesDto : IDto
     {
         public int id { get; set; }
 

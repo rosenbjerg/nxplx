@@ -1,6 +1,6 @@
 namespace NxPlx.Models.Dto.Models
 {
-    public class SubtitleFileDto
+    public class SubtitleFileDto : IDto
     {
         public int id { get; set; }
 

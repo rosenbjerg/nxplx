@@ -1,6 +1,6 @@
 namespace NxPlx.Models.Dto.Models
 {
-    public class OverviewElementDto
+    public class OverviewElementDto : IDto
     {
         public int id { get; set; }
         public string title { get; set; }

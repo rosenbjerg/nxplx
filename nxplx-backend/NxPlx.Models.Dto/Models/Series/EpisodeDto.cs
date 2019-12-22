@@ -2,7 +2,7 @@ using System;
 
 namespace NxPlx.Models.Dto.Models.Series
 {
-    public class EpisodeDto
+    public class EpisodeDto : IDto
     {
         public DateTime? airDate { get; set; }
         public int number { get; set; }

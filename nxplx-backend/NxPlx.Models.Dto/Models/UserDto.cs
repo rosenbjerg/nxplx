@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Dto.Models
 {
-    public class UserDto
+    public class UserDto : IDto
     {
         public int id { get; set; }
         public string username { get; set; }

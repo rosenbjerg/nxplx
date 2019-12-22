@@ -1,6 +1,6 @@
 namespace NxPlx.Models.Dto.Models
 {
-    public class LibraryDto
+    public class LibraryDto : IDto
     {
         public int id { get; set; }
         public string name { get; set; }
