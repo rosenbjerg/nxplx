@@ -1,7 +1,7 @@
 ﻿using System;
 using Crypt = BCrypt.Net.BCrypt;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class PasswordUtils
     {

@@ -9,7 +9,7 @@ using NxPlx.Models.Details.Series;
 using NxPlx.Models.Dto.Models.Series;
 using NxPlx.Models.File;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class EpisodeService
     {

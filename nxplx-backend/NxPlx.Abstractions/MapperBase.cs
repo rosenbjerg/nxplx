@@ -30,7 +30,7 @@ namespace NxPlx.Abstractions
         public IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
             where TFrom : class
         {
-            if (instances == null) return Enumerable.Empty<TTo>();
+            if (instances == null || !instances.Any()) return Enumerable.Empty<TTo>();
             
             if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
             {

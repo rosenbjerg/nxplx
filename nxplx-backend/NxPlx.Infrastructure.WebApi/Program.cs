@@ -7,6 +7,7 @@ using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.IoC.Conventions;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes;
+using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models;
 using NxPlx.Services.Database;
 using Red;

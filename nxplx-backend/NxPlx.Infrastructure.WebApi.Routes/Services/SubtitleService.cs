@@ -6,7 +6,7 @@ using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 using NxPlx.Models.File;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class SubtitleService
     {

@@ -7,7 +7,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class UserService
     {

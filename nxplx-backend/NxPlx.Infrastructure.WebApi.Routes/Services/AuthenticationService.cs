@@ -3,7 +3,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class AuthenticationService
     {
@@ -13,7 +13,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             await using var context = container.Resolve<IReadUserContext>();
             var user = await context.Users.One(u => u.Username == username);
 
-            if (user != null && !PasswordUtils.Verify(password, user.PasswordHash))
+            if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
             {
                 return new UserSession
                 {
