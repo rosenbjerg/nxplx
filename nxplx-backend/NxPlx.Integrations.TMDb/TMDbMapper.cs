@@ -39,11 +39,11 @@ namespace NxPlx.Integrations.TMDb
                 VoteAverage = tvDetails.vote_average,
                 VoteCount = tvDetails.vote_count,
             
-                Genres = MapMany<Models.Genre, Genre>(tvDetails.genres).ToList(),
-                CreatedBy = MapMany<CreatedBy, Creator>(tvDetails.created_by).ToList(),
-                Networks = MapMany<Models.Tv.Network, Network>(tvDetails.networks).ToList(),
-                Seasons = MapMany<TvDetailsSeason, SeasonDetails>(tvDetails.seasons).ToList(),
-                ProductionCompanies = MapMany<Models.ProductionCompany, ProductionCompany>(tvDetails.production_companies).ToList()
+                Genres = Map<Models.Genre, Genre>(tvDetails.genres).ToList(),
+                CreatedBy = Map<CreatedBy, Creator>(tvDetails.created_by).ToList(),
+                Networks = Map<Models.Tv.Network, Network>(tvDetails.networks).ToList(),
+                Seasons = Map<TvDetailsSeason, SeasonDetails>(tvDetails.seasons).ToList(),
+                ProductionCompanies = Map<Models.ProductionCompany, ProductionCompany>(tvDetails.production_companies).ToList()
             });
             
             SetMapping<MovieDetails, FilmDetails>(movieDetails => new FilmDetails
@@ -66,10 +66,10 @@ namespace NxPlx.Integrations.TMDb
                 OriginalTitle = movieDetails.original_title,
                 ReleaseDate = movieDetails.release_date,
                 
-                Genres = MapMany<Models.Genre, Genre>(movieDetails.genres).ToList(),
-                ProductionCompanies = MapMany<Models.ProductionCompany, ProductionCompany>(movieDetails.production_companies).ToList(),
-                ProductionCountries = MapMany<Models.Movie.ProductionCountry, ProductionCountry>(movieDetails.production_countries).ToList(),
-                SpokenLanguages = MapMany<Models.Movie.SpokenLanguage, SpokenLanguage>(movieDetails.spoken_languages).ToList(),
+                Genres = Map<Models.Genre, Genre>(movieDetails.genres).ToList(),
+                ProductionCompanies = Map<Models.ProductionCompany, ProductionCompany>(movieDetails.production_companies).ToList(),
+                ProductionCountries = Map<Models.Movie.ProductionCountry, ProductionCountry>(movieDetails.production_countries).ToList(),
+                SpokenLanguages = Map<Models.Movie.SpokenLanguage, SpokenLanguage>(movieDetails.spoken_languages).ToList(),
                 BelongsToCollection = Map<Models.Movie.MovieCollection, MovieCollection>(movieDetails.belongs_to_collection),
             });
             
@@ -129,7 +129,7 @@ namespace NxPlx.Integrations.TMDb
                 AirDate = tvSeasonDetails.air_date,
                 PosterPath = tvSeasonDetails.poster_path,
                 SeasonNumber = tvSeasonDetails.season_number,
-                Episodes = MapMany<Episode, EpisodeDetails>(tvSeasonDetails.episodes).ToList()
+                Episodes = Map<Episode, EpisodeDetails>(tvSeasonDetails.episodes).ToList()
             });
             SetMapping<TvDetailsSeason, SeasonDetails>(tvSeasonDetails => new SeasonDetails
             {
@@ -158,10 +158,10 @@ namespace NxPlx.Integrations.TMDb
             });
             
             SetMapping<SearchResult<TvShowResult>, SeriesResult[]>(searchResult 
-                => MapMany<TvShowResult, SeriesResult>(searchResult.results).ToArray());
+                => Map<TvShowResult, SeriesResult>(searchResult.results).ToArray());
             
             SetMapping<SearchResult<MovieResult>, FilmResult[]>(searchResult 
-                => MapMany<MovieResult, FilmResult>(searchResult.results).ToArray());
+                => Map<MovieResult, FilmResult>(searchResult.results).ToArray());
             
             SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
             {

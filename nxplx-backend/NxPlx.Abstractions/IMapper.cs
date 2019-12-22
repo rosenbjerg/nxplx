@@ -12,7 +12,7 @@ namespace NxPlx.Abstractions
             where TTo : class
             where TFrom : class;
         
-        IEnumerable<TTo> MapMany<TFrom, TTo>(IEnumerable<TFrom> instances)
+        IEnumerable<TTo> Map<TFrom, TTo>(IEnumerable<TFrom> instances)
             where TFrom : class;
     }
 }

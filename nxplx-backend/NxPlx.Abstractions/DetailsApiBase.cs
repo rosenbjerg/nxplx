@@ -28,25 +28,18 @@ namespace NxPlx.Abstractions
             _imageFolder = imageFolder;
         }
         
-        protected async Task<(string? content, bool cached)> FetchInternal(string url)
+        protected async Task<string?> FetchInternal(string url)
         {
-            var cached = true;
-            var content = await CachingService.GetAsync(url);
+            var response = await Client.GetAsync(url);
 
-            if (string.IsNullOrEmpty(content))
+            if (response.IsSuccessStatusCode)
             {
-                var response = await Client.GetAsync(url);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    content = await response.Content.ReadAsStringAsync();
-                    await CachingService.SetAsync(url, content, CacheKind.WebRequest);
-                }
-                cached = false;
-
+                var content = await response.Content.ReadAsStringAsync();
+                await CachingService.SetAsync(url, content, CacheKind.WebRequest);
+                return content;
             }
 
-            return (content, cached);
+            return default;
         }
 
         protected async Task DownloadImageInternal(string url, string size, string imageName, bool first = true)
