@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Dto.Models.Series
 {
-    public class SeasonDto
+    public class SeasonDto : IDto
     {
         public DateTime? airDate { get; set; }
         public string name { get; set; }

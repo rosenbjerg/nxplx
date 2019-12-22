@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Dto.Models
 {
-    public class InfoDto
+    public class InfoDto : IDto
     {
         public int id { get; set; }
         public int fid { get; set; }
@@ -11,5 +11,6 @@ namespace NxPlx.Models.Dto.Models
         public string poster { get; set; }
         public string backdrop { get; set; }
         public IEnumerable<string> subtitles { get; set; }
+        public float duration { get; set; }
     }
 }

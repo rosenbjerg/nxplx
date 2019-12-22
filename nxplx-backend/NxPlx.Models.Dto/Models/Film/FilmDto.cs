@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Dto.Models.Film
 {
-    public class FilmDto
+    public class FilmDto : IDto
     {
         public int id { get; set; }
         public int fid { get; set; }

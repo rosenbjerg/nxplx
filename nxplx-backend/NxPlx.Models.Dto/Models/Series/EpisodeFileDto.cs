@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace NxPlx.Models.Dto.Models.Series
 {
-    public class EpisodeFileDto
+    public class EpisodeFileDto : IDto
     {
         public int id { get; set; }
 

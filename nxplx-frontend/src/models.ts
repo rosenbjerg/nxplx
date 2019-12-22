@@ -19,6 +19,7 @@ export interface OverviewElement { id:number; title:string; poster:string; kind:
 export interface FileInfo {
     id:number
     fid:number
+    duration:number
     title:string
     poster:string
     backdrop:string

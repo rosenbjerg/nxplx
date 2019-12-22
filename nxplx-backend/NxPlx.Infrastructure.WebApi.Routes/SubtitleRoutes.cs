@@ -1,11 +1,8 @@
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
+using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models;
-using NxPlx.Models.File;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
@@ -31,86 +28,34 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var lang = req.Context.ExtractUrlParameter("lang");
             var kind = req.Context.ExtractUrlParameter("kind");
 
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
+            var subtitlePath = await SubtitleService.GetSubtitlePath(kind, id, lang);
 
-            var file = kind == "film"
-                ? (MediaFileBase) await ctx.FilmFiles.OneById(id)
-                : await ctx.EpisodeFiles.OneById(id);
-            
-            if (file == default)
-            {
-                return await res.SendStatus(HttpStatusCode.NotFound);
-            }
-
-            var subtitle = file.Subtitles.FirstOrDefault(s => s.Language == lang);
-
-            if (subtitle == default)
-            {
-                return await res.SendStatus(HttpStatusCode.NotFound);
-            }
-
-            return await res.SendFile(subtitle.Path);
+            return await res.SendFile(subtitlePath);
         }
-
         private static async Task<HandlerType> SetLanguagePreferenceByFileId(Request req, Response res)
         {
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var language = req.ParseBody<JsonValue<string>>();
             var session = req.GetData<UserSession>();
 
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadUserContext>();
-            await using var transaction = ctx.BeginTransactionedContext();
-            
-            var preference =
-                await transaction.SubtitlePreferences.One(wp => wp.UserId == session.UserId && wp.FileId == fileId);
+            await SubtitleService.SetLanguagePreference(session.UserId, fileId, language.value);
 
-            if (preference == null)
-            {
-                preference = new SubtitlePreference
-                {
-                    UserId = session.UserId,
-                    FileId = fileId
-                };
-                transaction.SubtitlePreferences.Add(preference);
-            }
-
-            preference.Language = language.value;
-            await transaction.SaveChanges();
-            
             return await res.SendStatus(HttpStatusCode.OK);
         }
-
         private static async Task<HandlerType> GetLanguagePreferenceByFileId(Request req, Response res)
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var session = req.GetData<UserSession>();
 
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadUserContext>();
-
-            var preference = await ctx.SubtitlePreferences
-                .ProjectOne(sp => sp.UserId == session.UserId && sp.FileId == id, sp => sp.Language);
+            var preference = await SubtitleService.GetLanguagePreference(session.UserId, id);
 
             return await res.SendString(preference ?? "none");
         }
-
         private static async Task<HandlerType> GetSubtitleLanguagesByFileId(Request req, Response res)
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
-            
-            var file = await ctx.FilmFiles.OneById(id) ?? (MediaFileBase) await ctx.EpisodeFiles.OneById(id);
-
-            if (file == default)
-            {
-                return await res.SendJson(new string[0]);
-            }
-
-            return await res.SendJson(file.Subtitles.Select(sub => sub.Language));
+            var subtitles = await SubtitleService.FindSubtitles(id);
+            return await res.SendJson(subtitles);
         }
     }
 }

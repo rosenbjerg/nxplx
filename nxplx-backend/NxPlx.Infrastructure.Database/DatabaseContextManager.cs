@@ -13,15 +13,13 @@ namespace NxPlx.Services.Database
         public void Register(IServiceCollection services)
         {
             services.AddEntityFrameworkNpgsql()
-                .AddDbContext<MediaContext>()
-                .AddDbContext<UserContext>()
+                .AddDbContext<NxplxContext>()
                 .BuildServiceProvider();
         }
 
         public async Task Initialize(ILoggingService logger)
         {
-            await Initialize<MediaContext>(logger);
-            await Initialize<UserContext>(logger);
+            await Initialize<NxplxContext>(logger);
         }
 
         private static async Task Initialize<TDbContext>(ILoggingService logger)

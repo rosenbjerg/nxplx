@@ -27,7 +27,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var libIds = req.ParseBody<JsonValue<int[]>>().value;
             
             IEnumerable<Library> libraries;
-            await using (var ctx = container.Resolve<IReadMediaContext>())
+            await using (var ctx = container.Resolve<IReadContext>())
             {
                 libraries = await ctx.Libraries.Many(l => libIds.Contains(l.Id));
             }
@@ -42,7 +42,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var container = ResolveContainer.Default();
 
             IEnumerable<Library> libraries;
-            await using (var ctx = container.Resolve<IReadMediaContext>())
+            await using (var ctx = container.Resolve<IReadContext>())
             {
                 libraries = await ctx.Libraries.Many();
             }

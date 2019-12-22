@@ -48,7 +48,7 @@ namespace NxPlx.Integrations.TMDb
 
             _bucket.Consume(1);
             
-            var (content, cached) = await FetchInternal(url);
+            var content = await FetchInternal(url);
             
             if (string.IsNullOrEmpty(content) || content.StartsWith("{\"status_code\":25"))
             {

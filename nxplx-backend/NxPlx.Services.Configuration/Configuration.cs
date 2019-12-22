@@ -15,8 +15,7 @@
         public string LogFolder { get; set; }
         
         public string SqlHost { get; set; }
-        public string SqlMediaDatabase { get; set; }
-        public string SqlUserDatabase { get; set; }
+        public string SqlDatabase { get; set; }
         public string SqlJobDatabase { get; set; }
         public string SqlUsername { get; set; }
         public string SqlPassword { get; set; }

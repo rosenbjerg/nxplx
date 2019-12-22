@@ -1,25 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.IoC.Conventions;
-using NxPlx.Infrastructure.Logging;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes;
+using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models;
-using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
-using NxPlx.Services.Index;
 using Red;
 using Red.CookieSessions;
 using Red.CookieSessions.EFCore;
-using BindingFlags = System.Reflection.BindingFlags;
 using Utils = NxPlx.Infrastructure.WebApi.Routes.Utils;
 
 namespace NxPlx.WebApi
@@ -52,7 +45,7 @@ namespace NxPlx.WebApi
             {
                 Secure = cfg.Production,
                 Path = "/",
-                Store = new EntityFrameworkSessionStore<UserSession>(() => new UserContext())
+                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext())
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
@@ -93,7 +86,7 @@ namespace NxPlx.WebApi
         private static async Task CreateAdminAccount(ResolveContainer container)
         {
             var logger = container.Resolve<ILoggingService>();
-            await using var ctx = container.Resolve<IReadUserContext>();
+            await using var ctx = container.Resolve<IReadContext>();
             await using var transaction = ctx.BeginTransactionedContext();
             if (await ctx.Users.Count() == default)
             {

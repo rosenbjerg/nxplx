@@ -1,7 +1,7 @@
 ﻿using System;
 using Crypt = BCrypt.Net.BCrypt;
 
-namespace NxPlx.Infrastructure.WebApi.Routes
+namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class PasswordUtils
     {
@@ -27,7 +27,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var workFactor = 10;
             double timeUsed;
             
-            while ((timeUsed = TimeBCrypt(testValue, workFactor++)) < 300) ;
+            while ((timeUsed = TimeBCrypt(testValue, workFactor++)) < 350) ;
 
             return (workFactor, timeUsed);
         }

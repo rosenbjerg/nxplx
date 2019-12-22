@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace NxPlx.Services.Database.Migrations.Media
+namespace NxPlx.Services.Database.Migrations
 {
-    public partial class Init_Media_DB : Migration
+    public partial class Reinit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,32 +44,6 @@ namespace NxPlx.Services.Database.Migrations.Media
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DbSeriesDetails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FFMpegProbeDetails",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    VideoCodec = table.Column<string>(nullable: true),
-                    VideoFrameRate = table.Column<float>(nullable: false),
-                    VideoBitrate = table.Column<int>(nullable: false),
-                    VideoBitDepth = table.Column<int>(nullable: false),
-                    VideoHeight = table.Column<int>(nullable: false),
-                    VideoWidth = table.Column<int>(nullable: false),
-                    AudioCodec = table.Column<string>(nullable: true),
-                    AudioBitrate = table.Column<int>(nullable: false),
-                    AudioChannelLayout = table.Column<string>(nullable: true),
-                    AudioCodecName = table.Column<string>(nullable: true),
-                    AudioStreamIndex = table.Column<int>(nullable: false),
-                    VideoCodecName = table.Column<string>(nullable: true),
-                    Duration = table.Column<float>(nullable: false),
-                    VideoAspectRatio = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FFMpegProbeDetails", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -171,15 +145,40 @@ namespace NxPlx.Services.Database.Migrations.Media
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Username = table.Column<string>(nullable: true),
+                    Email = table.Column<string>(nullable: true),
+                    PasswordHash = table.Column<string>(nullable: true),
+                    HasChangedPassword = table.Column<bool>(nullable: false),
+                    Admin = table.Column<bool>(nullable: false),
+                    LibraryAccessIds = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JoinEntity<DbSeriesDetails, Creator>",
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbSeriesDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbSeriesDetails, Creator>", x => new { x.Entity1Id, x.Entity2Id });
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbSeriesDetails, Creator>_DbSeriesDetails_DbSeri~",
+                        column: x => x.DbSeriesDetailsId,
+                        principalTable: "DbSeriesDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbSeriesDetails, Creator>_DbSeriesDetails_Entity~",
                         column: x => x.Entity1Id,
@@ -215,7 +214,7 @@ namespace NxPlx.Services.Database.Migrations.Media
                         column: x => x.DbSeriesDetailsId,
                         principalTable: "DbSeriesDetails",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -223,11 +222,18 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbSeriesDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbSeriesDetails, Genre>", x => new { x.Entity1Id, x.Entity2Id });
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbSeriesDetails, Genre>_DbSeriesDetails_DbSeries~",
+                        column: x => x.DbSeriesDetailsId,
+                        principalTable: "DbSeriesDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbSeriesDetails, Genre>_DbSeriesDetails_Entity1Id",
                         column: x => x.Entity1Id,
@@ -254,6 +260,19 @@ namespace NxPlx.Services.Database.Migrations.Media
                     Created = table.Column<DateTime>(nullable: false),
                     LastWrite = table.Column<DateTime>(nullable: false),
                     MediaDetailsId = table.Column<int>(nullable: true),
+                    MediaDetails_Id = table.Column<int>(nullable: true),
+                    MediaDetails_VideoCodec = table.Column<string>(nullable: true),
+                    MediaDetails_VideoFrameRate = table.Column<float>(nullable: true),
+                    MediaDetails_VideoBitrate = table.Column<int>(nullable: true),
+                    MediaDetails_VideoBitDepth = table.Column<int>(nullable: true),
+                    MediaDetails_VideoHeight = table.Column<int>(nullable: true),
+                    MediaDetails_VideoWidth = table.Column<int>(nullable: true),
+                    MediaDetails_AudioCodec = table.Column<string>(nullable: true),
+                    MediaDetails_AudioBitrate = table.Column<int>(nullable: true),
+                    MediaDetails_AudioChannelLayout = table.Column<string>(nullable: true),
+                    MediaDetails_AudioStreamIndex = table.Column<int>(nullable: true),
+                    MediaDetails_Duration = table.Column<float>(nullable: true),
+                    MediaDetails_VideoAspectRatio = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     SeasonNumber = table.Column<int>(nullable: false),
                     EpisodeNumber = table.Column<int>(nullable: false),
@@ -264,17 +283,11 @@ namespace NxPlx.Services.Database.Migrations.Media
                 {
                     table.PrimaryKey("PK_EpisodeFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_EpisodeFiles_FFMpegProbeDetails_MediaDetailsId",
-                        column: x => x.MediaDetailsId,
-                        principalTable: "FFMpegProbeDetails",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_EpisodeFiles_Libraries_PartOfLibraryId",
                         column: x => x.PartOfLibraryId,
                         principalTable: "Libraries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EpisodeFiles_DbSeriesDetails_SeriesDetailsId",
                         column: x => x.SeriesDetailsId,
@@ -323,11 +336,18 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbSeriesDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbSeriesDetails, Network>", x => new { x.Entity1Id, x.Entity2Id });
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbSeriesDetails, Network>_DbSeriesDetails_DbSeri~",
+                        column: x => x.DbSeriesDetailsId,
+                        principalTable: "DbSeriesDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbSeriesDetails, Network>_DbSeriesDetails_Entity~",
                         column: x => x.Entity1Id,
@@ -347,13 +367,20 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbSeriesDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbSeriesDetails, ProductionCompany>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbSeriesDetails, ProductionCompany>_DbSeriesDeta~",
+                        column: x => x.DbSeriesDetailsId,
+                        principalTable: "DbSeriesDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbSeriesDetails, ProductionCompany>_DbSeriesDet~1",
                         column: x => x.Entity1Id,
                         principalTable: "DbSeriesDetails",
                         principalColumn: "Id",
@@ -362,6 +389,27 @@ namespace NxPlx.Services.Database.Migrations.Media
                         name: "FK_JoinEntity<DbSeriesDetails, ProductionCompany>_ProductionCo~",
                         column: x => x.Entity2Id,
                         principalTable: "ProductionCompany",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSessions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    Expiration = table.Column<DateTime>(nullable: false),
+                    UserId = table.Column<int>(nullable: false),
+                    IsAdmin = table.Column<bool>(nullable: false),
+                    UserAgent = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSessions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -391,7 +439,7 @@ namespace NxPlx.Services.Database.Migrations.Media
                         column: x => x.SeasonDetailsId,
                         principalTable: "SeasonDetails",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -406,6 +454,19 @@ namespace NxPlx.Services.Database.Migrations.Media
                     Created = table.Column<DateTime>(nullable: false),
                     LastWrite = table.Column<DateTime>(nullable: false),
                     MediaDetailsId = table.Column<int>(nullable: true),
+                    MediaDetails_Id = table.Column<int>(nullable: true),
+                    MediaDetails_VideoCodec = table.Column<string>(nullable: true),
+                    MediaDetails_VideoFrameRate = table.Column<float>(nullable: true),
+                    MediaDetails_VideoBitrate = table.Column<int>(nullable: true),
+                    MediaDetails_VideoBitDepth = table.Column<int>(nullable: true),
+                    MediaDetails_VideoHeight = table.Column<int>(nullable: true),
+                    MediaDetails_VideoWidth = table.Column<int>(nullable: true),
+                    MediaDetails_AudioCodec = table.Column<string>(nullable: true),
+                    MediaDetails_AudioBitrate = table.Column<int>(nullable: true),
+                    MediaDetails_AudioChannelLayout = table.Column<string>(nullable: true),
+                    MediaDetails_AudioStreamIndex = table.Column<int>(nullable: true),
+                    MediaDetails_Duration = table.Column<float>(nullable: true),
+                    MediaDetails_VideoAspectRatio = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true),
                     FilmDetailsId = table.Column<int>(nullable: true),
                     Year = table.Column<int>(nullable: false),
@@ -421,17 +482,11 @@ namespace NxPlx.Services.Database.Migrations.Media
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_FilmFiles_FFMpegProbeDetails_MediaDetailsId",
-                        column: x => x.MediaDetailsId,
-                        principalTable: "FFMpegProbeDetails",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "FK_FilmFiles_Libraries_PartOfLibraryId",
                         column: x => x.PartOfLibraryId,
                         principalTable: "Libraries",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -439,11 +494,18 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbFilmDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, Genre>", x => new { x.Entity1Id, x.Entity2Id });
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbFilmDetails, Genre>_DbFilmDetails_DbFilmDetail~",
+                        column: x => x.DbFilmDetailsId,
+                        principalTable: "DbFilmDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, Genre>_DbFilmDetails_Entity1Id",
                         column: x => x.Entity1Id,
@@ -463,13 +525,20 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<int>(nullable: false)
+                    Entity2Id = table.Column<int>(nullable: false),
+                    DbFilmDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, ProductionCompany>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetails_~",
+                        column: x => x.DbFilmDetailsId,
+                        principalTable: "DbFilmDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetails~1",
                         column: x => x.Entity1Id,
                         principalTable: "DbFilmDetails",
                         principalColumn: "Id",
@@ -487,13 +556,20 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<string>(nullable: false)
+                    Entity2Id = table.Column<string>(nullable: false),
+                    DbFilmDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, ProductionCountry, string>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFilm~",
+                        column: x => x.DbFilmDetailsId,
+                        principalTable: "DbFilmDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFil~1",
                         column: x => x.Entity1Id,
                         principalTable: "DbFilmDetails",
                         principalColumn: "Id",
@@ -511,13 +587,20 @@ namespace NxPlx.Services.Database.Migrations.Media
                 columns: table => new
                 {
                     Entity1Id = table.Column<int>(nullable: false),
-                    Entity2Id = table.Column<string>(nullable: false)
+                    Entity2Id = table.Column<string>(nullable: false),
+                    DbFilmDetailsId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, SpokenLanguage, string>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDet~",
+                        column: x => x.DbFilmDetailsId,
+                        principalTable: "DbFilmDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDe~1",
                         column: x => x.Entity1Id,
                         principalTable: "DbFilmDetails",
                         principalColumn: "Id",
@@ -553,13 +636,76 @@ namespace NxPlx.Services.Database.Migrations.Media
                         column: x => x.EpisodeFileId,
                         principalTable: "EpisodeFiles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SubtitleFiles_FilmFiles_FilmFileId",
                         column: x => x.FilmFileId,
                         principalTable: "FilmFiles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubtitlePreferences",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    FileId = table.Column<int>(nullable: false),
+                    Language = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubtitlePreferences", x => new { x.UserId, x.FileId });
+                    table.ForeignKey(
+                        name: "FK_SubtitlePreferences_EpisodeFiles_FileId",
+                        column: x => x.FileId,
+                        principalTable: "EpisodeFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubtitlePreferences_FilmFiles_FileId",
+                        column: x => x.FileId,
+                        principalTable: "FilmFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubtitlePreferences_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WatchingProgresses",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(nullable: false),
+                    FileId = table.Column<int>(nullable: false),
+                    LastWatched = table.Column<DateTime>(nullable: false),
+                    Time = table.Column<double>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WatchingProgresses", x => new { x.UserId, x.FileId });
+                    table.ForeignKey(
+                        name: "FK_WatchingProgresses_EpisodeFiles_FileId",
+                        column: x => x.FileId,
+                        principalTable: "EpisodeFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WatchingProgresses_FilmFiles_FileId",
+                        column: x => x.FileId,
+                        principalTable: "FilmFiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WatchingProgresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -571,11 +717,6 @@ namespace NxPlx.Services.Database.Migrations.Media
                 name: "IX_EpisodeDetails_SeasonDetailsId",
                 table: "EpisodeDetails",
                 column: "SeasonDetailsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EpisodeFiles_MediaDetailsId",
-                table: "EpisodeFiles",
-                column: "MediaDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EpisodeFiles_PartOfLibraryId",
@@ -598,14 +739,14 @@ namespace NxPlx.Services.Database.Migrations.Media
                 column: "FilmDetailsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FilmFiles_MediaDetailsId",
-                table: "FilmFiles",
-                column: "MediaDetailsId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FilmFiles_PartOfLibraryId",
                 table: "FilmFiles",
                 column: "PartOfLibraryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbFilmDetails, Genre>_DbFilmDetailsId",
+                table: "JoinEntity<DbFilmDetails, Genre>",
+                column: "DbFilmDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, Genre>_Entity2Id",
@@ -613,9 +754,19 @@ namespace NxPlx.Services.Database.Migrations.Media
                 column: "Entity2Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetailsId",
+                table: "JoinEntity<DbFilmDetails, ProductionCompany>",
+                column: "DbFilmDetailsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, ProductionCompany>_Entity2Id",
                 table: "JoinEntity<DbFilmDetails, ProductionCompany>",
                 column: "Entity2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFilm~",
+                table: "JoinEntity<DbFilmDetails, ProductionCountry, string>",
+                column: "DbFilmDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, ProductionCountry, string>_Entity~",
@@ -623,9 +774,19 @@ namespace NxPlx.Services.Database.Migrations.Media
                 column: "Entity2Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDet~",
+                table: "JoinEntity<DbFilmDetails, SpokenLanguage, string>",
+                column: "DbFilmDetailsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, SpokenLanguage, string>_Entity2Id",
                 table: "JoinEntity<DbFilmDetails, SpokenLanguage, string>",
                 column: "Entity2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbSeriesDetails, Creator>_DbSeriesDetailsId",
+                table: "JoinEntity<DbSeriesDetails, Creator>",
+                column: "DbSeriesDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbSeriesDetails, Creator>_Entity2Id",
@@ -633,14 +794,29 @@ namespace NxPlx.Services.Database.Migrations.Media
                 column: "Entity2Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbSeriesDetails, Genre>_DbSeriesDetailsId",
+                table: "JoinEntity<DbSeriesDetails, Genre>",
+                column: "DbSeriesDetailsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbSeriesDetails, Genre>_Entity2Id",
                 table: "JoinEntity<DbSeriesDetails, Genre>",
                 column: "Entity2Id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbSeriesDetails, Network>_DbSeriesDetailsId",
+                table: "JoinEntity<DbSeriesDetails, Network>",
+                column: "DbSeriesDetailsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbSeriesDetails, Network>_Entity2Id",
                 table: "JoinEntity<DbSeriesDetails, Network>",
                 column: "Entity2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinEntity<DbSeriesDetails, ProductionCompany>_DbSeriesDeta~",
+                table: "JoinEntity<DbSeriesDetails, ProductionCompany>",
+                column: "DbSeriesDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbSeriesDetails, ProductionCompany>_Entity2Id",
@@ -661,6 +837,21 @@ namespace NxPlx.Services.Database.Migrations.Media
                 name: "IX_SubtitleFiles_FilmFileId",
                 table: "SubtitleFiles",
                 column: "FilmFileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubtitlePreferences_FileId",
+                table: "SubtitlePreferences",
+                column: "FileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSessions_UserId",
+                table: "UserSessions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WatchingProgresses_FileId",
+                table: "WatchingProgresses",
+                column: "FileId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -696,6 +887,15 @@ namespace NxPlx.Services.Database.Migrations.Media
                 name: "SubtitleFiles");
 
             migrationBuilder.DropTable(
+                name: "SubtitlePreferences");
+
+            migrationBuilder.DropTable(
+                name: "UserSessions");
+
+            migrationBuilder.DropTable(
+                name: "WatchingProgresses");
+
+            migrationBuilder.DropTable(
                 name: "SeasonDetails");
 
             migrationBuilder.DropTable(
@@ -723,13 +923,13 @@ namespace NxPlx.Services.Database.Migrations.Media
                 name: "FilmFiles");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "DbSeriesDetails");
 
             migrationBuilder.DropTable(
                 name: "DbFilmDetails");
-
-            migrationBuilder.DropTable(
-                name: "FFMpegProbeDetails");
 
             migrationBuilder.DropTable(
                 name: "Libraries");

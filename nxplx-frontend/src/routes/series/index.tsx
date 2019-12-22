@@ -28,7 +28,7 @@ export default class Series extends Component<Props, State> {
 
     public render(props:Props, { details, bg }:State) {
         if (!details) {
-            return (<Loading/>);
+            return (<div class={`nx-scroll ${style.content}`}><Loading/></div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>

@@ -7,19 +7,43 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
 
-namespace NxPlx.Services.Database.Migrations.Media
+namespace NxPlx.Services.Database.Migrations
 {
-    [DbContext(typeof(MediaContext))]
-    [Migration("20191107231216_Init_Media_DB")]
-    partial class Init_Media_DB
+    [DbContext(typeof(NxplxContext))]
+    [Migration("20191222160453_Reinit")]
+    partial class Reinit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.0.0")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            modelBuilder.Entity("NxPlx.Infrastructure.Session.UserSession", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSessions");
+                });
 
             modelBuilder.Entity("NxPlx.Models.Database.DbFilmDetails", b =>
                 {
@@ -145,7 +169,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<string>("Entity2Id")
                         .HasColumnType("text");
 
+                    b.Property<int?>("DbFilmDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbFilmDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -160,7 +189,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<string>("Entity2Id")
                         .HasColumnType("text");
 
+                    b.Property<int?>("DbFilmDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbFilmDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -175,7 +209,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbFilmDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbFilmDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -190,7 +229,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbFilmDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbFilmDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -205,7 +249,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbSeriesDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbSeriesDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -220,7 +269,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbSeriesDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbSeriesDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -235,7 +289,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbSeriesDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbSeriesDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -250,7 +309,12 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.Property<int>("Entity2Id")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("DbSeriesDetailsId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Entity1Id", "Entity2Id");
+
+                    b.HasIndex("DbSeriesDetailsId");
 
                     b.HasIndex("Entity2Id");
 
@@ -494,8 +558,6 @@ namespace NxPlx.Services.Database.Migrations.Media
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MediaDetailsId");
-
                     b.HasIndex("PartOfLibraryId");
 
                     b.HasIndex("SeasonNumber");
@@ -503,60 +565,6 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.HasIndex("SeriesDetailsId");
 
                     b.ToTable("EpisodeFiles");
-                });
-
-            modelBuilder.Entity("NxPlx.Models.File.FFMpegProbeDetails", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<int>("AudioBitrate")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("AudioChannelLayout")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AudioCodec")
-                        .HasColumnType("text");
-
-                    b.Property<string>("AudioCodecName")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AudioStreamIndex")
-                        .HasColumnType("integer");
-
-                    b.Property<float>("Duration")
-                        .HasColumnType("real");
-
-                    b.Property<string>("VideoAspectRatio")
-                        .HasColumnType("text");
-
-                    b.Property<int>("VideoBitDepth")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VideoBitrate")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("VideoCodec")
-                        .HasColumnType("text");
-
-                    b.Property<string>("VideoCodecName")
-                        .HasColumnType("text");
-
-                    b.Property<float>("VideoFrameRate")
-                        .HasColumnType("real");
-
-                    b.Property<int>("VideoHeight")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VideoWidth")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("FFMpegProbeDetails");
                 });
 
             modelBuilder.Entity("NxPlx.Models.File.FilmFile", b =>
@@ -599,8 +607,6 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.HasKey("Id");
 
                     b.HasIndex("FilmDetailsId");
-
-                    b.HasIndex("MediaDetailsId");
 
                     b.HasIndex("PartOfLibraryId");
 
@@ -671,18 +677,102 @@ namespace NxPlx.Services.Database.Migrations.Media
                     b.ToTable("Libraries");
                 });
 
+            modelBuilder.Entity("NxPlx.Models.SubtitlePreference", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FileId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Language")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "FileId");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("SubtitlePreferences");
+                });
+
+            modelBuilder.Entity("NxPlx.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<bool>("Admin")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("HasChangedPassword")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LibraryAccessIds")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("NxPlx.Models.WatchingProgress", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("FileId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastWatched")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<double>("Time")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("UserId", "FileId");
+
+                    b.HasIndex("FileId");
+
+                    b.ToTable("WatchingProgresses");
+                });
+
+            modelBuilder.Entity("NxPlx.Infrastructure.Session.UserSession", b =>
+                {
+                    b.HasOne("NxPlx.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("NxPlx.Models.Database.DbFilmDetails", b =>
                 {
                     b.HasOne("NxPlx.Models.Details.Film.MovieCollection", "BelongsInCollection")
                         .WithMany()
-                        .HasForeignKey("BelongsInCollectionId");
+                        .HasForeignKey("BelongsInCollectionId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbFilmDetails, NxPlx.Models.Details.Film.ProductionCountry, string>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany("ProductionCountries")
+                        .HasForeignKey("DbFilmDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
+                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFil~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -695,9 +785,14 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbFilmDetails, NxPlx.Models.Details.Film.SpokenLanguage, string>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany("SpokenLanguages")
+                        .HasForeignKey("DbFilmDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
+                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDe~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -710,8 +805,12 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbFilmDetails, NxPlx.Models.Details.Genre>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany("Genres")
+                        .HasForeignKey("DbFilmDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -725,9 +824,14 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbFilmDetails, NxPlx.Models.Details.ProductionCompany>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany("ProductionCompanies")
+                        .HasForeignKey("DbFilmDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
+                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetails~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -740,8 +844,12 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbSeriesDetails, NxPlx.Models.Details.Genre>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany("Genres")
+                        .HasForeignKey("DbSeriesDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -755,9 +863,14 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbSeriesDetails, NxPlx.Models.Details.ProductionCompany>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany("ProductionCompanies")
+                        .HasForeignKey("DbSeriesDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
+                        .HasConstraintName("FK_JoinEntity<DbSeriesDetails, ProductionCompany>_DbSeriesDet~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -770,8 +883,12 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbSeriesDetails, NxPlx.Models.Details.Series.Creator>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany("CreatedBy")
+                        .HasForeignKey("DbSeriesDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -785,8 +902,12 @@ namespace NxPlx.Services.Database.Migrations.Media
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbSeriesDetails, NxPlx.Models.Details.Series.Network>", b =>
                 {
-                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany("Networks")
+                        .HasForeignKey("DbSeriesDetailsId");
+
+                    b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
+                        .WithMany()
                         .HasForeignKey("Entity1Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -802,32 +923,82 @@ namespace NxPlx.Services.Database.Migrations.Media
                 {
                     b.HasOne("NxPlx.Models.Details.Series.SeasonDetails", null)
                         .WithMany("Episodes")
-                        .HasForeignKey("SeasonDetailsId");
+                        .HasForeignKey("SeasonDetailsId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("NxPlx.Models.Details.Series.SeasonDetails", b =>
                 {
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany("Seasons")
-                        .HasForeignKey("DbSeriesDetailsId");
+                        .HasForeignKey("DbSeriesDetailsId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("NxPlx.Models.File.EpisodeFile", b =>
                 {
-                    b.HasOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails")
-                        .WithMany()
-                        .HasForeignKey("MediaDetailsId");
-
                     b.HasOne("NxPlx.Models.Library", "PartOfLibrary")
                         .WithMany()
                         .HasForeignKey("PartOfLibraryId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "SeriesDetails")
                         .WithMany()
                         .HasForeignKey("SeriesDetailsId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                        {
+                            b1.Property<int>("EpisodeFileId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("AudioBitrate")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("AudioChannelLayout")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("AudioCodec")
+                                .HasColumnType("text");
+
+                            b1.Property<int>("AudioStreamIndex")
+                                .HasColumnType("integer");
+
+                            b1.Property<float>("Duration")
+                                .HasColumnType("real");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("VideoAspectRatio")
+                                .HasColumnType("text");
+
+                            b1.Property<int>("VideoBitDepth")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("VideoBitrate")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("VideoCodec")
+                                .HasColumnType("text");
+
+                            b1.Property<float>("VideoFrameRate")
+                                .HasColumnType("real");
+
+                            b1.Property<int>("VideoHeight")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("VideoWidth")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("EpisodeFileId");
+
+                            b1.ToTable("EpisodeFiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("EpisodeFileId");
+                        });
                 });
 
             modelBuilder.Entity("NxPlx.Models.File.FilmFile", b =>
@@ -837,26 +1008,118 @@ namespace NxPlx.Services.Database.Migrations.Media
                         .HasForeignKey("FilmDetailsId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails")
-                        .WithMany()
-                        .HasForeignKey("MediaDetailsId");
-
                     b.HasOne("NxPlx.Models.Library", "PartOfLibrary")
                         .WithMany()
                         .HasForeignKey("PartOfLibraryId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                        {
+                            b1.Property<int>("FilmFileId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("AudioBitrate")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("AudioChannelLayout")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("AudioCodec")
+                                .HasColumnType("text");
+
+                            b1.Property<int>("AudioStreamIndex")
+                                .HasColumnType("integer");
+
+                            b1.Property<float>("Duration")
+                                .HasColumnType("real");
+
+                            b1.Property<int>("Id")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("VideoAspectRatio")
+                                .HasColumnType("text");
+
+                            b1.Property<int>("VideoBitDepth")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("VideoBitrate")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("VideoCodec")
+                                .HasColumnType("text");
+
+                            b1.Property<float>("VideoFrameRate")
+                                .HasColumnType("real");
+
+                            b1.Property<int>("VideoHeight")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("VideoWidth")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("FilmFileId");
+
+                            b1.ToTable("FilmFiles");
+
+                            b1.WithOwner()
+                                .HasForeignKey("FilmFileId");
+                        });
                 });
 
             modelBuilder.Entity("NxPlx.Models.File.SubtitleFile", b =>
                 {
                     b.HasOne("NxPlx.Models.File.EpisodeFile", null)
                         .WithMany("Subtitles")
-                        .HasForeignKey("EpisodeFileId");
+                        .HasForeignKey("EpisodeFileId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("NxPlx.Models.File.FilmFile", null)
                         .WithMany("Subtitles")
-                        .HasForeignKey("FilmFileId");
+                        .HasForeignKey("FilmFileId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("NxPlx.Models.SubtitlePreference", b =>
+                {
+                    b.HasOne("NxPlx.Models.File.EpisodeFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NxPlx.Models.File.FilmFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NxPlx.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("NxPlx.Models.WatchingProgress", b =>
+                {
+                    b.HasOne("NxPlx.Models.File.EpisodeFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NxPlx.Models.File.FilmFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NxPlx.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

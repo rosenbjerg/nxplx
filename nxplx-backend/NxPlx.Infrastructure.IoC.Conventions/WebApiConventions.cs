@@ -19,10 +19,10 @@ namespace NxPlx.Infrastructure.IoC.Conventions
             registration.Register<IBroadcaster, WebSocketBroadcaster>();
             registration.Register<ILoggingService, NLoggingService>();
             registration.Register<IDatabaseMapper, DatabaseMapper>();
+            registration.Register<IDtoMapper, DtoMapper>();
             registration.Register<IDetailsApi, TMDbApi>(false);
             registration.Register<IIndexer, Indexer>(false);
-            registration.Register<IReadUserContext, ReadUserContext>(false);
-            registration.Register<IReadMediaContext, ReadMediaContext>(false);
+            registration.Register<IReadContext, ReadContext>(false);
         }
     }
 }

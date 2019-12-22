@@ -1,9 +1,7 @@
 using System.Net;
 using System.Threading.Tasks;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
+using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models.Dto.Models;
 using Red;
 using Red.CookieSessions;
@@ -23,13 +21,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSessions(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
-
-            var sessions = await context.UserSessions.Many(s => s.UserId == session.UserId);
-
-            return await res.SendMapped<UserSession, UserSessionDto>(container.Resolve<IDatabaseMapper>(), sessions);
+            var sessions = await SessionService.GetUserSessions(session.UserId);
+            return await res.SendJson(sessions);
         }
         private static async Task<HandlerType> CloseSession(Request req, Response res)
         {
@@ -42,32 +35,17 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 return await res.SendStatus(HttpStatusCode.OK);
             }
             
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
-            await using var transaction = context.BeginTransactionedContext();
+            var ok = await SessionService.CloseUserSession(sessionId, currentSession.UserId, currentSession.IsAdmin);
 
-            var session = await transaction.UserSessions.OneById(sessionId);
-            if (session.UserId != currentSession.UserId && !currentSession.IsAdmin)
-            {
-                return await res.SendStatus(HttpStatusCode.BadRequest);
-            }
-
-            transaction.UserSessions.Remove(session);
-            await transaction.SaveChanges();
-            
+            if (!ok) return await res.SendStatus(HttpStatusCode.BadRequest);
             return await res.SendStatus(HttpStatusCode.OK);
         }
-
         private static async Task<HandlerType> GetUsersSessions(Request req, Response res)
         {
             var userId = int.Parse(req.Queries["userId"]);
-            
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
-
-            var sessions = await context.UserSessions.Many(s => s.UserId == userId);
-
-            return await res.SendMapped<UserSession, UserSessionDto>(container.Resolve<IDatabaseMapper>(), sessions);
+            var sessions = await SessionService.GetUserSessions(userId);
+            return await res.SendJson(sessions);
         }
+
     }
 }

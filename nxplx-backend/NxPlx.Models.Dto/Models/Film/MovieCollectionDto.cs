@@ -1,6 +1,6 @@
 namespace NxPlx.Models.Dto.Models.Film
 {
-    public class MovieCollectionDto
+    public class MovieCollectionDto : IDto
     {
         public int id { get; set; }
         public string name { get; set; }
