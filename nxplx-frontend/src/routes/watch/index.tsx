@@ -43,16 +43,17 @@ export default class Watch extends Component<Props, State> {
         if (!state.info) {
             return <Loading/>;
         }
+        const completed = (this.playerTime / state.info.duration) > 0.95;
         return (
             <div class={style.container}>
                 <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${state.info.title} - NxPlx`}/>
 
                 <ShakaPlayer
                     events={this.shakaComm}
-                    time={this.playerTime}
+                    time={completed ? 0 : this.playerTime}
                     muted={this.playerMuted}
                     volume={this.playerVolume}
-                    autoPlay={this.playerAutoplay || this.playerTime < 3}
+                    autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}
                     title={state.info.title}
                     videoTrack={`/api/${kind}/watch/${fid}`}
                     preferredTextLanguage={this.subtitleLanguage}

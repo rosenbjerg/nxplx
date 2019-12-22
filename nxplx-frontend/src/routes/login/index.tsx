@@ -39,7 +39,7 @@ const Login = connect(['isLoggedIn', 'isAdmin'], actions)(
             <Typography headline5>NxPlx Login</Typography>
             <form onSubmit={login}>
                 <div>
-                    <input class="inline-edit" placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required/>
+                    <input class="inline-edit" placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required autofocus/>
                     <input class="inline-edit" placeholder="Password" type="password" name={'password'} minLength={6} maxLength={50} required/>
                 </div>
                 <button class="bordered">Login</button>
