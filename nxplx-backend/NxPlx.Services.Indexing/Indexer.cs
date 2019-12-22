@@ -56,9 +56,10 @@ namespace NxPlx.Services.Index
         private async Task IndexMovieLibrary(Library library)
         {
             var startTime = DateTime.UtcNow;
+            _loggingService.Info("Started indexing {LibraryName}", library.Name);
             
             var fileIndexer = new FileIndexer();
-            await using var ctx = new MediaContext();
+            await using var ctx = new NxplxContext();
 
             var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
             
@@ -81,8 +82,8 @@ namespace NxPlx.Services.Index
             ctx.AddRange(spokenLanguages);
             ctx.AddRange(productionCompanies);
             ctx.AddRange(movieCollections);
-            ctx.AddRange(newFilm);
-            var databaseDetails = _databaseMapper.MapMany<FilmDetails, DbFilmDetails>(details);
+            ctx.FilmFiles.AddRange(newFilm);
+            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details);
             var newDetails = await databaseDetails.GetUniqueNew();
             await ctx.AddRangeAsync(newDetails);
             
@@ -96,53 +97,36 @@ namespace NxPlx.Services.Index
         }
 
         private async Task RemoveDeletedMovies(
-            Library library, HashSet<string> currentFilm, MediaContext mediaContext, DateTime startTime)
+            Library library, HashSet<string> currentFilm, NxplxContext nxplxContext, DateTime startTime)
         {
             var deletedFilmPaths = currentFilm.Where(path => !File.Exists(path)).ToList();
             if (deletedFilmPaths.Any())
             {
-                var deletedFilm = await mediaContext.FilmFiles.Where(ef => deletedFilmPaths.Contains(ef.Path)).ToListAsync();
-                await RemovePrefsAndProgressesFromDeleted(deletedFilm.Select(df => df.Id));
-                mediaContext.SubtitleFiles.RemoveRange(deletedFilm.SelectMany(e => e.Subtitles));
-                mediaContext.FilmFiles.RemoveRange(deletedFilm);
+                var deletedFilm = await nxplxContext.FilmFiles.Where(ef => deletedFilmPaths.Contains(ef.Path)).ToListAsync();
+                nxplxContext.FilmFiles.RemoveRange(deletedFilm);
 
-                await mediaContext.SaveChangesAsync();
+                await nxplxContext.SaveChangesAsync();
                 _loggingService.Info(
                     "Deleted {DeletedAmount} film from {LibraryName} because files were removed, after {ScanTime} seconds",
                     deletedFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             }
         }
         private async Task RemoveDeletedEpisodes(
-            Library library, HashSet<string> currentEpisodes, MediaContext mediaContext, DateTime startTime)
+            Library library, HashSet<string> currentEpisodes, NxplxContext nxplxContext, DateTime startTime)
         {
             var deletedEpisodePaths = currentEpisodes.Where(path => !File.Exists(path)).ToList();
             if (deletedEpisodePaths.Any())
             {
-                var deletedEpisodes = await mediaContext.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
-                await RemovePrefsAndProgressesFromDeleted(deletedEpisodes.Select(df => df.Id));
-                mediaContext.SubtitleFiles.RemoveRange(deletedEpisodes.SelectMany(e => e.Subtitles));
-                mediaContext.EpisodeFiles.RemoveRange(deletedEpisodes);
+                var deletedEpisodes = await nxplxContext.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
+                nxplxContext.SubtitleFiles.RemoveRange(deletedEpisodes.SelectMany(e => e.Subtitles));
+                nxplxContext.EpisodeFiles.RemoveRange(deletedEpisodes);
 
-                await mediaContext.SaveChangesAsync();
+                await nxplxContext.SaveChangesAsync();
                 _loggingService.Info(
                     "Deleted {DeletedAmount} episodes from {LibraryName} because files were removed, after {ScanTime} seconds",
                     deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             }
         }
-
-        private static async Task RemovePrefsAndProgressesFromDeleted(IEnumerable<int> deletedIds)
-        {
-            await using var userContext = new UserContext();
-
-            var subtitlePreferences = userContext.SubtitlePreferences.Where(sp => deletedIds.Contains(sp.FileId));
-            userContext.SubtitlePreferences.RemoveRange(subtitlePreferences);
-
-            var watchingProgresses = userContext.WatchingProgresses.Where(wp => deletedIds.Contains(wp.FileId));
-            userContext.WatchingProgresses.RemoveRange(watchingProgresses);
-
-            await userContext.SaveChangesAsync();
-        }
-
 
         private async Task<List<FilmDetails>> FindFilmDetails(List<FilmFile> newFilm, Library library)
         {
@@ -174,10 +158,10 @@ namespace NxPlx.Services.Index
         private async Task IndexSeriesLibrary(Library library)
         {
             var startTime = DateTime.UtcNow;
+            _loggingService.Info("Started indexing {LibraryName}", library.Name);
             
             var fileIndexer = new FileIndexer();
-            await using var ctx = new MediaContext();
-            await using var transaction = ctx.Database.BeginTransaction();
+            await using var ctx = new NxplxContext();
             
             var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
             
@@ -194,12 +178,12 @@ namespace NxPlx.Services.Index
             var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew();
             var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
             
-            ctx.AddRange(newEpisodes);
             ctx.AddRange(genres);
             ctx.AddRange(networks);
             ctx.AddRange(creators);
             ctx.AddRange(productionCompanies);
-            var databaseDetails = _databaseMapper.MapMany<SeriesDetails, DbSeriesDetails>(details).ToList();
+            ctx.EpisodeFiles.AddRange(newEpisodes);
+            var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
             await ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();

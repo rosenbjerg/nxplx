@@ -104,7 +104,7 @@ namespace NxPlx.Services.Index
             where T : class
         {
             List<TKey> unique;
-            using (var ctx = new MediaContext())
+            using (var ctx = new NxplxContext())
             {
                 unique = await ctx.Set<T>().Select(keySelector).ToListAsync();
             }
