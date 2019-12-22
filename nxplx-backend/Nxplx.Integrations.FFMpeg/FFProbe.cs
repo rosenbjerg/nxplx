@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using NxPlx.Models.File;
@@ -40,7 +41,7 @@ namespace Nxplx.Integrations.FFMpeg
             
             return new FFMpegProbeDetails
             {
-                Duration = float.Parse(videoStream.duration),
+                Duration = float.Parse(videoStream.duration, NumberStyles.Any, CultureInfo.InvariantCulture),
                 AudioStreamIndex = audioStream.index,
                 AudioBitrate = int.Parse(audioStream.bit_rate),
                 AudioChannelLayout = audioStream.channel_layout,
@@ -59,7 +60,7 @@ namespace Nxplx.Integrations.FFMpeg
         private static float ParseFramerate(string framerate)
         {
             var split = framerate.Split('/');
-            return float.Parse(split[0]) / float.Parse(split[1]);
+            return float.Parse(split[0], NumberStyles.Any, CultureInfo.InvariantCulture) / float.Parse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture);
         }
     }
     class Stream
