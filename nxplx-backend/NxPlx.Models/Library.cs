@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace NxPlx.Models
 {
     public class Library : EntityBase

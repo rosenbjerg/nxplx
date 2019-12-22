@@ -1,7 +1,5 @@
 using System.Net;
 using System.Threading.Tasks;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using Red;
 using Red.CookieSessions;
@@ -35,32 +33,12 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var form = await req.GetFormDataAsync();
 
-            string username = form["username"];
-            string password = form["password"];
-
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-            {
-                return await res.SendStatus(HttpStatusCode.BadRequest);
-            }
-
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
-            var user = await context.Users.One(u => u.Username == username);
-
-            if (user == null || !PasswordUtils.Verify(password, user.PasswordHash))
-            {
-                return await res.SendStatus(HttpStatusCode.BadRequest);
-            }
-
-            await res.OpenSession(new UserSession
-            {
-                UserAgent = req.Headers["User-Agent"], 
-                IsAdmin = user.Admin, 
-                UserId = user.Id
-            });
-
-            return await res.SendString(user.Admin.ToString());
+            var session = await AuthenticationService.TryCreateSession(form["username"], form["password"], req.Headers["User-Agent"]);
+            if (session == null) return await res.SendStatus(HttpStatusCode.BadRequest);
+            
+            await res.OpenSession(session);
+            return await res.SendString(session.IsAdmin.ToString());
         }
-
+        
     }
 }
