@@ -24,10 +24,10 @@ namespace NxPlx.Services.Database
                 voteAverage = seriesDetails.VoteAverage,
                 voteCount = seriesDetails.VoteCount,
                 name = seriesDetails.Name,
-                networks = Map<Network, NetworkDto>(seriesDetails.Networks.Select(n => n.Entity2)),
-                genres = Map<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)),
-                createdBy = Map<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)),
-                productionCompanies = Map<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)),
+                networks = Map<Network, NetworkDto>(seriesDetails.Networks.Select(n => n.Entity2)).ToList(),
+                genres = Map<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)).ToList(),
+                createdBy = Map<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)).ToList(),
+                productionCompanies = Map<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)).ToList(),
                 overview = seriesDetails.Overview
             });
             SetMapping<SeasonDetails, SeasonDto>(seasonDetails => new SeasonDto

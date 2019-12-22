@@ -75,7 +75,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var seriesDto = mapper.Map<DbSeriesDetails, SeriesDto>(series);
             seriesDto.seasons = series.Seasons
                 .Select(s => MergeEpisodes(mapper, s, files.Where(f => f.SeasonNumber == s.SeasonNumber)))
-                .Where(s => s.episodes.Any());
+                .Where(s => s.episodes.Any())
+                .ToList();
             return seriesDto;
         }
         public static SeasonDto MergeEpisodes(IMapper mapper, SeasonDetails seasonDetails, IEnumerable<EpisodeFile> files)
