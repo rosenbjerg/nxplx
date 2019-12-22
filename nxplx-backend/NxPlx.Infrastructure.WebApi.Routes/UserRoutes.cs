@@ -42,19 +42,19 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
             var users = await UserService.GetUsers();
-            return await res.SendDto<User, UserDto>(users);
+            return await res.SendJson(users);
         }
         private static async Task<HandlerType> GetUser(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
             var user = await UserService.GetUser(session.UserId);
-            return await res.SendDto<User, UserDto>(user);
+            return await res.SendJson(user);
         }
         private static async Task<HandlerType> CreateUser(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();
             var user = await UserService.CreateUser(form["username"], form["email"], form["admin"] == "true", form["libraries"].Select(int.Parse), form["password1"]);
-            return await res.SendDto<User, UserDto>(user);
+            return await res.SendJson(user);
         }
         private static async Task<HandlerType> ChangePassword(Request req, Response res)
         {

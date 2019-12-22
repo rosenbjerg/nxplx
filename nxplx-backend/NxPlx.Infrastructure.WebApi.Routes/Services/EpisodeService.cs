@@ -6,6 +6,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
+using NxPlx.Models.Dto.Models;
 using NxPlx.Models.Dto.Models.Series;
 using NxPlx.Models.File;
 
@@ -13,10 +14,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class EpisodeService
     {
-        public static async Task<EpisodeFile?> TryFindNextEpisode(int fileId, bool isAdmin, List<int> libraryAccess)
+        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
+            await using var ctx = container.Resolve<IReadContext>();
             var current = await ctx.EpisodeFiles.OneById(fileId);
 
             var season = await ctx.EpisodeFiles.Many(ef =>
@@ -33,29 +34,29 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
                 next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
             }
 
-            return next;
+            return container.Resolve<IDtoMapper>().Map<EpisodeFile, NextEpisodeDto>(next);
         }
-        public static async Task<EpisodeFile?> FindEpisodeFile(int id, bool isAdmin, List<int> libraryAccess)
+        public static async Task<string?> FindEpisodeFilePath(int id, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
-
-            var episode = await ctx.EpisodeFiles
-                .One(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)));
-            return episode;
-        }
-        public static async Task<EpisodeFile?> FindFileInfo(int id, bool isAdmin, List<int> libraryAccess)
-        {
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
+            await using var ctx = container.Resolve<IReadContext>();
 
             return await ctx.EpisodeFiles
+                .ProjectOne(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Path);
+        }
+        public static async Task<InfoDto?> FindEpisodeFileInfo(int id, bool isAdmin, List<int> libraryAccess)
+        {
+            var container = ResolveContainer.Default();
+            await using var ctx = container.Resolve<IReadContext>();
+
+            var episode = await ctx.EpisodeFiles
                 .One(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Subtitles);
+            return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
         }
         public static async Task<SeriesDto?> FindSeriesDetails(int id, bool isAdmin, List<int> libraryAccess, int? season)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
+            await using var ctx = container.Resolve<IReadContext>();
 
             var episodes = await ctx.EpisodeFiles
                 .Many(ef => ef.SeriesDetailsId == id &&
@@ -64,7 +65,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             if (!episodes.Any()) return default;
             
-            var dtoMapper = container.Resolve<IDatabaseMapper>();
+            var dtoMapper = container.Resolve<IDtoMapper>();
             var seriesDetails = episodes.First().SeriesDetails;
             return MergeEpisodes(dtoMapper, seriesDetails, episodes);
         }

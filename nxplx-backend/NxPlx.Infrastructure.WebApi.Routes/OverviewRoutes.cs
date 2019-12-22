@@ -24,7 +24,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadMediaContext>();
+            await using var ctx = container.Resolve<IReadContext>();
 
             var libs = session.User.LibraryAccessIds;
             if (session.IsAdmin)
@@ -41,7 +41,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 return await res.SendString(cached, "application/json");
             }
             
-            var dtoMapper = container.Resolve<IDatabaseMapper>();
+            var dtoMapper = container.Resolve<IDtoMapper>();
 
             var seriesDetails = await ctx.EpisodeFiles.ProjectMany(
                 ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId), ef => ef.SeriesDetails, ef => ef.SeriesDetails);
@@ -50,8 +50,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), ff => ff.FilmDetails, ff => ff.FilmDetails);
             
             var overview = new List<OverviewElementDto>(filmDetails.Count + seriesDetails.Count);
-            overview.AddRange(dtoMapper.MapMany<DbSeriesDetails, OverviewElementDto>(seriesDetails));
-            overview.AddRange(dtoMapper.MapMany<DbFilmDetails, OverviewElementDto>(filmDetails));
+            overview.AddRange(dtoMapper.Map<DbSeriesDetails, OverviewElementDto>(seriesDetails));
+            overview.AddRange(dtoMapper.Map<DbFilmDetails, OverviewElementDto>(filmDetails));
 
             cached = System.Text.Json.JsonSerializer.Serialize(overview);
             await cacher.SetAsync(overviewCacheKey, cached, CacheKind.JsonResponse);

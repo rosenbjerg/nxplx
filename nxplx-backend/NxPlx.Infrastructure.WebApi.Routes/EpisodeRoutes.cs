@@ -25,12 +25,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetNext(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
             var next = await EpisodeService.TryFindNextEpisode(fileId, session.IsAdmin, session.User.LibraryAccessIds);
-
-            return await res.SendDto<EpisodeFile, NextEpisodeDto>(next);
+            return await res.SendJson(next);
         }
 
         private static async Task<HandlerType> StreamFile(Request req, Response res)
@@ -38,11 +36,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
-            var episode = await EpisodeService.FindEpisodeFile(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.IsAdmin, session.User.LibraryAccessIds);
 
-            if (episode == null || !File.Exists(episode.Path)) 
-                return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendFile(episode.Path);
+            if (episodePath == null || !File.Exists(episodePath)) return await res.SendStatus(HttpStatusCode.NotFound);
+            return await res.SendFile(episodePath);
         }
         
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
@@ -50,10 +47,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
-            var episode = await EpisodeService.FindFileInfo(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var episode = await EpisodeService.FindEpisodeFileInfo(id, session.IsAdmin, session.User.LibraryAccessIds);
 
             if (episode == null) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendDto<EpisodeFile, InfoDto>(episode);
+            return await res.SendJson(episode);
         }
         
         private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)

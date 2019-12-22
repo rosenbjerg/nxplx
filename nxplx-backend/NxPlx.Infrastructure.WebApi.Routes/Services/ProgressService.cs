@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<double> GetUserWatchingProgress(int userId, int fileId)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadUserContext>();
+            await using var ctx = container.Resolve<IReadContext>();
 
             var progress = await ctx.WatchingProgresses
                 .ProjectOne(wp => wp.UserId == userId && wp.FileId == fileId, wp => wp.Time);
@@ -20,7 +20,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task SetUserWatchingProgress(int userId, int fileId, double progressValue)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
+            await using var context = container.Resolve<IReadContext>();
             await using var transaction = context.BeginTransactionedContext();
             
             var progress = await transaction.WatchingProgresses.One(wp => wp.UserId == userId && wp.FileId == fileId);

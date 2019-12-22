@@ -27,10 +27,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
-            var filmFile = await FilmService.FindFilmFile(fileId, session.IsAdmin, session.User.LibraryAccessIds);
+            var filePath = await FilmService.FindFilmFilePath(fileId, session.IsAdmin, session.User.LibraryAccessIds);
 
-            if (filmFile == default || !File.Exists(filmFile.Path)) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendFile(filmFile.Path);
+            if (filePath == default || !File.Exists(filePath)) return await res.SendStatus(HttpStatusCode.NotFound);
+            return await res.SendFile(filePath);
         }
         
         private static async Task<HandlerType> GetFilmDetails(Request req, Response res)
@@ -38,10 +38,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("film_id"));
             
-            var filmFile = await FilmService.FindFilmByDetails(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var filmDto = await FilmService.FindFilmByDetails(id, session.IsAdmin, session.User.LibraryAccessIds);
 
-            if (filmFile == default) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendDto<FilmFile, FilmDto>(filmFile);
+            if (filmDto == default) return await res.SendStatus(HttpStatusCode.NotFound);
+            return await res.SendJson(filmDto);
         }
         
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
@@ -49,10 +49,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
-            var filmFile = await FilmService.FindFilmFile(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var filmFile = await FilmService.FindFilmFileInfo(id, session.IsAdmin, session.User.LibraryAccessIds);
 
             if (filmFile == default) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendDto<FilmFile, InfoDto>(filmFile);
+            return await res.SendJson(filmFile);
         }
         
     }

@@ -45,7 +45,7 @@ namespace NxPlx.WebApi
             {
                 Secure = cfg.Production,
                 Path = "/",
-                Store = new EntityFrameworkSessionStore<UserSession>(() => new UserContext())
+                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext())
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
@@ -86,7 +86,7 @@ namespace NxPlx.WebApi
         private static async Task CreateAdminAccount(ResolveContainer container)
         {
             var logger = container.Resolve<ILoggingService>();
-            await using var ctx = container.Resolve<IReadUserContext>();
+            await using var ctx = container.Resolve<IReadContext>();
             await using var transaction = ctx.BeginTransactionedContext();
             if (await ctx.Users.Count() == default)
             {

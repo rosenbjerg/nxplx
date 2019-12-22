@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<UserSession?> TryCreateSession(string username, string password, string userAgent)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
+            await using var context = container.Resolve<IReadContext>();
             var user = await context.Users.One(u => u.Username == username);
 
             if (user != null && PasswordUtils.Verify(password, user.PasswordHash))

@@ -28,9 +28,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var lang = req.Context.ExtractUrlParameter("lang");
             var kind = req.Context.ExtractUrlParameter("kind");
 
-            var subtitle = await SubtitleService.GetSubtitlePath(kind, id, lang);
+            var subtitlePath = await SubtitleService.GetSubtitlePath(kind, id, lang);
 
-            return await res.SendFile(subtitle.Path);
+            return await res.SendFile(subtitlePath);
         }
         private static async Task<HandlerType> SetLanguagePreferenceByFileId(Request req, Response res)
         {

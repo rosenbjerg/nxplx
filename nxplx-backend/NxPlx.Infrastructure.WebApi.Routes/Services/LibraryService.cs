@@ -6,6 +6,7 @@ using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
+using NxPlx.Models.Dto.Models;
 
 namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
@@ -14,8 +15,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<bool> SetUserLibraryPermissions(int userId, List<int> libraryIds)
         {
             var container = ResolveContainer.Default();
-            await using var mediaContext = container.Resolve<IReadMediaContext>();
-            await using var userContext = container.Resolve<IReadUserContext>();
+            await using var mediaContext = container.Resolve<IReadContext>();
+            await using var userContext = container.Resolve<IReadContext>();
             await using var transaction = userContext.BeginTransactionedContext();
 
             var user = await transaction.Users.OneById(userId);
@@ -53,7 +54,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             Library library;
 
-            await using var readUserContext = container.Resolve<IReadUserContext>();
+            await using var readUserContext = container.Resolve<IReadContext>();
             await using var userTransaction = readUserContext.BeginTransactionedContext();
             foreach (var user in await userTransaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)))
             {
@@ -62,7 +63,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             await userTransaction.SaveChanges();
 
-            await using (var context = container.Resolve<IReadMediaContext>())
+            await using (var context = container.Resolve<IReadContext>())
             await using (var mediaTransaction = context.BeginTransactionedContext())
             {
                 library = await mediaTransaction.Libraries.OneById(libraryId);
@@ -97,14 +98,15 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
             return true;
         }
-        public static async Task<User?> FindUser(int userId)
+        public static async Task<List<int>?> FindLibraryAccess(int userId)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadUserContext>();
+            await using var context = container.Resolve<IReadContext>();
 
-            return await context.Users.OneById(userId);
+            var user = await context.Users.OneById(userId);
+            return user?.LibraryAccessIds;
         }
-        public static async Task<Library> CreateNewLibrary(string name, string path, string language, string kind)
+        public static async Task<AdminLibraryDto> CreateNewLibrary(string name, string path, string language, string kind)
         {
             var lib = new Library
             {
@@ -115,14 +117,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             };
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadMediaContext>();
+            await using var context = container.Resolve<IReadContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             transaction.Libraries.Add(lib);
             await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>().Info("Created library {Name} with {Path}", lib.Name, lib.Path);
-            return lib;
+            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib);
         }
     }
 }
