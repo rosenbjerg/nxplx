@@ -52,6 +52,13 @@ namespace NxPlx.Services.Database
                 poster = filmDetails.PosterPath,
                 title = filmDetails.Title
             });
+            SetMapping<MovieCollection, OverviewElementDto>(movieCollection => new OverviewElementDto
+            {
+                id = movieCollection.Id,
+                kind = "collection",
+                poster = movieCollection.PosterPath,
+                title = movieCollection.Name
+            });
             
             SetMapping<FilmFile, FilmDto>(filmFilm => new FilmDto
             {
@@ -175,14 +182,14 @@ namespace NxPlx.Services.Database
                 id = library.Id,
                 name = library.Name,
                 language = library.Language,
-                kind = library.Kind.ToString()
+                kind = library.Kind.ToString().ToLowerInvariant()
             });
             SetMapping<Library, AdminLibraryDto>(library => new AdminLibraryDto
             {
                 id = library.Id,
                 name = library.Name,
                 language = library.Language,
-                kind = library.Kind.ToString(),
+                kind = library.Kind.ToString().ToLowerInvariant(),
                 path = library.Path
             });
             

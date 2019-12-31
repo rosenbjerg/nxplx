@@ -9,6 +9,7 @@ import Typography from 'preact-material-components/Typography';
 import 'preact-material-components/Typography/style.css';
 import { connect } from "unistore/preact";
 import { Store } from "unistore";
+import { translate } from "../../localisation";
 
 const actions = (store:Store<NxPlxStore>) => (
     {
@@ -55,13 +56,13 @@ export class Login2 extends Component {
         return (
             <div class={style.login}>
                 <Helmet title={`Login at NxPlx`} />
-                <Typography headline5>NxPlx Login</Typography>
+                <Typography headline5>NxPlx</Typography>
                 <form onSubmit={this.login}>
                     <div>
-                        <input placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required/>
-                        <input placeholder="Password" type="password" name={'password'} minLength={6} maxLength={50} required/>
+                        <input placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>
+                        <input placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required/>
                     </div>
-                    <button class="bordered">Login</button>
+                    <button class="bordered">{translate('login')}</button>
                 </form>
             </div>
         );

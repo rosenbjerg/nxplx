@@ -7,6 +7,7 @@ import UserPermissions from "../../components/UserPermissions";
 import http from "../../Http";
 import { Library, User } from "../../models";
 import * as style from "./style.css";
+import { translate } from "../../localisation";
 
 interface Props {}
 interface State {
@@ -25,17 +26,17 @@ export default class Admin extends Component<Props, State> {
     public render(props:Props, { users, libraries, selectedUser }:State) {
         return (
             <div class={style.profile}>
-                <h1>Admin stuff</h1>
+                <h1>{translate('admin-stuff')}</h1>
 
-                <h2>Libraries</h2>
+                <h2>{translate('libraries')}</h2>
                 <form onSubmit={this.submitNewLibrary}>
                     <table class="fullwidth">
                         <thead>
                             <tr>
-                                <td class={style.td}>Name</td>
-                                <td class={style.td}>Kind</td>
-                                <td class={style.td}>Language</td>
-                                <td class={style.td}>Path</td>
+                                <td class={style.td}>{translate('name')}</td>
+                                <td class={style.td}>{translate('kind')}</td>
+                                <td class={style.td}>{translate('language')}</td>
+                                <td class={style.td}>{translate('path')}</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,9 +44,9 @@ export default class Admin extends Component<Props, State> {
                                 !libraries ? (<Loading />) : libraries.map(l => (
                                     <tr key={l.id}>
                                         <td class={style.td}>{l.name}</td>
-                                        <td class={style.td}>{l.kind}</td>
+                                        <td class={style.td}>{translate(l.kind)}</td>
                                         <td class={style.td}>{l.language}</td>
-                                        <td class={style.td}>{l.path || 'not specified'}</td>
+                                        <td class={style.td}>{l.path || translate('not specified')}</td>
                                         <td>
                                             <button type="button" onClick={this.indexLibrary(l)} class="material-icons bordered">refresh</button>
                                             <button type="button" onClick={this.deleteLibrary(l)} class="material-icons bordered">close</button>
@@ -55,12 +56,12 @@ export default class Admin extends Component<Props, State> {
                             }
                             <tr>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="name" placeholder="Name" type="text" required/>
+                                    <input class="inline-edit fullwidth" name="name" placeholder={translate('name')} type="text" required/>
                                 </td>
                                 <td>
                                     <select class="inline-edit fullwidth" name="kind" required>
-                                        <option value="film">Film</option>
-                                        <option value="series">Series</option>
+                                        <option value={'film'}>{translate('film')}</option>
+                                        <option value={'series'}>{translate('series')}</option>
                                     </select>
                                 </td>
                                 <td>
@@ -70,7 +71,7 @@ export default class Admin extends Component<Props, State> {
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="path" placeholder="Path" type="text" required/>
+                                    <input class="inline-edit fullwidth" name="path" placeholder={translate('path')} type="text" required/>
                                 </td>
                                 <td>
                                     <button class="material-icons bordered">done</button>
@@ -79,33 +80,33 @@ export default class Admin extends Component<Props, State> {
                         </tbody>
                     </table>
                 </form>
-                <button class="bordered" onClick={this.indexAllLibraries}>Index all libraries</button>
+                <button class="bordered" onClick={this.indexAllLibraries}>{translate('index-all-libraries')}</button>
                 <DirectoryBrowser/>
 
-                <h2>Users</h2>
+                <h2>{translate('users')}</h2>
                 <form onSubmit={this.submitNewUser}>
                     <table class="fullwidth">
                         <thead>
                         <tr>
-                            <td class={style.td}>Username</td>
-                            <td class={style.td}>Email</td>
-                            <td class={style.td}>Privileges</td>
-                            <td class={style.td}>Has changed password</td>
+                            <td class={style.td}>{translate('username')}</td>
+                            <td class={style.td}>{translate('email')}</td>
+                            <td class={style.td}>{translate('privileges')}</td>
+                            <td class={style.td}>{translate('has-changed-password')}</td>
                         </tr>
                         </thead>
                         <tbody>
                             {
                                 !users ? (<Loading />) : users.map(u => (
-                                    <tr key={u.username}>
+                                    <tr key={u.id}>
                                         <td class={style.td}>{u.username}</td>
-                                        <td class={style.td}>{u.email || 'none'}</td>
-                                        <td class={style.td}>{u.isAdmin ? 'admin' : 'user'}</td>
-                                        <td class={style.td} colSpan={2}>{u.passwordChanged ? 'Yes' : 'No'}</td>
+                                        <td class={style.td}>{u.email || translate('none')}</td>
+                                        <td class={style.td}>{u.isAdmin ? translate('admin') : translate('user')}</td>
+                                        <td class={style.td} colSpan={2}>{u.passwordChanged ? translate('yes') : translate('no')}</td>
                                         <td>
                                             {u.username !== 'admin' && (
                                                 <span>
-                                                    <button type="button" onClick={() => this.setState({ selectedUser:u })} class="material-icons bordered">video_library</button>
                                                     <button type="button" onClick={this.deleteUser(u)} class="material-icons bordered">close</button>
+                                                    <button type="button" onClick={() => this.setState({ selectedUser:u })} class="material-icons bordered">video_library</button>
                                                 </span>
                                             )}
                                         </td>
@@ -114,22 +115,22 @@ export default class Admin extends Component<Props, State> {
                             }
                             <tr>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="username" minLength={4} maxLength={20} placeholder="Username" type="text" required/>
+                                    <input class="inline-edit fullwidth" name="username" minLength={4} maxLength={20} placeholder={translate('username')} type="text" required/>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="email" placeholder="Email" type="email"/>
+                                    <input class="inline-edit fullwidth" name="email" placeholder={translate('email')} type="email"/>
                                 </td>
                                 <td>
                                     <select class="inline-edit fullwidth" name="privileges" required>
-                                        <option value="user">User</option>
-                                        <option value="admin">Admin</option>
+                                        <option value="user">{translate('user')}</option>
+                                        <option value="admin">{translate('admin')}</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="password1" placeholder="Initial password" minLength={6} maxLength={50} type="password" required/>
+                                    <input class="inline-edit fullwidth" name="password1" placeholder={translate('initial-password')} minLength={6} maxLength={50} type="password" required/>
                                 </td>
                                 <td>
-                                    <input class="inline-edit fullwidth" name="password2" placeholder="Initial password (repeat)" minLength={6} maxLength={50} type="password" required/>
+                                    <input class="inline-edit fullwidth" name="password2" placeholder={translate('initial-password-again')} minLength={6} maxLength={50} type="password" required/>
                                 </td>
                                 <td>
                                     <button class="material-icons bordered">done</button>
@@ -139,8 +140,7 @@ export default class Admin extends Component<Props, State> {
                     </table>
                 </form>
                 <div>
-                    {selectedUser && (<h3>Libraries that {selectedUser.username} have access to</h3>)}
-                    <UserPermissions userId={selectedUser && selectedUser.id}/>
+                    <UserPermissions user={selectedUser}/>
                 </div>
             </div>
         );
