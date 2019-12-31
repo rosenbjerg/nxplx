@@ -1,13 +1,14 @@
 import { Component, h } from "preact";
 import Loading from '../../components/loading';
 import http from "../../Http";
-import { Library } from "../../models";
+import { Library, User } from "../../models";
 import * as style from './style.css'
 
 import linkState from "linkstate";
 import Checkbox from 'preact-material-components/Checkbox';
 import 'preact-material-components/Checkbox/style.css';
 import FormField from 'preact-material-components/FormField';
+import { translate } from "../../localisation";
 
 interface UserPermission {
     library:Library
@@ -15,10 +16,10 @@ interface UserPermission {
 }
 
 interface Props {
-    userId?:number
+    user?:User
 }
 interface State {
-    currentUserId?:number
+    currentUser?:User
     permissions?: UserPermission[]
 }
 
@@ -26,8 +27,8 @@ export default class UserPermissions extends Component<Props, State> {
 
 
     public componentDidUpdate(previousProps: Readonly<Props>, previousState: Readonly<State>, previousContext: any): void {
-        if (this.props.userId && previousProps.userId !== this.props.userId) {
-            this.setState({ currentUserId: this.props.userId });
+        if (this.props.user && previousProps.user !== this.props.user) {
+            this.setState({ currentUser: this.props.user });
             this.loadUserPermissions();
         }
     }
@@ -35,7 +36,7 @@ export default class UserPermissions extends Component<Props, State> {
     public loadUserPermissions() {
         Promise.all([
             http.get(`/api/library/list`).then(res => res.json()),
-            http.get(`/api/library/permissions?userId=${this.state.currentUserId}`).then(res => res.json())
+            http.get(`/api/library/permissions?userId=${this.state.currentUser!.id}`).then(res => res.json())
         ]).then(results => {
             const libraries:Library[] = results[0];
             const permissionIds = results[1];
@@ -50,14 +51,14 @@ export default class UserPermissions extends Component<Props, State> {
     }
 
     public savePermissions = async () => {
-        if (!this.props.userId || this.state.permissions === undefined) return;
+        if (!this.props.user || this.state.permissions === undefined) return;
 
         const permissions = this.state.permissions
             .filter(p => p.hasPermission)
             .map(p => p.library.id);
 
         const form = new FormData();
-        form.append('userId', this.props.userId.toString());
+        form.append('userId', this.props.user.id.toString());
         for (const up of permissions) {
             form.append('libraries', up.toString());
         }
@@ -66,7 +67,7 @@ export default class UserPermissions extends Component<Props, State> {
         if (response.ok) {
             console.log('permissions saved!');
             this.setState({
-                currentUserId: undefined,
+                currentUser: undefined,
                 permissions: undefined
             })
 
@@ -78,9 +79,10 @@ export default class UserPermissions extends Component<Props, State> {
 
         return (
             <div class={style.container}>
+                <h3>{translate('libraries-username-has-access-to', props.user.username)}</h3>
                 {permissions.map((up, i) => (
                     <div key={up.library.id}>
-                        <FormField>
+                        <FormField class={style.forceThemeFont}>
                             <span>{up.library.name} ({up.library.language})</span>
                             <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>
                         </FormField>
