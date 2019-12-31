@@ -74,7 +74,7 @@ export default class UserPermissions extends Component<Props, State> {
     };
 
     public render(props:Props, { permissions }:State) {
-        if (!props.userId || permissions === undefined) return null;
+        if (!props.user || permissions === undefined) return <span/>;
 
         return (
             <div class={style.container}>

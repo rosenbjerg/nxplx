@@ -28,7 +28,7 @@ export default class Season extends Component<Props, State> {
 
     public render(props:Props, { series, season, bg, bgImg }:State) {
         if (!series) {
-            return (<Loading />);
+            return (<div class={style.content}><Loading /></div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>

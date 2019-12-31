@@ -25,7 +25,10 @@ export default class Profile extends Component<Props, State> {
     }
     
     public render(props:Props, { user }:State) {
-        if (!user) { return (<Loading/>); }
+        if (!user)
+        {
+            return (<div class={style.profile}><Loading /></div>);
+        }
         return (
             <div class={style.profile}>
                 <h1>Account settings for {user.username}</h1>

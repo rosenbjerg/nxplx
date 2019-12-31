@@ -20,7 +20,6 @@ export default class Series extends Component<Props, State> {
             .then(response => response.json())
             .then((details:SeriesDetails) => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
-                console.log(details);
                 this.setState({ details, bg });
             });
     }

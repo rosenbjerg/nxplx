@@ -32,7 +32,7 @@ export default class Home extends Component<Props, State> {
 
     public render(props:Props, { details, bg, subtitle }:State) {
         if (!details) {
-            return (<Loading />);
+            return (<div class={style.content}><Loading /></div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>

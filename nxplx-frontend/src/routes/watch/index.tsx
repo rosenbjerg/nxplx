@@ -41,7 +41,7 @@ export default class Watch extends Component<Props, State> {
 
     public render({ kind, fid }: Props, state: State) {
         if (!state.info) {
-            return <Loading/>;
+            return (<div class={style.container}><Loading /></div>);
         }
         const completed = (this.playerTime / state.info.duration) > 0.95;
         return (
