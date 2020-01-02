@@ -56,13 +56,13 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
             var collections = filmDetails
                 .Where(fd => fd.BelongsInCollectionId.HasValue)
-                .GroupBy(fd => fd.BelongsInCollection)
+                .GroupBy(fd => fd.BelongsInCollectionId)
                 .Where(group => group.Count() > 1)
-                .Select(group => group.Key)
+                .Select(group => group.First().BelongsInCollection)
                 .ToList();
 
             var collectionIds = collections.Select(c => c.Id).ToList();
-            var notInCollections = filmDetails.Where(fd => fd.BelongsInCollectionId == null || collectionIds.Contains(fd.BelongsInCollectionId.Value)).ToList();
+            var notInCollections = filmDetails.Where(fd => fd.BelongsInCollectionId == null || !collectionIds.Contains(fd.BelongsInCollectionId.Value)).ToList();
             
             var dtoMapper = container.Resolve<IDtoMapper>();
             var overview = new List<OverviewElementDto>(notInCollections.Count + seriesDetails.Count + collections.Count);
