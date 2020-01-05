@@ -6,19 +6,20 @@ import Helmet from 'preact-helmet';
 import { Link } from "preact-router";
 import { formatInfoPair, formatRunTime } from '../../commonFilmInfo';
 import Loading from '../../components/loading';
-import { imageUrl, round, SeasonDetails, SeriesDetails } from "../../Details";
+import { imageUrl, MovieCollection, round, SeasonDetails, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 
 interface Props { id:string }
 
-interface State { details:SeriesDetails, bg:string }
+interface State { details:MovieCollection, bg:string }
 
 export default class Collection extends Component<Props, State> {
     public componentDidMount() : void {
         http.get(`/api/film/collection/detail/${this.props.id}`)
             .then(response => response.json())
-            .then((details:SeriesDetails) => {
+            .then((details:MovieCollection) => {
+                console.log(details);
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
                 this.setState({ details, bg });
             });
@@ -36,32 +37,14 @@ export default class Collection extends Component<Props, State> {
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                     </div>
-                    <img class={style.poster} src={imageUrl(details.poster, 500)}
-                         alt=""/>
-                    <span class={[style.info, style.marked].join(" ")}>
-                        <div>
-                            {
-                                [
-                                    // {title: 'Released', value: details.seasons[0].airDate.substr(0, 4)},
-                                    // {title: 'Episode run time', value: formatRunTime(details.e)},
-                                    {title: 'Rating', value: `${round(details.voteAverage)}/10 from ${details.voteCount} votes`},
-                                    {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},
-                                    {title: 'Networks', value: details.networks.map(n => n.name).join(", ")},
-                                    {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
-                                    {title: 'Seasons', value: details.seasons.length.toString()},
-                                    // {title: 'Episodes', value: details.seasons.reduce((acc, s) => acc + s.episodes.length, 0).toString()},
-                                ].map(formatInfoPair)
-                            }
-                        </div>
-                    </span>
+                    <img class={style.poster} src={imageUrl(details.poster, 500)} alt=""/>
                     <div>
-                        {orderBy(details.seasons, ['number'], ['asc'])
-                            .map(season => (
+                        {orderBy(details.movies, ['year', 'title'], ['asc'])
+                            .map(movie => (
                                 <span class={style.seasonContainer}>
-                                    <Link href={`/series/${details.id}/${season.number}`}>
-                                        <img tabIndex={1} key={season.number} class={style.season} src={imageUrl(season.poster, 342, details.poster)} title={`Season ${season.number}`} alt={season.number.toString()} />
+                                    <Link href={`/${movie.kind}/${movie.id}`}>
+                                        <img tabIndex={1} key={movie.id} class={style.season} src={imageUrl(movie.poster, 342, details.poster)} title={movie.title} alt={movie.title} />
                                     </Link>
-                                    <b class={style.number}>S{season.number}</b>
                                 </span>
 
                                 )

@@ -5,9 +5,9 @@ import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Loading from "../../components/loading"
 import UserPermissions from "../../components/UserPermissions";
 import http from "../../Http";
-import { Library, User } from "../../models";
 import * as style from "./style.css";
 import { translate } from "../../localisation";
+import { Library, User } from "../../models";
 
 interface Props {}
 interface State {

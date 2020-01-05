@@ -1,7 +1,6 @@
 import { Component, h } from "preact";
 import Loading from '../../components/loading';
 import http from "../../Http";
-import { Library, User } from "../../models";
 import * as style from './style.css'
 
 import linkState from "linkstate";
@@ -9,6 +8,7 @@ import Checkbox from 'preact-material-components/Checkbox';
 import 'preact-material-components/Checkbox/style.css';
 import FormField from 'preact-material-components/FormField';
 import { translate } from "../../localisation";
+import { Library, User } from "../../models";
 
 interface UserPermission {
     library:Library
@@ -82,7 +82,7 @@ export default class UserPermissions extends Component<Props, State> {
                 <h3>{translate('libraries-username-has-access-to', props.user.username)}</h3>
                 {permissions.map((up, i) => (
                     <div key={up.library.id}>
-                        <FormField class={style.forceThemeFont}>
+                        <FormField>
                             <span>{up.library.name} ({up.library.language})</span>
                             <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>
                         </FormField>

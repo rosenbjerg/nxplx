@@ -5,7 +5,7 @@ import Helmet from "preact-helmet";
 import { Store } from "unistore";
 import Loading from "../../components/loading";
 import { formatSubtitleName } from "../../components/Subtitles";
-import { imageUrl } from "../../Details";
+import { imageUrl } from "../../models";
 import http from "../../Http";
 import { FileInfo } from "../../models";
 import * as style from "./style.css";

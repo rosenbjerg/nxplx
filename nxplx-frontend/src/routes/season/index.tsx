@@ -6,7 +6,7 @@ import { Link } from "preact-router";
 import { formatInfoPair } from '../../commonFilmInfo';
 import { EpisodeStill } from "../../components/EpisodeStill";
 import Loading from '../../components/loading';
-import { EpisodeDetails, imageUrl, SeasonDetails, SeriesDetails } from "../../Details";
+import { EpisodeDetails, imageUrl, SeasonDetails, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 

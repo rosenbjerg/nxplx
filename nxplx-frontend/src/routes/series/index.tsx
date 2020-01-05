@@ -6,7 +6,7 @@ import Helmet from 'preact-helmet';
 import { Link } from "preact-router";
 import { formatInfoPair, formatRunTime } from '../../commonFilmInfo';
 import Loading from '../../components/loading';
-import { imageUrl, round, SeasonDetails, SeriesDetails } from "../../Details";
+import { imageUrl, round, SeasonDetails, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 

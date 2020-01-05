@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { Link } from "preact-router";
-import { imageUrl } from "../../Details";
+import { imageUrl } from "../../models";
 import * as style from './style.css';
 
 interface Props { poster:string, href:string, posterClick?:()=>{} }

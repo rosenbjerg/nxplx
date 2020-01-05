@@ -26,18 +26,23 @@ if ((module as any).hot) {
 const store = createStore<NxPlxStore>({
     isLoggedIn: false,
     isAdmin: false,
-    build: '',
-    localeReady: false
+    build: ''
 });
 
-export default class App extends Component {
+interface Props {  }
 
-    public render() {
+interface State { localeReady: boolean }
+
+export default class App extends Component<Props, State> {
+    public state = {
+        localeReady: false
+    };
+    public render(props:Props, state:State) {
         return (
             <Provider store={store}>
                 <div id="app">
                     <Header />
-                    {store.getState().localeReady ? (
+                    {!state.localeReady ? (
                         <Loading/>
                     ) : (
                         <Router>
@@ -63,8 +68,7 @@ export default class App extends Component {
         this.loadBuild();
     }
     private loadDictionary() {
-        setLocale(getEntry('locale', 'en'))
-            .then(() => store.setState({ localeReady: true }));
+        setLocale(getEntry('locale', 'en')).then(() => this.setState({ localeReady: true }));
     }
     private loadBuild() {
         http.get('/api/build')

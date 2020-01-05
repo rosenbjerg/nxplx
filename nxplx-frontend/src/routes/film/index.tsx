@@ -6,7 +6,7 @@ import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
 import { FilmPoster } from "../../components/FilmPoster";
 import Loading from '../../components/loading';
 import Subtitles from '../../components/Subtitles';
-import { FilmDetails, imageUrl, SeriesDetails } from "../../Details";
+import { FilmDetails, imageUrl, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 

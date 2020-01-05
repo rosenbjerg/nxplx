@@ -1,13 +1,13 @@
-import { Component, h } from "preact";
-import Loading from '../../components/loading';
-import http from "../../Http";
-import { Library, User } from "../../models";
-import * as style from "./style.css";
-import FormField from 'preact-material-components/FormField';
-import 'preact-material-components/FormField/style.css';
 import { createSnackbar } from "@snackbar/core";
+import { Component, h } from "preact";
+import 'preact-material-components/FormField/style.css';
+import Loading from '../../components/loading';
 import SessionManager from "../../components/SessionManager";
+import http from "../../Http";
 import { translate } from "../../localisation";
+import { getEntry, setEntry } from "../../localstorage";
+import { User } from "../../models";
+import * as style from "./style.css";
 
 interface Props {
 }
@@ -85,6 +85,12 @@ export default class Profile extends Component<Props, State> {
                     </table>
                     <button class="bordered">{translate('change-password')}</button>
                 </form>
+
+                <h3>{translate('language')}</h3>
+                <select class="inline-edit" onInput={e => setEntry('locale', (e as any).target.value)} value={getEntry('locale', 'en')}>
+                    <option value="en">English</option>
+                    <option value="da">Dansk</option>
+                </select>
 
                 <h3>{translate('your-active-sessions')}</h3>
                 <SessionManager/>
