@@ -9,8 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Red.CookieSessions" Version="4.1.0" />
-      <PackageReference Include="Red.CookieSessions.EFCore" Version="1.2.1" />
+      <PackageReference Include="Red.CookieSessions" Version="5.0.0" />
+      <PackageReference Include="Red.CookieSessions.EFCore" Version="3.3.0" />
       <PackageReference Include="RHttpServer" Version="4.0.2" />
     </ItemGroup>
 

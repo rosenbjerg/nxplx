@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
@@ -45,7 +47,7 @@ namespace NxPlx.WebApi
             {
                 Secure = cfg.Production,
                 Path = "/",
-                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext())
+                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext(), session => session.User)
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
