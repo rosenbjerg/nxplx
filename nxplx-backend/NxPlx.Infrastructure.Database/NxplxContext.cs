@@ -25,6 +25,7 @@ namespace NxPlx.Services.Database
         public DbSet<WatchingProgress> WatchingProgresses { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
+        public DbSet<Genre> Genre { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -36,7 +37,7 @@ namespace NxPlx.Services.Database
 
             modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Seasons).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<SeasonDetails>().HasMany(s => s.Episodes).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<DbFilmDetails>().HasOne(fd => fd.BelongsInCollection).WithMany().OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<DbFilmDetails>().HasOne(fd => fd.BelongsInCollection).WithMany(mc => mc.Movies).OnDelete(DeleteBehavior.Restrict);
             
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
             modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);
