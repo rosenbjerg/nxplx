@@ -5,15 +5,16 @@ using Microsoft.EntityFrameworkCore.Storage;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
+using NxPlx.Models.Details;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper
 {
-    public class TransactionedContext : ReadContext, INxplxContext
+    public class TransactionedNxplxContext : ReadNxplxContext, INxplxContext
     {
         private readonly IDbContextTransaction _transaction;
 
-        internal TransactionedContext(NxplxContext context) : base(context)
+        internal TransactionedNxplxContext(NxplxContext context) : base(context)
         {
             _filmFiles = InitLazySet(context, context.FilmFiles);
             _episodeFiles = InitLazySet(context, context.EpisodeFiles);
@@ -23,6 +24,7 @@ namespace NxPlx.Services.Database.Wrapper
             _watchingProgresses = InitLazySet(context, context.WatchingProgresses);
             _users = InitLazySet(context, context.Users);
             _userSessions = InitLazySet(context, context.UserSessions);
+            _genres = InitLazySet(context, context.Genre);
         }
         
         private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)
@@ -38,6 +40,7 @@ namespace NxPlx.Services.Database.Wrapper
         private readonly Lazy<EntitySet<WatchingProgress>> _watchingProgresses;
         private readonly Lazy<EntitySet<User>> _users;
         private readonly Lazy<EntitySet<UserSession>> _userSessions;
+        private readonly Lazy<EntitySet<Genre>> _genres;
 
         public new IEntitySet<FilmFile> FilmFiles => _filmFiles.Value;
         public new IEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
@@ -46,6 +49,7 @@ namespace NxPlx.Services.Database.Wrapper
         public new IEntitySet<WatchingProgress> WatchingProgresses => _watchingProgresses.Value;
         public new IEntitySet<User> Users => _users.Value;
         public new IEntitySet<UserSession> UserSessions => _userSessions.Value;
+        public new IEntitySet<Genre> Genres => _genres.Value;
 
         public Task SaveChanges()
         {

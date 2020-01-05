@@ -17,7 +17,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
             var current = await ctx.EpisodeFiles.OneById(fileId);
 
             var season = await ctx.EpisodeFiles.Many(ef =>
@@ -39,7 +39,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<string?> FindEpisodeFilePath(int id, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
 
             return await ctx.EpisodeFiles
                 .ProjectOne(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Path);
@@ -47,7 +47,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<InfoDto?> FindEpisodeFileInfo(int id, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
 
             var episode = await ctx.EpisodeFiles
                 .One(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Subtitles);
@@ -56,7 +56,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<SeriesDto?> FindSeriesDetails(int id, bool isAdmin, List<int> libraryAccess, int? season)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
 
             var episodes = await ctx.EpisodeFiles
                 .Many(ef => ef.SeriesDetailsId == id &&

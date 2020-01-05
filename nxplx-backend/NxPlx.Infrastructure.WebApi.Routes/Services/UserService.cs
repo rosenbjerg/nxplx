@@ -15,7 +15,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task UpdateUser(int userId, IFormCollection form)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             var user = await transaction.Users.OneById(userId);
@@ -30,7 +30,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<bool> RemoveUser(string username)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             var user = await transaction.Users.One(u => u.Username == username);
@@ -48,7 +48,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             if (string.IsNullOrWhiteSpace(password1) || password1 != password2) return false;
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
             var user = await transaction.Users.OneById(userId);
 
@@ -64,14 +64,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<IEnumerable<UserDto>> GetUsers()
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             var users = await context.Users.Many();
             return container.Resolve<IDtoMapper>().Map<User, UserDto>(users);
         }
         public static async Task<UserDto> GetUser(int userId)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             var user = await context.Users.OneById(userId);
             return container.Resolve<IDtoMapper>().Map<User, UserDto>(user);
@@ -88,7 +88,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             };
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             transaction.Users.Add(user);

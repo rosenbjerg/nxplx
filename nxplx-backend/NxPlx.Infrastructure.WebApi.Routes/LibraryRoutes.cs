@@ -70,7 +70,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<IEnumerable<LibraryDto>> ListLibraries(bool isAdmin, IEnumerable<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             if (isAdmin)
             {

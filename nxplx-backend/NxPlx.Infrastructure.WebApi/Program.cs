@@ -86,7 +86,7 @@ namespace NxPlx.WebApi
         private static async Task CreateAdminAccount(ResolveContainer container)
         {
             var logger = container.Resolve<ILoggingService>();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
             await using var transaction = ctx.BeginTransactionedContext();
             if (await ctx.Users.Count() == default)
             {

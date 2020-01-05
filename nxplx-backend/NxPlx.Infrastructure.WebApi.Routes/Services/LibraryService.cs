@@ -15,8 +15,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<bool> SetUserLibraryPermissions(int userId, List<int> libraryIds)
         {
             var container = ResolveContainer.Default();
-            await using var mediaContext = container.Resolve<IReadContext>();
-            await using var userContext = container.Resolve<IReadContext>();
+            await using var mediaContext = container.Resolve<IReadNxplxContext>();
+            await using var userContext = container.Resolve<IReadNxplxContext>();
             await using var transaction = userContext.BeginTransactionedContext();
 
             var user = await transaction.Users.OneById(userId);
@@ -54,7 +54,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             Library library;
 
-            await using var readUserContext = container.Resolve<IReadContext>();
+            await using var readUserContext = container.Resolve<IReadNxplxContext>();
             await using var userTransaction = readUserContext.BeginTransactionedContext();
             foreach (var user in await userTransaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)))
             {
@@ -63,7 +63,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             await userTransaction.SaveChanges();
 
-            await using (var context = container.Resolve<IReadContext>())
+            await using (var context = container.Resolve<IReadNxplxContext>())
             await using (var mediaTransaction = context.BeginTransactionedContext())
             {
                 library = await mediaTransaction.Libraries.OneById(libraryId);
@@ -101,7 +101,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<List<int>?> FindLibraryAccess(int userId)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             var user = await context.Users.OneById(userId);
             return user?.LibraryAccessIds;
@@ -117,7 +117,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             };
 
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             transaction.Libraries.Add(lib);

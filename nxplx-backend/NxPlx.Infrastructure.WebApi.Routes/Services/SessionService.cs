@@ -13,7 +13,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<bool> CloseUserSession(string sessionId, int currentUserId, bool isAdmin)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             var session = await transaction.UserSessions.OneById(sessionId);
@@ -29,7 +29,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<IEnumerable<UserSessionDto>> GetUserSessions(int userId)
         {
             var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             var sessions = await context.UserSessions.Many(s => s.UserId == userId);
             return container.Resolve<IDtoMapper>().Map<UserSession, UserSessionDto>(sessions);

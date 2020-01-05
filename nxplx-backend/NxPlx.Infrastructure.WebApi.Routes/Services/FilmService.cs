@@ -14,7 +14,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<FilmDto> FindFilmByDetails(int id, bool isAdmin, List<int> libraryAccess)
         {
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
             var filmFile = await ctx.FilmFiles
                 .One(ff => ff.FilmDetailsId == id && (isAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
 
@@ -24,7 +24,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         {
             var container = ResolveContainer.Default();
 
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
             var filmFile = await ctx.FilmFiles
                 .One(ff => ff.Id == fileId && (isAdmin || libraryAccess.Contains(ff.PartOfLibraryId)));
             return container.Resolve<IDtoMapper>().Map<FilmFile, InfoDto>(filmFile);
@@ -32,7 +32,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         }
         public static async Task<string> FindFilmFilePath(int fileId, bool isAdmin, List<int> libraryAccess)
         {
-            await using var ctx = ResolveContainer.Default().Resolve<IReadContext>();
+            await using var ctx = ResolveContainer.Default().Resolve<IReadNxplxContext>();
             return await ctx.FilmFiles
                 .ProjectOne(ff => ff.Id == fileId && (isAdmin || libraryAccess.Contains(ff.PartOfLibraryId)), ff => ff.Path);
         }
