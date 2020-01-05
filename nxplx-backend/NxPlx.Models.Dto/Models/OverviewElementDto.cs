@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace NxPlx.Models.Dto.Models
 {
     public class OverviewElementDto : IDto
@@ -6,5 +8,7 @@ namespace NxPlx.Models.Dto.Models
         public string title { get; set; }
         public string poster { get; set; }
         public string kind { get; set; }
+        public int year { get; set; }
+        public List<int> genres { get; set; }
     }
 }

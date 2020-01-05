@@ -19,6 +19,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Get("/detail/:film_id", Authenticated.User, GetFilmDetails);
             
+            router.Get("/collection/detail/:collection_id", Authenticated.User, GetCollectionDetails);
+            
             router.Get("/watch/:file_id", Authenticated.User, StreamFile);
         }
 
@@ -44,6 +46,17 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             return await res.SendJson(filmDto);
         }
         
+        private static async Task<HandlerType> GetCollectionDetails(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var id = int.Parse(req.Context.ExtractUrlParameter("collection_id"));
+            
+            var collectionDto = await FilmService.FindCollectionByDetails(id, session.IsAdmin, session.User.LibraryAccessIds);
+
+            if (collectionDto == default) return await res.SendStatus(HttpStatusCode.NotFound);
+            return await res.SendJson(collectionDto);
+        }
+
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
         {
             var session = req.GetData<UserSession>();

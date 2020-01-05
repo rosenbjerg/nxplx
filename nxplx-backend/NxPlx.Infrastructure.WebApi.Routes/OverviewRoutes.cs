@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models.Database;
+using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Models.Dto.Models.Film;
@@ -19,6 +21,20 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Get("/", Authenticated.User, GetOverview);
+            router.Get("/genres", Authenticated.User, GetGenresOverview);
+        }
+
+        private static async Task<HandlerType> SendCachedJson(this Response res, string key, Func<Task<object>> builder)
+        {
+            var cache = ResolveContainer.Default().Resolve<ICachingService>();
+            var cached = await cache.GetAsync(key);
+            if (cached == null)
+            {
+                cached = System.Text.Json.JsonSerializer.Serialize(await builder());
+                await cache.SetAsync(key, cached, CacheKind.JsonResponse);
+            }
+            
+            return await res.SendString(cached, "application/json");
         }
 
         private static async Task<HandlerType> GetOverview(Request req, Response res)
@@ -26,24 +42,28 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
 
             var libs = session.User.LibraryAccessIds;
             if (session.IsAdmin) libs = await ctx.Libraries.ProjectMany(null, l => l.Id);
-            
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
-            var cacher = container.Resolve<ICachingService>();
-            var cached = await cacher.GetAsync(overviewCacheKey);
-            if (cached == null)
-            {
-                cached = await BuildOverview(container, ctx, libs);
-                await cacher.SetAsync(overviewCacheKey, cached, CacheKind.JsonResponse);
-            }
-            
-            return await res.SendString(cached, "application/json");
+            return await res.SendCachedJson(overviewCacheKey, async () => await BuildOverview(container, ctx, libs));
         }
 
-        private static async Task<string> BuildOverview(ResolveContainer container, IReadContext ctx, List<int> libs)
+        private static async Task<HandlerType> GetGenresOverview(Request req, Response res)
+        {
+            var container = ResolveContainer.Default();
+            var overviewCacheKey = "OVERVIEW:GENRES";
+            return await res.SendCachedJson(overviewCacheKey, async () =>
+            {
+                await using var ctx = container.Resolve<IReadNxplxContext>();
+                var genres = await ctx.Genres.Many();
+                
+                var dtoMapper = container.Resolve<IDtoMapper>();
+                return dtoMapper.Map<Genre, GenreDto>(genres);
+            });
+        }
+        private static async Task<List<OverviewElementDto>> BuildOverview(ResolveContainer container, IReadNxplxContext ctx, List<int> libs)
         {
 
             var seriesDetails = await ctx.EpisodeFiles.ProjectMany(
@@ -52,7 +72,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
             var filmDetails = await ctx.FilmFiles
                 .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), ff => ff.FilmDetails,
-                    ff => ff.FilmDetails);
+                    ff => ff.FilmDetails, ff => ff.FilmDetails.BelongsInCollection);
 
             var collections = filmDetails
                 .Where(fd => fd.BelongsInCollectionId.HasValue)
@@ -70,8 +90,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             overview.AddRange(dtoMapper.Map<DbFilmDetails, OverviewElementDto>(notInCollections));
             overview.AddRange(dtoMapper.Map<MovieCollection, OverviewElementDto>(collections));
 
-            var cached = System.Text.Json.JsonSerializer.Serialize(overview);
-            return cached;
+            return overview;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
+using NxPlx.Models.Details;
 using NxPlx.Models.File;
 
 namespace NxPlx.Abstractions.Database
@@ -13,5 +14,6 @@ namespace NxPlx.Abstractions.Database
         IEntitySet<WatchingProgress> WatchingProgresses { get; }
         IEntitySet<User> Users { get; }
         IEntitySet<UserSession> UserSessions { get; }
+        IEntitySet<Genre> Genres { get; }
     }
 }

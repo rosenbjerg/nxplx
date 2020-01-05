@@ -43,23 +43,29 @@ namespace NxPlx.Services.Database
                 id = seriesDetails.Id,
                 kind = "series",
                 poster = seriesDetails.PosterPath,
-                title = seriesDetails.Name
+                title = seriesDetails.Name,
+                genres = seriesDetails.Genres.Select(g => g.Entity2Id).ToList(),
+                year = seriesDetails.FirstAirDate?.Year ?? 9999
             });
             SetMapping<DbFilmDetails, OverviewElementDto>(filmDetails => new OverviewElementDto
             {
                 id = filmDetails.Id,
                 kind = "film",
                 poster = filmDetails.PosterPath,
-                title = filmDetails.Title
+                title = filmDetails.Title,
+                genres = filmDetails.Genres.Select(g => g.Entity2Id).ToList(),
+                year = filmDetails.ReleaseDate?.Year ?? 9999
             });
             SetMapping<MovieCollection, OverviewElementDto>(movieCollection => new OverviewElementDto
             {
                 id = movieCollection.Id,
                 kind = "collection",
                 poster = movieCollection.PosterPath,
-                title = movieCollection.Name
+                title = movieCollection.Name,
+                genres = movieCollection.Movies.SelectMany(f => f.Genres).Select(g => g.Entity2Id).Distinct().ToList(),
+                year = movieCollection.Movies.Min(f => f.ReleaseDate?.Year ?? 9999)
             });
-            
+
             SetMapping<FilmFile, FilmDto>(filmFilm => new FilmDto
             {
                 id = filmFilm.FilmDetails.Id,
@@ -85,7 +91,7 @@ namespace NxPlx.Services.Database
                 spokenLanguages = Map<SpokenLanguage, SpokenLanguageDto>(filmFilm.FilmDetails.SpokenLanguages.Select(e => e.Entity2)).ToList(),
                 voteAverage = filmFilm.FilmDetails.VoteAverage,
                 voteCount = filmFilm.FilmDetails.VoteCount,
-                belongsToCollection = Map<MovieCollection, MovieCollectionDto>(filmFilm.FilmDetails.BelongsInCollection),
+                belongsToCollectionId = filmFilm.FilmDetails.BelongsInCollectionId
             });
             
             SetMapping<FilmFile, InfoDto>(filmFile => new InfoDto
@@ -154,7 +160,7 @@ namespace NxPlx.Services.Database
                 id = movieCollection.Id,
                 name = movieCollection.Name,
                 backdrop = movieCollection.BackdropPath,
-                poster = movieCollection.PosterPath
+                poster = movieCollection.PosterPath,
             });
             SetMapping<Network, NetworkDto>(network => new NetworkDto
             {
