@@ -1,7 +1,10 @@
 import http from "./Http";
+import english from './assets/localisation/nxplx.en.json';
 
 let currentLocale = 'en';
-const dictionary = {};
+const dictionary = {
+    en: english
+};
 
 export async function setLocale(locale:string) {
     if (dictionary[locale] !== undefined) return;

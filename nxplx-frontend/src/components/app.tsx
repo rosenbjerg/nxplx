@@ -29,35 +29,25 @@ const store = createStore<NxPlxStore>({
     build: ''
 });
 
-interface Props {  }
 
-interface State { localeReady: boolean }
-
-export default class App extends Component<Props, State> {
-    public state = {
-        localeReady: false
-    };
-    public render(props:Props, state:State) {
+export default class App extends Component {
+    public render() {
         return (
             <Provider store={store}>
                 <div id="app">
                     <Header />
-                    {!state.localeReady ? (
-                        <Loading/>
-                    ) : (
-                        <Router>
-                            <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
-                            <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
-                            <LiquidRoute animator={FadeAnimation} path="/admin" getComponent={() => import('../routes/admin').then(module => module.default)}/>
-                            <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
-                            <LiquidRoute animator={FadeAnimation} path="/collection/:id" component={Collection}/>
-                            <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
-                            <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
-                            <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" getComponent={() => import('../routes/watch').then(module => module.default)}/>
-                            <LiquidRoute animator={FadeAnimation} path="/profile" getComponent={() => import('../routes/profile').then(module => module.default)}/>
-                            {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
-                        </Router>
-                    )}
+                    <Router>
+                        <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
+                        <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
+                        <LiquidRoute animator={FadeAnimation} path="/admin" getComponent={() => import('../routes/admin').then(module => module.default)}/>
+                        <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
+                        <LiquidRoute animator={FadeAnimation} path="/collection/:id" component={Collection}/>
+                        <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
+                        <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
+                        <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" getComponent={() => import('../routes/watch').then(module => module.default)}/>
+                        <LiquidRoute animator={FadeAnimation} path="/profile" getComponent={() => import('../routes/profile').then(module => module.default)}/>
+                        {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
+                    </Router>
                 </div>
             </Provider>
         );
@@ -65,10 +55,14 @@ export default class App extends Component<Props, State> {
     public componentDidMount() {
         this.loadDictionary();
         this.checkLoggedIn();
-        this.loadBuild();
+        store.subscribe(state => {
+            if (!state.build && state.isLoggedIn) {
+                this.loadBuild();
+            }
+        })
     }
     private loadDictionary() {
-        setLocale(getEntry('locale', 'en')).then(() => this.setState({ localeReady: true }));
+        setLocale(getEntry('locale', 'en'));
     }
     private loadBuild() {
         http.get('/api/build')
@@ -78,7 +72,7 @@ export default class App extends Component<Props, State> {
     private checkLoggedIn = async () => {
         const response = await http.get('/api/authentication/verify');
         if (response.ok) {
-            const isAdmin = (await response.text()) === 'True';
+            const isAdmin = await response.text() === 'True';
             store.setState({ isLoggedIn: true, isAdmin });
             if (location.pathname === '/login') {
                 route('/', true);

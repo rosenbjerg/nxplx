@@ -54,9 +54,6 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
                         <Link onClick={logout}>
                             <i class="material-icons">exit_to_app</i>
                         </Link>
-                        {/*<Link href="/settings">*/}
-                        {/*    <i class="material-icons">settings</i>*/}
-                        {/*</Link>*/}
                     </span>
                 </nav>
             )}
