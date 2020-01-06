@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Details;
+using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper
@@ -14,6 +16,10 @@ namespace NxPlx.Services.Database.Wrapper
         protected readonly NxplxContext Context;
 
         public ReadNxplxContext() : this(new NxplxContext())
+        {
+            
+        }
+        public ReadNxplxContext(User user) : this(new NxplxContext(user))
         {
             
         }
@@ -32,6 +38,7 @@ namespace NxPlx.Services.Database.Wrapper
         private readonly Lazy<ReadEntitySet<User>> _users;
         private readonly Lazy<ReadEntitySet<UserSession>> _userSessions;
         private readonly Lazy<ReadEntitySet<Genre>> _genres;
+        private readonly Lazy<ReadEntitySet<MovieCollection>> _collections;
 
         public IReadEntitySet<FilmFile> FilmFiles => _filmFiles.Value;
         public IReadEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
@@ -41,6 +48,7 @@ namespace NxPlx.Services.Database.Wrapper
         public IReadEntitySet<User> Users => _users.Value;
         public IReadEntitySet<UserSession> UserSessions => _userSessions.Value;
         public IReadEntitySet<Genre> Genres => _genres.Value;
+        public IReadEntitySet<MovieCollection> Collections => _collections.Value;
 
         public INxplxContext BeginTransactionedContext()
         {
@@ -58,6 +66,7 @@ namespace NxPlx.Services.Database.Wrapper
             _users = InitLazyReadOnlySet(Context.Users);
             _userSessions = InitLazyReadOnlySet(Context.UserSessions);
             _genres = InitLazyReadOnlySet(Context.Genre);
+            _collections = InitLazyReadOnlySet(Context.MovieCollection);
         }
         
         public virtual ValueTask DisposeAsync()

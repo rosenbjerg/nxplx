@@ -18,7 +18,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var session = req.GetData<UserSession>();
 
-            var broadcaster = ResolveContainer.Default().Resolve<IBroadcaster<WebSocketDialog>>();
+            var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster<WebSocketDialog>>();
             broadcaster.Subscribe(session.UserId, session.IsAdmin, wsd);
 
             return wsd.Continue();

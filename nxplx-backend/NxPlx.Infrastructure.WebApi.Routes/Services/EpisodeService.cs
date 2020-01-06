@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
+using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.Dto.Models;
@@ -14,54 +15,51 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class EpisodeService
     {
-        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, bool isAdmin, List<int> libraryAccess)
+        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, User user)
         {
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadNxplxContext>();
+            var container = ResolveContainer.Default;
+            await using var ctx = container.Resolve<IReadNxplxContext>(user);
             var current = await ctx.EpisodeFiles.OneById(fileId);
 
             var season = await ctx.EpisodeFiles.Many(ef =>
-                (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)) &&
                 ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
                 ef.EpisodeNumber > current.EpisodeNumber);
+            
             var next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
 
             if (next == null)
             {
                 season = await ctx.EpisodeFiles.Many(ef =>
-                    (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)) &&
                     ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1);
                 next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
             }
 
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, NextEpisodeDto>(next);
         }
-        public static async Task<string?> FindEpisodeFilePath(int id, bool isAdmin, List<int> libraryAccess)
+        public static async Task<string?> FindEpisodeFilePath(int id, User user)
         {
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadNxplxContext>();
+            var container = ResolveContainer.Default;
+            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
             return await ctx.EpisodeFiles
-                .ProjectOne(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Path);
+                .ProjectOne(ef => ef.Id == id, ef => ef.Path);
         }
-        public static async Task<InfoDto?> FindEpisodeFileInfo(int id, bool isAdmin, List<int> libraryAccess)
+        public static async Task<InfoDto?> FindEpisodeFileInfo(int id, User user)
         {
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadNxplxContext>();
+            var container = ResolveContainer.Default;
+            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
             var episode = await ctx.EpisodeFiles
-                .One(ef => ef.Id == id && (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)), ef => ef.Subtitles);
+                .One(ef => ef.Id == id, ef => ef.Subtitles);
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
         }
-        public static async Task<SeriesDto?> FindSeriesDetails(int id, bool isAdmin, List<int> libraryAccess, int? season)
+        public static async Task<SeriesDto?> FindSeriesDetails(int id, int? season, User user)
         {
-            var container = ResolveContainer.Default();
-            await using var ctx = container.Resolve<IReadNxplxContext>();
+            var container = ResolveContainer.Default;
+            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
             var episodes = await ctx.EpisodeFiles
-                .Many(ef => ef.SeriesDetailsId == id &&
-                            (season == null || ef.SeasonNumber == season ) &&
-                            (isAdmin || libraryAccess.Contains(ef.PartOfLibraryId)));
+                .Many(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season));
 
             if (!episodes.Any()) return default;
             

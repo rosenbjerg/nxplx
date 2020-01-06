@@ -23,7 +23,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var progressValue = req.ParseBody<JsonValue<double>>();
             var session = req.GetData<UserSession>();
 
-            await ProgressService.SetUserWatchingProgress(session.UserId, fileId, progressValue.value);
+            await ProgressService.SetUserWatchingProgress(session.User, fileId, progressValue.value);
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
@@ -32,7 +32,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var session = req.GetData<UserSession>();
 
-            var progress = await ProgressService.GetUserWatchingProgress(session.UserId, fileId);
+            var progress = await ProgressService.GetUserWatchingProgress(session.User, fileId);
 
             return await res.SendJson(progress);
         }

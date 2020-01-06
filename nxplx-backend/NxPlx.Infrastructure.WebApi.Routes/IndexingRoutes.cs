@@ -22,7 +22,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> IndexLibraries(Request req, Response res)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
 
             var libIds = req.ParseBody<JsonValue<int[]>>().value;
             
@@ -39,7 +39,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> IndexAllLibraries(Request req, Response res)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
 
             IEnumerable<Library> libraries;
             await using (var ctx = container.Resolve<IReadNxplxContext>())

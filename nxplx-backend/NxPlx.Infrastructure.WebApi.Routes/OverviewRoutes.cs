@@ -26,7 +26,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> SendCachedJson(this Response res, string key, Func<Task<object>> builder)
         {
-            var cache = ResolveContainer.Default().Resolve<ICachingService>();
+            var cache = ResolveContainer.Default.Resolve<ICachingService>();
             var cached = await cache.GetAsync(key);
             if (cached == null)
             {
@@ -41,7 +41,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var session = req.GetData<UserSession>();
 
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>();
 
             var libs = session.User.LibraryAccessIds;
@@ -52,7 +52,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> GetGenresOverview(Request req, Response res)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
             var overviewCacheKey = "OVERVIEW:GENRES";
             return await res.SendCachedJson(overviewCacheKey, async () =>
             {
@@ -73,7 +73,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var filmDetails = await ctx.FilmFiles
                 .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), ff => ff.FilmDetails,
                     ff => ff.FilmDetails, ff => ff.FilmDetails.BelongsInCollection);
-
+            
             var collections = filmDetails
                 .Where(fd => fd.BelongsInCollectionId.HasValue)
                 .GroupBy(fd => fd.BelongsInCollectionId)

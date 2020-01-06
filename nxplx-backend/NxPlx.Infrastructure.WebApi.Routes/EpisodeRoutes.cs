@@ -27,7 +27,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
-            var next = await EpisodeService.TryFindNextEpisode(fileId, session.IsAdmin, session.User.LibraryAccessIds);
+            var next = await EpisodeService.TryFindNextEpisode(fileId, session.User);
             return await res.SendJson(next);
         }
 
@@ -36,7 +36,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             
-            var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.User);
 
             if (episodePath == null || !File.Exists(episodePath)) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendFile(episodePath);
@@ -47,7 +47,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
 
-            var episode = await EpisodeService.FindEpisodeFileInfo(id, session.IsAdmin, session.User.LibraryAccessIds);
+            var episode = await EpisodeService.FindEpisodeFileInfo(id, session.User);
 
             if (episode == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(episode);
@@ -59,7 +59,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
             var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
             
-            var seriesDto = await EpisodeService.FindSeriesDetails(id, session.IsAdmin, session.User.LibraryAccessIds, no);
+            var seriesDto = await EpisodeService.FindSeriesDetails(id, no, session.User);
             
             if (seriesDto == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(seriesDto);
@@ -70,7 +70,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
             var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
 
-            var seriesDto = await EpisodeService.FindSeriesDetails(id, session.IsAdmin, session.User.LibraryAccessIds, null);
+            var seriesDto = await EpisodeService.FindSeriesDetails(id, null, session.User);
 
             if (seriesDto == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(seriesDto);

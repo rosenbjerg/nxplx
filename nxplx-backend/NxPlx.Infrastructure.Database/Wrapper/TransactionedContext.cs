@@ -6,6 +6,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Details;
+using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper
@@ -25,6 +26,7 @@ namespace NxPlx.Services.Database.Wrapper
             _users = InitLazySet(context, context.Users);
             _userSessions = InitLazySet(context, context.UserSessions);
             _genres = InitLazySet(context, context.Genre);
+            _collections = InitLazySet(context, context.MovieCollection);
         }
         
         private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)
@@ -41,6 +43,7 @@ namespace NxPlx.Services.Database.Wrapper
         private readonly Lazy<EntitySet<User>> _users;
         private readonly Lazy<EntitySet<UserSession>> _userSessions;
         private readonly Lazy<EntitySet<Genre>> _genres;
+        private readonly Lazy<EntitySet<MovieCollection>> _collections;
 
         public new IEntitySet<FilmFile> FilmFiles => _filmFiles.Value;
         public new IEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
@@ -50,6 +53,7 @@ namespace NxPlx.Services.Database.Wrapper
         public new IEntitySet<User> Users => _users.Value;
         public new IEntitySet<UserSession> UserSessions => _userSessions.Value;
         public new IEntitySet<Genre> Genres => _genres.Value;
+        public new IEntitySet<MovieCollection> Collections => _collections.Value;
 
         public Task SaveChanges()
         {

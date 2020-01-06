@@ -16,6 +16,9 @@ namespace NxPlx.Services.Database
 {
     public class NxplxContext : DbContext
     {
+        private readonly int _userId;
+        private readonly List<int> _libraryAccess;
+        private readonly bool _isAdmin;
         public DbSet<FilmFile> FilmFiles { get; set; }
         public DbSet<EpisodeFile> EpisodeFiles { get; set; }
         public DbSet<Library> Libraries { get; set; }
@@ -26,6 +29,7 @@ namespace NxPlx.Services.Database
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Genre> Genre { get; set; }
+        public DbSet<MovieCollection> MovieCollection { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -58,6 +62,28 @@ namespace NxPlx.Services.Database
                 .HasConversion(
                     ls => string.Join(',', ls),
                     str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
+
+            if (!_isAdmin)
+            {
+                modelBuilder.Entity<User>().HasQueryFilter(e => e.Id == _userId);
+                modelBuilder.Entity<UserSession>().HasQueryFilter(e => e.UserId == _userId);
+                modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _userId);
+                modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _userId);
+                
+                modelBuilder.Entity<FilmFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
+                modelBuilder.Entity<EpisodeFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
+            }
+        }
+
+        public NxplxContext()
+        {
+            _isAdmin = true;
+        }
+        public NxplxContext(User user)
+        {
+            _isAdmin = user.Admin;
+            _userId = user.Id;
+            _libraryAccess = user.LibraryAccessIds;
         }
 
         private static void ConfigureSeriesDetailsJoinEntities(ModelBuilder modelBuilder)

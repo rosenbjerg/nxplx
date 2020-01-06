@@ -28,7 +28,7 @@ namespace NxPlx.WebApi
             WebApiConventions.Install();
 
             var cfg = ConfigurationService.Current;
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
 
