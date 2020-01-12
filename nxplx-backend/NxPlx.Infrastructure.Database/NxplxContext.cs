@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using NxPlx.Configuration;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -29,7 +30,6 @@ namespace NxPlx.Services.Database
         public DbSet<User> Users { get; set; }
         public DbSet<UserSession> UserSessions { get; set; }
         public DbSet<Genre> Genre { get; set; }
-        public DbSet<MovieCollection> MovieCollection { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -128,17 +128,16 @@ namespace NxPlx.Services.Database
             modelBuilder.Entity<FilmFile>().HasOne(ff => ff.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FilmFile>().HasMany(ff => ff.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FilmFile>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<FilmFile>().HasMany<WatchingProgress>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FilmFile>().OwnsOne(ff => ff.MediaDetails);
         }
 
         private static void ConfigureEpisodeFileEntity(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.SeriesDetails).WithMany().OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<EpisodeFile>().Ignore(ef => ef.SeasonDetails).Ignore(ef => ef.EpisodeDetails);
             modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<EpisodeFile>().HasMany(ef => ef.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<EpisodeFile>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<EpisodeFile>().HasMany<WatchingProgress>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<EpisodeFile>().OwnsOne(ef => ef.MediaDetails);
             modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
         }
