@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -32,7 +33,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var container = ResolveContainer.Default;
             await using var context = container.Resolve<IReadNxplxContext>(user);
 
-            var sessions = await context.UserSessions.Many();
+            var sessions = await context.UserSessions.Many().ToListAsync();
             return container.Resolve<IDtoMapper>().Map<UserSession, UserSessionDto>(sessions);
         }
     }

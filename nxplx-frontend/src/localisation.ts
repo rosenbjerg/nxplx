@@ -1,5 +1,5 @@
-import http from "./Http";
 import english from './assets/localisation/nxplx.en.json';
+import http from "./Http";
 
 let currentLocale = 'en';
 const dictionary = {
@@ -8,15 +8,15 @@ const dictionary = {
 
 export async function setLocale(locale:string) {
     if (dictionary[locale] !== undefined) return;
-    let response = await http.get(`/assets/localisation/nxplx.${locale}.json`);
-    if (!response.ok) {
-        locale = 'en';
-        console.warn(`locale not found: ${locale}. defaulting to en`);
-        if (dictionary[locale] !== undefined) return;
-        response = await http.get(`/assets/localisation/nxplx.en.json`);
+    const response = await http.get(`/assets/localisation/nxplx.${locale}.json`);
+    if (response.ok) {
+        dictionary[locale] = await response.json();
+        currentLocale = locale;
     }
-    currentLocale = locale;
-    dictionary[locale] = await response.json();
+    else {
+        console.warn(`locale not found: ${locale}. defaulting to en`);
+        currentLocale = 'en';
+    }
 }
 
 const templateRegex = /\$[A-Z]+/;
@@ -24,11 +24,13 @@ export function translate(key:string, ...params:string[]) {
     let translation = dictionary[currentLocale][key];
     if (translation === undefined) {
         console.warn(`translation for ${key} not found for locale ${currentLocale}`);
-        translation = '';
+        translation = dictionary.en[key];
     }
-    const matches = translation.match(templateRegex);
-    for (let i = 0; i < params.length; i++) {
-        translation = translation.replace(matches[i], params[i]);
+    if (params.length) {
+        const matches = translation.match(templateRegex);
+        for (let i = 0; i < params.length; i++) {
+            translation = translation.replace(matches[i], params[i]);
+        }
     }
     return translation;
 }

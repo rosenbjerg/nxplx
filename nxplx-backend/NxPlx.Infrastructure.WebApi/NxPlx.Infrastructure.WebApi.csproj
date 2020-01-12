@@ -29,8 +29,4 @@
       </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Routes" />
-    </ItemGroup>
-
 </Project>

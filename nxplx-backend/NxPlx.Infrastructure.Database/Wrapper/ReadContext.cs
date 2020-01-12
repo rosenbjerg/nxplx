@@ -66,7 +66,6 @@ namespace NxPlx.Services.Database.Wrapper
             _users = InitLazyReadOnlySet(Context.Users);
             _userSessions = InitLazyReadOnlySet(Context.UserSessions);
             _genres = InitLazyReadOnlySet(Context.Genre);
-            _collections = InitLazyReadOnlySet(Context.MovieCollection);
         }
         
         public virtual ValueTask DisposeAsync()

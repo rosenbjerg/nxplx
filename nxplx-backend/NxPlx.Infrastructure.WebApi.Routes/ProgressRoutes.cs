@@ -13,6 +13,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
+            router.Get("/continue", Authenticated.User, GetContinueWatchingList);
             router.Get("/:file_id", Authenticated.User, GetProgressByFileId);
             router.Put("/:file_id", Authenticated.User, SetProgressByFileId);
         }
@@ -37,6 +38,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             return await res.SendJson(progress);
         }
 
+        private static async Task<HandlerType> GetContinueWatchingList(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+
+            var continueWatchingList = await ProgressService.GetUserContinueWatchingList(session.User);
+
+            return await res.SendJson(continueWatchingList);
+        }
 
     }
 }

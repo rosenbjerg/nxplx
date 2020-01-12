@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -59,7 +60,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<IEnumerable<UserDto>> GetUsers()
         {
             await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
-            var users = await context.Users.Many();
+            var users = await context.Users.Many().ToListAsync();
             return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
         }
         public static async Task<UserDto> GetUser(int userId)

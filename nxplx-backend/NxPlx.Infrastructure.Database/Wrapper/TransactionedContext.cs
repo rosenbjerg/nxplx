@@ -26,7 +26,6 @@ namespace NxPlx.Services.Database.Wrapper
             _users = InitLazySet(context, context.Users);
             _userSessions = InitLazySet(context, context.UserSessions);
             _genres = InitLazySet(context, context.Genre);
-            _collections = InitLazySet(context, context.MovieCollection);
         }
         
         private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)
@@ -53,7 +52,6 @@ namespace NxPlx.Services.Database.Wrapper
         public new IEntitySet<User> Users => _users.Value;
         public new IEntitySet<UserSession> UserSessions => _userSessions.Value;
         public new IEntitySet<Genre> Genres => _genres.Value;
-        public new IEntitySet<MovieCollection> Collections => _collections.Value;
 
         public Task SaveChanges()
         {

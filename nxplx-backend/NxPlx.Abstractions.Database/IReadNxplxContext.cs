@@ -16,6 +16,5 @@ namespace NxPlx.Abstractions.Database
         IReadEntitySet<User> Users { get; }
         IReadEntitySet<UserSession> UserSessions { get; }
         IReadEntitySet<Genre> Genres { get; }
-        IReadEntitySet<MovieCollection> Collections { get; }
     }
 }

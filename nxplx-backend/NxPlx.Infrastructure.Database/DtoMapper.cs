@@ -65,6 +65,24 @@ namespace NxPlx.Services.Database
                 genres = movieCollection.Movies.SelectMany(f => f.Genres).Select(g => g.Entity2Id).Distinct().ToList(),
                 year = movieCollection.Movies.Min(f => f.ReleaseDate?.Year ?? 9999)
             });
+            SetMapping<(WatchingProgress wp, EpisodeFile ef), ContinueWatchingDto>(pair => new ContinueWatchingDto
+            {
+                fileId = pair.ef.Id,
+                kind = "series",
+                poster = pair.ef.SeasonDetails.PosterPath ?? pair.ef.SeasonDetails.PosterPath,
+                title = $"{pair.ef.SeriesDetails?.Name} - {pair.ef.GetNumber()} - {pair.ef.EpisodeDetails?.Name}",
+                watched = pair.wp.LastWatched,
+                progress = pair.wp.Time
+            });
+            SetMapping<(WatchingProgress wp, FilmFile ff), ContinueWatchingDto>(pair => new ContinueWatchingDto
+            {
+                fileId = pair.ff.Id,
+                kind = "film",
+                poster = pair.ff.FilmDetails.PosterPath,
+                title = $"{pair.ff.FilmDetails?.Title}",
+                watched = pair.wp.LastWatched,
+                progress = pair.wp.Time
+            });
 
             SetMapping<FilmFile, FilmDto>(filmFilm => new FilmDto
             {

@@ -53,7 +53,6 @@ export default class App extends Component {
         );
     }
     public componentDidMount() {
-        this.loadDictionary();
         this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {

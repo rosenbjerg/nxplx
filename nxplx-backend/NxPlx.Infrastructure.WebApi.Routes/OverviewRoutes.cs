@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -18,6 +19,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class OverviewRoutes
     {
+        private const int MaxCacheAge = 15;
         public static void Register(IRouter router)
         {
             router.Get("/", Authenticated.User, GetOverview);
@@ -34,6 +36,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 await cache.SetAsync(key, cached, CacheKind.JsonResponse);
             }
             
+            res.AddHeader("Cache-Control", $"max-age={MaxCacheAge}");
             return await res.SendString(cached, "application/json");
         }
 
@@ -45,7 +48,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             await using var ctx = container.Resolve<IReadNxplxContext>();
 
             var libs = session.User.LibraryAccessIds;
-            if (session.IsAdmin) libs = await ctx.Libraries.ProjectMany(null, l => l.Id);
+            if (session.IsAdmin) libs = await ctx.Libraries.ProjectMany(null, l => l.Id).ToListAsync();
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
             return await res.SendCachedJson(overviewCacheKey, async () => await BuildOverview(container, ctx, libs));
         }
@@ -57,7 +60,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             return await res.SendCachedJson(overviewCacheKey, async () =>
             {
                 await using var ctx = container.Resolve<IReadNxplxContext>();
-                var genres = await ctx.Genres.Many();
+                var genres = await ctx.Genres.Many().ToListAsync();
                 
                 var dtoMapper = container.Resolve<IDtoMapper>();
                 return dtoMapper.Map<Genre, GenreDto>(genres);
@@ -65,14 +68,15 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<List<OverviewElementDto>> BuildOverview(ResolveContainer container, IReadNxplxContext ctx, List<int> libs)
         {
-
-            var seriesDetails = await ctx.EpisodeFiles.ProjectMany(
-                ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId), ef => ef.SeriesDetails,
-                ef => ef.SeriesDetails);
+            var seriesDetails = await ctx.EpisodeFiles
+                .ProjectMany(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId),
+                    ef => ef.SeriesDetails, ef => ef.SeriesDetails)
+                .ToListAsync();
 
             var filmDetails = await ctx.FilmFiles
-                .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), ff => ff.FilmDetails,
-                    ff => ff.FilmDetails, ff => ff.FilmDetails.BelongsInCollection);
+                .ProjectMany(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId), 
+                    ff => ff.FilmDetails, ff => ff.FilmDetails, ff => ff.FilmDetails.BelongsInCollection)
+                .ToListAsync();
             
             var collections = filmDetails
                 .Where(fd => fd.BelongsInCollectionId.HasValue)

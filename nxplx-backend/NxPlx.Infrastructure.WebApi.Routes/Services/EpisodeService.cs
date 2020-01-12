@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -23,14 +24,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 
             var season = await ctx.EpisodeFiles.Many(ef =>
                 ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
-                ef.EpisodeNumber > current.EpisodeNumber);
+                ef.EpisodeNumber > current.EpisodeNumber).ToListAsync();
             
             var next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
 
             if (next == null)
             {
                 season = await ctx.EpisodeFiles.Many(ef =>
-                    ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1);
+                    ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1).ToListAsync();
                 next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
             }
 
@@ -59,7 +60,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
             var episodes = await ctx.EpisodeFiles
-                .Many(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season));
+                .Many(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season)).ToListAsync();
 
             if (!episodes.Any()) return default;
             

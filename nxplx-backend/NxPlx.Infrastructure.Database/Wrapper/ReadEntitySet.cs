@@ -20,7 +20,7 @@ namespace NxPlx.Services.Database.Wrapper
 
         private IQueryable<TEntity> ApplicableQueryable => DbSet;
 
-        public Task<List<TEntity>> Many(
+        public IQueryable<TEntity> Many(
             Expression<Func<TEntity, bool>>? predicate, 
             params Expression<Func<TEntity, object>>[] includes)
         {
@@ -30,7 +30,7 @@ namespace NxPlx.Services.Database.Wrapper
                 queryable = queryable.Where(predicate);
             }
 
-            return queryable.ToListAsync();
+            return queryable;
         }
 
         public Task<TEntity?> One(
@@ -49,12 +49,7 @@ namespace NxPlx.Services.Database.Wrapper
         {
             return includes.Aggregate(ApplicableQueryable, (current, expression) => current.Include(expression));
         }
-
-        public Task<int> Count(Expression<Func<TEntity, bool>>? predicate, params Expression<Func<TEntity, object>>[] includes)
-        {
-            return predicate != null ? ApplicableQueryable.CountAsync(predicate) : ApplicableQueryable.CountAsync();
-        }
-
+        
         public Task<TProjection> ProjectOne<TProjection>(
             Expression<Func<TEntity, bool>> predicate, 
             Expression<Func<TEntity, TProjection>> projection,
@@ -62,8 +57,8 @@ namespace NxPlx.Services.Database.Wrapper
         {
             return WithIncludes(includes).Where(predicate).Select(projection).FirstOrDefaultAsync();
         }
-
-        public Task<List<TProjection>> ProjectMany<TProjection>(
+        
+        public IQueryable<TProjection> ProjectMany<TProjection>(
             Expression<Func<TEntity, bool>>? predicate, 
             Expression<Func<TEntity, TProjection>> projection,
             params Expression<Func<TEntity, object>>[] includes)
@@ -74,7 +69,8 @@ namespace NxPlx.Services.Database.Wrapper
                 queryable = queryable.Where(predicate);
             }
 
-            return queryable.Select(projection).Distinct().ToListAsync();
+            return queryable.Select(projection).Distinct();
         }
+
     }
 }

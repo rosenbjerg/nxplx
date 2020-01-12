@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -21,7 +22,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var user = await transaction.Users.OneById(userId);
             if (user == null) return false;
 
-            var libraryCount = await context.Libraries.Count(l => libraryIds.Contains(l.Id));
+            var libraryCount = await context.Libraries.Many(l => libraryIds.Contains(l.Id)).CountAsync();
             if (libraryIds.Count != libraryCount) return false;
 
             user.LibraryAccessIds = libraryIds;
@@ -56,7 +57,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using (var context = container.Resolve<IReadNxplxContext>())
             await using (var transaction = context.BeginTransactionedContext())
             {
-                foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)))
+                foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
                 {
                     user.LibraryAccessIds.Remove(libraryId);
                 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -27,7 +28,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         {
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var filmFiles = await ctx.FilmFiles.Many(ff => ff.FilmDetails.BelongsInCollectionId == id, ff => ff.FilmDetails);
+            var filmFiles = await ctx.FilmFiles.Many(ff => ff.FilmDetails.BelongsInCollectionId == id, ff => ff.FilmDetails).ToListAsync();
 
             var mapper = container.Resolve<IDtoMapper>();
             var collection = mapper.Map<MovieCollection, MovieCollectionDto>(filmFiles.First().FilmDetails.BelongsInCollection);
