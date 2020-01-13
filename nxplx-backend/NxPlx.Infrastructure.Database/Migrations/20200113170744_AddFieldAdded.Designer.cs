@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
@@ -9,9 +10,10 @@ using NxPlx.Services.Database;
 namespace NxPlx.Services.Database.Migrations
 {
     [DbContext(typeof(NxplxContext))]
-    partial class NxplxContextModelSnapshot : ModelSnapshot
+    [Migration("20200113170744_AddFieldAdded")]
+    partial class AddFieldAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

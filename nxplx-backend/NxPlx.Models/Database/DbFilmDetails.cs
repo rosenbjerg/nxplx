@@ -5,7 +5,7 @@ using NxPlx.Models.Details.Film;
 
 namespace NxPlx.Models.Database
 {
-    public class DbFilmDetails : EntityBase
+    public class DbFilmDetails : EntityBase, IAdded
     {
         public bool Adult { get; set; }
         public long Budget { get; set; }
@@ -29,5 +29,7 @@ namespace NxPlx.Models.Database
         public virtual List<JoinEntity<DbFilmDetails, ProductionCompany>> ProductionCompanies { get; set; }
         public float VoteAverage { get; set; }
         public int VoteCount { get; set; }
+        
+        public DateTime Added { get; set; }
     }
 }

@@ -83,7 +83,8 @@ namespace NxPlx.Services.Index
             ctx.AddRange(productionCompanies);
             ctx.AddRange(movieCollections);
             ctx.FilmFiles.AddRange(newFilm);
-            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details);
+            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
+            databaseDetails.ForEach(film => film.Added = DateTime.UtcNow);
             var newDetails = await databaseDetails.GetUniqueNew();
             await ctx.AddRangeAsync(newDetails);
             
@@ -184,6 +185,7 @@ namespace NxPlx.Services.Index
             ctx.AddRange(productionCompanies);
             ctx.EpisodeFiles.AddRange(newEpisodes);
             var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
+            databaseDetails.ForEach(series => series.Added = DateTime.UtcNow);
             await ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();
