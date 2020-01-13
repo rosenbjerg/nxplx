@@ -34,10 +34,10 @@ namespace NxPlx.Infrastructure.Logging
                         IncludeAllProperties = true
                     },
                     FileName = Path.Combine(cfg.LogFolder, "log.current.json"),
-                    ArchiveFileName = Path.Combine(cfg.LogFolder, "archives/log.${longdate}.json"),
+                    ArchiveFileName = Path.Combine(cfg.LogFolder, "archives", "log.{#}.json"),
                     ArchiveAboveSize = 5000000,
                     ArchiveEvery = FileArchivePeriod.Day,
-                    ArchiveNumbering = ArchiveNumberingMode.Sequence,
+                    ArchiveNumbering = ArchiveNumberingMode.Date,
                     MaxArchiveFiles = 50,
                     OptimizeBufferReuse = true
                 }
