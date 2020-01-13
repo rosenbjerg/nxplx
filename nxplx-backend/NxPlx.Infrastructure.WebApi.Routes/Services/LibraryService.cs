@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -14,15 +15,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
     {
         public static async Task<bool> SetUserLibraryPermissions(int userId, List<int> libraryIds)
         {
-            var container = ResolveContainer.Default();
-            await using var mediaContext = container.Resolve<IReadContext>();
-            await using var userContext = container.Resolve<IReadContext>();
-            await using var transaction = userContext.BeginTransactionedContext();
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>();
+            await using var transaction = context.BeginTransactionedContext();
 
             var user = await transaction.Users.OneById(userId);
             if (user == null) return false;
 
-            var libraryCount = await mediaContext.Libraries.Count(l => libraryIds.Contains(l.Id));
+            var libraryCount = await context.Libraries.Many(l => libraryIds.Contains(l.Id)).CountAsync();
             if (libraryIds.Count != libraryCount) return false;
 
             user.LibraryAccessIds = libraryIds;
@@ -50,49 +50,24 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         }
         public static async Task<bool> RemoveLibrary(int libraryId)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
 
             Library library;
 
-            await using var readUserContext = container.Resolve<IReadContext>();
-            await using var userTransaction = readUserContext.BeginTransactionedContext();
-            foreach (var user in await userTransaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)))
+            await using (var context = container.Resolve<IReadNxplxContext>())
+            await using (var transaction = context.BeginTransactionedContext())
             {
-                user.LibraryAccessIds.Remove(libraryId);
-            }
-
-            await userTransaction.SaveChanges();
-
-            await using (var context = container.Resolve<IReadContext>())
-            await using (var mediaTransaction = context.BeginTransactionedContext())
-            {
-                library = await mediaTransaction.Libraries.OneById(libraryId);
+                foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
+                {
+                    user.LibraryAccessIds.Remove(libraryId);
+                }
+                await transaction.SaveChanges();
+                
+                library = await transaction.Libraries.OneById(libraryId);
                 if (library == null) return false;
 
-                if (library.Kind == LibraryKind.Film)
-                {
-                    var film = await mediaTransaction.FilmFiles.Many(f => f.PartOfLibraryId == libraryId);
-                    var ids = film.Select(f => f.Id).ToList();
-                    userTransaction.WatchingProgresses.Remove(
-                        await userTransaction.WatchingProgresses.Many(wp => ids.Contains(wp.FileId)));
-                    userTransaction.SubtitlePreferences.Remove(
-                        await userTransaction.SubtitlePreferences.Many(wp => ids.Contains(wp.FileId)));
-                    mediaTransaction.FilmFiles.Remove(film);
-                }
-                else
-                {
-                    var episodes = await mediaTransaction.EpisodeFiles.Many(f => f.PartOfLibraryId == libraryId);
-                    var ids = episodes.Select(f => f.Id).ToList();
-                    userTransaction.WatchingProgresses.Remove(
-                        await userTransaction.WatchingProgresses.Many(wp => ids.Contains(wp.FileId)));
-                    userTransaction.SubtitlePreferences.Remove(
-                        await userTransaction.SubtitlePreferences.Many(wp => ids.Contains(wp.FileId)));
-                    mediaTransaction.EpisodeFiles.Remove(episodes);
-                }
-
-                await userTransaction.SaveChanges();
-                mediaTransaction.Libraries.Remove(library);
-                await mediaTransaction.SaveChanges();
+                transaction.Libraries.Remove(library);
+                await transaction.SaveChanges();
             }
 
             container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
@@ -100,8 +75,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         }
         public static async Task<List<int>?> FindLibraryAccess(int userId)
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             var user = await context.Users.OneById(userId);
             return user?.LibraryAccessIds;
@@ -116,8 +91,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
                 Kind = kind == "film" ? LibraryKind.Film : LibraryKind.Series
             };
 
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             transaction.Libraries.Add(lib);

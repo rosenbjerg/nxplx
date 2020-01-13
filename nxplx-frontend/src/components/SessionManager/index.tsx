@@ -4,6 +4,7 @@ import { UAParser } from 'ua-parser-js'
 import http from "../../Http";
 import Loading from "../loading";
 import { createSnackbar } from "@snackbar/core";
+import { translate } from "../../localisation";
 
 interface Props { userId?:number }
 
@@ -49,8 +50,8 @@ export default class SessionManager extends Component<Props, State> {
                 <table>
                     <thead>
                         <tr>
-                            <td>Device</td>
-                            <td>Expires</td>
+                            <td>{translate('device')}</td>
+                            <td>{translate('expires')}</td>
                             <td/>
                         </tr>
                     </thead>

@@ -6,7 +6,7 @@ import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
 import { FilmPoster } from "../../components/FilmPoster";
 import Loading from '../../components/loading';
 import Subtitles from '../../components/Subtitles';
-import { FilmDetails, imageUrl, SeriesDetails } from "../../Details";
+import { FilmDetails, imageUrl, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 
@@ -32,7 +32,7 @@ export default class Home extends Component<Props, State> {
 
     public render(props:Props, { details, bg, subtitle }:State) {
         if (!details) {
-            return (<Loading />);
+            return (<div class={style.content}><Loading /></div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>

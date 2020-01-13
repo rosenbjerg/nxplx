@@ -6,7 +6,7 @@ import { Link } from "preact-router";
 import { formatInfoPair } from '../../commonFilmInfo';
 import { EpisodeStill } from "../../components/EpisodeStill";
 import Loading from '../../components/loading';
-import { EpisodeDetails, imageUrl, SeasonDetails, SeriesDetails } from "../../Details";
+import { EpisodeDetails, imageUrl, SeasonDetails, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 
@@ -28,7 +28,7 @@ export default class Season extends Component<Props, State> {
 
     public render(props:Props, { series, season, bg, bgImg }:State) {
         if (!series) {
-            return (<Loading />);
+            return (<div class={style.content}><Loading /></div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>

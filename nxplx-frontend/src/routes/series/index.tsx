@@ -6,7 +6,7 @@ import Helmet from 'preact-helmet';
 import { Link } from "preact-router";
 import { formatInfoPair, formatRunTime } from '../../commonFilmInfo';
 import Loading from '../../components/loading';
-import { imageUrl, round, SeasonDetails, SeriesDetails } from "../../Details";
+import { imageUrl, round, SeasonDetails, SeriesDetails } from "../../models";
 import http from '../../Http';
 import * as style from './style.css';
 
@@ -20,7 +20,6 @@ export default class Series extends Component<Props, State> {
             .then(response => response.json())
             .then((details:SeriesDetails) => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
-                console.log(details);
                 this.setState({ details, bg });
             });
     }

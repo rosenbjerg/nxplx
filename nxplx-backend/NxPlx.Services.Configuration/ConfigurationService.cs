@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace NxPlx.Configuration
 {
@@ -34,7 +34,7 @@ namespace NxPlx.Configuration
         }
         private static Configuration LoadFromFile()
         {
-            return JsonConvert.DeserializeObject<Configuration>(File.ReadAllText("config.json"));
+            return JsonSerializer.Deserialize<Configuration>(File.ReadAllText("config.json"));
         }
     }
 }

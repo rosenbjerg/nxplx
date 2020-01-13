@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -12,69 +13,62 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class UserService
     {
-        public static async Task UpdateUser(int userId, IFormCollection form)
+        public static async Task UpdateUser(User user, IFormCollection form)
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             await using var transaction = context.BeginTransactionedContext();
 
-            var user = await transaction.Users.OneById(userId);
-
+            var existingUser = await transaction.Users.OneById(user.Id);
             if (form.TryGetValue("email", out var email))
             {
-                user.Email = email;
+                existingUser.Email = email;
             }
 
             await transaction.SaveChanges();
         }
-        public static async Task<bool> RemoveUser(string username)
+        public static async Task<bool> RemoveUser(User user, string username)
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             await using var transaction = context.BeginTransactionedContext();
 
-            var user = await transaction.Users.One(u => u.Username == username);
+            var existingUser = await transaction.Users.One(u => u.Username == username);
+            if (existingUser == default) return false;
 
-            if (user == default) return false;
-
-            transaction.Users.Remove(user);
+            transaction.Users.Remove(existingUser);
             await transaction.SaveChanges();
 
-            container.Resolve<ILoggingService>().Info("Deleted user {Username}", user.Username);
+            ResolveContainer.Default.Resolve<ILoggingService>().Info("Deleted user {Username}", existingUser.Username);
             return true;
         }
-        public static async Task<bool> ChangeUserPassword(int userId, string oldPassword, string password1, string password2)
+        public static async Task<bool> ChangeUserPassword(User user, string oldPassword, string password1, string password2)
         {
             if (string.IsNullOrWhiteSpace(password1) || password1 != password2) return false;
 
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             await using var transaction = context.BeginTransactionedContext();
-            var user = await transaction.Users.OneById(userId);
+            
+            var existingUser = await transaction.Users.OneById(user.Id);
+            if (existingUser == null || !PasswordUtils.Verify(oldPassword, existingUser.PasswordHash)) return false;
 
-            if (user == null || !PasswordUtils.Verify(oldPassword, user.PasswordHash)) return false;
-
-            user.PasswordHash = PasswordUtils.Hash(password1);
-            user.HasChangedPassword = true;
+            existingUser.PasswordHash = PasswordUtils.Hash(password1);
+            existingUser.HasChangedPassword = true;
             await transaction.SaveChanges();
 
-            container.Resolve<ILoggingService>().Info("User {Username} changed password", user.Username);
+            ResolveContainer.Default.Resolve<ILoggingService>().Info("User {Username} changed password", existingUser.Username);
             return true;
         }
         public static async Task<IEnumerable<UserDto>> GetUsers()
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
-            var users = await context.Users.Many();
-            return container.Resolve<IDtoMapper>().Map<User, UserDto>(users);
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
+            var users = await context.Users.Many().ToListAsync();
+            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
         }
         public static async Task<UserDto> GetUser(int userId)
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
 
             var user = await context.Users.OneById(userId);
-            return container.Resolve<IDtoMapper>().Map<User, UserDto>(user);
+            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(user);
         }
         public static async Task<UserDto> CreateUser(string username, string email, bool isAdmin, IEnumerable<int> libraryIds, string password)
         {
@@ -87,15 +81,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
                 PasswordHash = PasswordUtils.Hash(password)
             };
 
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>();
             await using var transaction = context.BeginTransactionedContext();
 
             transaction.Users.Add(user);
             await transaction.SaveChanges();
 
-            container.Resolve<ILoggingService>()
-                .Info("Created user {Username}", user.Username);
+            container.Resolve<ILoggingService>().Info("Created user {Username}", user.Username);
             return container.Resolve<IDtoMapper>().Map<User, UserDto>(user);
         }
     }

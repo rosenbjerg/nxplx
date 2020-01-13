@@ -1,18 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
+using NxPlx.Models.Details;
+using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper
 {
-    public class ReadContext : IReadContext
+    public class ReadNxplxContext : IReadNxplxContext
     {
         protected readonly NxplxContext Context;
 
-        public ReadContext() : this(new NxplxContext())
+        public ReadNxplxContext() : this(new NxplxContext())
+        {
+            
+        }
+        public ReadNxplxContext(User user) : this(new NxplxContext(user))
         {
             
         }
@@ -30,6 +37,8 @@ namespace NxPlx.Services.Database.Wrapper
         private readonly Lazy<ReadEntitySet<WatchingProgress>> _watchingProgresses;
         private readonly Lazy<ReadEntitySet<User>> _users;
         private readonly Lazy<ReadEntitySet<UserSession>> _userSessions;
+        private readonly Lazy<ReadEntitySet<Genre>> _genres;
+        private readonly Lazy<ReadEntitySet<MovieCollection>> _collections;
 
         public IReadEntitySet<FilmFile> FilmFiles => _filmFiles.Value;
         public IReadEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
@@ -38,13 +47,15 @@ namespace NxPlx.Services.Database.Wrapper
         public IReadEntitySet<WatchingProgress> WatchingProgresses => _watchingProgresses.Value;
         public IReadEntitySet<User> Users => _users.Value;
         public IReadEntitySet<UserSession> UserSessions => _userSessions.Value;
+        public IReadEntitySet<Genre> Genres => _genres.Value;
+        public IReadEntitySet<MovieCollection> Collections => _collections.Value;
 
         public INxplxContext BeginTransactionedContext()
         {
-            return new TransactionedContext(Context);
+            return new TransactionedNxplxContext(Context);
         }
         
-        protected ReadContext(NxplxContext nxplxContext)
+        protected ReadNxplxContext(NxplxContext nxplxContext)
         {
             Context = nxplxContext;
             _filmFiles = InitLazyReadOnlySet(Context.FilmFiles);
@@ -54,6 +65,7 @@ namespace NxPlx.Services.Database.Wrapper
             _watchingProgresses = InitLazyReadOnlySet(Context.WatchingProgresses);
             _users = InitLazyReadOnlySet(Context.Users);
             _userSessions = InitLazyReadOnlySet(Context.UserSessions);
+            _genres = InitLazyReadOnlySet(Context.Genre);
         }
         
         public virtual ValueTask DisposeAsync()

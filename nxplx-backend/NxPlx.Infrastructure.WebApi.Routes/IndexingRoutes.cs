@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -22,14 +23,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> IndexLibraries(Request req, Response res)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
 
             var libIds = req.ParseBody<JsonValue<int[]>>().value;
             
             IEnumerable<Library> libraries;
-            await using (var ctx = container.Resolve<IReadContext>())
+            await using (var ctx = container.Resolve<IReadNxplxContext>())
             {
-                libraries = await ctx.Libraries.Many(l => libIds.Contains(l.Id));
+                libraries = await ctx.Libraries.Many(l => libIds.Contains(l.Id)).ToListAsync();
             }
 
             await res.SendStatus(HttpStatusCode.OK);
@@ -39,12 +40,12 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> IndexAllLibraries(Request req, Response res)
         {
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
 
             IEnumerable<Library> libraries;
-            await using (var ctx = container.Resolve<IReadContext>())
+            await using (var ctx = container.Resolve<IReadNxplxContext>())
             {
-                libraries = await ctx.Libraries.Many();
+                libraries = await ctx.Libraries.Many().ToListAsync();
             }
             var libIds = libraries.Select(l => l.Id).ToArray();
             

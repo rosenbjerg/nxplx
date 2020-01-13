@@ -1,12 +1,13 @@
-import { Component, h } from "preact";
-import Loading from '../../components/loading';
-import http from "../../Http";
-import { Library, User } from "../../models";
-import * as style from "./style.css";
-import FormField from 'preact-material-components/FormField';
-import 'preact-material-components/FormField/style.css';
 import { createSnackbar } from "@snackbar/core";
+import { Component, h } from "preact";
+import 'preact-material-components/FormField/style.css';
+import Loading from '../../components/loading';
 import SessionManager from "../../components/SessionManager";
+import http from "../../Http";
+import { translate } from "../../localisation";
+import { getEntry, setEntry } from "../../localstorage";
+import { User } from "../../models";
+import * as style from "./style.css";
 
 interface Props {
 }
@@ -25,18 +26,21 @@ export default class Profile extends Component<Props, State> {
     }
     
     public render(props:Props, { user }:State) {
-        if (!user) { return (<Loading/>); }
+        if (!user)
+        {
+            return (<div class={style.profile}><Loading /></div>);
+        }
         return (
             <div class={style.profile}>
-                <h1>Account settings for {user.username}</h1>
+                <h1>{translate('account-settings-for')} {user.username}</h1>
 
                 <form ref={this.setDetailsFormRef} onSubmit={this.saveDetails}>
-                    <h3>Your account details</h3>
+                    <h3>{translate('your-account-details')}</h3>
                     <table>
                         <tbody>
                         <tr>
                             <td>
-                                <label>Email</label>
+                                <label>{translate('email')}</label>
                             </td>
                             <td>
                                 <input class="inline-edit" name="email" type="email" value={user.email}/>
@@ -50,12 +54,12 @@ export default class Profile extends Component<Props, State> {
                 </form>
 
                 <form ref={this.setChangePasswordFormRef} onSubmit={this.changePassword}>
-                    <h3>Change your password</h3>
+                    <h3>{translate('change-your-password')}</h3>
                     <table>
                         <tbody>
                             <tr>
                                 <td>
-                                    <label>Old password</label>
+                                    <label>{translate('old-password')}</label>
                                 </td>
                                 <td>
                                     <input class="inline-edit" type="password" name="oldPassword" required minLength={6} maxLength={50}/>
@@ -63,7 +67,7 @@ export default class Profile extends Component<Props, State> {
                             </tr>
                             <tr>
                                 <td>
-                                    <label>New password</label>
+                                    <label>{translate('new-password')}</label>
                                 </td>
                                 <td>
                                     <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
@@ -71,18 +75,24 @@ export default class Profile extends Component<Props, State> {
                             </tr>
                             <tr>
                                 <td>
-                                    <label>New password (again)</label>
+                                    <label>{translate('new-password-again')}</label>
                                 </td>
                                 <td>
-                                    <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
+                                    <input class="inline-edit" type="password" name="password2" required minLength={6} maxLength={50}/>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <button class="bordered">Change password</button>
+                    <button class="bordered">{translate('change-password')}</button>
                 </form>
 
-                <h3>Your active sessions</h3>
+                <h3>{translate('language')}</h3>
+                <select class="inline-edit" onInput={e => setEntry('locale', (e as any).target.value)} value={getEntry('locale', 'en')}>
+                    <option value="en">English</option>
+                    <option value="da">Dansk</option>
+                </select>
+
+                <h3>{translate('your-active-sessions')}</h3>
                 <SessionManager/>
             </div>
         );

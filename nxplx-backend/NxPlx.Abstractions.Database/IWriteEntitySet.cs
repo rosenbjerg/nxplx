@@ -11,7 +11,7 @@ namespace NxPlx.Abstractions.Database
         void Add(IEnumerable<TEntity> entities);
 
         Task AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector);
-        Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Expression<Func<TEntity, TPrimaryKey>> keySelector);
+        Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Func<TEntity, TPrimaryKey> keySelector);
         
         void Remove(TEntity entity);
         void Remove(IEnumerable<TEntity> entities);

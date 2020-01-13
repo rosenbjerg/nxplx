@@ -5,7 +5,7 @@ import Helmet from "preact-helmet";
 import { Store } from "unistore";
 import Loading from "../../components/loading";
 import { formatSubtitleName } from "../../components/Subtitles";
-import { imageUrl } from "../../Details";
+import { imageUrl } from "../../models";
 import http from "../../Http";
 import { FileInfo } from "../../models";
 import * as style from "./style.css";
@@ -41,7 +41,7 @@ export default class Watch extends Component<Props, State> {
 
     public render({ kind, fid }: Props, state: State) {
         if (!state.info) {
-            return <Loading/>;
+            return (<div class={style.container}><Loading /></div>);
         }
         const completed = (this.playerTime / state.info.duration) > 0.95;
         return (

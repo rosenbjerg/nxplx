@@ -27,8 +27,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var lang = req.Context.ExtractUrlParameter("lang");
             var kind = req.Context.ExtractUrlParameter("kind");
-
-            var subtitlePath = await SubtitleService.GetSubtitlePath(kind, id, lang);
+            var session = req.GetData<UserSession>();
+            
+            var subtitlePath = await SubtitleService.GetSubtitlePath(session.User, kind, id, lang);
 
             return await res.SendFile(subtitlePath);
         }
@@ -37,8 +38,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var language = req.ParseBody<JsonValue<string>>();
             var session = req.GetData<UserSession>();
-
-            await SubtitleService.SetLanguagePreference(session.UserId, fileId, language.value);
+            
+            await SubtitleService.SetLanguagePreference(session.User, fileId, language.value);
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
@@ -46,15 +47,17 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var session = req.GetData<UserSession>();
-
-            var preference = await SubtitleService.GetLanguagePreference(session.UserId, id);
+            
+            var preference = await SubtitleService.GetLanguagePreference(session.User, id);
 
             return await res.SendString(preference ?? "none");
         }
         private static async Task<HandlerType> GetSubtitleLanguagesByFileId(Request req, Response res)
         {
             var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var subtitles = await SubtitleService.FindSubtitles(id);
+            var session = req.GetData<UserSession>();
+            
+            var subtitles = await SubtitleService.FindSubtitles(session.User, id);
             return await res.SendJson(subtitles);
         }
     }

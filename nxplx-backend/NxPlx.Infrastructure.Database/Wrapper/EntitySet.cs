@@ -28,6 +28,17 @@ namespace NxPlx.Services.Database.Wrapper
 
         public async Task AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector)
         {
+            var id = keySelector(entity);
+            if (!id.Equals(default))
+            {
+                var existingEntity = DbSet.FirstOrDefaultAsync(e => id.Equals(keySelector(e)));
+                _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+            }
+            else
+            {
+                DbSet.Add(entity);
+            }
+            
             var set = _context.Set<TEntity>();
             var existing = await set.FindAsync(keySelector(entity));
             
@@ -35,16 +46,17 @@ namespace NxPlx.Services.Database.Wrapper
             else set.Update(entity);
         }
 
-        public async Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Expression<Func<TEntity, TPrimaryKey>> keySelector)
+        public async Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Func<TEntity, TPrimaryKey> keySelector)
         {
-            var set = _context.Set<TEntity>();
-            var keySelectorFunc = keySelector.Compile();
-            var ids = entities.Select(keySelectorFunc).ToList();
-            var existingIds = await set.Where(e => ids.Contains(keySelectorFunc(e))).Select(keySelector).ToListAsync();
-
-            var existingEntities = entities.Where(e => existingIds.Contains(keySelectorFunc(e))).ToList();
-            set.AddRange(entities.Except(existingEntities));
-            set.UpdateRange(existingEntities);
+            var ids = entities.Select(keySelector).Where(id => !id.Equals(default)).ToList();
+            var existing = await DbSet.Where(e => ids.Contains(keySelector(e))).ToDictionaryAsync(keySelector);
+            foreach (var entity in entities)
+            {
+                if (existing.TryGetValue(keySelector(entity), out var existingEntity))
+                    _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+                else
+                    DbSet.Add(entity);
+            }
         }
 
         public void Remove(TEntity entity)

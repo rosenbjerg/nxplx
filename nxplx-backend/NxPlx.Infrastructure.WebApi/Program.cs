@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Configuration;
@@ -17,16 +22,15 @@ using Utils = NxPlx.Infrastructure.WebApi.Routes.Utils;
 
 namespace NxPlx.WebApi
 {
-
-    
     class Program
     {
+        private const int StaticFileCacheMaxAge = 60 * 60 * 24 * 2;
         static async Task Main(string[] args)
         {
             WebApiConventions.Install();
 
             var cfg = ConfigurationService.Current;
-            var container = ResolveContainer.Default();
+            var container = ResolveContainer.Default;
             var logger = container.Resolve<ILoggingService>();
             logger.Info("NxPlx.Infrastructure.WebApi starting...");
 
@@ -45,7 +49,7 @@ namespace NxPlx.WebApi
             {
                 Secure = cfg.Production,
                 Path = "/",
-                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext())
+                Store = new EntityFrameworkSessionStore<UserSession>(() => new NxplxContext(), session => session.User)
             });
             server.OnHandlerException += (sender, eventArgs) =>
             {
@@ -86,9 +90,9 @@ namespace NxPlx.WebApi
         private static async Task CreateAdminAccount(ResolveContainer container)
         {
             var logger = container.Resolve<ILoggingService>();
-            await using var ctx = container.Resolve<IReadContext>();
+            await using var ctx = container.Resolve<IReadNxplxContext>();
             await using var transaction = ctx.BeginTransactionedContext();
-            if (await ctx.Users.Count() == default)
+            if (await ctx.Users.Many().CountAsync() == 0)
             {
                 var admin = new User
                 {
@@ -100,7 +104,7 @@ namespace NxPlx.WebApi
                 transaction.Users.Add(admin);
                 await transaction.SaveChanges();
 
-                logger.Trace("No users found. Default admin account created");
+                logger.Info("No users found. Default admin account created");
             }
         }
     }

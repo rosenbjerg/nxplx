@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
@@ -69,17 +70,17 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<IEnumerable<LibraryDto>> ListLibraries(bool isAdmin, IEnumerable<int> libraryAccess)
         {
-            var container = ResolveContainer.Default();
-            await using var context = container.Resolve<IReadContext>();
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>();
 
             if (isAdmin)
             {
-                var libraries = await context.Libraries.Many();
+                var libraries = await context.Libraries.Many().ToListAsync();
                 return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(libraries);
             }
             else
             {
-                var libraries = await context.Libraries.Many(l => libraryAccess.Contains(l.Id));
+                var libraries = await context.Libraries.Many(l => libraryAccess.Contains(l.Id)).ToListAsync();
                 return container.Resolve<IDtoMapper>().Map<Library, LibraryDto>(libraries);
             }
         } 

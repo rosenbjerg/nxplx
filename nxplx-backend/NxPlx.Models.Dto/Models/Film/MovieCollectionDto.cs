@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace NxPlx.Models.Dto.Models.Film
 {
     public class MovieCollectionDto : IDto
@@ -6,5 +8,7 @@ namespace NxPlx.Models.Dto.Models.Film
         public string name { get; set; }
         public string poster { get; set; }
         public string backdrop { get; set; }
+
+        public List<OverviewElementDto> movies { get; set; }
     }
 }

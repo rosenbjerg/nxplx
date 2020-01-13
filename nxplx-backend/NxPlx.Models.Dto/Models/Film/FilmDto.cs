@@ -13,7 +13,7 @@ namespace NxPlx.Models.Dto.Models.Film
         public string backdrop { get; set; }
         public long budget { get; set; }
         public string imdbId { get; set; }
-        public MovieCollectionDto belongsToCollection { get; set; }
+        public int? belongsToCollectionId { get; set; }
         public string originalTitle { get; set; }
         public List<ProductionCountryDto> productionCountries { get; set; }
         public DateTime? releaseDate { get; set; }

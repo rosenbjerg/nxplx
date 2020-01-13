@@ -6,10 +6,10 @@ import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import {Link, route} from "preact-router";
 import Loading from '../../components/loading';
-import { imageUrl } from "../../Details";
 import http from '../../Http';
-import { OverviewElement } from "../../models";
 import * as style from './style.css';
+import { translate } from "../../localisation";
+import { imageUrl, OverviewElement } from "../../models";
 
 
 interface Props {}
@@ -34,7 +34,7 @@ export default class Home extends Component<Props, State> {
             <div class={style.home}>
                 <Helmet title="NxPlx" />
                 <div class={style.top}>
-                    <input tabIndex={0} autofocus class={style.search} placeholder="search here" type="search" value={this.state.search} onInput={linkState(this, 'search')} />
+                    <input tabIndex={0} autofocus class={style.search} placeholder={translate('search-here')} type="search" value={this.state.search} onInput={linkState(this, 'search')} />
                     {/*<button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>*/}
                 </div>
 
@@ -66,6 +66,7 @@ export default class Home extends Component<Props, State> {
             .then(async response => {
                 if (response.ok) {
                     const overview = await response.json();
+                    console.log(overview);
                     this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
                 }
             })

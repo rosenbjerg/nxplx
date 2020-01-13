@@ -21,7 +21,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSessions(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var sessions = await SessionService.GetUserSessions(session.UserId);
+            var sessions = await SessionService.GetUserSessions(session.User, session.User.Id);
             return await res.SendJson(sessions);
         }
         private static async Task<HandlerType> CloseSession(Request req, Response res)
@@ -35,7 +35,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 return await res.SendStatus(HttpStatusCode.OK);
             }
             
-            var ok = await SessionService.CloseUserSession(sessionId, currentSession.UserId, currentSession.IsAdmin);
+            var ok = await SessionService.CloseUserSession(currentSession.User, sessionId);
 
             if (!ok) return await res.SendStatus(HttpStatusCode.BadRequest);
             return await res.SendStatus(HttpStatusCode.OK);
@@ -43,7 +43,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetUsersSessions(Request req, Response res)
         {
             var userId = int.Parse(req.Queries["userId"]);
-            var sessions = await SessionService.GetUserSessions(userId);
+            var currentSession = req.GetData<UserSession>();
+            var sessions = await SessionService.GetUserSessions(currentSession.User, userId);
             return await res.SendJson(sessions);
         }
 

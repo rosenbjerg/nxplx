@@ -13,6 +13,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
+            router.Get("/continue", Authenticated.User, GetContinueWatchingList);
             router.Get("/:file_id", Authenticated.User, GetProgressByFileId);
             router.Put("/:file_id", Authenticated.User, SetProgressByFileId);
         }
@@ -23,7 +24,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var progressValue = req.ParseBody<JsonValue<double>>();
             var session = req.GetData<UserSession>();
 
-            await ProgressService.SetUserWatchingProgress(session.UserId, fileId, progressValue.value);
+            await ProgressService.SetUserWatchingProgress(session.User, fileId, progressValue.value);
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
@@ -32,11 +33,19 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
             var session = req.GetData<UserSession>();
 
-            var progress = await ProgressService.GetUserWatchingProgress(session.UserId, fileId);
+            var progress = await ProgressService.GetUserWatchingProgress(session.User, fileId);
 
             return await res.SendJson(progress);
         }
 
+        private static async Task<HandlerType> GetContinueWatchingList(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+
+            var continueWatchingList = await ProgressService.GetUserContinueWatchingList(session.User);
+
+            return await res.SendJson(continueWatchingList);
+        }
 
     }
 }

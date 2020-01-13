@@ -40,23 +40,20 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
                     <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
 
                     <span class={style.menuContent}>
-                        <Link title="Go to overview" href="/">
+                        <Link href="/">
                             <i class="material-icons">home</i>
                         </Link>
                         {isAdmin && (
-                            <Link title="Go to administrator view" href="/admin">
+                            <Link href="/admin">
                                 <i class="material-icons">supervisor_account</i>
                             </Link>
                         )}
-                        <Link title="View or edit account settings" href="/profile">
+                        <Link href="/profile">
                             <i class="material-icons">account_circle</i>
                         </Link>
-                        <Link title="Logout" onClick={logout}>
+                        <Link onClick={logout}>
                             <i class="material-icons">exit_to_app</i>
                         </Link>
-                        {/*<Link href="/settings">*/}
-                        {/*    <i class="material-icons">settings</i>*/}
-                        {/*</Link>*/}
                     </span>
                 </nav>
             )}
