@@ -15,14 +15,8 @@ namespace NxPlx.Abstractions
         public TTo Map<TFrom, TTo>(TFrom instance)
         {
             if (instance.Equals(default)) return default;
-            
-            if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
-            {
-                var mapper = (Func<TFrom, TTo>) mapperObject;
-                return mapper(instance);
-            }
 
-            throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instance));
+            return Map<TFrom, TTo>(new[] { instance }).First();
         }
         public IEnumerable<TTo> Map<TFrom, TTo>(IEnumerable<TFrom> instances)
         {

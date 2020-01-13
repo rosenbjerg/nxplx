@@ -66,7 +66,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 return dtoMapper.Map<Genre, GenreDto>(genres);
             });
         }
-        private static async Task<List<OverviewElementDto>> BuildOverview(ResolveContainer container, IReadNxplxContext ctx, List<int> libs)
+        private static async Task<IEnumerable<OverviewElementDto>> BuildOverview(ResolveContainer container, IReadNxplxContext ctx, List<int> libs)
         {
             var seriesDetails = await ctx.EpisodeFiles
                 .ProjectMany(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId),
@@ -94,7 +94,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             overview.AddRange(dtoMapper.Map<DbFilmDetails, OverviewElementDto>(notInCollections));
             overview.AddRange(dtoMapper.Map<MovieCollection, OverviewElementDto>(collections));
 
-            return overview;
+            return overview.OrderByDescending(oe => oe.title);
         }
     }
 

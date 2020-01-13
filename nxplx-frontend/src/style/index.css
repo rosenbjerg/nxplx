@@ -37,6 +37,7 @@ body {
 }
 .nx-scroll::-webkit-scrollbar {
     width: 0.5em;
+    height: 0.5em;
     background-color: var(--secondary-background-color);
 }
 .nx-scroll::-webkit-scrollbar-track {

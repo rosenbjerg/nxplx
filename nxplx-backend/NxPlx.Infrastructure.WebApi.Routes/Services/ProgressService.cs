@@ -48,6 +48,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var progress = await context.WatchingProgresses.Many()
                 .OrderByDescending(wp => wp.LastWatched)
                 .Take(20).ToDictionaryAsync(wp => wp.FileId);
+
             var ids = progress.Keys.ToList();
 
             var mapper = container.Resolve<IDtoMapper>();

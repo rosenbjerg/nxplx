@@ -6,13 +6,13 @@ import {Link} from "preact-router";
 import Loading from '../../components/loading';
 import http from '../../utils/http';
 import { translate } from "../../utils/localisation";
-import { imageUrl, OverviewElement } from "../../utils/models";
+import { ContinueWatchingElement, imageUrl, OverviewElement } from "../../utils/models";
 import * as style from './style.css';
 
 
 interface Props {}
 
-interface State { overview?: OverviewElement[]; progress?: object; search:string }
+interface State { overview?: OverviewElement[]; progress?: ContinueWatchingElement[]; search:string }
 
 export default class Home extends Component<Props, State> {
 
@@ -27,24 +27,35 @@ export default class Home extends Component<Props, State> {
     }
 
 
-    public render(_, { overview, search }: State) {
+    public render(_, { overview, search, progress }: State) {
         return (
             <div class={style.home}>
                 <Helmet title="NxPlx" />
                 <div class={style.top}>
                     <input tabIndex={0} autofocus class={style.search} placeholder={translate('search-here')} type="search" value={this.state.search} onInput={linkState(this, 'search')} />
-                    {/*<button tabIndex={0} class={['material-icons', style.scan].join(' ')} title="Scan library files" onClick={this.scan}>refresh</button>*/}
                 </div>
 
                 {overview === undefined ? (
                     <Loading />
                 ) : (
                     <div class={`${style.entryContainer} nx-scroll`}>
+                        {!search && progress && (
+                            <span>
+                                <div>Continue watching</div>
+                                <div class="nx-scroll" style={{'white-space': 'nowrap', 'overflow-x': 'auto', 'margin-bottom': '3px'}}>
+                                    {progress.map(p => (
+                                        <Link key={p.kind[0] + p.fileId} title={p.title} href={`/watch/${p.kind}/${p.fileId}`}>
+                                            <img class={style.entryTile} src={imageUrl(p.poster, 342)} alt={p.title} />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </span>
+                        )}
                         {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
                                     <Link key={entry.id} title={entry.title} href={`/${entry.kind}/${entry.id}`}>
-                                        <img key={entry.id} class={style.entryTile} src={imageUrl(entry.poster, 342)} alt={entry.title} />
+                                        <img class={style.entryTile} src={imageUrl(entry.poster, 342)} alt={entry.title} />
                                     </Link>
                                 )
                             )}
@@ -67,21 +78,14 @@ export default class Home extends Component<Props, State> {
                     console.log(overview);
                     this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
                 }
+            });
+        http.get('/api/progress/continue')
+            .then(async response => {
+                if (response.ok) {
+                    const progress = await response.json();
+                    console.log(progress);
+                    this.setState({ progress });
+                }
             })
     };
-
-    // private scan = () => {
-    //     const scanning = createSnackbar('Scanning library...', { timeout: 1500 });
-    //     http.post('/api/scan', '', false).then(response => {
-    //         if (!response.ok) {
-    //             scanning.destroy();
-    //             createSnackbar('Scanning failed :/', { timeout: 1500 });
-    //         }
-    //         else {
-    //             scanning.destroy();
-    //             createSnackbar('Scan completed', { timeout: 1500 });
-    //             this.load();
-    //         }
-    //     })
-    // }
 }
