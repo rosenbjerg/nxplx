@@ -1,6 +1,6 @@
 type ShakaMessage = 'state_changed'|'volume_changed'|'muted'|'subtitle_changed'|'time_changed'
 
-function CreateEventBroker() : EventBroker {
+function CreateEventBroker() : Events {
     const allHandlers:{} = {};
 
     const publish = (event:ShakaMessage, data:any) => {
@@ -22,7 +22,7 @@ function CreateEventBroker() : EventBroker {
     return publish;
 }
 
-export interface EventBroker {
+export interface Events {
     (event:ShakaMessage, data:any):void
     subscribe<TData>(event:ShakaMessage, handler:(data:TData)=>void):void
 }

@@ -1,13 +1,11 @@
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-// @ts-ignore
 import Helmet from 'preact-helmet';
-import { Link } from "preact-router";
-import { formatInfoPair } from '../../commonFilmInfo';
 import { EpisodeStill } from "../../components/EpisodeStill";
 import Loading from '../../components/loading';
-import { EpisodeDetails, imageUrl, SeasonDetails, SeriesDetails } from "../../models";
-import http from '../../Http';
+import { formatInfoPair } from '../../utils/common';
+import http from '../../utils/http';
+import { imageUrl, SeasonDetails, SeriesDetails } from "../../utils/models";
 import * as style from './style.css';
 
 interface Props { id:string, season:string }
@@ -26,7 +24,7 @@ export default class Season extends Component<Props, State> {
     }
 
 
-    public render(props:Props, { series, season, bg, bgImg }:State) {
+    public render(_, { series, season, bg, bgImg }:State) {
         if (!series) {
             return (<div class={style.content}><Loading /></div>);
         }

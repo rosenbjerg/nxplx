@@ -1,15 +1,13 @@
-import { Action, createSnackbar, Snackbar, SnackOptions } from '@snackbar/core'
 import { Component, h } from "preact";
 import Helmet from 'preact-helmet';
-import { route } from "preact-router";
-import http from "../../Http";
-import * as style from "./style.css";
-
 import Typography from 'preact-material-components/Typography';
 import 'preact-material-components/Typography/style.css';
-import { connect } from "unistore/preact";
+import { route } from "preact-router";
 import { Store } from "unistore";
-import { translate } from "../../localisation";
+import { connect } from "unistore/preact";
+import http from "../../utils/http";
+import { translate } from "../../utils/localisation";
+import * as style from "./style.css";
 
 const actions = (store:Store<NxPlxStore>) => (
     {

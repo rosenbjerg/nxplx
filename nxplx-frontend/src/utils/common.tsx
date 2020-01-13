@@ -1,5 +1,5 @@
 import { h, JSX } from "preact";
-import * as style from "./routes/series/style.css";
+import * as style from "../routes/series/style.css";
 
 interface InfoPair { title:string, value:any }
 

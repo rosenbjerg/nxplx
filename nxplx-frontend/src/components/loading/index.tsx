@@ -1,10 +1,7 @@
 import { h } from 'preact';
-// @ts-ignore
 import * as style from './style.css';
 
-interface Props {  }
-
-export default (props:Props) => (
+export default () => (
     <span class={style.loadingContainer}>
         <div class={style.skFoldingCube}>
             <div class={[style.skCube].join(" ")}/>

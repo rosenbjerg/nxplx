@@ -1,10 +1,10 @@
+import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
 import { format } from "timeago.js";
 import { UAParser } from 'ua-parser-js'
-import http from "../../Http";
+import http from "../../utils/http";
+import { translate } from "../../utils/localisation";
 import Loading from "../loading";
-import { createSnackbar } from "@snackbar/core";
-import { translate } from "../../localisation";
 
 interface Props { userId?:number }
 
@@ -43,7 +43,7 @@ export default class SessionManager extends Component<Props, State> {
             });
     }
 
-    public render(props:Props, { sessions }:State) {
+    public render(_, { sessions }:State) {
         if (!sessions) return (<Loading />);
         return (
             <div>

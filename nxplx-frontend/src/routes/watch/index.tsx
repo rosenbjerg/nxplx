@@ -1,18 +1,15 @@
-import { Action, createSnackbar, Snackbar, SnackOptions } from "@snackbar/core";
 import { Component, h } from "preact";
-// @ts-ignore
 import Helmet from "preact-helmet";
+import { route } from "preact-router";
 import { Store } from "unistore";
 import Loading from "../../components/loading";
-import { formatSubtitleName } from "../../components/Subtitles";
-import { imageUrl } from "../../models";
-import http from "../../Http";
-import { FileInfo } from "../../models";
-import * as style from "./style.css";
-
-import { route } from "preact-router";
 import ShakaPlayer from "../../components/ShakaPlayer";
-import CreateEventBroker from "../../EventBroker";
+import { formatSubtitleName } from "../../components/Subtitles";
+import CreateEventBroker from "../../utils/events";
+import http from "../../utils/http";
+import { imageUrl } from "../../utils/models";
+import { FileInfo } from "../../utils/models";
+import * as style from "./style.css";
 
 interface Props {
     store: Store<object>;

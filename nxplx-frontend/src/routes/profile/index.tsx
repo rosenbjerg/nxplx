@@ -3,10 +3,10 @@ import { Component, h } from "preact";
 import 'preact-material-components/FormField/style.css';
 import Loading from '../../components/loading';
 import SessionManager from "../../components/SessionManager";
-import http from "../../Http";
-import { translate } from "../../localisation";
-import { getEntry, setEntry } from "../../localstorage";
-import { User } from "../../models";
+import http from "../../utils/http";
+import { translate } from "../../utils/localisation";
+import { getEntry, setEntry } from "../../utils/localstorage";
+import { User } from "../../utils/models";
 import * as style from "./style.css";
 
 interface Props {
@@ -16,16 +16,13 @@ interface State {
 }
 export default class Profile extends Component<Props, State> {
 
-    private detailsForm?:HTMLFormElement;
-    private changePasswordForm?:HTMLFormElement;
-
     public componentDidMount() {
         http.get('/api/user')
             .then(res => res.json())
             .then(user => this.setState({ user }));
     }
     
-    public render(props:Props, { user }:State) {
+    public render(_, { user }:State) {
         if (!user)
         {
             return (<div class={style.profile}><Loading /></div>);
@@ -34,7 +31,7 @@ export default class Profile extends Component<Props, State> {
             <div class={style.profile}>
                 <h1>{translate('account-settings-for')} {user.username}</h1>
 
-                <form ref={this.setDetailsFormRef} onSubmit={this.saveDetails}>
+                <form onSubmit={this.saveDetails}>
                     <h3>{translate('your-account-details')}</h3>
                     <table>
                         <tbody>
@@ -53,7 +50,7 @@ export default class Profile extends Component<Props, State> {
                     </table>
                 </form>
 
-                <form ref={this.setChangePasswordFormRef} onSubmit={this.changePassword}>
+                <form onSubmit={this.changePassword}>
                     <h3>{translate('change-your-password')}</h3>
                     <table>
                         <tbody>
@@ -123,8 +120,4 @@ export default class Profile extends Component<Props, State> {
             createSnackbar('Unable to change your password :/', { timeout: 3000 });
         }
     }
-
-
-    private setDetailsFormRef = ref => this.detailsForm = ref;
-    private setChangePasswordFormRef = ref => this.changePasswordForm = ref;
 }

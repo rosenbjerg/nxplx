@@ -1,12 +1,8 @@
 import { Component, h } from 'preact';
 import "shaka-player/dist/controls.css";
 import shaka from "shaka-player/dist/shaka-player.ui";
-import { EventBroker } from "../../EventBroker";
+import { Events } from "../../utils/events";
 
-interface PlayerEvent {
-    type:'state_changed'|'volume_changed'|'subtitle_changed'|'muted'
-    value:string|number
-}
 interface TextTrack {
     displayName: string
     language: string
@@ -79,7 +75,7 @@ const onError = (event: any) => {
 };
 
 interface Props {
-    events: EventBroker;
+    events: Events;
     videoTrack: string
     time: number
     autoPlay: boolean
@@ -139,7 +135,7 @@ export default class ShakaPlayer extends Component<Props> {
         );
     }
 
-    public shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
+    public shouldComponentUpdate(): boolean {
         return false;
     }
 

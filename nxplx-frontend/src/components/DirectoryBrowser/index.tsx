@@ -1,7 +1,6 @@
 import { Component, h } from "preact";
-import http from "../../Http";
+import http from "../../utils/http";
 import * as style from './style.css'
-import linkState from "linkstate";
 
 interface Props {
 
@@ -39,7 +38,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
         }
     }
 
-    public render(props:Props, {cwd, dirs}:State) {
+    public render(_, {cwd, dirs}:State) {
         return (
             <div class={style.container}>
                 <div>

@@ -1,6 +1,3 @@
-import { h } from "preact";
-
-
 export type MessageHandler = (msg: Message) => void;
 
 export interface Message {
@@ -8,14 +5,14 @@ export interface Message {
     data:any
 }
 
-export interface Messenger {
+export interface Connection {
     send(message:Message):void
 
     subscribe(type:string, handler:(msg:Message) => void)
     unsubscribe(type:string, handler:(msg:Message) => void)
 }
 
-export default class WebsocketMessenger implements Messenger {
+export default class WebsocketMessenger implements Connection {
     private webSocket:WebSocket;
     private connected = false;
 

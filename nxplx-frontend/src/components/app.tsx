@@ -6,17 +6,14 @@ import 'preact-material-components/FormField/style.css';
 import { route, Router } from "preact-router";
 import createStore from 'unistore'
 import { Provider } from 'unistore/preact'
-import http from "../Http";
-import { setLocale } from "../localisation";
-import { getEntry } from "../localstorage";
+import Collection from "../routes/collection";
 import Film from "../routes/film";
 import Home from "../routes/home";
 import Login from "../routes/login";
 import Season from "../routes/season";
 import Series from "../routes/series";
+import http from "../utils/http";
 import Header from "./header";
-import Loading from "./loading";
-import Collection from "../routes/collection";
 
 if ((module as any).hot) {
     // tslint:disable-next-line:no-var-requires
@@ -59,9 +56,6 @@ export default class App extends Component {
                 this.loadBuild();
             }
         })
-    }
-    private loadDictionary() {
-        setLocale(getEntry('locale', 'en'));
     }
     private loadBuild() {
         http.get('/api/build')

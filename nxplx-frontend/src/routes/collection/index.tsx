@@ -1,13 +1,10 @@
-import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-// @ts-ignore
 import Helmet from 'preact-helmet';
 import { Link } from "preact-router";
-import { formatInfoPair, formatRunTime } from '../../commonFilmInfo';
 import Loading from '../../components/loading';
-import { imageUrl, MovieCollection, round, SeasonDetails, SeriesDetails } from "../../models";
-import http from '../../Http';
+import http from '../../utils/http';
+import { imageUrl, MovieCollection } from "../../utils/models";
 import * as style from './style.css';
 
 interface Props { id:string }
@@ -26,7 +23,7 @@ export default class Collection extends Component<Props, State> {
     }
 
 
-    public render(props:Props, { details, bg }:State) {
+    public render(_, { details, bg }:State) {
         if (!details) {
             return (<div class={`nx-scroll ${style.content}`}><Loading/></div>);
         }

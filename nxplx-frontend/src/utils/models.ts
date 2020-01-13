@@ -77,6 +77,15 @@ export interface User {
 
 export interface OverviewElement { id:number; title:string; poster:string; kind:'film'|'series' }
 
+export interface ContinueWatchingElement {
+    fileId:number
+    title:string
+    poster:string
+    kind:string
+    watched:string
+    progress:number
+}
+
 export interface FileInfo {
     id:number
     fid:number

@@ -1,5 +1,5 @@
 import {Component, h} from "preact";
-import http from "../../Http";
+import http from "../../utils/http";
 import * as style from "./style.css";
 
 interface Props { kind:'film'|'series', file_id:string }
@@ -39,7 +39,7 @@ export default class SubtitleSelector extends Component<Props, State> {
             .then(preference => this.setState({selected: preference }));
     }
 
-    public render(props:Props, state:State) {
+    public render(_, state:State) {
         if (state.languages === undefined || state.languages.length === 0) {
             return "None"
         }

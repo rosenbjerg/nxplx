@@ -1,5 +1,5 @@
-import english from './assets/localisation/nxplx.en.json';
-import http from "./Http";
+import english from '../assets/localisation/nxplx.en.json';
+import http from "./http";
 
 let currentLocale = 'en';
 const dictionary = {

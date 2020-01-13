@@ -1,18 +1,16 @@
 import { Component, h } from 'preact';
-// @ts-ignore
 import Helmet from 'preact-helmet';
-import {Link} from "preact-router";
-import { formatInfoPair, formatRunTime } from "../../commonFilmInfo";
 import { FilmPoster } from "../../components/FilmPoster";
 import Loading from '../../components/loading';
 import Subtitles from '../../components/Subtitles';
-import { FilmDetails, imageUrl, SeriesDetails } from "../../models";
-import http from '../../Http';
+import { formatInfoPair, formatRunTime } from "../../utils/common";
+import http from '../../utils/http';
+import { FilmDetails, imageUrl } from "../../utils/models";
 import * as style from './style.css';
 
 interface Props { id:string }
 
-interface State { details?:FilmDetails, bg:string; subtitle:string }
+interface State { details?:FilmDetails, bg:string }
 
 export default class Home extends Component<Props, State> {
 
@@ -30,7 +28,7 @@ export default class Home extends Component<Props, State> {
         });
     }
 
-    public render(props:Props, { details, bg, subtitle }:State) {
+    public render(_, { details, bg }:State) {
         if (!details) {
             return (<div class={style.content}><Loading /></div>);
         }

@@ -1,15 +1,13 @@
-import { createSnackbar } from '@snackbar/core'
 import linkState from 'linkstate';
 import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-// @ts-ignore
 import Helmet from 'preact-helmet';
-import {Link, route} from "preact-router";
+import {Link} from "preact-router";
 import Loading from '../../components/loading';
-import http from '../../Http';
+import http from '../../utils/http';
+import { translate } from "../../utils/localisation";
+import { imageUrl, OverviewElement } from "../../utils/models";
 import * as style from './style.css';
-import { translate } from "../../localisation";
-import { imageUrl, OverviewElement } from "../../models";
 
 
 interface Props {}
@@ -29,7 +27,7 @@ export default class Home extends Component<Props, State> {
     }
 
 
-    public render(props:Props, { overview, search }: State) {
+    public render(_, { overview, search }: State) {
         return (
             <div class={style.home}>
                 <Helmet title="NxPlx" />

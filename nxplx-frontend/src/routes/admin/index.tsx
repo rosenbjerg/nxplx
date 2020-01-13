@@ -4,10 +4,10 @@ import { Component, h } from "preact";
 import DirectoryBrowser from "../../components/DirectoryBrowser";
 import Loading from "../../components/loading"
 import UserPermissions from "../../components/UserPermissions";
-import http from "../../Http";
+import http from "../../utils/http";
+import { translate } from "../../utils/localisation";
+import { Library, User } from "../../utils/models";
 import * as style from "./style.css";
-import { translate } from "../../localisation";
-import { Library, User } from "../../models";
 
 interface Props {}
 interface State {
@@ -23,7 +23,7 @@ export default class Admin extends Component<Props, State> {
         selectedUser:undefined
     };
 
-    public render(props:Props, { users, libraries, selectedUser }:State) {
+    public render(_, { users, libraries, selectedUser }:State) {
         return (
             <div class={style.profile}>
                 <h1>{translate('admin-stuff')}</h1>

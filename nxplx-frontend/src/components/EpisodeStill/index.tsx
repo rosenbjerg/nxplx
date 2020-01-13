@@ -1,6 +1,6 @@
 import { h } from "preact";
 import { Link } from "preact-router";
-import { EpisodeDetails, imageUrl } from "../../models";
+import { EpisodeDetails, imageUrl } from "../../utils/models";
 import * as style from './style.css';
 
 interface Props { key:number, episode:EpisodeDetails, posterClick?:()=>{} }

@@ -1,14 +1,13 @@
 import { Component, h } from "preact";
-import Loading from '../../components/loading';
-import http from "../../Http";
+import http from "../../utils/http";
 import * as style from './style.css'
 
 import linkState from "linkstate";
 import Checkbox from 'preact-material-components/Checkbox';
 import 'preact-material-components/Checkbox/style.css';
 import FormField from 'preact-material-components/FormField';
-import { translate } from "../../localisation";
-import { Library, User } from "../../models";
+import { translate } from "../../utils/localisation";
+import { Library, User } from "../../utils/models";
 
 interface UserPermission {
     library:Library
@@ -26,7 +25,7 @@ interface State {
 export default class UserPermissions extends Component<Props, State> {
 
 
-    public componentDidUpdate(previousProps: Readonly<Props>, previousState: Readonly<State>, previousContext: any): void {
+    public componentDidUpdate(previousProps: Readonly<Props>): void {
         if (this.props.user && previousProps.user !== this.props.user) {
             this.setState({ currentUser: this.props.user });
             this.loadUserPermissions();

@@ -1,12 +1,10 @@
 import { createSnackbar } from "@snackbar/core";
-import { Component, h } from "preact";
+import { h } from "preact";
 import { Link, route } from "preact-router";
 import { Store } from "unistore";
 import { connect } from 'unistore/preact'
-import http from "../../Http";
+import http from "../../utils/http";
 import * as style from "./style.css";
-
-
 
 const actions = (store:Store<NxPlxStore>) => (
     {
