@@ -3596,10 +3596,10 @@ elliptic@^6.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
-eme-encryption-scheme-polyfill@^1.0.2:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-1.0.3.tgz#6ee8d9633bfa5ab44a620ea33854f4e7aa58f3c2"
-  integrity sha512-BO98g91VkDSpFHHgWAeppz9hn1U3WRQWKh4O3mZk5JvaUvgYm0Q67t7/bC+8iEQsK+JA/K7+v2lhz1B+zXR/zA==
+eme-encryption-scheme-polyfill@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.0.tgz#b44a8fb7d5c7c0be869897be9d77a8cb9c0ba795"
+  integrity sha512-/zoXuACHLGQ8w5nkJrVr3YI0IGe05ZS8HR1x5uTqiAoHuj5hPzdnoyW9Zom8iPv93arPzwpde93GrKCFKLFK4g==
 
 emoji-regex@^7.0.1:
   version "7.0.3"
@@ -9063,11 +9063,11 @@ sha.js@^2.4.0, sha.js@^2.4.8:
     safe-buffer "^5.0.1"
 
 shaka-player@^2.5.5:
-  version "2.5.7"
-  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.7.tgz#d8cf3489fef2609957ae44a4faa46a38a5fcda20"
-  integrity sha512-Hcanwr1cnGru1E42EXml6XaoRCByutr3DRI9LRoknZKdIlsBG+F4kT5aWrMlwFw6foFNw9hoMpRsB6LWUPlrIw==
+  version "2.5.8"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.8.tgz#956318e856424e263777295000cb29ca0e6b1deb"
+  integrity sha512-IsyqXisimHZl9ITAZgGw6p2/E4004Vl3em+XQUk4zF1CjupVvL8kcs32a1iAXFYjNGrw+PMiPDULUpy2+Z/KPw==
   dependencies:
-    eme-encryption-scheme-polyfill "^1.0.2"
+    eme-encryption-scheme-polyfill "^2.0.0"
 
 shallowequal@^1.1.0:
   version "1.1.0"
