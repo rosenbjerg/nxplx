@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
-using NxPlx.Abstractions;
-using NxPlx.Infrastructure.IoC;
-using NxPlx.Models.Dto.Models;
 using Red;
 
 namespace NxPlx.Infrastructure.WebApi.Routes

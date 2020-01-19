@@ -6,7 +6,6 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 using NxPlx.Models.File;
-using NxPlx.Services.Database.Wrapper;
 
 namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {

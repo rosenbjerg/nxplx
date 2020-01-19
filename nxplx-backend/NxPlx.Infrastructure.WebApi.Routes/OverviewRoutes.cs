@@ -11,7 +11,6 @@ using NxPlx.Models.Database;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Dto.Models;
-using NxPlx.Models.Dto.Models.Film;
 using Red;
 using Red.Interfaces;
 
