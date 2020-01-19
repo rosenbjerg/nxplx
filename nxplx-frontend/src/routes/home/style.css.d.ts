@@ -5,3 +5,4 @@ export const entryTile: string;
 export const search: string;
 export const scan: string;
 export const top: string;
+export const continueWatching: string;

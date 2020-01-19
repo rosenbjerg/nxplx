@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NxPlx.Services.Database;
@@ -9,9 +10,10 @@ using NxPlx.Services.Database;
 namespace NxPlx.Services.Database.Migrations
 {
     [DbContext(typeof(NxplxContext))]
-    partial class NxplxContextModelSnapshot : ModelSnapshot
+    [Migration("20200115231417_AddMediaTypePropToSubtitleProgress")]
+    partial class AddMediaTypePropToSubtitlePreference
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -693,8 +695,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.HasIndex("FileId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("SubtitlePreferences");
                 });
 
@@ -746,10 +746,6 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("double precision");
 
                     b.HasKey("UserId", "FileId");
-
-                    b.HasIndex("FileId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("WatchingProgresses");
                 });
@@ -1090,6 +1086,18 @@ namespace NxPlx.Services.Database.Migrations
 
             modelBuilder.Entity("NxPlx.Models.SubtitlePreference", b =>
                 {
+                    b.HasOne("NxPlx.Models.File.EpisodeFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("NxPlx.Models.File.FilmFile", null)
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("NxPlx.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")

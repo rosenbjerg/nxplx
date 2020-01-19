@@ -45,6 +45,9 @@ export default class Watch extends Component<Props, State> {
             <div class={style.container}>
                 <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${state.info.title} - NxPlx`}/>
 
+                <meta property="og:title" content={state.info.title} />
+                <meta property="og:image" content={imageUrl(this.state.info.backdrop, 1280)} />
+
                 <ShakaPlayer
                     events={this.shakaComm}
                     time={completed ? 0 : this.playerTime}
@@ -61,7 +64,7 @@ export default class Watch extends Component<Props, State> {
                         path: `/api/subtitle/${kind}/${fid}/${lang}`
                     }))}/>
                 {state.info.subtitles.map(lang => (
-                    <track src={`/api/subtitle/${kind}/${fid}/${lang}.vtt`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
+                    <track src={`/api/subtitle/${kind}/${fid}/${lang}`} kind="captions" srcLang={lang} label={formatSubtitleName(lang)} />
                 ))}
             </div>
         );
@@ -82,7 +85,6 @@ export default class Watch extends Component<Props, State> {
             this.setState({ playerState: data.state });
             if (data.state === 'ended') {
                 http.get(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(res => res.json()).then(next => {
-                    // console.log(next);
                     route(`/watch/${this.props.kind}/${next.fid}`);
                 })
             }
@@ -98,8 +100,8 @@ export default class Watch extends Component<Props, State> {
         const { kind, fid } = this.props;
         Promise.all([
             http.get(`/api/${kind}/info/${fid}`).then(response => response.json()),
-            http.get(`/api/subtitle/preference/${fid}`).then(response => response.text()),
-            http.get(`/api/progress/${fid}`).then(response => response.text())
+            http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
+            http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
         ]).then(results => {
             const info = results[0];
             this.subtitleLanguage = results[1];
@@ -113,7 +115,7 @@ export default class Watch extends Component<Props, State> {
             return;
         }
         if (this.playerTime > 5) {
-            http.put("/api/progress/" + this.state.info.fid, { value: this.playerTime });
+            http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}`, { value: this.playerTime });
         }
         localStorage.setItem("player_volume", this.playerVolume.toString());
         localStorage.setItem("player_autoplay", this.playerAutoplay.toString());
@@ -121,50 +123,4 @@ export default class Watch extends Component<Props, State> {
 
         window.onbeforeunload = this.previousUnload;
     };
-
-
-    // Promise.all([
-    //     http.get(`/api/subtitle/preference/${fid}`).then(response => response.text()),
-    //     http.get(`/api/progress/${fid}`).then(response => response.text()),
-    // ]).then(results => {
-    //     const defaultLang = results[0];
-    //     const progress = parseFloat(results[1]);
-    //
-    //     video.ready(() => {
-    //         video.currentTime = progress;
-    //         if (progress > 1) {
-    //             createSnackbar(`Continuing from ${formatProgress(progress)}`, { timeout: 10000, actions: [
-    //                     {
-    //                         text: 'RESTART',
-    //                         callback: (_, snackbar:Snackbar) => {
-    //                             video.currentTime = 0.0;
-    //                             snackbar.destroy()
-    //                         }
-    //                     }
-    //                 ]});
-    //         }
-    //         video.play();
-    //     });
-    //     const tracks:TextTrack[] = Array.from(video.textTracks());
-    //     for (const track of tracks) {
-    //         if (track.language === defaultLang) {
-    //             track.mode = 'showing';
-    //             break;
-    //         }
-    //     }
-    // });
-
-    // // @ts-ignore
-    // const settings = video.textTrackSettings;
-    // settings.setValues({
-    //     "fontPercent": "50%",
-    //     "backgroundColor": "Black",
-    //     "backgroundOpacity": "0",
-    //     "edgeStyle": "uniform",
-    // });
-    // settings.updateDisplay();
-    // this.video.ready(() => {
-    //
-    // });
-
 }

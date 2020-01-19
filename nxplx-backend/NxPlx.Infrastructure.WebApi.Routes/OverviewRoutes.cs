@@ -94,7 +94,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             overview.AddRange(dtoMapper.Map<DbFilmDetails, OverviewElementDto>(notInCollections));
             overview.AddRange(dtoMapper.Map<MovieCollection, OverviewElementDto>(collections));
 
-            return overview.OrderByDescending(oe => oe.title);
+            return overview.OrderBy(oe => oe.title);
         }
     }
 

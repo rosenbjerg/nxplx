@@ -1,55 +1,64 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 using NxPlx.Models.File;
+using NxPlx.Services.Database.Wrapper;
 
 namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class SubtitleService
     {
-        public static async Task<string?> GetSubtitlePath(User user, string kind, int id, string lang)
+        public static async Task<string?> GetSubtitlePath(User user, MediaFileType mediaType, int id, string lang)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-
-            var file = kind == "film"
-                ? (MediaFileBase) await ctx.FilmFiles.OneById(id)
-                : (MediaFileBase) await ctx.EpisodeFiles.OneById(id);
-
+            var file = await FindFile(user, id, mediaType);
             return file?.Subtitles.FirstOrDefault(s => s.Language == lang)?.Path;
         }
-        public static async Task SetLanguagePreference(User user, int fileId, string language)
+        public static async Task SetLanguagePreference(User user, MediaFileType mediaType, int fileId, string language)
         {
             await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             await using var transaction = ctx.BeginTransactionedContext();
 
-            var preference = await transaction.SubtitlePreferences.One(wp => wp.FileId == fileId);
+            var preference =
+                await transaction.SubtitlePreferences.One(wp => wp.FileId == fileId && wp.MediaType == mediaType);
             if (preference == null)
             {
-                preference = new SubtitlePreference { UserId = user.Id, FileId = fileId };
+                preference = new SubtitlePreference { UserId = user.Id, FileId = fileId, MediaType = mediaType};
                 transaction.SubtitlePreferences.Add(preference);
             }
 
             preference.Language = language;
             await transaction.SaveChanges();
         }
-        public static async Task<string> GetLanguagePreference(User user, int fileId)
+        public static async Task<string> GetLanguagePreference(User user, MediaFileType mediaType, int fileId)
         {
             await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
 
-            var preference = await ctx.SubtitlePreferences.ProjectOne(sp => sp.FileId == fileId, sp => sp.Language);
+            var preference = await ctx.SubtitlePreferences.ProjectOne(sp => sp.FileId == fileId && sp.MediaType == mediaType, sp => sp.Language);
             return preference ?? "none";
         }
-        public static async Task<IEnumerable<string>> FindSubtitles(User user, int id)
+        public static async Task<IEnumerable<string>> FindSubtitles(User user, MediaFileType mediaType, int id)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-
-            var file = await ctx.FilmFiles.OneById(id) ?? (MediaFileBase) await ctx.EpisodeFiles.OneById(id);
-
+            var file = await FindFile(user, id, mediaType);
             if (file == default) return Enumerable.Empty<string>();
             return file.Subtitles.Select(sub => sub.Language);
+        }
+
+        private static async Task<MediaFileBase> FindFile(User user, int fileId, MediaFileType mediaFileType)
+        {
+            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
+            switch (mediaFileType)
+            {
+                case MediaFileType.Film:
+                    return await ctx.FilmFiles.One(ff => ff.Id == fileId, ff => ff.Subtitles);
+                case MediaFileType.Episode:
+                    return await ctx.EpisodeFiles.One(ef => ef.Id == fileId, ef => ef.Subtitles);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(mediaFileType), mediaFileType, null);
+            }
         }
     }
 }

@@ -128,7 +128,8 @@ export default class ShakaPlayer extends Component<Props> {
                 <video data-shaka-player
                     ref={this.setVideoRef}
                     poster={props.poster ? props.poster : undefined}
-                    autoPlay={props.autoPlay}>
+                    autoPlay={props.autoPlay}
+                    src={props.videoTrack}>
                     {this.props.children}
                 </video>
             </div>

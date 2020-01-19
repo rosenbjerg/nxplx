@@ -34,9 +34,9 @@ export default class SubtitleSelector extends Component<Props, State> {
             .then(response => response.json())
             .then(langs => this.setState({languages: langs}));
 
-        http.get(`/api/subtitle/preference/${this.props.file_id}`)
-            .then(response => response.text() || "none")
-            .then(preference => this.setState({selected: preference }));
+        http.get(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`)
+            .then(response => response.text())
+            .then(preference => this.setState({selected: preference || "none" }));
     }
 
     public render(_, state:State) {
@@ -55,6 +55,6 @@ export default class SubtitleSelector extends Component<Props, State> {
         // @ts-ignore
         const lang = event.target.value;
         if (!lang) { return; }
-        http.put(`/api/subtitle/preference/${this.props.file_id}`, { value: lang });
+        http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, { value: lang });
     }
 }

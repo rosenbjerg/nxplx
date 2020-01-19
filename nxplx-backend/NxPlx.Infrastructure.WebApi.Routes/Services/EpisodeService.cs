@@ -50,8 +50,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            var episode = await ctx.EpisodeFiles
-                .One(ef => ef.Id == id, ef => ef.Subtitles);
+            var episode = await ctx.EpisodeFiles.One(ef => ef.Id == id, ef => ef.Subtitles);
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
         }
         public static async Task<SeriesDto?> FindSeriesDetails(int id, int? season, User user)

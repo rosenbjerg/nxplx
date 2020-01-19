@@ -153,7 +153,10 @@ namespace NxPlx.Services.Index
                     continue;
                 }
 
-                var filmDetails = await functionCache.Invoke(searchResults[0].Id, library.Language);
+                var actual = new Fastenshtein.Levenshtein(filmFile.Title);
+                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Title)).First();
+
+                var filmDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
                 filmFile.FilmDetailsId = filmDetails.Id;
                 allDetails.Add(filmDetails);
             }
@@ -213,13 +216,16 @@ namespace NxPlx.Services.Index
             foreach (var episodeFile in newEpisodes)
             {
                 var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
-
-                var details = searchResults != null && searchResults.Any() ? searchResults[0] : null;
-
-                if (details == null) 
+                if (searchResults == null || !searchResults.Any())
+                {
+                    episodeFile.SeriesDetailsId = null;
                     continue;
-
-                var seriesDetails = await functionCache.Invoke(details.Id, library.Language);
+                }
+                
+                var actual = new Fastenshtein.Levenshtein(episodeFile.Name);
+                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Name)).First();
+                
+                var seriesDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
                 episodeFile.SeriesDetailsId = seriesDetails.Id;
                 allDetails.Add(seriesDetails);
             }

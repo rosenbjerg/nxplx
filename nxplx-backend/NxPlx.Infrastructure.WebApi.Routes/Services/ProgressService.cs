@@ -14,24 +14,26 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class ProgressService
     {
-        public static async Task<double> GetUserWatchingProgress(User user, int fileId)
+        public static async Task<double> GetUserWatchingProgress(User user, MediaFileType mediaType, int fileId)
         {
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            var progress = await ctx.WatchingProgresses.ProjectOne(wp => wp.FileId == fileId, wp => wp.Time);
+            var progress =
+                await ctx.WatchingProgresses.ProjectOne(wp => wp.FileId == fileId && wp.MediaType == mediaType,
+                    wp => wp.Time);
             return progress;
         }
-        public static async Task SetUserWatchingProgress(User user, int fileId, double progressValue)
+        public static async Task SetUserWatchingProgress(User user, MediaFileType mediaType, int fileId, double progressValue)
         {
             var container = ResolveContainer.Default;
             await using var context = container.Resolve<IReadNxplxContext>(user);
             await using var transaction = context.BeginTransactionedContext();
 
-            var progress = await transaction.WatchingProgresses.One(wp => wp.FileId == fileId);
+            var progress = await transaction.WatchingProgresses.One(wp => wp.FileId == fileId && wp.MediaType == mediaType);
             if (progress == null)
             {
-                progress = new WatchingProgress { UserId = user.Id, FileId = fileId };
+                progress = new WatchingProgress { UserId = user.Id, FileId = fileId, MediaType = mediaType};
                 transaction.WatchingProgresses.Add(progress);
             }
 
@@ -47,7 +49,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             
             var progress = await context.WatchingProgresses.Many()
                 .OrderByDescending(wp => wp.LastWatched)
-                .Take(20).ToDictionaryAsync(wp => wp.FileId);
+                .Take(40).ToDictionaryAsync(wp => wp.FileId);
 
             var ids = progress.Keys.ToList();
 

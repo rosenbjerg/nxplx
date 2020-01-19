@@ -72,7 +72,7 @@ namespace NxPlx.Services.Database
                 poster = pair.ef.SeasonDetails.PosterPath ?? pair.ef.SeasonDetails.PosterPath,
                 title = $"{pair.ef.SeriesDetails?.Name} - {pair.ef.GetNumber()} - {pair.ef.EpisodeDetails?.Name}",
                 watched = pair.wp.LastWatched,
-                progress = pair.wp.Time
+                progress = pair.wp.Time / pair.ef.MediaDetails.Duration
             });
             SetMapping<(WatchingProgress wp, FilmFile ff), ContinueWatchingDto>(pair => new ContinueWatchingDto
             {
@@ -81,7 +81,7 @@ namespace NxPlx.Services.Database
                 poster = pair.ff.FilmDetails.PosterPath,
                 title = $"{pair.ff.FilmDetails?.Title}",
                 watched = pair.wp.LastWatched,
-                progress = pair.wp.Time
+                progress = pair.wp.Time / pair.ff.MediaDetails.Duration
             });
 
             SetMapping<FilmFile, FilmDto>(filmFilm => new FilmDto

@@ -39,13 +39,14 @@ export default class Home extends Component<Props, State> {
                     <Loading />
                 ) : (
                     <div class={`${style.entryContainer} nx-scroll`}>
-                        {!search && progress && (
+                        {!search && progress && progress.length > 0 && (
                             <span>
-                                <div>Continue watching</div>
-                                <div class="nx-scroll" style={{'white-space': 'nowrap', 'overflow-x': 'auto', 'margin-bottom': '3px'}}>
+                                <label>Continue watching</label>
+                                <div class="nx-scroll" style={{ 'overflow-y': 'hidden', 'white-space': 'nowrap', 'overflow-x': 'auto', 'margin-bottom': '6px'}}>
                                     {progress.map(p => (
-                                        <Link key={p.kind[0] + p.fileId} title={p.title} href={`/watch/${p.kind}/${p.fileId}`}>
-                                            <img class={style.entryTile} src={imageUrl(p.poster, 342)} alt={p.title} />
+                                        <Link style={{position: 'relative'}} key={p.kind[0] + p.fileId} title={p.title} href={`/watch/${p.kind}/${p.fileId}`}>
+                                            <img class={style.entryTile} src={imageUrl(p.poster, 342)} alt={p.title}></img>
+                                            <span class={style.continueWatching} style={{ 'width': (p.progress * 100) + '%'}}>&nbsp;</span>
                                         </Link>
                                     ))}
                                 </div>

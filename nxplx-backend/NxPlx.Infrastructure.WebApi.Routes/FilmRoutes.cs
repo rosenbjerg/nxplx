@@ -16,11 +16,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
-            
             router.Get("/detail/:film_id", Authenticated.User, GetFilmDetails);
-            
             router.Get("/collection/detail/:collection_id", Authenticated.User, GetCollectionDetails);
-            
             router.Get("/watch/:file_id", Authenticated.User, StreamFile);
         }
 

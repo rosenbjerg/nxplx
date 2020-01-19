@@ -6,6 +6,7 @@ namespace NxPlx.Integrations.TMDb.Models.Search
     {
         public DateTime? release_date { get; set; }
         public string original_title { get; set; }
+        public int vote_count { get; set; }
         public string title { get; set; }
     }
 }
