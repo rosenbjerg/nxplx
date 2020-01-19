@@ -70,12 +70,13 @@ namespace NxPlx.WebApi
             OverviewRoutes.Register(server.CreateRouter("/api/overview"));
             EpisodeRoutes.Register(server.CreateRouter("/api/series"));
             FilmRoutes.Register(server.CreateRouter("/api/film"));
-
+            
             IndexingRoutes.Register(server.CreateRouter("/api/indexing"));
             BroadcastRoutes.Register(server.CreateRouter("/api/broadcast"));
             SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
+            CommandRoutes.Register(server.CreateRouter("/api/command"));
 
             server.Get("/*", Utils.SendSPA);
 

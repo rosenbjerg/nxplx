@@ -14,6 +14,8 @@ import Season from "../routes/season";
 import Series from "../routes/series";
 import http from "../utils/http";
 import Header from "./header";
+import { setLocale } from "../utils/localisation";
+import { getEntry } from "../utils/localstorage";
 
 if ((module as any).hot) {
     // tslint:disable-next-line:no-var-requires
@@ -50,6 +52,7 @@ export default class App extends Component {
         );
     }
     public componentDidMount() {
+        setLocale(getEntry('locale', 'en'));
         this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {

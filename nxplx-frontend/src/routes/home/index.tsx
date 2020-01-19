@@ -41,11 +41,11 @@ export default class Home extends Component<Props, State> {
                     <div class={`${style.entryContainer} nx-scroll`}>
                         {!search && progress && progress.length > 0 && (
                             <span>
-                                <label>Continue watching</label>
-                                <div class="nx-scroll" style={{ 'overflow-y': 'hidden', 'white-space': 'nowrap', 'overflow-x': 'auto', 'margin-bottom': '6px'}}>
+                                <label>{translate('continue-watching')}</label>
+                                <div class={`nx-scroll ${style.continueWatchingContainer}`}>
                                     {progress.map(p => (
                                         <Link style={{position: 'relative'}} key={p.kind[0] + p.fileId} title={p.title} href={`/watch/${p.kind}/${p.fileId}`}>
-                                            <img class={style.entryTile} src={imageUrl(p.poster, 342)} alt={p.title}></img>
+                                            <img class={style.entryTile} src={imageUrl(p.poster, 342)} alt={p.title}/>
                                             <span class={style.continueWatching} style={{ 'width': (p.progress * 100) + '%'}}>&nbsp;</span>
                                         </Link>
                                     ))}
@@ -72,21 +72,13 @@ export default class Home extends Component<Props, State> {
     };
 
     private load = () => {
-        http.get('/api/overview')
-            .then(async response => {
-                if (response.ok) {
-                    const overview = await response.json();
-                    console.log(overview);
-                    this.setState({ overview: orderBy(overview, ['title'], ['asc']) });
-                }
-            });
-        http.get('/api/progress/continue')
-            .then(async response => {
-                if (response.ok) {
-                    const progress = await response.json();
-                    console.log(progress);
-                    this.setState({ progress });
-                }
-            })
+        if (!this.state.overview) {
+            http.getJson('/api/overview')
+                .then(async overview => this.setState({ overview: orderBy(overview, ['title'], ['asc']) }));
+        }
+        if (!this.state.progress) {
+            http.getJson('/api/progress/continue').then(async progress => this.setState({ progress }));
+        }
     };
+
 }

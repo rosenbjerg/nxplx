@@ -216,13 +216,17 @@ namespace NxPlx.Services.Database
                 kind = library.Kind.ToString().ToLowerInvariant(),
                 path = library.Path
             });
-            
-            
             SetMapping<UserSession, UserSessionDto>(userSession => new UserSessionDto
             {
                 id = userSession.Id,
                 userAgent = userSession.UserAgent,
                 expiration = userSession.Expiration
+            });
+            SetMapping<CommandBase, CommandDto>(command => new CommandDto
+            {
+                name = command.Name,
+                description = command.Description,
+                arguments = command.Arguments
             });
         }
     }

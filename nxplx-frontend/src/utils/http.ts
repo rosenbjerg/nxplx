@@ -1,6 +1,7 @@
 
 interface Http {
 	get: (url:string) => Promise<Response>,
+	getJson: (url:string) => Promise<any|null>,
 	post: (url:string, body?:any, json?:boolean) => Promise<Response>,
 	put: (url:string, body?:any, json?:boolean) => Promise<Response>,
 	delete: (url:string, body?:any, json?:boolean) => Promise<Response>
@@ -21,6 +22,7 @@ function buildOptions(method:string, body:any, json:boolean) : object {
 
 const http:Http = {
 	get: url => fetch(url, { credentials: 'same-origin' }),
+	getJson: url => fetch(url, { credentials: 'same-origin' }).then(response => response.ok ? response.json() : null ),
 
 	post: (url, body, json = true) => fetch(url, buildOptions('POST', body, json)),
 

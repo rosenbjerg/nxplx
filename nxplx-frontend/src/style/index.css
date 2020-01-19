@@ -90,6 +90,19 @@ button.bordered:not(:disabled):hover {
     outline: none;
 }
 
+.columns-1 {
+    display: inline-block;
+    width: 12em;
+}
+.columns-2 {
+    display: inline-block;
+    width: 20em;
+}
+.columns-3 {
+    display: inline-block;
+    width: 28em;
+}
+
 video.shaka-video {
     height: calc(100vh - 56px);
     width: 100%;
@@ -103,6 +116,7 @@ video.shaka-video {
     border-radius: 2px;
     color: var(--focused-text);
     height: 30px;
+    padding-top: 0;
     padding-left: 4px;
     transition: border-color 200ms, box-shadow 200ms;
 }
@@ -121,14 +135,4 @@ video.shaka-video {
 table {
     border-collapse: collapse;
     overflow-x: auto;
-}
-td {
-    padding-left: 3px;
-    padding-right: 3px;
-}
-td:first-child {
-    padding-left: 0;
-}
-td:last-child {
-    padding-right: 0;
 }

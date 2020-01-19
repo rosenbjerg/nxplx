@@ -147,11 +147,14 @@ export default class Admin extends Component<Props, State> {
     }
     public componentDidMount() {
         Promise.all([
-            http.get('/api/user/list').then(res => res.json()),
-            http.get('/api/library/list').then(res => res.json())
+            http.getJson('/api/user/list'),
+            http.getJson('/api/library/list'),
+            http.getJson('/api/command/list')
         ]).then(results => {
             const users:User[] = results[0];
             const libraries:Library[] = results[1];
+            const commands:any[] = results[2];
+            console.log(commands);
             this.setState({ users, libraries });
         })
     }

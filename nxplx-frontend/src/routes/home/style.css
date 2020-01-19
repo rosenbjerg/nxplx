@@ -27,9 +27,9 @@
 }
 .entryTile:hover,
 .entryTile:focus {
-    border: var(--hover-border-color) solid 2px;
+    border: var(--hover-border-color) solid 1px;
     box-shadow: 0 0 5px 0 var(--hover-border-color);
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 .search {
@@ -67,10 +67,18 @@
 .top {
     display: flex;
 }
+.continueWatchingContainer {
+    overflow-y: hidden;
+    white-space: nowrap;
+    overflow-x: auto;
+    margin-bottom: 6px;
+}
+
 .continueWatching {
     margin-left: 2px;
     margin-right: 2px;
-    height: 5px;
+    margin-bottom: 3px;
+    height: 3px;
     background-color: rgba(128,207,247,0.9);
     position: absolute;
     bottom: 0;

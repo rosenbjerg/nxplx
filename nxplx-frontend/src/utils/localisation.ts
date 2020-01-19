@@ -7,11 +7,11 @@ const dictionary = {
 };
 
 export async function setLocale(locale:string) {
+    currentLocale = locale;
     if (dictionary[locale] !== undefined) return;
     const response = await http.get(`/assets/localisation/nxplx.${locale}.json`);
     if (response.ok) {
         dictionary[locale] = await response.json();
-        currentLocale = locale;
     }
     else {
         console.warn(`locale not found: ${locale}. defaulting to en`);
