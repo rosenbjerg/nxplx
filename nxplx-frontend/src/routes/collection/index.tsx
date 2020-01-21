@@ -2,7 +2,7 @@ import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import { Link } from "preact-router";
-import Loading from '../../components/loading';
+import Loading from '../../components/Loading';
 import http from '../../utils/http';
 import { imageUrl, MovieCollection } from "../../utils/models";
 import * as style from './style.css';
@@ -25,7 +25,7 @@ export default class Collection extends Component<Props, State> {
 
     public render(_, { details, bg }:State) {
         if (!details) {
-            return (<div class={`nx-scroll ${style.content}`}><Loading/></div>);
+            return (<Loading fullscreen/>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>

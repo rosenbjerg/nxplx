@@ -2,7 +2,7 @@ import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import { EpisodeStill } from "../../components/EpisodeStill";
-import Loading from '../../components/loading';
+import Loading from '../../components/Loading';
 import { formatInfoPair } from '../../utils/common';
 import http from '../../utils/http';
 import { imageUrl, SeasonDetails, SeriesDetails } from "../../utils/models";
@@ -26,7 +26,7 @@ export default class Season extends Component<Props, State> {
 
     public render(_, { series, season, bg, bgImg }:State) {
         if (!series) {
-            return (<div class={style.content}><Loading /></div>);
+            return (<Loading fullscreen/>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>

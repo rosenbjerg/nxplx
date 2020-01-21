@@ -18,7 +18,6 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Post("", Authenticated.Admin, IndexLibraries);
-            router.Post("/all", Authenticated.Admin, IndexAllLibraries);
         }
 
         private static async Task<HandlerType> IndexLibraries(Request req, Response res)
@@ -33,22 +32,6 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 libraries = await ctx.Libraries.Many(l => libIds.Contains(l.Id)).ToListAsync();
             }
 
-            await res.SendStatus(HttpStatusCode.OK);
-            await IndexAndBroadcast(container, libIds, libraries);
-            return HandlerType.Final;
-        }
-
-        private static async Task<HandlerType> IndexAllLibraries(Request req, Response res)
-        {
-            var container = ResolveContainer.Default;
-
-            IEnumerable<Library> libraries;
-            await using (var ctx = container.Resolve<IReadNxplxContext>())
-            {
-                libraries = await ctx.Libraries.Many().ToListAsync();
-            }
-            var libIds = libraries.Select(l => l.Id).ToArray();
-            
             await res.SendStatus(HttpStatusCode.OK);
             await IndexAndBroadcast(container, libIds, libraries);
             return HandlerType.Final;

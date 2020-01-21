@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import { FilmPoster } from "../../components/FilmPoster";
-import Loading from '../../components/loading';
+import Loading from '../../components/Loading';
 import Subtitles from '../../components/Subtitles';
 import { formatInfoPair, formatRunTime } from "../../utils/common";
 import http from '../../utils/http';
@@ -30,7 +30,7 @@ export default class Home extends Component<Props, State> {
 
     public render(_, { details, bg }:State) {
         if (!details) {
-            return (<div class={style.content}><Loading /></div>);
+            return (<Loading fullscreen/>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>

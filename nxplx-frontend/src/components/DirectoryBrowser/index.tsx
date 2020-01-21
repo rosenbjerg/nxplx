@@ -10,8 +10,7 @@ interface State {
     dirs: string[]
 }
 
-const getDirs = cwd => http.get(`/api/library/browse?cwd=${cwd}`)
-    .then(res => res.json());
+const getDirs = cwd => http.getJson(`/api/library/browse?cwd=${cwd}`);
 
 export default class DirectoryBrowser extends Component<Props, State> {
 
@@ -33,7 +32,6 @@ export default class DirectoryBrowser extends Component<Props, State> {
         path.length--;
         if (path.length === 0) { this.setCwd('/'); }
         else {
-            console.log(path);
             this.setCwd(`/${path.join('/')}/`);
         }
     }

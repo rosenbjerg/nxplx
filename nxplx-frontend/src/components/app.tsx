@@ -13,7 +13,7 @@ import Login from "../routes/login";
 import Season from "../routes/season";
 import Series from "../routes/series";
 import http from "../utils/http";
-import Header from "./header";
+import Header from "./Header";
 import { setLocale } from "../utils/localisation";
 import { getEntry } from "../utils/localstorage";
 

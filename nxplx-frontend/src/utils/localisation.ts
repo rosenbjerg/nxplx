@@ -19,7 +19,7 @@ export async function setLocale(locale:string) {
     }
 }
 
-const templateRegex = /\$[A-Z]+/;
+const templateRegex = /\$[A-Z]+/g;
 export function translate(key:string, ...params:string[]) {
     let translation = dictionary[currentLocale][key];
     if (translation === undefined) {

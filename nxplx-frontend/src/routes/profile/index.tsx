@@ -1,7 +1,8 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
 import "preact-material-components/FormField/style.css";
-import Loading from "../../components/loading";
+import ChangePassword from "../../components/ChangePassword";
+import Loading from "../../components/Loading";
 import SessionManager from "../../components/SessionManager";
 import http from "../../utils/http";
 import { setLocale, translate } from "../../utils/localisation";
@@ -24,14 +25,14 @@ export default class Profile extends Component<Props, State> {
 
     public render(_, { user }: State) {
         if (!user) {
-            return (<div class={style.profile}><Loading/></div>);
+            return (<Loading fullscreen/>);
         }
         return (
             <div class={style.profile}>
                 <h1>{translate("account-settings-for")} {user.username}</h1>
 
+                <h3>{translate("your-account-details")}</h3>
                 <form onSubmit={this.saveDetails}>
-                    <h3>{translate("your-account-details")}</h3>
                     <div>
                         <label class="columns-1">{translate("email")}</label>
                         <input class="inline-edit" name="email" type="email" value={user.email}/>
@@ -39,23 +40,8 @@ export default class Profile extends Component<Props, State> {
                     <button class="bordered">{translate('save-details')}</button>
                 </form>
                 <br/>
-                <form onSubmit={this.changePassword}>
-                    <h3>{translate("change-your-password")}</h3>
-                    <div>
-                        <label class="columns-1">{translate("old-password")}</label>
-                        <input class="inline-edit" type="password" name="oldPassword" required minLength={6} maxLength={50}/>
-                    </div>
-                    <br/>
-                    <div>
-                        <label class="columns-1">{translate("new-password")}</label>
-                        <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
-                    </div>
-                    <div>
-                        <label class="columns-1">{translate("new-password-again")}</label>
-                        <input class="inline-edit" type="password" name="password2" required minLength={6} maxLength={50}/>
-                    </div>
-                    <button class="bordered">{translate("change-password")}</button>
-                </form>
+                <h3>{translate("change-your-password")}</h3>
+                <ChangePassword/>
                 <br/>
                 <h3>{translate("language")}</h3>
                 <label class="columns-1">{translate("user-interface-language")}</label>
@@ -90,18 +76,6 @@ export default class Profile extends Component<Props, State> {
             ev.target.reset();
         } else {
             createSnackbar("Unable to save your account details :/", { timeout: 3000 });
-        }
-    }
-
-    private async changePassword(ev) {
-        ev.preventDefault();
-        const formdata = new FormData(ev.target);
-        const response = await http.post("/api/user/changepassword", formdata, false);
-        if (response.ok) {
-            createSnackbar("Your password has been changed!", { timeout: 2000 });
-            ev.target.reset();
-        } else {
-            createSnackbar("Unable to change your password :/", { timeout: 3000 });
         }
     }
 }

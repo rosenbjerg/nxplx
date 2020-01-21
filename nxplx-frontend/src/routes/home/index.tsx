@@ -3,7 +3,7 @@ import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
 import Helmet from 'preact-helmet';
 import {Link} from "preact-router";
-import Loading from '../../components/loading';
+import Loading from '../../components/Loading';
 import http from '../../utils/http';
 import { translate } from "../../utils/localisation";
 import { ContinueWatchingElement, imageUrl, OverviewElement } from "../../utils/models";
@@ -36,7 +36,7 @@ export default class Home extends Component<Props, State> {
                 </div>
 
                 {overview === undefined ? (
-                    <Loading />
+                    <Loading fullscreen/>
                 ) : (
                     <div class={`${style.entryContainer} nx-scroll`}>
                         {!search && progress && progress.length > 0 && (

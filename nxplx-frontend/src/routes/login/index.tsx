@@ -1,4 +1,4 @@
-import { Component, h } from "preact";
+import { h } from "preact";
 import Helmet from 'preact-helmet';
 import Typography from 'preact-material-components/Typography';
 import 'preact-material-components/Typography/style.css';
@@ -30,48 +30,20 @@ const actions = (store:Store<NxPlxStore>) => (
         }
     });
 
-const Login = connect(['isLoggedIn', 'isAdmin'], actions)(
+const Login = connect([], actions)(
     // @ts-ignore
     ({ login }) => {
         return (<div class={style.login}>
             <Helmet title={`Login at NxPlx`} />
-            <Typography headline5>NxPlx Login</Typography>
+            <Typography headline5>NxPlx</Typography>
             <form onSubmit={login}>
                 <div>
-                    <input class="inline-edit" placeholder="Username" type="text" name={'username'} minLength={4} maxLength={20} required autofocus/>
-                    <input class="inline-edit" placeholder="Password" type="password" name={'password'} minLength={6} maxLength={50} required/>
+                    <input placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>
+                    <input placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required/>
                 </div>
-                <button class="bordered">Login</button>
+                <button class="bordered">{translate('login')}</button>
             </form>
         </div>)
     }
 );
 export default Login;
-
-export class Login2 extends Component {
-
-    public render() {
-        return (
-            <div class={style.login}>
-                <Helmet title={`Login at NxPlx`} />
-                <Typography headline5>NxPlx</Typography>
-                <form onSubmit={this.login}>
-                    <div>
-                        <input placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>
-                        <input placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required/>
-                    </div>
-                    <button class="bordered">{translate('login')}</button>
-                </form>
-            </div>
-        );
-    }
-    private login = async (ev:any) => {
-        ev.preventDefault();
-        const formdata = new FormData(ev.target);
-        const response = await http.post('/api/authentication/login', formdata, false);
-        ev.target.reset();
-        if (response.ok) {
-            route('/', true);
-        }
-    };
-}

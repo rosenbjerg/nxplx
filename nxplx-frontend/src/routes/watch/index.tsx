@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import Helmet from "preact-helmet";
 import { route } from "preact-router";
 import { Store } from "unistore";
-import Loading from "../../components/loading";
+import Loading from "../../components/Loading";
 import ShakaPlayer from "../../components/ShakaPlayer";
 import { formatSubtitleName } from "../../components/Subtitles";
 import CreateEventBroker from "../../utils/events";
@@ -38,7 +38,7 @@ export default class Watch extends Component<Props, State> {
 
     public render({ kind, fid }: Props, state: State) {
         if (!state.info) {
-            return (<div class={style.container}><Loading /></div>);
+            return (<Loading fullscreen/>);
         }
         const completed = (this.playerTime / state.info.duration) > 0.95;
         return (
