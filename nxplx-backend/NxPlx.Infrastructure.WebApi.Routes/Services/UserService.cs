@@ -19,12 +19,16 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var transaction = context.BeginTransactionedContext();
 
             var existingUser = await transaction.Users.OneById(user.Id);
-            if (form.TryGetValue("email", out var email))
-            {
-                existingUser.Email = email;
-            }
 
-            await transaction.SaveChanges();
+            if (existingUser != null)
+            {
+                if (form.TryGetValue("email", out var email))
+                {
+                    existingUser.Email = email;
+                }
+
+                await transaction.SaveChanges();
+            }
         }
         public static async Task<bool> RemoveUser(User user, string username)
         {

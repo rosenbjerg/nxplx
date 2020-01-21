@@ -83,6 +83,8 @@ namespace NxPlx.Services.Database
         public NxplxContext()
         {
             _isAdmin = true;
+            _userId = 0;
+            _libraryAccess = new List<int>(0);
         }
         public NxplxContext(User user)
         {

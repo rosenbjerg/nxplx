@@ -34,14 +34,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         }
 
 
-        public static IEnumerable<string>? GetDirectoryEntries(string cwd)
+        public static IEnumerable<string> GetDirectoryEntries(string cwd)
         {
-            if (string.IsNullOrEmpty(cwd))
-            {
-                cwd = Path.GetPathRoot("/");
-            }
-
-            if (!Directory.Exists(cwd)) return null;
+            if (cwd == string.Empty || !Directory.Exists(cwd))
+                return Enumerable.Empty<string>();
 
             return Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
             {
@@ -52,23 +48,19 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         {
             var container = ResolveContainer.Default;
 
-            Library library;
-
-            await using (var context = container.Resolve<IReadNxplxContext>())
-            await using (var transaction = context.BeginTransactionedContext())
+            await using var context = container.Resolve<IReadNxplxContext>();
+            await using var transaction = context.BeginTransactionedContext();
+            foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
             {
-                foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
-                {
-                    user.LibraryAccessIds.Remove(libraryId);
-                }
-                await transaction.SaveChanges();
-                
-                library = await transaction.Libraries.OneById(libraryId);
-                if (library == null) return false;
-
-                transaction.Libraries.Remove(library);
-                await transaction.SaveChanges();
+                user.LibraryAccessIds.Remove(libraryId);
             }
+            await transaction.SaveChanges();
+                
+            var library = await transaction.Libraries.OneById(libraryId);
+            if (library == null) return false;
+
+            transaction.Libraries.Remove(library);
+            await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
             return true;

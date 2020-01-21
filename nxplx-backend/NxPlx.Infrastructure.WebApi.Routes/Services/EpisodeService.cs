@@ -22,6 +22,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
             var current = await ctx.EpisodeFiles.OneById(fileId);
 
+            if (current == null) return null;
+            
             var season = await ctx.EpisodeFiles.Many(ef =>
                 ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
                 ef.EpisodeNumber > current.EpisodeNumber).ToListAsync();

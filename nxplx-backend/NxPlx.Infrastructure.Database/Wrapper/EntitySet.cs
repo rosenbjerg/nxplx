@@ -29,7 +29,7 @@ namespace NxPlx.Services.Database.Wrapper
         public async Task AddOrUpdate<TPrimaryKey>(TEntity entity, Func<TEntity, TPrimaryKey> keySelector)
         {
             var id = keySelector(entity);
-            if (!id.Equals(default))
+            if (id != null && !id.Equals(default))
             {
                 var existingEntity = DbSet.FirstOrDefaultAsync(e => id.Equals(keySelector(e)));
                 _context.Entry(existingEntity).CurrentValues.SetValues(entity);
@@ -48,7 +48,7 @@ namespace NxPlx.Services.Database.Wrapper
 
         public async Task AddOrUpdate<TPrimaryKey>(IList<TEntity> entities, Func<TEntity, TPrimaryKey> keySelector)
         {
-            var ids = entities.Select(keySelector).Where(id => !id.Equals(default)).ToList();
+            var ids = entities.Select(keySelector).Where(id => id != null && !id.Equals(default)).ToList();
             var existing = await DbSet.Where(e => ids.Contains(keySelector(e))).ToDictionaryAsync(keySelector);
             foreach (var entity in entities)
             {

@@ -42,22 +42,18 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         public static async Task<IEnumerable<string>> FindSubtitles(User user, MediaFileType mediaType, int id)
         {
             var file = await FindFile(user, id, mediaType);
-            if (file == default) return Enumerable.Empty<string>();
-            return file.Subtitles.Select(sub => sub.Language);
+            return file?.Subtitles.Select(sub => sub.Language) ?? Enumerable.Empty<string>();
         }
 
-        private static async Task<MediaFileBase> FindFile(User user, int fileId, MediaFileType mediaFileType)
+        private static async Task<MediaFileBase?> FindFile(User user, int fileId, MediaFileType mediaFileType)
         {
             await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            switch (mediaFileType)
+            return mediaFileType switch
             {
-                case MediaFileType.Film:
-                    return await ctx.FilmFiles.One(ff => ff.Id == fileId, ff => ff.Subtitles);
-                case MediaFileType.Episode:
-                    return await ctx.EpisodeFiles.One(ef => ef.Id == fileId, ef => ef.Subtitles);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(mediaFileType), mediaFileType, null);
-            }
+                MediaFileType.Film => await ctx.FilmFiles.One(ff => ff.Id == fileId, ff => ff.Subtitles),
+                MediaFileType.Episode => await ctx.EpisodeFiles.One(ef => ef.Id == fileId, ef => ef.Subtitles),
+                _ => null
+            };
         }
     }
 }

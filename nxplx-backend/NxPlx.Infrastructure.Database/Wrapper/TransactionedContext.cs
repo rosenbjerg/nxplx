@@ -17,10 +17,10 @@ namespace NxPlx.Services.Database.Wrapper
 
         internal TransactionedNxplxContext(NxplxContext context) : base(context)
         {
+            _transaction = context.Database.BeginTransaction();
             _filmFiles = InitLazySet(context, context.FilmFiles);
             _episodeFiles = InitLazySet(context, context.EpisodeFiles);
             _libraries = InitLazySet(context, context.Libraries);
-            _transaction = context.Database.BeginTransaction();
             _subtitlePreferences = InitLazySet(context, context.SubtitlePreferences);
             _watchingProgresses = InitLazySet(context, context.WatchingProgresses);
             _users = InitLazySet(context, context.Users);
@@ -42,7 +42,6 @@ namespace NxPlx.Services.Database.Wrapper
         private readonly Lazy<EntitySet<User>> _users;
         private readonly Lazy<EntitySet<UserSession>> _userSessions;
         private readonly Lazy<EntitySet<Genre>> _genres;
-        private readonly Lazy<EntitySet<MovieCollection>> _collections;
 
         public new IEntitySet<FilmFile> FilmFiles => _filmFiles.Value;
         public new IEntitySet<EpisodeFile> EpisodeFiles => _episodeFiles.Value;
