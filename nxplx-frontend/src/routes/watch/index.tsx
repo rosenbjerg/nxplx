@@ -56,16 +56,13 @@ export default class Watch extends Component<Props, State> {
                     autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}
                     title={state.info.title}
                     videoTrack={`/api/${kind}/watch/${fid}`}
-                    preferredTextLanguage={this.subtitleLanguage}
                     poster={imageUrl(this.state.info.backdrop, 1280)}
                     textTracks={state.info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
-                        path: `/api/subtitle/${kind}/${fid}/${lang}`
+                        path: `/api/subtitle/${kind}/${fid}/${lang}.vtt`,
+                        default: lang === this.subtitleLanguage
                     }))}/>
-                {state.info.subtitles.map(lang => (
-                    <track src={`/api/subtitle/${kind}/${fid}/${lang}`} kind="captions" srcLang={lang} label={formatSubtitleName(lang)} />
-                ))}
             </div>
         );
     }

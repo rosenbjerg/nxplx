@@ -7,6 +7,7 @@ interface TextTrack {
     displayName: string
     language: string
     path: string
+    default: boolean
 }
 const uiConfig = {
     addBigPlayButton: false,
@@ -41,7 +42,6 @@ const initPlayer = async (
     });
 
     ui.configure(uiConfig);
-
     player.addEventListener("error", onError);
     player.addEventListener("buffering", ({ buffering }: any) => {
         if (!buffering) {
@@ -83,7 +83,6 @@ interface Props {
     volume: number
     poster: string
     title: string
-    preferredTextLanguage: string
     textTracks: TextTrack[]
 }
 
@@ -130,7 +129,9 @@ export default class ShakaPlayer extends Component<Props> {
                     poster={props.poster ? props.poster : undefined}
                     autoPlay={props.autoPlay}
                     src={props.videoTrack}>
-                    {this.props.children}
+                    {props.textTracks.map(track => (
+                        <track default={track.default} src={track.path} kind="captions" srcLang={track.language} label={track.displayName} />
+                    ))}
                 </video>
             </div>
         );

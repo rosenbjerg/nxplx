@@ -67,7 +67,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var users = await context.Users.Many().ToListAsync();
             return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
         }
-        public static async Task<UserDto> GetUser(int userId)
+        public static async Task<UserDto?> GetUser(int userId)
         {
             await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
 
