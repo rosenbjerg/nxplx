@@ -66,8 +66,6 @@
     "preact-helmet": "^4.0.0-alpha-3",
     "preact-material-components": "^1.5.7",
     "preact-router": "^2.6.1",
-    "shaka-player": "^2.5.5",
-    "timeago.js": "^4.0.1",
     "ua-parser-js": "^0.7.20",
     "unistore": "^3.4.1"
   },
