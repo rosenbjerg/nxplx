@@ -59,7 +59,6 @@
     "@types/ua-parser-js": "^0.7.33",
     "got": "^10.2.2",
     "linkstate": "^1.1.1",
-    "liquid-route": "^1.1.0",
     "lodash": "^4.17.15",
     "preact": "^10.0.0",
     "preact-helmet": "^4.0.0-alpha-3",
