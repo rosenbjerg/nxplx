@@ -26,7 +26,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var filePath = await FilmService.FindFilmFilePath(fileId, session.User);
 
             if (filePath == default || !File.Exists(filePath)) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendFile(filePath);
+            return await res.SendFile(filePath, "video/mp4");
         }
         
         private static async Task<HandlerType> GetFilmDetails(Request req, Response res)

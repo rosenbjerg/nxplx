@@ -28,7 +28,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             }
             
             res.AddHeader("Cache-Control", $"max-age={ImageMaxCacheAge}");
-            return res.SendFile(fullPath, handleRanges: false);
+            return res.SendFile(fullPath, handleRanges: false, contentType: "image/jpeg");
         }
     }
 }

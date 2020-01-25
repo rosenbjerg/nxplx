@@ -28,7 +28,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             var subtitlePath = await SubtitleService.GetSubtitlePath(session.User, kind, id, lang);
 
-            return await res.SendFile(subtitlePath);
+            return await res.SendFile(subtitlePath, "text/vtt");
         }
         private static async Task<HandlerType> SetLanguagePreferenceByFileId(Request req, Response res)
         {

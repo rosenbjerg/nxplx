@@ -37,7 +37,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.User);
 
             if (episodePath == null || !File.Exists(episodePath)) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendFile(episodePath);
+            return await res.SendFile(episodePath, "video/mp4");
         }
         
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
