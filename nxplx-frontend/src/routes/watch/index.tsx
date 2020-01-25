@@ -3,13 +3,13 @@ import Helmet from "preact-helmet";
 import { route } from "preact-router";
 import { Store } from "unistore";
 import Loading from "../../components/Loading";
-import ShakaPlayer from "../../components/ShakaPlayer";
 import { formatSubtitleName } from "../../components/Subtitles";
 import CreateEventBroker from "../../utils/events";
 import http from "../../utils/http";
 import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
+import VideoPlayer from "../../components/VideoPlayer";
 
 interface Props {
     store: Store<object>;
@@ -31,12 +31,12 @@ export default class Watch extends Component<Props, State> {
 
     private playNextMode = "default";
 
-    private shakaComm = CreateEventBroker();
+    private videoEvents = CreateEventBroker();
     private previousUnload?: any;
     private playerTime = 0;
     private subtitleLanguage = "none";
 
-    public render({ kind, fid }: Props, state: State) {
+    public render(props: Props, state: State) {
         if (!state.info) {
             return (<Loading fullscreen/>);
         }
@@ -48,21 +48,35 @@ export default class Watch extends Component<Props, State> {
                 <meta property="og:title" content={state.info.title} />
                 <meta property="og:image" content={imageUrl(this.state.info.backdrop, 1280)} />
 
-                <ShakaPlayer
-                    events={this.shakaComm}
-                    time={completed ? 0 : this.playerTime}
-                    muted={this.playerMuted}
-                    volume={this.playerVolume}
-                    autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}
+                <VideoPlayer
+                    events={this.videoEvents}
+                    startTime={completed ? 0 : this.playerTime}
                     title={state.info.title}
-                    videoTrack={`/api/${kind}/watch/${fid}`}
+                    src={`/api/${props.kind}/watch/${props.fid}`}
                     poster={imageUrl(this.state.info.backdrop, 1280)}
-                    textTracks={state.info.subtitles.map(lang => ({
+
+                    subtitles={state.info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
-                        path: `/api/subtitle/${kind}/${fid}/${lang}.vtt`,
+                        path: `/api/subtitle/${props.kind}/${props.fid}/${lang}`,
                         default: lang === this.subtitleLanguage
                     }))}/>
+
+                {/*<ShakaPlayer*/}
+                {/*    events={this.shakaComm}*/}
+                {/*    time={completed ? 0 : this.playerTime}*/}
+                {/*    muted={this.playerMuted}*/}
+                {/*    volume={this.playerVolume}*/}
+                {/*    autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}*/}
+                {/*    title={state.info.title}*/}
+                {/*    videoTrack={`/api/${kind}/watch/${fid}`}*/}
+                {/*    poster={imageUrl(this.state.info.backdrop, 1280)}*/}
+                {/*    textTracks={state.info.subtitles.map(lang => ({*/}
+                {/*        displayName: formatSubtitleName(lang),*/}
+                {/*        language: lang,*/}
+                {/*        path: `/api/subtitle/${kind}/${fid}/${lang}.vtt`,*/}
+                {/*        default: lang === this.subtitleLanguage*/}
+                {/*    }))}/>*/}
             </div>
         );
     }
@@ -76,20 +90,20 @@ export default class Watch extends Component<Props, State> {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
 
-        this.shakaComm.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
+        this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
             this.playerTime = data.time;
             this.playerAutoplay = data.state === "playing";
             this.setState({ playerState: data.state });
-            if (data.state === 'ended') {
+            if (data.state === 'ended' && kind === 'series') {
                 http.get(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(res => res.json()).then(next => {
                     route(`/watch/${this.props.kind}/${next.fid}`);
                 })
             }
         });
-        this.shakaComm.subscribe<{ time: number }>("time_changed", data => {
+        this.videoEvents.subscribe<{ time: number }>("time_changed", data => {
             this.playerTime = data.time;
         });
-        this.shakaComm.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
+        this.videoEvents.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
             this.playerVolume = data.volume;
             this.playerMuted = data.muted;
         });
