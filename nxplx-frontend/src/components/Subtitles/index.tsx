@@ -8,22 +8,22 @@ interface State { selected?:string, languages?:string[] }
 
 export function formatSubtitleName(name:string) : string {
     switch (name) {
-            case 'en':
-            case 'eng': return 'english';
-            case 'da': return 'dansk';
-            case 'sv': return 'svenska';
-            case 'no': return 'norsk';
-            case 'de': return 'deutsch';
-            case 'fr': return 'français';
-            case 'es': return 'español';
-            case 'ar': return 'العربية';
-            case 'hi': return 'हिन्दी';
-            case 'ja': return '日本の';
-            case 'cs': return 'český';
-            case 'pl': return 'polský';
-            case 'ru': return 'ruský';
-            case 'nl': return 'nederlands';
-            default: return name;
+        case 'eng':
+        case 'en': return 'English';
+        case 'da': return 'Dansk';
+        case 'sv': return 'Svenska';
+        case 'no': return 'Norsk';
+        case 'de': return 'Deutsch';
+        case 'fr': return 'Français';
+        case 'es': return 'Español';
+        case 'ar': return 'العربية';
+        case 'hi': return 'हिन्दी';
+        case 'ja': return '日本の';
+        case 'cs': return 'Český';
+        case 'pl': return 'Polský';
+        case 'ru': return 'Ruský';
+        case 'nl': return 'Mederlands';
+        default: return name;
     }
 }
 
