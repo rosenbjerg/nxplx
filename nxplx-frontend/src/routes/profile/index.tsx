@@ -63,7 +63,7 @@ export default class Profile extends Component<Props, State> {
         setEntry("locale", value);
         await setLocale(value);
         target.disabled = false;
-        this.setState(() => {});
+        this.setState({});
     };
 
     private async saveDetails(ev) {

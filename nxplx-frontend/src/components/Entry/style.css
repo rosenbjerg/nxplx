@@ -3,99 +3,103 @@
 }
 
 .entry {
-    margin-right: 2px;
-    margin-left: 2px;
+    margin-right: 4px;
+    margin-left: 4px;
+    margin-bottom: 2px;
     box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
     border-radius: 2px;
     cursor: pointer;
-    width: 126px;
     transition: border 100ms;
 }
 .entry:hover,
 .entry:focus {
-    border: var(--hover-border-color) solid 1px;
-    box-shadow: 0 0 5px 0 var(--hover-border-color);
+    box-shadow: 0 0 5px 3px var(--hover-border-color);
     border-radius: 4px;
 }
 
 .progress {
-    margin-left: 2px;
-    margin-right: 2px;
-    margin-bottom: 3px;
+    margin-left: 4px;
+    margin-right: 4px;
+    margin-bottom: 5px;
     height: 3px;
     background-color: rgba(128, 207, 247, 0.9);
     position: absolute;
     bottom: 0;
     left: 0;
+    box-shadow: 1px -1px 2px 0px rgba(0, 0, 0, 0.3);
     border-radius: 1px;
 }
+.autosize {
+    width: 126px;
+}
+
 @media only screen and (max-width: 1969px) {
-    .entry {
-        min-width: calc((100% / 14) - 4px);
+    .autosize {
+        min-width: calc((100% / 14) - 8px);
     }
 }
 @media only screen and (max-width: 1839px) {
-    .entry {
-        min-width: calc((100% / 13) - 4px);
+    .autosize {
+        min-width: calc((100% / 13) - 8px);
     }
 }
 @media only screen and (max-width: 1709px) {
-    .entry {
-        min-width: calc((100% / 12) - 4px);
+    .autosize {
+        min-width: calc((100% / 12) - 8px);
     }
 }
 @media only screen and (max-width: 1579px) {
-    .entry {
-        min-width: calc((100% / 11) - 4px);
+    .autosize {
+        min-width: calc((100% / 11) - 8px);
     }
 }
 @media only screen and (max-width: 1449px) {
-    .entry {
-        min-width: calc((100% / 10) - 4px);
+    .autosize {
+        min-width: calc((100% / 10) - 8px);
     }
 }
 @media only screen and (max-width: 1319px) {
-    .entry {
-        min-width: calc((100% / 9) - 4px);
+    .autosize {
+        min-width: calc((100% / 9) - 8px);
     }
 }
 @media only screen and (max-width: 1189px) {
-    .entry {
-        min-width: calc((100% / 8) - 4px);
+    .autosize {
+        min-width: calc((100% / 8) - 8px);
     }
 }
 @media only screen and (max-width: 1059px) {
-    .entry {
-        min-width: calc((100% / 7) - 4px);
+    .autosize {
+        min-width: calc((100% / 7) - 8px);
     }
 }
 @media only screen and (max-width: 929px) {
-    .entry {
-        min-width: calc((100% / 6) - 4px);
+    .autosize {
+        min-width: calc((100% / 6) - 8px);
     }
 }
 @media only screen and (max-width: 799px) {
-    .entry {
-        min-width: calc((100% / 5) - 4px);
+    .autosize {
+        min-width: calc((100% / 5) - 8px);
     }
 }
 @media only screen and (max-width: 669px) {
-    .entry {
-        min-width: calc((100% / 4) - 4px);
+    .autosize {
+        min-width: calc((100% / 4) - 8px);
     }
 }
 @media only screen and (max-width: 539px) {
-    .entry {
-        min-width: calc((100% / 3) - 4px);
+    .autosize {
+        min-width: calc((100% / 3) - 8px);
     }
 }
 @media only screen and (max-width: 409px) {
-    .entry {
-        min-width: calc((100% / 2) - 4px);
+    .autosize {
+        min-width: calc((100% / 2) - 8px);
     }
 }
 @media only screen and (max-width: 279px) {
-    .entry {
-        min-width: calc((100% / 1) - 4px);
+    .autosize {
+        min-width: calc((100% / 1) - 8px);
     }
 }

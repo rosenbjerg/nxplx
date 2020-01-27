@@ -1,0 +1,70 @@
+.num {
+    color: white;
+    text-shadow: 0 0 6px black;
+    position: absolute;
+    top: -6px;
+    left: 0;
+    width: 100%;
+    padding-right: 8px;
+    text-align: right;
+    transition: top 90ms, left 90ms;
+}
+.autosize {
+    width: 185px;
+}
+
+@media only screen and (max-width: 1985px) {
+    .autosize {
+        width: calc((100% / 11) - 8px);
+    }
+}
+@media only screen and (max-width: 1821px) {
+    .autosize {
+        width: calc((100% / 10) - 8px);
+    }
+}
+@media only screen and (max-width: 1657px) {
+    .autosize {
+        width: calc((100% / 9) - 8px);
+    }
+}
+@media only screen and (max-width: 1493px) {
+    .autosize {
+        width: calc((100% / 8) - 8px);
+    }
+}
+@media only screen and (max-width: 1329px) {
+    .autosize {
+        width: calc((100% / 7) - 8px);
+    }
+}
+@media only screen and (max-width: 1165px) {
+    .autosize {
+        width: calc((100% / 6) - 8px);
+    }
+}
+@media only screen and (max-width: 1001px) {
+    .autosize {
+        width: calc((100% / 5) - 8px);
+    }
+}
+@media only screen and (max-width: 837px) {
+    .autosize {
+        width: calc((100% / 4) - 8px);
+    }
+}
+@media only screen and (max-width: 673px) {
+    .autosize {
+        width: calc((100% / 3) - 8px);
+    }
+}
+@media only screen and (max-width: 509px) {
+    .autosize {
+        min-width: calc((100% / 2) - 8px);
+    }
+}
+@media only screen and (max-width: 346px) {
+    .autosize {
+        width: calc((100% / 1) - 8px);
+    }
+}

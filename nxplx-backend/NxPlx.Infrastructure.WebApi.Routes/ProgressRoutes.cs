@@ -14,6 +14,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Get("/continue", Authenticated.User, GetContinueWatchingList);
+            router.Get("season/:seriesId/:seasonNumber", Authenticated.User, GetEpisodeProgress);
             router.Get("/:kind/:file_id", Authenticated.User, GetProgressByFileId);
             router.Put("/:kind/:file_id", Authenticated.User, SetProgressByFileId);
         }
@@ -45,6 +46,18 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var session = req.GetData<UserSession>();
 
             var continueWatchingList = await ProgressService.GetUserContinueWatchingList(session.User);
+
+            return await res.SendJson(continueWatchingList);
+        }
+
+        private static async Task<HandlerType> GetEpisodeProgress(Request req, Response res)
+        {
+            var seriesId = int.Parse(req.Context.ExtractUrlParameter("seriesId"));
+            var seasonNumber = int.Parse(req.Context.ExtractUrlParameter("seasonNumber"));
+
+            var session = req.GetData<UserSession>();
+
+            var continueWatchingList = await ProgressService.GetEpisodeProgress(session.User, seriesId, seasonNumber);
 
             return await res.SendJson(continueWatchingList);
         }

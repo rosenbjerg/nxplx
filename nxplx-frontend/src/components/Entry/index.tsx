@@ -1,21 +1,24 @@
 import { h } from "preact";
 import { Link } from "preact-router";
-import * as style from './style.css';
+import * as style from "./style.css";
 
 interface Props {
-    key: number|string
+    key: number | string
     title: string
     href: string
     image: string
     progress?: number
+    autosizeOverride?: string
+    children?: any
 }
 
-const Entry = ({ href, image, key, progress, title }: Props) => {
+const Entry = ({ href, image, key, progress, title, autosizeOverride, children }: Props) => {
     return (
         <Link key={key} class={style.link} title={title} href={href}>
-            <img class={style.entry} src={image} alt={title}/>
-            {progress && (
-                <span class={style.progress} style={{ 'width': (progress * 100) + '%'}}>&nbsp;</span>
+            <img class={`${style.entry} ${autosizeOverride || style.autosize}`} src={image} alt={title}/>
+            {children}
+            {(progress || false) && (
+                <span class={style.progress} style={{ "width": (progress * 100) + "%" }}>&nbsp;</span>
             )}
         </Link>
     );
