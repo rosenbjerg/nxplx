@@ -20,7 +20,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Delete("", Authenticated.Admin, RemoveUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
-            router.Get("/online", Authenticated.Admin, ListUsers);
+            router.Get("/list/online", Authenticated.Admin, ListOnlineUsers);
             router.Post("", Validated.CreateUserForm, Authenticated.Admin, CreateUser);
             
         }

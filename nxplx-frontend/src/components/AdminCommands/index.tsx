@@ -39,15 +39,16 @@ export default class AdminCommands extends Component<Props, State> {
     private onSelected = (ev:any) => {
         this.setState({ selectedCommand: this.state.commands.find(c => c.name === ev.target.value) })
     };
-    private invoke = () => {
+    private invoke = async () => {
         if (this.state.selectedCommand) {
             const name = this.state.selectedCommand.name;
-            http.post(`/api/command/invoke?command=${name}`).then(async response => {
-                if (response.ok) {
-                    createSnackbar(await response.text(), { timeout: 3000 });
-                }
-            });
             this.setState({ selectedCommand: undefined });
+            const snackbar = createSnackbar(`Command invoked!`, { timeout: 2000 });
+            const response = await http.post(`/api/command/invoke?command=${name}`);
+            if (response.ok) {
+                await snackbar.destroy();
+                createSnackbar(await response.text(), { timeout: 3000 });
+            }
         }
     };
 }
