@@ -20,6 +20,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Delete("", Authenticated.Admin, RemoveUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
+            router.Get("/online", Authenticated.Admin, ListUsers);
             router.Post("", Validated.CreateUserForm, Authenticated.Admin, CreateUser);
             
         }
@@ -43,7 +44,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
-            var users = await UserService.GetUsers();
+            var session = req.GetData<UserSession>();
+            var users = await UserService.GetUsers(session.User);
+            return await res.SendJson(users);
+        }
+        private static async Task<HandlerType> ListOnlineUsers(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var users = await UserService.ListOnlineUsers(session.User);
             return await res.SendJson(users);
         }
         private static async Task<HandlerType> GetUser(Request req, Response res)

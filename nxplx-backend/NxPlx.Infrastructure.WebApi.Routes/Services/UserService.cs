@@ -61,10 +61,19 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             ResolveContainer.Default.Resolve<ILoggingService>().Info("User {Username} changed password", existingUser.Username);
             return true;
         }
-        public static async Task<IEnumerable<UserDto>> GetUsers()
+        public static async Task<IEnumerable<UserDto>> GetUsers(User user)
         {
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             var users = await context.Users.Many().ToListAsync();
+            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
+        }
+        public static async Task<IEnumerable<UserDto>> ListOnlineUsers(User user)
+        {
+            var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster>();
+            var onlineIds = broadcaster.UniqueIds();
+            
+            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
+            var users = await context.Users.Many(u => onlineIds.Contains(u.Id)).ToListAsync();
             return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
         }
         public static async Task<UserDto?> GetUser(int userId)
