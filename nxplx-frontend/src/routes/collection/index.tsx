@@ -30,7 +30,7 @@ export default class Collection extends Component<Props, State> {
 
     public render(_, { details, bg }: State) {
         if (!details) {
-            return (<Loading fullscreen/>);
+            return (<div>loading..</div>);
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdrop}>
