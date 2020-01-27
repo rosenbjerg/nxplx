@@ -7,6 +7,3 @@ export const info: string;
 export const marked: string;
 export const infoKey: string;
 export const infoValue: string;
-export const seasonContainer: string;
-export const season: string;
-export const number: string;
