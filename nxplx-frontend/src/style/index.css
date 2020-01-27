@@ -129,3 +129,8 @@ table {
     border-collapse: collapse;
     overflow-x: auto;
 }
+.center-content {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}

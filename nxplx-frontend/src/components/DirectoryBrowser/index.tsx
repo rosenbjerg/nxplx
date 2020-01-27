@@ -39,7 +39,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
     public render(_, {cwd, dirs}:State) {
         return (
             <div class={style.container}>
-                <div>
+                <div class="center-content">
                     <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
                     <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
                     <button disabled={cwd === '/'} class="bordered">Copy current directory to c</button>

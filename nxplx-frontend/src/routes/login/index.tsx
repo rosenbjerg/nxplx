@@ -1,7 +1,5 @@
 import { h } from "preact";
 import Helmet from 'preact-helmet';
-import Typography from 'preact-material-components/Typography';
-import 'preact-material-components/Typography/style.css';
 import { route } from "preact-router";
 import { Store } from "unistore";
 import { connect } from "unistore/preact";
@@ -35,7 +33,7 @@ const Login = connect([], actions)(
     ({ login }) => {
         return (<div class={style.login}>
             <Helmet title={`Login at NxPlx`} />
-            <Typography headline5>NxPlx</Typography>
+            <h1>NxPlx</h1>
             <form onSubmit={login}>
                 <div>
                     <input class="inline-edit" placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>

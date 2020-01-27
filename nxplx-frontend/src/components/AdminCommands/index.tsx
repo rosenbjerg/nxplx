@@ -1,6 +1,5 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
-import Formfield from "preact-material-components/FormField";
 import http from "../../utils/http";
 
 interface Command {
@@ -14,7 +13,6 @@ interface State {
     commands: Command[]
     selectedCommand?: Command
 }
-
 export default class AdminCommands extends Component<Props, State> {
 
     public componentDidMount(): void {
@@ -24,13 +22,16 @@ export default class AdminCommands extends Component<Props, State> {
     public render(_, state) {
         return (
             <div>
-                <Formfield>
+                <div class="center-content">
                     <select onChange={this.onSelected} value={state.selectedCommand?.name ?? ''} class="inline-edit">
                         <option value="">- Select command</option>
-                        {state.commands?.map(command => <option key={command.name} value={command.name}>{command.name}</option>)}
+                        {state.commands?.map(command => <option key={command.name}
+                                                                value={command.name}>{command.name}</option>)}
                     </select>
-                    <button onClick={this.invoke} disabled={state.selectedCommand === undefined} class="bordered">Execute</button>
-                </Formfield>
+                    <button onChange={this.invoke} disabled={state.selectedCommand === undefined}
+                            class="bordered">Execute
+                    </button>
+                </div>
                 {state.selectedCommand && <p>{state.selectedCommand.description}</p>}
             </div>
         );

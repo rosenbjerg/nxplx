@@ -1,6 +1,5 @@
 import "@snackbar/core/dist/snackbar.min.css";
 import { Component, FunctionalComponent, h } from "preact";
-import "preact-material-components/FormField/style.css";
 import { Route, route, Router } from "preact-router";
 import { lazy, Suspense } from "preact/compat";
 import createStore from "unistore";

@@ -1,6 +1,5 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
-import "preact-material-components/FormField/style.css";
 import ChangePassword from "../../components/ChangePassword";
 import Loading from "../../components/Loading";
 import SessionManager from "../../components/SessionManager";

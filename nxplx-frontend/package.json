@@ -64,7 +64,6 @@
     "preact-helmet": "^4.0.0-alpha-3",
     "preact-jsx-chai": "^3.0.0",
     "preact-markup": "^2.0.0",
-    "preact-material-components": "^1.6.1",
     "preact-render-to-string": "^5.0.6",
     "preact-router": "^3.0.1",
     "ua-parser-js": "^0.7.21",
