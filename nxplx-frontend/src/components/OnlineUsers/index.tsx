@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
-import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { User } from "../../utils/models";
+import Loading from "../Loading";
 
 interface Props { }
 interface State {
