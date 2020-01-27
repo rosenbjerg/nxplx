@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
-using NxPlx.Services.Database.Wrapper;
 
 namespace NxPlx.Infrastructure.WebApi.Routes.Services.Commands
 {
@@ -11,13 +12,18 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services.Commands
 
         public override async Task<string> Execute(string[] args)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<ReadNxplxContext>();
+            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>();
             var transaction = ctx.BeginTransactionedContext();
-            await foreach (var batch in ctx.SubtitlePreferences.Many().Batched(500))
+
+            var userIds = await ctx.Users.ProjectMany(null, u => u.Id).ToListAsync();
+
+            foreach (var userId in userIds)
             {
-                transaction.SubtitlePreferences.Remove(batch);
+                var prefs = await ctx.SubtitlePreferences.Many(sp => sp.UserId == userId).ToListAsync();
+                transaction.SubtitlePreferences.Remove(prefs);
             }
 
+            await transaction.SaveChanges();
             return "All subtitle preferences has been removed";
         }
     }

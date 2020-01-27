@@ -18,14 +18,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var commands = AdminCommandService.AvailableCommands();
             return res.SendJson(commands);
         }
-        private static Task<HandlerType> InvokeCommand(Request req, Response res)
+        private static async Task<HandlerType> InvokeCommand(Request req, Response res)
         {
             string command = req.Queries["command"];
             string[] arguments = req.Queries["arguments"];
 
-            var commands = AdminCommandService.InvokeCommand(command, arguments);
-            
-            return res.SendJson(commands);
+            var output = await AdminCommandService.InvokeCommand(command, arguments);
+
+            return await res.SendString(output ?? $"{command} failed");
         }
     }
 }
