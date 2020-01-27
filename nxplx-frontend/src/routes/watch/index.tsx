@@ -1,18 +1,16 @@
 import { Component, h } from "preact";
 import Helmet from "preact-helmet";
 import { route } from "preact-router";
-import { Store } from "unistore";
 import Loading from "../../components/Loading";
 import { formatSubtitleName } from "../../components/Subtitles";
+import VideoPlayer from "../../components/VideoPlayer";
 import CreateEventBroker from "../../utils/events";
 import http from "../../utils/http";
 import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
-import VideoPlayer from "../../components/VideoPlayer";
 
 interface Props {
-    store: Store<object>;
     kind: string;
     fid: string
 }
@@ -24,7 +22,6 @@ interface State {
 }
 
 export default class Watch extends Component<Props, State> {
-
     private playerVolume = parseFloat(localStorage.getItem("player_volume") || "1.0") || 1.0;
     private playerAutoplay = localStorage.getItem("player_autoplay") === "true";
     private playerMuted = localStorage.getItem("player_muted") === "true";
@@ -61,22 +58,6 @@ export default class Watch extends Component<Props, State> {
                         path: `/api/subtitle/${props.kind}/${props.fid}/${lang}`,
                         default: lang === this.subtitleLanguage
                     }))}/>
-
-                {/*<ShakaPlayer*/}
-                {/*    events={this.shakaComm}*/}
-                {/*    time={completed ? 0 : this.playerTime}*/}
-                {/*    muted={this.playerMuted}*/}
-                {/*    volume={this.playerVolume}*/}
-                {/*    autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}*/}
-                {/*    title={state.info.title}*/}
-                {/*    videoTrack={`/api/${kind}/watch/${fid}`}*/}
-                {/*    poster={imageUrl(this.state.info.backdrop, 1280)}*/}
-                {/*    textTracks={state.info.subtitles.map(lang => ({*/}
-                {/*        displayName: formatSubtitleName(lang),*/}
-                {/*        language: lang,*/}
-                {/*        path: `/api/subtitle/${kind}/${fid}/${lang}.vtt`,*/}
-                {/*        default: lang === this.subtitleLanguage*/}
-                {/*    }))}/>*/}
             </div>
         );
     }
@@ -100,9 +81,7 @@ export default class Watch extends Component<Props, State> {
                 })
             }
         });
-        this.videoEvents.subscribe<{ time: number }>("time_changed", data => {
-            this.playerTime = data.time;
-        });
+        this.videoEvents.subscribe<{ time: number }>("time_changed", data => this.playerTime = data.time);
         this.videoEvents.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
             this.playerVolume = data.volume;
             this.playerMuted = data.muted;

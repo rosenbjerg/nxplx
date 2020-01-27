@@ -16,22 +16,6 @@
     color: var(--faded-text);
 }
 
-.entryTile {
-    margin-right: 2px;
-    margin-left: 2px;
-    box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
-    border-radius: 2px;
-    cursor: pointer;
-    width: 126px;
-    transition: border 100ms;
-}
-.entryTile:hover,
-.entryTile:focus {
-    border: var(--hover-border-color) solid 1px;
-    box-shadow: 0 0 5px 0 var(--hover-border-color);
-    border-radius: 4px;
-}
-
 .search {
     padding-left: 5px;
     width: 100%;
@@ -72,87 +56,4 @@
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 6px;
-}
-
-.continueWatching {
-    margin-left: 2px;
-    margin-right: 2px;
-    margin-bottom: 3px;
-    height: 3px;
-    background-color: rgba(128,207,247,0.9);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border-radius: 1px;
-}
-
-@media only screen and (max-width: 1969px) {
-    .entryTile {
-        min-width: calc((100% / 14) - 4px);
-    }
-}
-@media only screen and (max-width: 1839px) {
-    .entryTile {
-        min-width: calc((100% / 13) - 4px);
-    }
-}
-@media only screen and (max-width: 1709px) {
-    .entryTile {
-        min-width: calc((100% / 12) - 4px);
-    }
-}
-@media only screen and (max-width: 1579px) {
-    .entryTile {
-        min-width: calc((100% / 11) - 4px);
-    }
-}
-@media only screen and (max-width: 1449px) {
-    .entryTile {
-        min-width: calc((100% / 10) - 4px);
-    }
-}
-@media only screen and (max-width: 1319px) {
-    .entryTile {
-        min-width: calc((100% / 9) - 4px);
-    }
-}
-@media only screen and (max-width: 1189px) {
-    .entryTile {
-        min-width: calc((100% / 8) - 4px);
-    }
-}
-@media only screen and (max-width: 1059px) {
-    .entryTile {
-        min-width: calc((100% / 7) - 4px);
-    }
-}
-@media only screen and (max-width: 929px) {
-    .entryTile {
-        min-width: calc((100% / 6) - 4px);
-    }
-}
-@media only screen and (max-width: 799px) {
-    .entryTile {
-        min-width: calc((100% / 5) - 4px);
-    }
-}
-@media only screen and (max-width: 669px) {
-    .entryTile {
-        min-width: calc((100% / 4) - 4px);
-    }
-}
-@media only screen and (max-width: 539px) {
-    .entryTile {
-        min-width: calc((100% / 3) - 4px);
-    }
-}
-@media only screen and (max-width: 409px) {
-    .entryTile {
-        min-width: calc((100% / 2) - 4px);
-    }
-}
-@media only screen and (max-width: 279px) {
-    .entryTile {
-        min-width: calc((100% / 1) - 4px);
-    }
 }

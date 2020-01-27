@@ -37,7 +37,7 @@ export default class Series extends Component<Props, State> {
                     <img class={style.poster} src={imageUrl(details.poster, 500)}
                          alt=""/>
                     <span class={[style.info, style.marked].join(" ")}>
-                        <div>
+                        <table>
                             {
                                 [
                                     // {title: 'Released', value: details.seasons[0].airDate.substr(0, 4)},
@@ -50,7 +50,7 @@ export default class Series extends Component<Props, State> {
                                     // {title: 'Episodes', value: details.seasons.reduce((acc, s) => acc + s.episodes.length, 0).toString()},
                                 ].map(formatInfoPair)
                             }
-                        </div>
+                        </table>
                     </span>
                     <div>
                         {orderBy(details.seasons, ['number'], ['asc'])

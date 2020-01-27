@@ -12,6 +12,7 @@ import Home from "../routes/home";
 import Login from "../routes/login";
 import Season from "../routes/season";
 import Series from "../routes/series";
+import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
 import { getEntry } from "../utils/localstorage";
@@ -29,9 +30,9 @@ const store = createStore<NxPlxStore>({
 
 function MakeLazy(importer: () => Promise<{ default: any }>): FunctionalComponent {
     const LazyComponent = lazy(importer);
-    return () =>
+    return (props) =>
         <Suspense fallback={<Loading fullscreen/>}>
-            <LazyComponent/>
+            <LazyComponent {...props}/>
         </Suspense>;
 }
 
@@ -69,6 +70,7 @@ export default class App extends Component {
                 this.loadBuild();
             }
         });
+        WebsocketMessenger.Get();
     }
 
     private loadBuild() {

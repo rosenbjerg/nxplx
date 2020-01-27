@@ -1,6 +1,7 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
 import { UAParser } from "ua-parser-js";
+import { remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import Loading from "../Loading";
@@ -72,7 +73,7 @@ export default class SessionManager extends Component<Props, State> {
                                 {` - ${translate('expires-in')} ${session.expires}`}
                             </td>
                             <td>
-                                <button title={translate('close-this-session')} onClick={this.closeSession(session.id)}
+                                <button title={translate('close-this-session')} onClick={this.closeSession(session)}
                                         class="material-icons bordered">close
                                 </button>
                             </td>
@@ -84,13 +85,11 @@ export default class SessionManager extends Component<Props, State> {
         );
     }
 
-    private closeSession = (id: string) => async () => {
-        const response = await http.delete(`/api/session?sessionId=${id}`);
+    private closeSession = (session: Session) => async () => {
+        const response = await http.delete(`/api/session?sessionId=${session.id}`);
         if (response.ok) {
             createSnackbar("Session closed", { timeout: 1500 });
-            this.setState(s => {
-                s.sessions.splice(s.sessions.findIndex(se => se.id === id), 1);
-            });
+            this.setState({ sessions: remove(this.state.sessions, session) });
         } else {
             createSnackbar("Unable to close that session", { timeout: 2500 });
         }

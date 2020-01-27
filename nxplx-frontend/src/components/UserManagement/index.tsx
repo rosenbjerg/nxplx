@@ -1,6 +1,6 @@
 import { createSnackbar } from "@snackbar/core";
-import pull from "lodash/pull";
 import { Component, h } from "preact";
+import { add, remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import { User } from "../../utils/models";
@@ -83,7 +83,7 @@ export default class UserManagement extends Component<Props, State> {
     private deleteUser = (user:User) => () => {
         http.delete('/api/user', { value: user.username }).then(response => {
             if (response.ok) {
-                this.setState(s => { pull(s.users, user) });
+                this.setState({ users: remove(this.state.users, user) });
                 createSnackbar(`${user.username} deleted!`, { timeout: 1500 });
             } else {
                 createSnackbar('Unable to remove the user :/', { timeout: 1500 });
@@ -97,8 +97,7 @@ export default class UserManagement extends Component<Props, State> {
         const response = await http.post('/api/user', form, false);
         if (response.ok) {
             createSnackbar('User added!', { timeout: 1500 });
-            const user:User = await response.json();
-            this.setState(s => { s.users.push(user) });
+            this.setState({ users: add(this.state.users, await response.json()) });
             formElement.reset();
         } else {
             createSnackbar('Unable to create new user :/', { timeout: 1500 });

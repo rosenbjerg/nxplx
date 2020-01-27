@@ -13,6 +13,15 @@ export interface Connection {
 }
 
 export default class WebsocketMessenger implements Connection {
+
+    public static Get () {
+        const w = window as any;
+        if (w.__websocketmanager !== undefined) {
+            return w.__websocketmanager;
+        }
+        return w.__websocketmanager = new WebsocketMessenger();
+    }
+
     private webSocket:WebSocket;
     private connected = false;
 
@@ -21,12 +30,13 @@ export default class WebsocketMessenger implements Connection {
     private handlers:{ [index:string]:MessageHandler[] } = {};
 
     constructor() {
-        this.webSocket = new WebSocket('/api/broadcast');
+        const protocol = location.protocol === 'https' ? 'wss' : 'ws';
+        this.webSocket = new WebSocket(`${protocol}://${location.host}/api/broadcast`);
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);
         this.webSocket.addEventListener('message', this.onMessage);
-    }
 
+    }
     public send(message:Message): void {
         if (this.connected) {
             this.webSocket.send(JSON.stringify(message));
@@ -47,6 +57,7 @@ export default class WebsocketMessenger implements Connection {
     }
 
     private onOpen() {
+        console.log('connected');
         this.connected = true;
         const unsent = [ ...this.unsent ];
         this.unsent = [];
@@ -54,6 +65,7 @@ export default class WebsocketMessenger implements Connection {
     }
 
     private onClose() {
+        console.log('disconnected');
         this.connected = false;
     }
 

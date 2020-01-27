@@ -4,6 +4,7 @@ function CreateEventBroker() : Events {
     const allHandlers:{} = {};
 
     const publish = (event:ShakaMessage, data:any) => {
+        console.log('event', event);
         setTimeout(() => {
             const handlers = allHandlers[event] || [];
             handlers.forEach(handler => handler(data))

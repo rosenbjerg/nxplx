@@ -1,6 +1,6 @@
 import { createSnackbar } from "@snackbar/core";
-import pull from "lodash/pull";
 import { Component, h } from "preact";
+import { add, remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import { Library } from "../../utils/models";
@@ -79,33 +79,21 @@ export default class LibraryManagement extends Component<Props, State> {
     }
 
 
-    private indexLibrary = (library:Library) => () => {
-        http.post('/api/indexing', { value: [ library.id ] }).then(response => {
-            if (response.ok) {
-                createSnackbar(`Indexing ${library.name}..`, { timeout: 1500 });
-            } else {
-                createSnackbar('Unable to start indexing :/', { timeout: 1500 });
-            }
-        });
+    private indexLibrary = (library:Library) => async () => {
+        const response = await http.post('/api/indexing', { value: [ library.id ] });
+        const msg = response.ok ? `Indexing ${library.name}..` : 'Unable to start indexing :/';
+        createSnackbar(msg, { timeout: 1500 });
     };
-    private deleteLibrary = (library:Library) => () => {
-        http.delete('/api/library', { value: library.id }).then(response => {
-            if (response.ok) {
-                this.setState(s => { pull(s.libraries, library) });
-                createSnackbar(`${library.name} deleted!`, { timeout: 1500 });
-            } else {
-                createSnackbar('Unable to remove the library :/', { timeout: 1500 });
-            }
-        });
+    private deleteLibrary = (library:Library) => async () => {
+        const response = await http.delete('/api/library', { value: library.id });
+        if (response.ok) this.setState({ libraries: remove(this.state.libraries, library) });
+        const msg = response.ok ? `${library.name} deleted!` : 'Unable to remove the library :/';
+        createSnackbar(msg, { timeout: 1500 });
     };
-    private indexAllLibraries = () => {
-        http.post('/api/indexing', { value: this.state.libraries.map(l => l.id) }).then(response => {
-            if (response.ok) {
-                createSnackbar(`Indexing all libraries..`, { timeout: 1500 });
-            } else {
-                createSnackbar('Unable to start indexing :/', { timeout: 1500 });
-            }
-        });
+    private indexAllLibraries = async () => {
+        const response = await http.post('/api/indexing', { value: this.state.libraries.map(lib => lib.id) });
+        const msg = response.ok ? 'Indexing all libraries..' : 'Unable to start indexing :/';
+        createSnackbar(msg, { timeout: 1500 });
     };
     private submitNewLibrary = async (ev:Event) => {
         ev.preventDefault();
@@ -113,9 +101,7 @@ export default class LibraryManagement extends Component<Props, State> {
         const form = new FormData(formElement);
         const response = await http.post('/api/library', form, false);
         if (response.ok) {
-            createSnackbar('Library added!', { timeout: 1500 });
-            const library:Library = await response.json();
-            this.setState(s => { s.libraries.push(library) });
+            this.setState({ libraries: add(this.state.libraries, await response.json()) });
             formElement.reset();
         }
         else {

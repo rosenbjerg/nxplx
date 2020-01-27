@@ -46,7 +46,7 @@ export default class Home extends Component<Props, State> {
                     )}
                     <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
                     <span class={[style.info, style.marked].join(" ")}>
-                    <div>
+                    <table>
                         {
                             [
                                 {title: 'Released', value: (details.releaseDate || '').substr(0, 4)},
@@ -59,15 +59,15 @@ export default class Home extends Component<Props, State> {
                                 {title: 'Subtitles', value: <Subtitles kind="film" file_id={details.fid.toString()} />}
                             ].map(formatInfoPair)
                         }
-                    </div>
+                    </table>
                 </span>
-                    <span class={[style.info, style.marked].join(" ")}>
+                    <table class={[style.info, style.marked].join(" ")}>
                     {
                         [
                             {title: 'Overview', value: details.overview},
                         ].map(formatInfoPair)
                     }
-                </span>
+                </table>
                 </div>
             </div>
         );

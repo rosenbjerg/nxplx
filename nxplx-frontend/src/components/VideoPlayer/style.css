@@ -1,7 +1,6 @@
 .video {
+    height: calc(100vh - 56px);
     width: 100%;
-    height: auto;
-    /*position: relative;*/
-    /*top: 50%;*/
-    /*transform: translateY(-50%);*/
+    margin: auto;
+    background-color: black;
 }
