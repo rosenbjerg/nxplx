@@ -13,7 +13,7 @@ namespace NxPlx.Abstractions
         {
             _dictionary[(typeof(TFrom), typeof(TTo))] = mapping;
         }
-        public TTo Map<TFrom, TTo>(TFrom instance)
+        public TTo? Map<TFrom, TTo>(TFrom instance)
             where TTo : class
         {
             if (instance == null) return null;

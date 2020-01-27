@@ -27,15 +27,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             router.Put("/permissions", Validated.SetUserPermissionsForm, Authenticated.Admin, SetUserLibraryPermissions);
             router.Get("/browse", Authenticated.Admin, BrowseForDirectory);
         }
-        
-        
+
+
         private static Task<HandlerType> BrowseForDirectory(Request req, Response res)
-        { 
+        {
             string cwd = req.Queries["cwd"];
-            
+
             var entries = LibraryService.GetDirectoryEntries(cwd);
-            
-            if (entries == null) return res.SendStatus(HttpStatusCode.BadRequest);
+
             return res.SendJson(entries);
         }
 
@@ -43,7 +42,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> CreateLibrary(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();
-            
+
             var lib = await LibraryService.CreateNewLibrary(form["name"], form["path"], form["language"], form["kind"]);
 
             return await res.SendJson(lib);
@@ -64,37 +63,24 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> ListLibraries(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var libraries = await ListLibraries(session.IsAdmin, session.User.LibraryAccessIds);
+
+            var libraries = await LibraryService.ListLibraries(session.User);
+
             return await res.SendJson(libraries);
         }
 
-        private static async Task<IEnumerable<LibraryDto>> ListLibraries(bool isAdmin, IEnumerable<int> libraryAccess)
-        {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-
-            if (isAdmin)
-            {
-                var libraries = await context.Libraries.Many().ToListAsync();
-                return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(libraries);
-            }
-            else
-            {
-                var libraries = await context.Libraries.Many(l => libraryAccess.Contains(l.Id)).ToListAsync();
-                return container.Resolve<IDtoMapper>().Map<Library, LibraryDto>(libraries);
-            }
-        } 
         private static async Task<HandlerType> SetUserLibraryPermissions(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();
             var userId = int.Parse(form["userId"]);
             var libraryIds = form["libraries"].Select(int.Parse).ToList();
-            
+
             var ok = await LibraryService.SetUserLibraryPermissions(userId, libraryIds);
 
             if (!ok) return await res.SendStatus(HttpStatusCode.BadRequest);
             return await res.SendStatus(HttpStatusCode.OK);
         }
+
         private static async Task<HandlerType> GetUserLibraryPermissions(Request req, Response res)
         {
             var userId = int.Parse(req.Queries["userId"]);
@@ -102,7 +88,5 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             if (libraryAccess == default) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(libraryAccess);
         }
-
-
     }
 }

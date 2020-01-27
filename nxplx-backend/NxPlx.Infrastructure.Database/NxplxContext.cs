@@ -75,6 +75,7 @@ namespace NxPlx.Services.Database
                 modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _userId);
                 modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _userId);
                 
+                modelBuilder.Entity<Library>().HasQueryFilter(e => _libraryAccess.Contains(e.Id));
                 modelBuilder.Entity<FilmFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
                 modelBuilder.Entity<EpisodeFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
             }

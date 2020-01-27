@@ -65,6 +65,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
             return true;
         }
+        public static async Task<IEnumerable<LibraryDto>> ListLibraries(User user)
+        {
+            var container = ResolveContainer.Default;
+            await using var context = container.Resolve<IReadNxplxContext>(user);
+
+            var libraries = await context.Libraries.Many().ToListAsync();
+            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(libraries);
+        } 
         public static async Task<List<int>?> FindLibraryAccess(int userId)
         {
             var container = ResolveContainer.Default;
