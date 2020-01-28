@@ -22,6 +22,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
             var current = await ctx.EpisodeFiles.OneById(fileId);
 
+            if (current == null) return null;
+            
             var season = await ctx.EpisodeFiles.Many(ef =>
                 ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
                 ef.EpisodeNumber > current.EpisodeNumber).ToListAsync();
@@ -50,8 +52,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            var episode = await ctx.EpisodeFiles
-                .One(ef => ef.Id == id, ef => ef.Subtitles);
+            var episode = await ctx.EpisodeFiles.One(ef => ef.Id == id, ef => ef.Subtitles);
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
         }
         public static async Task<SeriesDto?> FindSeriesDetails(int id, int? season, User user)

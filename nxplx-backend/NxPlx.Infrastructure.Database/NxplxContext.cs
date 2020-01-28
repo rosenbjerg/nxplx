@@ -42,7 +42,7 @@ namespace NxPlx.Services.Database
             modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Seasons).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<SeasonDetails>().HasMany(s => s.Episodes).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<DbFilmDetails>().HasOne(fd => fd.BelongsInCollection).WithMany(mc => mc.Movies).OnDelete(DeleteBehavior.Restrict);
-            
+
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
             modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);
             
@@ -51,7 +51,12 @@ namespace NxPlx.Services.Database
             ConfigureSeriesDetailsJoinEntities(modelBuilder);
             
             modelBuilder.Entity<SubtitlePreference>().HasKey(sp => new { sp.UserId, sp.FileId });
+            modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.UserId);
+            modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.FileId);
+            
             modelBuilder.Entity<WatchingProgress>().HasKey(wp => new { wp.UserId, wp.FileId });
+            modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.UserId);
+            modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.FileId);
             
             modelBuilder.Entity<User>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.UserId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<User>().HasMany<WatchingProgress>().WithOne().HasForeignKey(wp => wp.UserId).OnDelete(DeleteBehavior.Cascade);
@@ -70,6 +75,7 @@ namespace NxPlx.Services.Database
                 modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _userId);
                 modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _userId);
                 
+                modelBuilder.Entity<Library>().HasQueryFilter(e => _libraryAccess.Contains(e.Id));
                 modelBuilder.Entity<FilmFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
                 modelBuilder.Entity<EpisodeFile>().HasQueryFilter(e => _libraryAccess.Contains(e.PartOfLibraryId));
             }
@@ -78,6 +84,8 @@ namespace NxPlx.Services.Database
         public NxplxContext()
         {
             _isAdmin = true;
+            _userId = 0;
+            _libraryAccess = new List<int>(0);
         }
         public NxplxContext(User user)
         {
@@ -107,39 +115,41 @@ namespace NxPlx.Services.Database
         private static void ConfigureFilmDetailsJoinEntities(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            
             modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
-            
             modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasOne(o => o.Entity2).WithMany().OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasOne(o => o.Entity2).WithMany().OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasOne(o => o.Entity2).WithMany().OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasOne(o => o.Entity1).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasOne(o => o.Entity2).WithMany().OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureFilmFileEntity(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FilmFile>().HasIndex(ff => ff.PartOfLibraryId);
             modelBuilder.Entity<FilmFile>().HasOne(ff => ff.FilmDetails).WithMany().OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<FilmFile>().HasOne(ff => ff.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FilmFile>().HasMany(ff => ff.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<FilmFile>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<FilmFile>().HasMany(ff => ff.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<FilmFile>().OwnsOne(ff => ff.MediaDetails);
         }
 
         private static void ConfigureEpisodeFileEntity(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
+            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.PartOfLibraryId);
             modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.SeriesDetails).WithMany().OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<EpisodeFile>().Ignore(ef => ef.SeasonDetails).Ignore(ef => ef.EpisodeDetails);
             modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<EpisodeFile>().HasMany(ef => ef.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<EpisodeFile>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.FileId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<EpisodeFile>().OwnsOne(ef => ef.MediaDetails);
-            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

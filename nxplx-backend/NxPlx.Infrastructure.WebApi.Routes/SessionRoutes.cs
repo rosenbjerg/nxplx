@@ -2,7 +2,6 @@ using System.Net;
 using System.Threading.Tasks;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes.Services;
-using NxPlx.Models.Dto.Models;
 using Red;
 using Red.CookieSessions;
 using Red.Interfaces;

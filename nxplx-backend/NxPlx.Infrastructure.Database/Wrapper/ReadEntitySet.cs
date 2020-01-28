@@ -40,7 +40,7 @@ namespace NxPlx.Services.Database.Wrapper
             return WithIncludes(includes).FirstOrDefaultAsync(predicate);
         }
 
-        public async ValueTask<TEntity> OneById(params object[] keys)
+        public async ValueTask<TEntity?> OneById(params object[] keys)
         {
             return await DbSet.FindAsync(keys);
         }

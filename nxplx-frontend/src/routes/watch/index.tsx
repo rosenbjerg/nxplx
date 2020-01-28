@@ -1,21 +1,16 @@
-import { Action, createSnackbar, Snackbar, SnackOptions } from "@snackbar/core";
 import { Component, h } from "preact";
-// @ts-ignore
 import Helmet from "preact-helmet";
-import { Store } from "unistore";
-import Loading from "../../components/loading";
+import { route } from "preact-router";
+import Loading from "../../components/Loading";
 import { formatSubtitleName } from "../../components/Subtitles";
-import { imageUrl } from "../../models";
-import http from "../../Http";
-import { FileInfo } from "../../models";
+import VideoPlayer from "../../components/VideoPlayer";
+import CreateEventBroker from "../../utils/events";
+import http from "../../utils/http";
+import { imageUrl } from "../../utils/models";
+import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 
-import { route } from "preact-router";
-import ShakaPlayer from "../../components/ShakaPlayer";
-import CreateEventBroker from "../../EventBroker";
-
 interface Props {
-    store: Store<object>;
     kind: string;
     fid: string
 }
@@ -27,45 +22,42 @@ interface State {
 }
 
 export default class Watch extends Component<Props, State> {
-
     private playerVolume = parseFloat(localStorage.getItem("player_volume") || "1.0") || 1.0;
     private playerAutoplay = localStorage.getItem("player_autoplay") === "true";
     private playerMuted = localStorage.getItem("player_muted") === "true";
 
     private playNextMode = "default";
 
-    private shakaComm = CreateEventBroker();
+    private videoEvents = CreateEventBroker();
     private previousUnload?: any;
     private playerTime = 0;
     private subtitleLanguage = "none";
 
-    public render({ kind, fid }: Props, state: State) {
+    public render(props: Props, state: State) {
         if (!state.info) {
-            return (<div class={style.container}><Loading /></div>);
+            return (<Loading fullscreen/>);
         }
         const completed = (this.playerTime / state.info.duration) > 0.95;
         return (
             <div class={style.container}>
                 <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${state.info.title} - NxPlx`}/>
 
-                <ShakaPlayer
-                    events={this.shakaComm}
-                    time={completed ? 0 : this.playerTime}
-                    muted={this.playerMuted}
-                    volume={this.playerVolume}
-                    autoPlay={this.playerAutoplay || this.playerTime < 3 || completed}
+                <meta property="og:title" content={state.info.title} />
+                <meta property="og:image" content={imageUrl(this.state.info.backdrop, 1280)} />
+
+                <VideoPlayer
+                    events={this.videoEvents}
+                    startTime={completed ? 0 : this.playerTime}
                     title={state.info.title}
-                    videoTrack={`/api/${kind}/watch/${fid}`}
-                    preferredTextLanguage={this.subtitleLanguage}
+                    src={`/api/${props.kind}/watch/${props.fid}`}
                     poster={imageUrl(this.state.info.backdrop, 1280)}
-                    textTracks={state.info.subtitles.map(lang => ({
+
+                    subtitles={state.info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
-                        path: `/api/subtitle/${kind}/${fid}/${lang}`
+                        path: `/api/subtitle/${props.kind}/${props.fid}/${lang}`,
+                        default: lang === this.subtitleLanguage
                     }))}/>
-                {state.info.subtitles.map(lang => (
-                    <track src={`/api/subtitle/${kind}/${fid}/${lang}.vtt`} kind="subtitles" srcLang={lang} label={formatSubtitleName(lang)} />
-                ))}
             </div>
         );
     }
@@ -79,21 +71,18 @@ export default class Watch extends Component<Props, State> {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
 
-        this.shakaComm.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
+        this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
             this.playerTime = data.time;
             this.playerAutoplay = data.state === "playing";
             this.setState({ playerState: data.state });
-            if (data.state === 'ended') {
+            if (data.state === 'ended' && kind === 'series') {
                 http.get(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(res => res.json()).then(next => {
-                    // console.log(next);
                     route(`/watch/${this.props.kind}/${next.fid}`);
                 })
             }
         });
-        this.shakaComm.subscribe<{ time: number }>("time_changed", data => {
-            this.playerTime = data.time;
-        });
-        this.shakaComm.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
+        this.videoEvents.subscribe<{ time: number }>("time_changed", data => this.playerTime = data.time);
+        this.videoEvents.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
             this.playerVolume = data.volume;
             this.playerMuted = data.muted;
         });
@@ -101,8 +90,8 @@ export default class Watch extends Component<Props, State> {
         const { kind, fid } = this.props;
         Promise.all([
             http.get(`/api/${kind}/info/${fid}`).then(response => response.json()),
-            http.get(`/api/subtitle/preference/${fid}`).then(response => response.text()),
-            http.get(`/api/progress/${fid}`).then(response => response.text())
+            http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
+            http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
         ]).then(results => {
             const info = results[0];
             this.subtitleLanguage = results[1];
@@ -116,7 +105,7 @@ export default class Watch extends Component<Props, State> {
             return;
         }
         if (this.playerTime > 5) {
-            http.put("/api/progress/" + this.state.info.fid, { value: this.playerTime });
+            http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}`, { value: this.playerTime });
         }
         localStorage.setItem("player_volume", this.playerVolume.toString());
         localStorage.setItem("player_autoplay", this.playerAutoplay.toString());
@@ -124,50 +113,4 @@ export default class Watch extends Component<Props, State> {
 
         window.onbeforeunload = this.previousUnload;
     };
-
-
-    // Promise.all([
-    //     http.get(`/api/subtitle/preference/${fid}`).then(response => response.text()),
-    //     http.get(`/api/progress/${fid}`).then(response => response.text()),
-    // ]).then(results => {
-    //     const defaultLang = results[0];
-    //     const progress = parseFloat(results[1]);
-    //
-    //     video.ready(() => {
-    //         video.currentTime = progress;
-    //         if (progress > 1) {
-    //             createSnackbar(`Continuing from ${formatProgress(progress)}`, { timeout: 10000, actions: [
-    //                     {
-    //                         text: 'RESTART',
-    //                         callback: (_, snackbar:Snackbar) => {
-    //                             video.currentTime = 0.0;
-    //                             snackbar.destroy()
-    //                         }
-    //                     }
-    //                 ]});
-    //         }
-    //         video.play();
-    //     });
-    //     const tracks:TextTrack[] = Array.from(video.textTracks());
-    //     for (const track of tracks) {
-    //         if (track.language === defaultLang) {
-    //             track.mode = 'showing';
-    //             break;
-    //         }
-    //     }
-    // });
-
-    // // @ts-ignore
-    // const settings = video.textTrackSettings;
-    // settings.setValues({
-    //     "fontPercent": "50%",
-    //     "backgroundColor": "Black",
-    //     "backgroundOpacity": "0",
-    //     "edgeStyle": "uniform",
-    // });
-    // settings.updateDisplay();
-    // this.video.ready(() => {
-    //
-    // });
-
 }

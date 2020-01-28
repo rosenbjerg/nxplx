@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
@@ -21,6 +20,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Delete("", Authenticated.Admin, RemoveUser);
             router.Get("/list", Authenticated.Admin, ListUsers);
+            router.Get("/list/online", Authenticated.Admin, ListOnlineUsers);
             router.Post("", Validated.CreateUserForm, Authenticated.Admin, CreateUser);
             
         }
@@ -44,7 +44,14 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
-            var users = await UserService.GetUsers();
+            var session = req.GetData<UserSession>();
+            var users = await UserService.GetUsers(session.User);
+            return await res.SendJson(users);
+        }
+        private static async Task<HandlerType> ListOnlineUsers(Request req, Response res)
+        {
+            var session = req.GetData<UserSession>();
+            var users = await UserService.ListOnlineUsers(session.User);
             return await res.SendJson(users);
         }
         private static async Task<HandlerType> GetUser(Request req, Response res)

@@ -1,14 +1,11 @@
-import { Component, h } from "preact";
-import Loading from '../../components/loading';
-import http from "../../Http";
-import * as style from './style.css'
-
+import { createSnackbar } from "@snackbar/core";
 import linkState from "linkstate";
-import Checkbox from 'preact-material-components/Checkbox';
-import 'preact-material-components/Checkbox/style.css';
-import FormField from 'preact-material-components/FormField';
-import { translate } from "../../localisation";
-import { Library, User } from "../../models";
+import { Component, h } from "preact";
+import http from "../../utils/http";
+import { translate } from "../../utils/localisation";
+import { Library, User } from "../../utils/models";
+import Checkbox from "../Checkbox";
+import * as style from './style.css'
 
 interface UserPermission {
     library:Library
@@ -26,10 +23,11 @@ interface State {
 export default class UserPermissions extends Component<Props, State> {
 
 
-    public componentDidUpdate(previousProps: Readonly<Props>, previousState: Readonly<State>, previousContext: any): void {
+    public componentDidUpdate(previousProps: Readonly<Props>): void {
         if (this.props.user && previousProps.user !== this.props.user) {
-            this.setState({ currentUser: this.props.user });
-            this.loadUserPermissions();
+            this.setState({ currentUser: this.props.user }, () => {
+                this.loadUserPermissions();
+            });
         }
     }
 
@@ -65,7 +63,7 @@ export default class UserPermissions extends Component<Props, State> {
 
         const response = await http.put('/api/library/permissions', form, false);
         if (response.ok) {
-            console.log('permissions saved!');
+            createSnackbar('Permissions saved!', { timeout: 2000 });
             this.setState({
                 currentUser: undefined,
                 permissions: undefined
@@ -82,10 +80,8 @@ export default class UserPermissions extends Component<Props, State> {
                 <h3>{translate('libraries-username-has-access-to', props.user.username)}</h3>
                 {permissions.map((up, i) => (
                     <div key={up.library.id}>
-                        <FormField>
-                            <span>{up.library.name} ({up.library.language})</span>
-                            <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>
-                        </FormField>
+                        <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>
+                        <span>{up.library.name} ({up.library.language})</span>
                     </div>
                 ))}
                 <button onClick={this.savePermissions} class="material-icons bordered">save</button>

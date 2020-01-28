@@ -14,4 +14,8 @@
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
+    </ItemGroup>
+
 </Project>

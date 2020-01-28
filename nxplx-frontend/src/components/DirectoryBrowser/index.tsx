@@ -1,7 +1,6 @@
 import { Component, h } from "preact";
-import http from "../../Http";
+import http from "../../utils/http";
 import * as style from './style.css'
-import linkState from "linkstate";
 
 interface Props {
 
@@ -11,8 +10,7 @@ interface State {
     dirs: string[]
 }
 
-const getDirs = cwd => http.get(`/api/library/browse?cwd=${cwd}`)
-    .then(res => res.json());
+const getDirs = cwd => http.getJson(`/api/library/browse?cwd=${cwd}`);
 
 export default class DirectoryBrowser extends Component<Props, State> {
 
@@ -34,15 +32,14 @@ export default class DirectoryBrowser extends Component<Props, State> {
         path.length--;
         if (path.length === 0) { this.setCwd('/'); }
         else {
-            console.log(path);
             this.setCwd(`/${path.join('/')}/`);
         }
     }
 
-    public render(props:Props, {cwd, dirs}:State) {
+    public render(_, {cwd, dirs}:State) {
         return (
             <div class={style.container}>
-                <div>
+                <div class="center-content">
                     <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
                     <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
                     <button disabled={cwd === '/'} class="bordered">Copy current directory to c</button>

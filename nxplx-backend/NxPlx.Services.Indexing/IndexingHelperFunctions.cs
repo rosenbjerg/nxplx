@@ -96,10 +96,6 @@ namespace NxPlx.Services.Index
             return await GetNew(unique, keySelector);
         }
         
-        internal static Task<List<T>> GetNew<T>(this IEnumerable<T> entities)
-            where T : EntityBase
-            => GetNew(entities, e => e.Id);
-
         private static async Task<List<T>> GetNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector)
             where T : class
         {

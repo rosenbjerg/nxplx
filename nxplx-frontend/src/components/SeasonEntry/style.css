@@ -1,0 +1,11 @@
+.num {
+    color: white;
+    text-shadow: 0 0 6px black;
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 100%;
+    text-align: right;
+    padding-right: 8px;
+    transition: top 90ms, left 90ms;
+}

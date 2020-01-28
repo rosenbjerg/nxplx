@@ -1,84 +1,93 @@
-import '@snackbar/core/dist/snackbar.min.css'
-import LiquidRoute, {FadeAnimation, PopAnimation} from 'liquid-route';
-import 'liquid-route/style.css';
-import { Component, h } from 'preact';
-import 'preact-material-components/FormField/style.css';
-import { route, Router } from "preact-router";
-import createStore from 'unistore'
-import { Provider } from 'unistore/preact'
-import http from "../Http";
-import { setLocale } from "../localisation";
-import { getEntry } from "../localstorage";
+import "@snackbar/core/dist/snackbar.min.css";
+import { Component, FunctionalComponent, h } from "preact";
+import { Route, route, Router } from "preact-router";
+import { lazy, Suspense } from "preact/compat";
+import createStore from "unistore";
+import { Provider } from "unistore/preact";
+import Collection from "../routes/collection";
 import Film from "../routes/film";
 import Home from "../routes/home";
 import Login from "../routes/login";
 import Season from "../routes/season";
 import Series from "../routes/series";
-import Header from "./header";
-import Loading from "./loading";
-import Collection from "../routes/collection";
+import WebsocketMessenger from "../utils/connection";
+import http from "../utils/http";
+import { setLocale } from "../utils/localisation";
+import { getEntry } from "../utils/localstorage";
+import Header from "./Header";
+import Loading from "./Loading";
 
 if ((module as any).hot) {
-    // tslint:disable-next-line:no-var-requires
-    require("preact/debug");
+    import("preact/debug");
 }
 
 const store = createStore<NxPlxStore>({
     isLoggedIn: false,
     isAdmin: false,
-    build: ''
+    build: ""
 });
 
+function MakeLazy(importer: () => Promise<{ default: any }>): FunctionalComponent {
+    const LazyComponent = lazy(importer);
+    return (props) =>
+        <Suspense fallback={<Loading fullscreen/>}>
+            <LazyComponent {...props}/>
+        </Suspense>;
+}
+
+const Admin = MakeLazy(() => import("../routes/admin"));
+const Profile = MakeLazy(() => import("../routes/profile"));
+const Watch = MakeLazy(() => import("../routes/watch"));
 
 export default class App extends Component {
     public render() {
         return (
             <Provider store={store}>
                 <div id="app">
-                    <Header />
+                    <Header/>
                     <Router>
-                        <LiquidRoute animator={FadeAnimation} path="/" component={Home}/>
-                        <LiquidRoute animator={PopAnimation} path="/login" component={Login}/>
-                        <LiquidRoute animator={FadeAnimation} path="/admin" getComponent={() => import('../routes/admin').then(module => module.default)}/>
-                        <LiquidRoute animator={FadeAnimation} path="/film/:id" component={Film}/>
-                        <LiquidRoute animator={FadeAnimation} path="/collection/:id" component={Collection}/>
-                        <LiquidRoute animator={FadeAnimation} path="/series/:id" component={Series}/>
-                        <LiquidRoute animator={FadeAnimation} path="/series/:id/:season" component={Season}/>
-                        <LiquidRoute animator={FadeAnimation} path="/watch/:kind/:fid" getComponent={() => import('../routes/watch').then(module => module.default)}/>
-                        <LiquidRoute animator={FadeAnimation} path="/profile" getComponent={() => import('../routes/profile').then(module => module.default)}/>
-                        {/*<Route path="/series/:id/:season/:episode" component={Episode} />*/}
+                        <Route path="/" component={Home}/>
+                        <Route path="/login" component={Login}/>
+                        <Route path="/film/:id" component={Film}/>
+                        <Route path="/collection/:id" component={Collection}/>
+                        <Route path="/series/:id" component={Series}/>
+                        <Route path="/series/:id/:season" component={Season}/>
+                        <Route path="/admin" component={Admin}/>
+                        <Route path="/profile" component={Profile}/>
+                        <Route path="/watch/:kind/:fid" component={Watch}/>
                     </Router>
                 </div>
             </Provider>
         );
     }
+
     public componentDidMount() {
+        setLocale(getEntry("locale", "en"));
         this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {
                 this.loadBuild();
             }
-        })
+        });
+        WebsocketMessenger.Get();
     }
-    private loadDictionary() {
-        setLocale(getEntry('locale', 'en'));
-    }
+
     private loadBuild() {
-        http.get('/api/build')
+        http.get("/api/build")
             .then(response => response.text())
             .then(text => store.setState({ build: text }));
     }
+
     private checkLoggedIn = async () => {
-        const response = await http.get('/api/authentication/verify');
+        const response = await http.get("/api/authentication/verify");
         if (response.ok) {
-            const isAdmin = await response.text() === 'True';
+            const isAdmin = await response.text() === "True";
             store.setState({ isLoggedIn: true, isAdmin });
-            if (location.pathname === '/login') {
-                route('/', true);
+            if (location.pathname === "/login") {
+                route("/", true);
             }
-        }
-        else {
-            route('/login', true);
+        } else {
+            route("/login", true);
         }
     };
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
@@ -16,7 +15,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
 {
     public static class FilmService
     {
-        public static async Task<FilmDto> FindFilmByDetails(int id, User user)
+        public static async Task<FilmDto?> FindFilmByDetails(int id, User user)
         {
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
@@ -36,7 +35,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             
             return collection;
         }
-        public static async Task<InfoDto> FindFilmFileInfo(int fileId, User user)
+        public static async Task<InfoDto?> FindFilmFileInfo(int fileId, User user)
         {
             var container = ResolveContainer.Default;
 

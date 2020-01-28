@@ -9,5 +9,6 @@ namespace NxPlx.Models.Details.Search
         public string OriginalLanguage { get; set; }
         public List<int> GenreIds { get; set; }
         public string Overview { get; set; }
+        public int Votes { get; set; }
     }
 }

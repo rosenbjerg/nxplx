@@ -5,7 +5,7 @@ using NxPlx.Models.Details.Series;
 
 namespace NxPlx.Models.Database
 {
-    public class DbSeriesDetails : EntityBase
+    public class DbSeriesDetails : EntityBase, IAdded
     {
         public virtual List<JoinEntity<DbSeriesDetails, Creator>> CreatedBy { get; set; }
         public DateTime? FirstAirDate { get; set; }
@@ -25,5 +25,7 @@ namespace NxPlx.Models.Database
         public virtual List<JoinEntity<DbSeriesDetails, ProductionCompany>> ProductionCompanies { get; set; }
         public double VoteAverage { get; set; }
         public int VoteCount { get; set; }
+        
+        public DateTime Added { get; set; }
     }
 }

@@ -158,10 +158,10 @@ namespace NxPlx.Integrations.TMDb
             });
             
             SetMapping<SearchResult<TvShowResult>, SeriesResult[]>(searchResult 
-                => Map<TvShowResult, SeriesResult>(searchResult.results).ToArray());
+                => Map<TvShowResult, SeriesResult>(searchResult.results.Take(10)).ToArray());
             
             SetMapping<SearchResult<MovieResult>, FilmResult[]>(searchResult 
-                => Map<MovieResult, FilmResult>(searchResult.results).ToArray());
+                => Map<MovieResult, FilmResult>(searchResult.results.Take(10)).ToArray());
             
             SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
             {
@@ -173,7 +173,8 @@ namespace NxPlx.Integrations.TMDb
                 Name = tvShowResult.name,
                 OriginalName = tvShowResult.original_name,
                 OriginCountry = tvShowResult.origin_country,
-                FirstAirDate = tvShowResult.first_air_date
+                FirstAirDate = tvShowResult.first_air_date,
+                Votes = tvShowResult.vote_count
             });
             
             SetMapping<MovieResult, FilmResult>(movieResult => new FilmResult
@@ -185,7 +186,8 @@ namespace NxPlx.Integrations.TMDb
                 GenreIds = movieResult.genre_ids,
                 OriginalLanguage = movieResult.original_language,
                 OriginalTitle = movieResult.original_title,
-                ReleaseDate = movieResult.release_date
+                ReleaseDate = movieResult.release_date,
+                Votes = movieResult.vote_count
             });
         }
         

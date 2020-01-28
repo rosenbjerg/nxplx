@@ -61,7 +61,7 @@ namespace NxPlx.Services.Index
             var fileIndexer = new FileIndexer();
             await using var ctx = new NxplxContext();
 
-            var currentFilm = ctx.FilmFiles.Select(e => e.Path).ToHashSet();
+            var currentFilm = new HashSet<string>(await ctx.FilmFiles.Select(e => e.Path).ToListAsync());
             
             await RemoveDeletedMovies(library, currentFilm, ctx, startTime);
 
@@ -83,7 +83,8 @@ namespace NxPlx.Services.Index
             ctx.AddRange(productionCompanies);
             ctx.AddRange(movieCollections);
             ctx.FilmFiles.AddRange(newFilm);
-            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details);
+            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
+            databaseDetails.ForEach(film => film.Added = DateTime.UtcNow);
             var newDetails = await databaseDetails.GetUniqueNew();
             await ctx.AddRangeAsync(newDetails);
             
@@ -103,6 +104,7 @@ namespace NxPlx.Services.Index
             if (deletedFilmPaths.Any())
             {
                 var deletedFilm = await nxplxContext.FilmFiles.Where(ef => deletedFilmPaths.Contains(ef.Path)).ToListAsync();
+                await RemoveWatchingProgress(nxplxContext, deletedFilm.Select(e => e.Id).ToList());
                 nxplxContext.FilmFiles.RemoveRange(deletedFilm);
 
                 await nxplxContext.SaveChangesAsync();
@@ -118,7 +120,7 @@ namespace NxPlx.Services.Index
             if (deletedEpisodePaths.Any())
             {
                 var deletedEpisodes = await nxplxContext.EpisodeFiles.Where(ef => deletedEpisodePaths.Contains(ef.Path)).ToListAsync();
-                nxplxContext.SubtitleFiles.RemoveRange(deletedEpisodes.SelectMany(e => e.Subtitles));
+                await RemoveWatchingProgress(nxplxContext, deletedEpisodes.Select(e => e.Id).ToList());
                 nxplxContext.EpisodeFiles.RemoveRange(deletedEpisodes);
 
                 await nxplxContext.SaveChangesAsync();
@@ -126,6 +128,12 @@ namespace NxPlx.Services.Index
                     "Deleted {DeletedAmount} episodes from {LibraryName} because files were removed, after {ScanTime} seconds",
                     deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             }
+        }
+
+        private async Task RemoveWatchingProgress(NxplxContext nxplxContext, List<int> fileIds)
+        {
+            var progress = await nxplxContext.WatchingProgresses.Where(wp => fileIds.Contains(wp.FileId)).ToListAsync();
+            nxplxContext.WatchingProgresses.RemoveRange(progress);
         }
 
         private async Task<List<FilmDetails>> FindFilmDetails(List<FilmFile> newFilm, Library library)
@@ -145,7 +153,10 @@ namespace NxPlx.Services.Index
                     continue;
                 }
 
-                var filmDetails = await functionCache.Invoke(searchResults[0].Id, library.Language);
+                var actual = new Fastenshtein.Levenshtein(filmFile.Title);
+                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Title)).First();
+
+                var filmDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
                 filmFile.FilmDetailsId = filmDetails.Id;
                 allDetails.Add(filmDetails);
             }
@@ -163,7 +174,7 @@ namespace NxPlx.Services.Index
             var fileIndexer = new FileIndexer();
             await using var ctx = new NxplxContext();
             
-            var currentEpisodes = ctx.EpisodeFiles.Select(e => e.Path).ToHashSet();
+            var currentEpisodes = new HashSet<string>(await ctx.EpisodeFiles.Select(e => e.Path).ToListAsync());
             
             await RemoveDeletedEpisodes(library, currentEpisodes, ctx, startTime);
             
@@ -184,6 +195,7 @@ namespace NxPlx.Services.Index
             ctx.AddRange(productionCompanies);
             ctx.EpisodeFiles.AddRange(newEpisodes);
             var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
+            databaseDetails.ForEach(series => series.Added = DateTime.UtcNow);
             await ctx.AddOrUpdate(databaseDetails);
             
             await ctx.SaveChangesAsync();
@@ -204,13 +216,16 @@ namespace NxPlx.Services.Index
             foreach (var episodeFile in newEpisodes)
             {
                 var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
-
-                var details = searchResults != null && searchResults.Any() ? searchResults[0] : null;
-
-                if (details == null) 
+                if (searchResults == null || !searchResults.Any())
+                {
+                    episodeFile.SeriesDetailsId = null;
                     continue;
-
-                var seriesDetails = await functionCache.Invoke(details.Id, library.Language);
+                }
+                
+                var actual = new Fastenshtein.Levenshtein(episodeFile.Name);
+                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Name)).First();
+                
+                var seriesDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
                 episodeFile.SeriesDetailsId = seriesDetails.Id;
                 allDetails.Add(seriesDetails);
             }

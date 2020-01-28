@@ -50,6 +50,9 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("Adult")
                         .HasColumnType("boolean");
 
@@ -114,6 +117,9 @@ namespace NxPlx.Services.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
@@ -536,9 +542,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<DateTime>("LastWrite")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("MediaDetailsId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -586,9 +589,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<DateTime>("LastWrite")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<int?>("MediaDetailsId")
-                        .HasColumnType("integer");
 
                     b.Property<int>("PartOfLibraryId")
                         .HasColumnType("integer");
@@ -686,9 +686,14 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<string>("Language")
                         .HasColumnType("text");
 
+                    b.Property<int>("MediaType")
+                        .HasColumnType("integer");
+
                     b.HasKey("UserId", "FileId");
 
                     b.HasIndex("FileId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SubtitlePreferences");
                 });
@@ -734,10 +739,17 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<DateTime>("LastWatched")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int>("MediaType")
+                        .HasColumnType("integer");
+
                     b.Property<double>("Time")
                         .HasColumnType("double precision");
 
                     b.HasKey("UserId", "FileId");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("WatchingProgresses");
                 });
@@ -1078,18 +1090,6 @@ namespace NxPlx.Services.Database.Migrations
 
             modelBuilder.Entity("NxPlx.Models.SubtitlePreference", b =>
                 {
-                    b.HasOne("NxPlx.Models.File.EpisodeFile", null)
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NxPlx.Models.File.FilmFile", null)
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NxPlx.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")

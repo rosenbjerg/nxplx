@@ -9,29 +9,26 @@ namespace NxPlx.Abstractions
         private readonly Dictionary<(Type, Type), object> _dictionary = new Dictionary<(Type, Type), object>();
         
         public void SetMapping<TFrom, TTo>(Func<TFrom, TTo> mapping)
+            where TTo : class
         {
             _dictionary[(typeof(TFrom), typeof(TTo))] = mapping;
         }
-        public TTo Map<TFrom, TTo>(TFrom instance)
+        public TTo? Map<TFrom, TTo>(TFrom instance)
+            where TTo : class
         {
-            if (instance.Equals(default)) return default;
-            
-            if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
-            {
-                var mapper = (Func<TFrom, TTo>) mapperObject;
-                return mapper(instance);
-            }
+            if (instance == null) return null;
 
-            throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instance));
+            return Map<TFrom, TTo>(new[] { instance }).First();
         }
         public IEnumerable<TTo> Map<TFrom, TTo>(IEnumerable<TFrom> instances)
+            where TTo : class
         {
-            if (instances == null || !instances.Any()) return Enumerable.Empty<TTo>();
+            if (instances == null) return Enumerable.Empty<TTo>();
             
             if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
             {
                 var mapper = (Func<TFrom, TTo>) mapperObject;
-                return instances.Select(e => e.Equals(default) ? default : mapper(e));
+                return instances.Select(e => e == null ? null : mapper(e));
             }
 
             throw new ArgumentException($"No mapping from {typeof(TFrom).FullName} to {typeof(TTo).FullName}", nameof(instances));

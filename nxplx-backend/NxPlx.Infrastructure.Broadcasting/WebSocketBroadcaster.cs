@@ -49,11 +49,20 @@ namespace NxPlx.Infrastructure.Broadcasting
                 WebSocketDialog = channel,
                 Admin = admin
             };
+            Console.WriteLine($"Connected: {session.UserId}");
             lock (_lock) _all.Add(session);
             channel.OnClosed += (sender, args) =>
             {
                 lock (_lock) _all.Remove(session);
             };
+        }
+
+        public IReadOnlyList<int> UniqueIds()
+        {
+            lock (_lock)
+            {
+                return _all.Select(c => c.UserId).Distinct().ToList().AsReadOnly();
+            }
         }
     }
 

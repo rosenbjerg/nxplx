@@ -72,8 +72,17 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
-            
-            return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
+
+            try
+            {
+
+                return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         
         public override async Task<SeriesResult[]> SearchTvShows(string name)

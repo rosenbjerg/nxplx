@@ -7,3 +7,12 @@
     height: 14rem;
     overflow-y: scroll;
 }
+.directories li {
+    padding-left: 2px;
+    transition: padding-left 25ms;
+    cursor: pointer;
+}
+.directories li:hover {
+    background-color: var(--border-color);
+    padding-left: 4px;
+}

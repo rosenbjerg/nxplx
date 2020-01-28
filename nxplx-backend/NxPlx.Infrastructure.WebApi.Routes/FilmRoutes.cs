@@ -3,9 +3,6 @@ using System.Net;
 using System.Threading.Tasks;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Infrastructure.WebApi.Routes.Services;
-using NxPlx.Models.Dto.Models;
-using NxPlx.Models.Dto.Models.Film;
-using NxPlx.Models.File;
 using Red;
 using Red.Interfaces;
 
@@ -16,11 +13,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         public static void Register(IRouter router)
         {
             router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
-            
             router.Get("/detail/:film_id", Authenticated.User, GetFilmDetails);
-            
             router.Get("/collection/detail/:collection_id", Authenticated.User, GetCollectionDetails);
-            
             router.Get("/watch/:file_id", Authenticated.User, StreamFile);
         }
 
@@ -32,7 +26,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var filePath = await FilmService.FindFilmFilePath(fileId, session.User);
 
             if (filePath == default || !File.Exists(filePath)) return await res.SendStatus(HttpStatusCode.NotFound);
-            return await res.SendFile(filePath);
+            return await res.SendFile(filePath, "video/mp4");
         }
         
         private static async Task<HandlerType> GetFilmDetails(Request req, Response res)
