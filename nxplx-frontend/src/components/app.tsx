@@ -4,7 +4,6 @@ import { Route, route, Router } from "preact-router";
 import { lazy, Suspense } from "preact/compat";
 import createStore from "unistore";
 import { Provider } from "unistore/preact";
-import Loading from "../components/Loading";
 import Collection from "../routes/collection";
 import Film from "../routes/film";
 import Home from "../routes/home";
@@ -16,6 +15,7 @@ import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
 import { getEntry } from "../utils/localstorage";
 import Header from "./Header";
+import Loading from "./Loading";
 
 if ((module as any).hot) {
     import("preact/debug");
