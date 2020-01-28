@@ -40,21 +40,21 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.video === undefined) return;
         this.video.volume = volume;
 
-        cast.framework.CastContext.getInstance().setOptions({
-            receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-        });
-        const player = new cast.framework.RemotePlayer();
-        const playerController = new cast.framework.RemotePlayerController(player);
-        console.log(player, playerController);
-        const mediaInfo = new chrome.cast.media.MediaInfo(this.props.src, "video/mp4");
-        mediaInfo.tracks = [];
-        const request = new chrome.cast.media.LoadRequest(mediaInfo);
-        console.log(mediaInfo, request);
-        console.log(cast.framework.CastContext.getInstance());
-        chrome.cast.requestSession((e) => {
-            console.log('session', e);
-        });
+        // cast.framework.CastContext.getInstance().setOptions({
+        //     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        //     autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+        // });
+        // const player = new cast.framework.RemotePlayer();
+        // const playerController = new cast.framework.RemotePlayerController(player);
+        // console.log(player, playerController);
+        // const mediaInfo = new chrome.cast.media.MediaInfo(this.props.src, "video/mp4");
+        // mediaInfo.tracks = [];
+        // const request = new chrome.cast.media.LoadRequest(mediaInfo);
+        // console.log(mediaInfo, request);
+        // console.log(cast.framework.CastContext.getInstance());
+        // chrome.cast.requestSession((e) => {
+        //     console.log('session', e);
+        // });
     }
 
     public shouldComponentUpdate(): boolean {
