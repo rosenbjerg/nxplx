@@ -30,7 +30,7 @@ export default class WebsocketMessenger implements Connection {
     private handlers:{ [index:string]:MessageHandler[] } = {};
 
     constructor() {
-        const protocol = location.protocol === 'https' ? 'wss' : 'ws';
+        const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
         this.webSocket = new WebSocket(`${protocol}://${location.host}/api/broadcast`);
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);
