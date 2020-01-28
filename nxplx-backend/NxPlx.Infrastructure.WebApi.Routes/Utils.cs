@@ -11,6 +11,15 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         public static Task<HandlerType> SendSPA(Request req, Response res)
         {
+            var file = Path.Combine("public", var file = fullPath.com)
+            
+            if (!File.Exists(file))
+                return res.SendStatus(HttpStatusCode.NotFound);
+            
+            return res.SendFile(file);
+        }
+        public static Task<HandlerType> NewSendSPA(Request req, Response res)
+        {
             var relativePath = req.AspNetRequest.Path.ToString().TrimStart('/');
             if (!relativePath.StartsWith("api")) return res.SendStatus(HttpStatusCode.NotFound);
             
@@ -21,8 +30,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             if (!fullPath.StartsWith(basePath) || !File.Exists(fullPath))
                 return res.SendStatus(HttpStatusCode.NotFound);
             
-            // if (relativePath != "index.html")
-            //     res.AddHeader("Cache-Control", $"max-age={FileMaxAge}");
+            if (relativePath != "index.html")
+                res.AddHeader("Cache-Control", $"max-age={FileMaxAge}");
             
             return res.SendFile(fullPath);
         }

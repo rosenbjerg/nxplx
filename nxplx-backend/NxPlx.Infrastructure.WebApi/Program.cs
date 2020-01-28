@@ -40,7 +40,7 @@ namespace NxPlx.WebApi
             }
 
             var databaseContextManager = new DatabaseContextManager();
-            var server = new RedHttpServer(cfg.HttpPort)
+            var server = new RedHttpServer(cfg.HttpPort, "public")
             {
                 RespondWithExceptionDetails = !cfg.Production,
                 ConfigureServices = databaseContextManager.Register
