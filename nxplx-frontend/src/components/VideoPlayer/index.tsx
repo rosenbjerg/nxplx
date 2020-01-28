@@ -30,8 +30,8 @@ const setVolume = vl => setEntry("player_volume", vl);
 const setAutoplay = ap => setEntry("player_autoplay", ap);
 const setMuted = mu => setEntry("player_muted", mu);
 
-declare const cast;
-declare const chrome;
+// declare const cast;
+// declare const chrome;
 
 export default class VideoPlayer extends Component<Props, State> {
     private video?: HTMLVideoElement;
