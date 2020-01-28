@@ -35,19 +35,4 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             return null;
         }
     }
-
-    public static class Extensions {
-        public static async IAsyncEnumerable<List<T>> Batched<T>(this IQueryable<T> queryable, Expression<Func<T, object>> ordering, int batchSize)
-        {
-            var currentBatch = 0;
-            var read = batchSize;
-            var ordered = queryable.OrderBy(ordering);
-            while (read == batchSize)
-            {
-                var batch = await ordered.Skip(currentBatch * batchSize).Take(batchSize).ToListAsync();
-                read = batch.Count;
-                yield return batch;
-            }
-        }
-    }
 }
