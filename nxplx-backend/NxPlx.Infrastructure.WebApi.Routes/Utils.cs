@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         public static Task<HandlerType> SendSPA(Request req, Response res)
         {
-            var file = Path.Combine("public", var file = fullPath.com)
+            var file = Path.Combine("public", "index.html");
             
             if (!File.Exists(file))
                 return res.SendStatus(HttpStatusCode.NotFound);
