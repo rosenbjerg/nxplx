@@ -62,7 +62,6 @@ namespace NxPlx.WebApi
             await databaseContextManager.Initialize(logger);
 
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
-
             AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
             UserRoutes.Register(server.CreateRouter("/api/user"));
             SessionRoutes.Register(server.CreateRouter("/api/session"));
@@ -72,13 +71,14 @@ namespace NxPlx.WebApi
             FilmRoutes.Register(server.CreateRouter("/api/film"));
             
             IndexingRoutes.Register(server.CreateRouter("/api/indexing"));
-            BroadcastRoutes.Register(server.CreateRouter("/api/broadcast"));
+            BroadcastRoutes.Register(server.CreateRouter("/api/websocket"));
             SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
             ProgressRoutes.Register(server.CreateRouter("/api/progress"));
             ImageRoutes.Register(server.CreateRouter("/api/image"));
             CommandRoutes.Register(server.CreateRouter("/api/command"));
 
-            server.Get("/*", Utils.SendSPA);
+            server.Get("/", Utils.SendSPA);
+            server.Get("/app/*", Utils.SendSPA);
 
             logger.Trace("All routes registered, preparing to listen on port {Port}", cfg.HttpPort);
 

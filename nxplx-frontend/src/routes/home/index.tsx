@@ -53,7 +53,7 @@ export default class Home extends Component<Props, State> {
                                         <Entry
                                             key={p.kind[0] + p.fileId}
                                             title={p.title}
-                                            href={`/watch/${p.kind}/${p.fileId}`}
+                                            href={`/app/watch/${p.kind}/${p.fileId}`}
                                             image={imageUrl(p.poster, 342)}
                                             progress={p.progress}
                                         />
@@ -67,7 +67,7 @@ export default class Home extends Component<Props, State> {
                                     <Entry
                                         key={entry.id}
                                         title={entry.title}
-                                        href={`/${entry.kind}/${entry.id}`}
+                                        href={`/app/${entry.kind}/${entry.id}`}
                                         image={imageUrl(entry.poster, 342)}
                                     />
                                 )
@@ -89,9 +89,9 @@ export default class Home extends Component<Props, State> {
             http.getJson("/api/overview")
                 .then(async overview => this.setState({ overview: orderBy(overview, ["title"], ["asc"]) }));
         }
-        if (!this.state.progress) {
-            http.getJson("/api/progress/continue").then(async progress => this.setState({ progress }));
-        }
+        // if (!this.state.progress) {
+        //     http.getJson("/api/progress/continue").then(async progress => this.setState({ progress }));
+        // }
     };
 
 }

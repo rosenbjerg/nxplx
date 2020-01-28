@@ -44,7 +44,7 @@ export default class Home extends Component<Props, State> {
                             <h4 class={[style.tag, style.marked].join(" ")}>{details.tagline}</h4>
                         </div>
                     )}
-                    <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
+                    <FilmPoster poster={details.poster} href={`/app/watch/film/${details.fid}`} />
                     <span class={[style.info, style.marked].join(" ")}>
                     <table>
                         {

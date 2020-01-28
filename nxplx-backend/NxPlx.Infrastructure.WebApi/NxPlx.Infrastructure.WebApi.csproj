@@ -5,7 +5,7 @@
         <Nullable>disable</Nullable>
         <LangVersion>8</LangVersion>
         <RootNamespace>NxPlx.WebApi</RootNamespace>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
