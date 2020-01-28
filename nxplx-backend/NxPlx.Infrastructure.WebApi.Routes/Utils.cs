@@ -21,8 +21,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             if (!fullPath.StartsWith(basePath) || !File.Exists(fullPath))
                 return res.SendStatus(HttpStatusCode.NotFound);
             
-            if (relativePath != "index.html")
-                res.AddHeader("Cache-Control", $"max-age={FileMaxAge}");
+            // if (relativePath != "index.html")
+            //     res.AddHeader("Cache-Control", $"max-age={FileMaxAge}");
             
             return res.SendFile(fullPath);
         }
