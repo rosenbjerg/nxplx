@@ -16,7 +16,7 @@ const actions = (store:Store<NxPlxStore>) => (
                             isLoggedIn: false,
                             isAdmin: false
                         });
-                        route('/login')
+                        route('/app/login')
                     }
                     else {
                         createSnackbar('Could not log out', { timeout: 3000 });
@@ -30,7 +30,7 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
     // @ts-ignore
     ({ isLoggedIn, isAdmin, build, logout }) => (
         <header class={style.header}>
-            <Link title={`NxPlx - v.${build}`} href={'/'}>
+            <Link title={`NxPlx - v.${build}`} href={'/app/'}>
                 <img src="/assets/images/nxplx-cropped-h120-light.png" alt="NxPlx"/>
             </Link>
             {isLoggedIn && (
@@ -38,15 +38,15 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
                     <i class={['material-icons', style.menuOpener].join(' ')}>menu</i>
 
                     <span class={style.menuContent}>
-                        <Link href="/">
+                        <Link href="/app/">
                             <i class="material-icons">home</i>
                         </Link>
                         {isAdmin && (
-                            <Link href="/admin">
+                            <Link href="/app/admin">
                                 <i class="material-icons">supervisor_account</i>
                             </Link>
                         )}
-                        <Link href="/profile">
+                        <Link href="/app/profile">
                             <i class="material-icons">account_circle</i>
                         </Link>
                         <Link onClick={logout}>

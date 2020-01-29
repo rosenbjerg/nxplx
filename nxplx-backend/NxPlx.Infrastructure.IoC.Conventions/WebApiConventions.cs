@@ -7,6 +7,7 @@ using NxPlx.Services.Caching;
 using NxPlx.Services.Database;
 using NxPlx.Services.Database.Wrapper;
 using NxPlx.Services.Index;
+using Red;
 
 namespace NxPlx.Infrastructure.IoC.Conventions
 {
@@ -15,8 +16,10 @@ namespace NxPlx.Infrastructure.IoC.Conventions
         public static void Install()
         {
             var registration = new RegistrationContainer();
+            var broadcaster = new WebSocketBroadcaster();
+            registration.Register<IBroadcaster, WebSocketBroadcaster>(broadcaster);
+            registration.Register<IBroadcaster<WebSocketDialog>, WebSocketBroadcaster>(broadcaster);
             registration.Register<ICachingService, RedisCachingService>();
-            registration.Register<IBroadcaster, WebSocketBroadcaster>();
             registration.Register<ILoggingService, NLoggingService>();
             registration.Register<IDatabaseMapper, DatabaseMapper>();
             registration.Register<IDtoMapper, DtoMapper>();

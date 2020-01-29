@@ -11,9 +11,15 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     {
         public static void Register(IRouter router)
         {
-            router.WebSocket("/", Authenticated.User, Connect);
+            router.WebSocket("/connect", Authenticated.User, Connect);
         }
 
+        public static async Task<HandlerType> Echo(Request req, Response res, WebSocketDialog wsd)
+        {
+            await wsd.SendText("Welcome to the echo test server");
+            wsd.OnTextReceived += (sender, eventArgs) => { wsd.SendText("you sent: " + eventArgs.Text); };
+            return HandlerType.Final;
+        }
         private static async Task<HandlerType> Connect(Request req, Response res, WebSocketDialog wsd)
         {
             var session = req.GetData<UserSession>();
@@ -21,7 +27,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster<WebSocketDialog>>();
             broadcaster.Subscribe(session.UserId, session.IsAdmin, wsd);
 
-            return wsd.Continue();
+            return wsd.Final();
         }
     }
 }

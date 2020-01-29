@@ -30,14 +30,14 @@ export default class WebsocketMessenger implements Connection {
     private handlers:{ [index:string]:MessageHandler[] } = {};
 
     constructor() {
-        const protocol = location.protocol === 'https' ? 'wss' : 'ws';
-        this.webSocket = new WebSocket(`${protocol}://${location.host}/api/broadcast`);
+        const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
+        // this.webSocket = new WebSocket(`ws://localhost:5353/api/websocket/connect`);
+        this.webSocket = new WebSocket(`${protocol}://${location.host}/api/websocket/connect`);
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);
         this.webSocket.addEventListener('message', this.onMessage);
-
     }
-    public send(message:Message): void {
+    public send = (message:Message): void => {
         if (this.connected) {
             this.webSocket.send(JSON.stringify(message));
         } else {
@@ -45,32 +45,31 @@ export default class WebsocketMessenger implements Connection {
         }
     }
 
-    public subscribe(type:string, handler:MessageHandler) {
+    public subscribe = (type:string, handler:MessageHandler) => {
         let handlers = this.handlers[type];
         if (!handlers) handlers = this.handlers[type] = [];
         handlers.push(handler);
-    }
+    };
 
-    public unsubscribe(type:string, handler:MessageHandler) {
+    public unsubscribe = (type:string, handler:MessageHandler) => {
         const handlers = this.handlers[type] || [];
         handlers.splice(handlers.indexOf(handler), 1);
-    }
+    };
 
-    private onOpen() {
+    private onOpen = () => {
         console.log('connected');
         this.connected = true;
-        const unsent = [ ...this.unsent ];
         this.unsent = [];
-        unsent.forEach(this.send);
-    }
+        this.unsent.forEach(this.send);
+    };
 
-    private onClose() {
+    private onClose = () => {
         console.log('disconnected');
         this.connected = false;
-    }
+    };
 
-    private onMessage(ev:MessageEvent) {
+    private onMessage = (ev:MessageEvent) => {
         const data = ev.data;
         console.log('received', data);
-    }
+    };
 }

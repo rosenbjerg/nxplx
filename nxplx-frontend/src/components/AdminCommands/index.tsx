@@ -28,8 +28,7 @@ export default class AdminCommands extends Component<Props, State> {
                         {state.commands?.map(command => <option key={command.name}
                                                                 value={command.name}>{command.name}</option>)}
                     </select>
-                    <button onChange={this.invoke} disabled={state.selectedCommand === undefined}
-                            class="bordered">Execute
+                    <button onClick={this.invoke} disabled={state.selectedCommand === undefined} class="bordered">Execute
                     </button>
                 </div>
                 {state.selectedCommand && <p>{state.selectedCommand.description}</p>}
@@ -38,7 +37,8 @@ export default class AdminCommands extends Component<Props, State> {
     }
 
     private onSelected = (ev:any) => {
-        this.setState({ selectedCommand: this.state.commands.find(c => c.name === ev.target.value) })
+        const name = ev.target.value;
+        this.setState({ selectedCommand: this.state.commands.find(c => c.name === name) })
     };
     private invoke = async () => {
         if (this.state.selectedCommand) {

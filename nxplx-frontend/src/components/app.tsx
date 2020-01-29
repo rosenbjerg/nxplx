@@ -46,15 +46,15 @@ export default class App extends Component {
                 <div id="app">
                     <Header/>
                     <Router>
-                        <Route path="/" component={Home}/>
-                        <Route path="/login" component={Login}/>
-                        <Route path="/film/:id" component={Film}/>
-                        <Route path="/collection/:id" component={Collection}/>
-                        <Route path="/series/:id" component={Series}/>
-                        <Route path="/series/:id/:season" component={Season}/>
-                        <Route path="/admin" component={Admin}/>
-                        <Route path="/profile" component={Profile}/>
-                        <Route path="/watch/:kind/:fid" component={Watch}/>
+                        <Route path="/app/" default component={Home}/>
+                        <Route path="/app/login" component={Login}/>
+                        <Route path="/app/film/:id" component={Film}/>
+                        <Route path="/app/collection/:id" component={Collection}/>
+                        <Route path="/app/series/:id" component={Series}/>
+                        <Route path="/app/series/:id/:season" component={Season}/>
+                        <Route path="/app/admin" component={Admin}/>
+                        <Route path="/app/profile" component={Profile}/>
+                        <Route path="/app/watch/:kind/:fid" component={Watch}/>
                     </Router>
                 </div>
             </Provider>
@@ -83,11 +83,11 @@ export default class App extends Component {
         if (response.ok) {
             const isAdmin = await response.text() === "True";
             store.setState({ isLoggedIn: true, isAdmin });
-            if (location.pathname === "/login") {
-                route("/", true);
+            if (location.pathname === "/app/login") {
+                route("/app/", true);
             }
         } else {
-            route("/login", true);
+            route("/app/login", true);
         }
     };
 }
