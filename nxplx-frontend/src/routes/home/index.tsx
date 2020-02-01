@@ -86,12 +86,13 @@ export default class Home extends Component<Props, State> {
 
     private load = () => {
         if (!this.state.overview) {
-            http.getJson("/api/overview")
-                .then(async overview => this.setState({ overview: orderBy(overview, ["title"], ["asc"]) }));
+            http.getJson<OverviewElement[]>("/api/overview")
+                .then(overview => this.setState({ overview: orderBy(overview, ["title"], ["asc"]) }));
         }
-        // if (!this.state.progress) {
-        //     http.getJson("/api/progress/continue").then(async progress => this.setState({ progress }));
-        // }
+        if (!this.state.progress) {
+            http.getJson<ContinueWatchingElement[]>("/api/progress/continue")
+                .then(progress => this.setState({ progress }));
+        }
     };
 
 }

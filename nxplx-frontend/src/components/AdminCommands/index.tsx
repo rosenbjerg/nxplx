@@ -16,7 +16,7 @@ interface State {
 export default class AdminCommands extends Component<Props, State> {
 
     public componentDidMount(): void {
-        http.getJson('/api/command/list').then(commands => this.setState({ commands }));
+        http.getJson<Command[]>('/api/command/list').then(commands => this.setState({ commands }));
     }
 
     public render(_, state) {

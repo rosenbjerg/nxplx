@@ -15,7 +15,7 @@ interface State {
 
 export default class LibraryManagement extends Component<Props, State> {
     public componentDidMount() {
-        http.getJson('/api/library/list').then((libraries:Library[]) => this.setState({ libraries }));
+        http.getJson<Library[]>('/api/library/list').then(libraries => this.setState({ libraries }));
     }
     public render(_, { libraries, showDirectories }) {
         return (

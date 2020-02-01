@@ -10,7 +10,7 @@ interface State {
     dirs: string[]
 }
 
-const getDirs = cwd => http.getJson(`/api/library/browse?cwd=${cwd}`);
+const getDirs = cwd => http.getJson<string[]>(`/api/library/browse?cwd=${cwd}`);
 
 export default class DirectoryBrowser extends Component<Props, State> {
 

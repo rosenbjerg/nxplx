@@ -1,7 +1,7 @@
 
 interface Http {
 	get: (url:string) => Promise<Response>,
-	getJson: (url:string) => Promise<any|null>,
+	getJson: <T>(url:string) => Promise<T>,
 	post: (url:string, body?:any, json?:boolean) => Promise<Response>,
 	postForm: (url:string, form:EventTarget) => Promise<Response>,
 	put: (url:string, body?:any, json?:boolean) => Promise<Response>,
