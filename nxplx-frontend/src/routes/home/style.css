@@ -5,7 +5,7 @@
 }
 
 .entryContainer {
-    margin-top: 10px;
+    padding-top: 10px;
     height: calc(100vh - 110px);
     overflow: auto;
     margin-right: -8px;
@@ -56,4 +56,5 @@
     white-space: nowrap;
     overflow-x: auto;
     margin-bottom: 6px;
+    padding-top: 4px;
 }
