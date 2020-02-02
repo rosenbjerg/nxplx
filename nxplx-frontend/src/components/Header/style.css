@@ -69,6 +69,8 @@
         background-color: rgba(0, 0, 0, 0.75);
         border-bottom-left-radius: 16px;
         display: inline-table;
+        position: absolute;
+        right: 0;
     }
     .menuContent {
         display: none;

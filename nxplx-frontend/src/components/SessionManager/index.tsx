@@ -13,15 +13,17 @@ interface Props {
 interface State {
     sessions: Session[]
 }
-
+interface UserSession {
+    id: string
+    expiration: string
+    userAgent: string
+}
 interface Session {
     id: string
     expiration: Date
     expires: string
     browser: any
-    device: any
     os: any
-    arch: any
 }
 
 const formatTime = (from, to) => {
@@ -41,7 +43,7 @@ export default class SessionManager extends Component<Props, State> {
 
     public componentDidMount(): void {
         const adminUserIdQuery = this.props.userId ? `/all?userId=${this.props.userId}` : "";
-        http.getJson(`/api/session${adminUserIdQuery}`).then(sessions => {
+        http.getJson<UserSession[]>(`/api/session${adminUserIdQuery}`).then(sessions => {
             const parser = new UAParser();
             const parsed = sessions.map(session => {
                 parser.setUA(session.userAgent);

@@ -6,7 +6,6 @@
 
     <ItemGroup>
       <PackageReference Include="System.Text.Json" Version="4.7.0" />
-      <PackageReference Include="xFFmpeg.NET" Version="3.4.0" />
     </ItemGroup>
 
     <ItemGroup>

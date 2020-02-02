@@ -19,7 +19,7 @@ interface State {
 export default class Profile extends Component<Props, State> {
 
     public componentDidMount() {
-        http.getJson("/api/user").then(user => this.setState({ user }));
+        http.getJson<User>("/api/user").then(user => this.setState({ user }));
     }
 
     public render(_, { user }: State) {

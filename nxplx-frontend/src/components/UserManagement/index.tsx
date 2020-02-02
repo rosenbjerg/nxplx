@@ -15,7 +15,7 @@ interface State {
 
 export default class UserManagement extends Component<Props, State> {
     public componentDidMount() {
-        http.getJson('/api/user/list').then((users:User[]) => this.setState({ users }));
+        http.getJson<User[]>('/api/user/list').then(users => this.setState({ users }));
     }
     public render(_, { users, selectedUser }) {
         return (

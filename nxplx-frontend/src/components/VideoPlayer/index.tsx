@@ -74,7 +74,7 @@ export default class VideoPlayer extends Component<Props, State> {
                    onPlay={this.onPlay}
                    onPause={this.onPause}
                    onEnded={this.onEnded}>
-                <source src={`${props.src}#${props.startTime}`} type="video/mp4"/>
+                <source src={`${props.src}#t=${props.startTime}`} type="video/mp4"/>
                 {props.subtitles.map(track => (
                     <track default={track.default} src={`${track.path}#${(props.startTime)}`} kind="captions"
                            srcLang={track.language} label={track.displayName}/>

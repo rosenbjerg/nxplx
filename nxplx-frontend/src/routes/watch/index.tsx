@@ -10,6 +10,10 @@ import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 
+
+interface ContinueWatching {
+    fid:number
+}
 interface Props {
     kind: string;
     fid: string
@@ -22,10 +26,6 @@ interface State {
 }
 
 export default class Watch extends Component<Props, State> {
-    private playerVolume = parseFloat(localStorage.getItem("player_volume") || "1.0") || 1.0;
-    private playerAutoplay = localStorage.getItem("player_autoplay") === "true";
-    private playerMuted = localStorage.getItem("player_muted") === "true";
-
     private playNextMode = "default";
 
     private videoEvents = CreateEventBroker();
@@ -73,30 +73,24 @@ export default class Watch extends Component<Props, State> {
 
         this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
             this.playerTime = data.time;
-            this.playerAutoplay = data.state === "playing";
             this.setState({ playerState: data.state });
             if (data.state === 'ended' && kind === 'series') {
-                http.get(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(res => res.json()).then(next => {
-                    route(`/watch/${this.props.kind}/${next.fid}`);
+                http.getJson<ContinueWatching>(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(next => {
+                    route(`/app/watch/${this.props.kind}/${next.fid}`);
                 })
             }
         });
         this.videoEvents.subscribe<{ time: number }>("time_changed", data => this.playerTime = data.time);
-        this.videoEvents.subscribe<{ volume: number, muted: boolean }>("volume_changed", data => {
-            this.playerVolume = data.volume;
-            this.playerMuted = data.muted;
-        });
 
         const { kind, fid } = this.props;
         Promise.all([
-            http.get(`/api/${kind}/info/${fid}`).then(response => response.json()),
+            http.getJson<FileInfo>(`/api/${kind}/info/${fid}`),
             http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
             http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
         ]).then(results => {
-            const info = results[0];
             this.subtitleLanguage = results[1];
             this.playerTime = parseFloat(results[2]);
-            this.setState({ info });
+            this.setState({ info: results[0] });
         });
     }
 
@@ -107,10 +101,6 @@ export default class Watch extends Component<Props, State> {
         if (this.playerTime > 5) {
             http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}`, { value: this.playerTime });
         }
-        localStorage.setItem("player_volume", this.playerVolume.toString());
-        localStorage.setItem("player_autoplay", this.playerAutoplay.toString());
-        localStorage.setItem("player_muted", this.playerMuted.toString());
-
         window.onbeforeunload = this.previousUnload;
     };
 }
