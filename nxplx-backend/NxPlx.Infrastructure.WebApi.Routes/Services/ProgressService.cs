@@ -20,7 +20,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
             var progress =
-                await ctx.WatchingProgresses.ProjectOne(wp => wp.FileId == fileId && wp.MediaType == mediaType,
+                await ctx.WatchingProgresses.ProjectOne(
+                    wp => wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType,
                     wp => wp.Time);
             return progress;
         }
@@ -33,10 +34,11 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var transaction = context.BeginTransactionedContext();
 
             var progress =
-                await transaction.WatchingProgresses.One(wp => wp.FileId == fileId && wp.MediaType == mediaType);
+                await transaction.WatchingProgresses.One(wp =>
+                    wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType);
             if (progress == null)
             {
-                progress = new WatchingProgress { UserId = user.Id, FileId = fileId, MediaType = mediaType };
+                progress = new WatchingProgress {UserId = user.Id, FileId = fileId, MediaType = mediaType};
                 transaction.WatchingProgresses.Add(progress);
             }
 
@@ -51,7 +53,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var container = ResolveContainer.Default;
             await using var context = container.Resolve<IReadNxplxContext>(user);
 
-            var progress = await context.WatchingProgresses.Many()
+            var progress = await context.WatchingProgresses.Many(wp => wp.UserId == user.Id)
                 .OrderByDescending(wp => wp.LastWatched)
                 .Take(40).ToListAsync();
 
@@ -90,7 +92,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var episodeIds = episodeDuration.Select(ed => ed.Item1).ToList();
 
             var progressMap = await context.WatchingProgresses
-                .Many(wp => wp.MediaType == MediaFileType.Episode && episodeIds.Contains(wp.FileId))
+                .Many(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode &&
+                            episodeIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId, wp => wp.Time);
 
             var progress = episodeDuration.Select(ed =>
@@ -106,7 +109,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
                     progress = duration / ed.Item2
                 };
             });
-            
+
             return progress;
         }
 

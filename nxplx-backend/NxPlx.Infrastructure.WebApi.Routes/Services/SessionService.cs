@@ -19,7 +19,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var transaction = context.BeginTransactionedContext();
 
             var session = await transaction.UserSessions.OneById(sessionId);
-            if (session == default)
+            if (session == default || session.UserId != user.Id)
             {
                 return false;
             }
@@ -33,7 +33,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             var container = ResolveContainer.Default;
             await using var context = container.Resolve<IReadNxplxContext>(user);
 
-            var sessions = await context.UserSessions.Many().ToListAsync();
+            var sessions = await context.UserSessions.Many(s => s.UserId == userId).ToListAsync();
             return container.Resolve<IDtoMapper>().Map<UserSession, UserSessionDto>(sessions);
         }
     }
