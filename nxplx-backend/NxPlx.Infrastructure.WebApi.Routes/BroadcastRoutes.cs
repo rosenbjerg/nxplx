@@ -18,12 +18,6 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 router.WebSocket("/connect", Connect);
         }
 
-        public static async Task<HandlerType> Echo(Request req, Response res, WebSocketDialog wsd)
-        {
-            await wsd.SendText("Welcome to the echo test server");
-            wsd.OnTextReceived += (sender, eventArgs) => { wsd.SendText("you sent: " + eventArgs.Text); };
-            return HandlerType.Final;
-        }
         private static async Task<HandlerType> Connect(Request req, Response res, WebSocketDialog wsd)
         {
             var session = req.GetData<UserSession>();
