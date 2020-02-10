@@ -1,3 +1,5 @@
+import ReconnectingWebSocket from 'reconnecting-websocket';
+
 export type MessageHandler = (msg: Message) => void;
 
 export interface Message {
@@ -22,7 +24,7 @@ export default class WebsocketMessenger implements Connection {
         return w.__websocketmanager = new WebsocketMessenger();
     }
 
-    private webSocket:WebSocket;
+    private webSocket:ReconnectingWebSocket;
     private connected = false;
 
     private unsent:Message[] = [];
@@ -30,9 +32,12 @@ export default class WebsocketMessenger implements Connection {
     private handlers:{ [index:string]:MessageHandler[] } = {};
 
     constructor() {
-        const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
-        // this.webSocket = new WebSocket(`ws://localhost:5353/api/websocket/connect`);
-        this.webSocket = new WebSocket(`${protocol}://${location.host}/api/websocket/connect`);
+        if (location.host === 'localhost:8080') {
+            this.webSocket = new ReconnectingWebSocket(`ws://localhost:5353/api/websocket/connect`);
+        } else {
+            const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
+            this.webSocket = new ReconnectingWebSocket(`${protocol}://${location.host}/api/websocket/connect`);
+        }
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);
         this.webSocket.addEventListener('message', this.onMessage);
@@ -43,7 +48,7 @@ export default class WebsocketMessenger implements Connection {
         } else {
             this.unsent.push(message);
         }
-    }
+    };
 
     public subscribe = (type:string, handler:MessageHandler) => {
         let handlers = this.handlers[type];
@@ -59,8 +64,8 @@ export default class WebsocketMessenger implements Connection {
     private onOpen = () => {
         console.log('connected');
         this.connected = true;
-        this.unsent = [];
         this.unsent.forEach(this.send);
+        this.unsent = [];
     };
 
     private onClose = () => {
