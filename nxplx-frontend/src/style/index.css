@@ -31,7 +31,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 .nx-scroll {
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: auto;
 }
 .nx-scroll::-webkit-scrollbar {
     width: 0.5em;

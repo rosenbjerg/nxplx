@@ -63,7 +63,7 @@ export default class VideoPlayer extends Component<Props, State> {
 
     public render(props: Props) {
         return (
-            <video is='google-castable-video' ref={this.bindVideo}
+            <video ref={this.bindVideo}
                    class={style.video}
                    muted={muted}
                    autoPlay={autoplay || props.startTime < 3}

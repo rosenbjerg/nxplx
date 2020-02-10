@@ -23,7 +23,7 @@ namespace NxPlx.Infrastructure.IoC.Conventions
             registration.Register<ILoggingService, NLoggingService>();
             registration.Register<IDatabaseMapper, DatabaseMapper>();
             registration.Register<IDtoMapper, DtoMapper>();
-            registration.Register<IDetailsApi, TMDbApi>(false);
+            registration.Register<IDetailsApi, TMDbApi>();
             registration.Register<IIndexer, Indexer>(false);
             registration.Register<IReadNxplxContext, ReadNxplxContext>(false);
         }
