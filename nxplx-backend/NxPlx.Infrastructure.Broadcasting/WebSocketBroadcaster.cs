@@ -49,7 +49,6 @@ namespace NxPlx.Infrastructure.Broadcasting
                 WebSocketDialog = channel,
                 Admin = admin
             };
-            Console.WriteLine($"Connected: {session.UserId}");
             lock (_lock) _all.Add(session);
             channel.OnClosed += (sender, args) =>
             {

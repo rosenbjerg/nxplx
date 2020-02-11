@@ -54,7 +54,6 @@
 .continueWatchingContainer {
     overflow-y: hidden;
     white-space: nowrap;
-    overflow-x: auto;
     margin-bottom: 6px;
     padding-top: 4px;
 }

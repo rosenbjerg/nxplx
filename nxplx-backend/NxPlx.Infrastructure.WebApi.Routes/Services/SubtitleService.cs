@@ -22,7 +22,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
             await using var transaction = ctx.BeginTransactionedContext();
 
             var preference =
-                await transaction.SubtitlePreferences.One(wp => wp.FileId == fileId && wp.MediaType == mediaType);
+                await transaction.SubtitlePreferences.One(sp => sp.UserId == user.Id && sp.FileId == fileId && sp.MediaType == mediaType);
             if (preference == null)
             {
                 preference = new SubtitlePreference { UserId = user.Id, FileId = fileId, MediaType = mediaType};
@@ -36,7 +36,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         {
             await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
 
-            var preference = await ctx.SubtitlePreferences.ProjectOne(sp => sp.FileId == fileId && sp.MediaType == mediaType, sp => sp.Language);
+            var preference = await ctx.SubtitlePreferences.ProjectOne(sp => sp.UserId == user.Id && sp.FileId == fileId && sp.MediaType == mediaType, sp => sp.Language);
             return preference ?? "none";
         }
         public static async Task<IEnumerable<string>> FindSubtitles(User user, MediaFileType mediaType, int id)

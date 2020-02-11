@@ -57,13 +57,13 @@ export default class VideoPlayer extends Component<Props, State> {
         // });
     }
 
-    public shouldComponentUpdate(): boolean {
-        return false;
+    public shouldComponentUpdate(nextProps: Props): boolean {
+        return nextProps.src !== this.props.src;
     }
 
     public render(props: Props) {
         return (
-            <video is='google-castable-video' ref={this.bindVideo}
+            <video ref={this.bindVideo}
                    class={style.video}
                    muted={muted}
                    autoPlay={autoplay || props.startTime < 3}

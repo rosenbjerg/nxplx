@@ -10,7 +10,7 @@
     border-radius: 2px;
     cursor: pointer;
     transition: border 100ms;
-    vertical-align: center;
+    /*vertical-align: middle;*/
 }
 .entry:hover,
 .entry:focus {
