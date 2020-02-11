@@ -57,8 +57,8 @@ export default class VideoPlayer extends Component<Props, State> {
         // });
     }
 
-    public shouldComponentUpdate(): boolean {
-        return false;
+    public shouldComponentUpdate(nextProps: Props): boolean {
+        return nextProps.src !== this.props.src;
     }
 
     public render(props: Props) {
