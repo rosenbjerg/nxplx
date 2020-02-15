@@ -37,7 +37,7 @@
     "identity-obj-proxy": "^3.0.0",
     "lint-staged": "^8.1.0",
     "per-env": "^1.0.2",
-    "preact-cli": "3.0.0-rc.9",
+    "preact-cli": "3.0.0-rc.7",
     "preact-render-to-string": "^5.1.4",
     "prettier": "^1.15.3",
     "ts-loader": "^3.5.0",
