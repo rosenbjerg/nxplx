@@ -37,8 +37,7 @@ export default class VideoPlayer extends Component<Props, State> {
     private video?: HTMLVideoElement;
 
     public componentDidMount(): void {
-        if (this.video === undefined) return;
-        this.video.volume = volume;
+        if (this.video !== undefined) this.video.volume = volume;
 
         // cast.framework.CastContext.getInstance().setOptions({
         //     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
@@ -57,26 +56,27 @@ export default class VideoPlayer extends Component<Props, State> {
         // });
     }
 
-    public shouldComponentUpdate(nextProps: Props): boolean {
-        return nextProps.src !== this.props.src;
+    public shouldComponentUpdate(nextProps: Readonly<Props>): boolean {
+        return this.props.src !== nextProps.src;
     }
 
-    public render(props: Props) {
+    public render({ poster, src, startTime, subtitles }: Props) {
         return (
-            <video ref={this.bindVideo}
+            <video key={src}
+                   ref={this.bindVideo}
                    class={style.video}
                    muted={muted}
-                   autoPlay={autoplay || props.startTime < 3}
-                   poster={props.poster}
+                   autoPlay={autoplay || startTime < 3}
+                   poster={poster}
                    controls
                    onTimeUpdate={this.onTimeChange}
                    onVolumeChange={this.onVolumeChange}
                    onPlay={this.onPlay}
                    onPause={this.onPause}
                    onEnded={this.onEnded}>
-                <source src={`${props.src}#t=${props.startTime}`} type="video/mp4"/>
-                {props.subtitles.map(track => (
-                    <track default={track.default} src={`${track.path}#${(props.startTime)}`} kind="captions"
+                <source src={`${src}#t=${startTime}`} type="video/mp4"/>
+                {subtitles.map(track => (
+                    <track default={track.default} src={`${track.path}#${(startTime)}`} kind="captions"
                            srcLang={track.language} label={track.displayName}/>
                 ))}
             </video>
@@ -84,23 +84,25 @@ export default class VideoPlayer extends Component<Props, State> {
     }
 
     private onTimeChange = () => {
-        this.props.events("time_changed", { time: this.video!.currentTime });
+        if (this.video) this.props.events("time_changed", { time: this.video.currentTime });
     };
     private onVolumeChange = () => {
-        setVolume(this.video?.volume);
-        setMuted(this.video?.muted);
+        if (this.video)  {
+            setVolume(this.video.volume);
+            setMuted(this.video.muted);
+        }
     };
 
     private onPlay = () => {
         setAutoplay(true);
-        this.props.events("state_changed", { state: "playing", time: this.video!.currentTime });
+        if (this.video) this.props.events("state_changed", { state: "playing", time: this.video.currentTime });
     };
     private onPause = () => {
         setAutoplay(false);
-        this.props.events("state_changed", { state: "paused", time: this.video!.currentTime });
+        if (this.video) this.props.events("state_changed", { state: "paused", time: this.video.currentTime });
     };
     private onEnded = () => {
-        this.props.events("state_changed", { state: "ended", time: this.video!.currentTime });
+        if (this.video) this.props.events("state_changed", { state: "ended", time: this.video.currentTime });
     };
 
     private bindVideo = ref => this.video = ref;

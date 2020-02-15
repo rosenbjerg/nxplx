@@ -1,7 +1,6 @@
 ﻿using System;
-using Crypt = BCrypt.Net.BCrypt;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class PasswordUtils
     {
@@ -35,18 +34,18 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services
         private static double TimeBCrypt(string password, int workFactor)
         {
             var started = DateTime.UtcNow;
-            var bcrypted = Crypt.HashPassword(Pepper(password), workFactor);
+            var bcrypted = BCrypt.Net.BCrypt.HashPassword(Pepper(password), workFactor);
             return (bcrypted.Length + DateTime.UtcNow.Subtract(started).TotalMilliseconds) - bcrypted.Length;
         }
 
         public static string Hash(string password)
         {
-            return Crypt.HashPassword(Pepper(password), WorkFactor);
+            return BCrypt.Net.BCrypt.HashPassword(Pepper(password), WorkFactor);
         }
 
         public static bool Verify(string password, string passwordHash)
         {
-            return Crypt.Verify(Pepper(password), passwordHash);
+            return BCrypt.Net.BCrypt.Verify(Pepper(password), passwordHash);
         }
     }
 }

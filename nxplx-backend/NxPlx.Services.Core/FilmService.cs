@@ -11,7 +11,7 @@ using NxPlx.Models.Dto.Models;
 using NxPlx.Models.Dto.Models.Film;
 using NxPlx.Models.File;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class FilmService
     {

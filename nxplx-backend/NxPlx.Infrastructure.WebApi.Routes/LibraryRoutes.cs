@@ -1,15 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using NxPlx.Core.Services;
 using NxPlx.Infrastructure.Session;
-using NxPlx.Infrastructure.WebApi.Routes.Services;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;

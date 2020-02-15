@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Abstractions.Database;
@@ -7,7 +6,7 @@ using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 using NxPlx.Models.File;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class SubtitleService
     {

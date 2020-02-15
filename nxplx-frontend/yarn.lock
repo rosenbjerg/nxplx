@@ -858,10 +858,11 @@
     "@hapi/hoek" "^8.3.0"
 
 "@preact/async-loader@^3.0.0-rc.0":
-  version "3.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.0-rc.0.tgz#8bde75819be256408d3f2eea323308ccce96eecd"
-  integrity sha512-xhJ41jIXBxVE5BhBAxJwyTKu8/9G+oh2KJ87z7GvsjaZwunSjOscMlA9syDqE6iMkOnckQZjPn5aICNr8F/sEw==
+  version "3.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.0-rc.9.tgz#fe6a2e763379b7abedcfa6c45d3be28089eb93be"
+  integrity sha512-PjCi/xKyOv1gx/Q0iUX5p0CANMFv9gkimKzg104FNUKmksh5TgKFi1PkQ2Xn+OLgra8N00auAxOt3BMMvcrGgA==
   dependencies:
+    kleur "^3.0.3"
     loader-utils "^1.1.0"
 
 "@samverschueren/stream-to-observable@^0.3.0":
@@ -6401,7 +6402,7 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.16, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-preact-cli@^3.0.0-rc.7:
+preact-cli@3.0.0-rc.7:
   version "3.0.0-rc.7"
   resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.0-rc.7.tgz#a58ab88ae6d0fb13224bcc39566915ad27be379b"
   integrity sha512-zhqZ+t7gvEtr8Tr6dxymMRgmz507eIvfXeZn7wtZXgwMa2kC1VUAnC8uL9QGNgiCimyGwVDPWBxiYE3Uwekkew==
@@ -6501,10 +6502,10 @@ preact-side-effect@^1.3.0:
   resolved "https://registry.yarnpkg.com/preact-side-effect/-/preact-side-effect-1.3.0.tgz#74345d6c7c6aa48d0567b23e81e71d8fb7e47af9"
   integrity sha512-5KfRhUES56pFIPk4uVucxe6pOjVQO7ppbXvR/jYB9KInPjovTxzIU31VheS3DB7vfs05uFvowy0uE+fYx+/vUw==
 
-preact@^10.0.0:
-  version "10.2.1"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.2.1.tgz#b30eb4cdc455499ee2ff82e0fa1a16fc8e20f3a4"
-  integrity sha512-BUNvmQcVtNElku7mYHexIiM5JlGNSW2BY9O2t9xk1NqA43O8wbE0cah6PAlvT7PBHvyDRJ5TAj5Fewdi9DqLoQ==
+preact@^10.3.2:
+  version "10.3.2"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.3.2.tgz#1dabd1747b54de4e6820c7d2eadbb8bc4c2e3047"
+  integrity sha512-yIx4i7gp45enhzX4SLkvvR20UZ+YOUbMdj2KEscU/dC70MHv/L6dpTcsP+4sXrU9SRbA3GjJQQCPfFa5sE17dQ==
 
 prelude-ls@~1.1.2:
   version "1.1.2"

@@ -40,6 +40,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Abstractions.Database
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.WebApi.Routes", "NxPlx.Infrastructure.WebApi.Routes\NxPlx.Infrastructure.WebApi.Routes.csproj", "{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Core", "NxPlx.Services.Core\NxPlx.Services.Core.csproj", "{2F945733-6917-4CF8-8228-F7356198C37E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,5 +128,9 @@ Global
 		{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -10,7 +10,7 @@ using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
 using NxPlx.Models.File;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class ProgressService
     {

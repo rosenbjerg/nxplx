@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NxPlx.Abstractions;
+using NxPlx.Core.Services.Commands;
 using NxPlx.Infrastructure.IoC;
-using NxPlx.Infrastructure.WebApi.Routes.Services.Commands;
 using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class AdminCommandService
     {

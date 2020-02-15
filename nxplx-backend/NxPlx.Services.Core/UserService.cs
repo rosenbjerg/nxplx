@@ -9,7 +9,7 @@ using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 using NxPlx.Models.Dto.Models;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class UserService
     {

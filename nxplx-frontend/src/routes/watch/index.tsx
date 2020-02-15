@@ -31,31 +31,28 @@ export default class Watch extends Component<Props, State> {
     private videoEvents = CreateEventBroker();
     private previousUnload?: any;
     private playerTime = 0;
+    private initalTime = 0;
     private subtitleLanguage = "none";
 
-    public render(props: Props, state: State) {
-        if (!state.info) {
+    public render({ fid, kind }: Props, { info }: State) {
+        if (!info) {
             return (<Loading fullscreen/>);
         }
-        const completed = (this.playerTime / state.info.duration) > 0.95;
+        const completed = (this.playerTime / info.duration) > 0.95;
         return (
             <div class={style.container}>
-                <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${state.info.title} - NxPlx`}/>
-
-                <meta property="og:title" content={state.info.title} />
-                <meta property="og:image" content={imageUrl(this.state.info.backdrop, 1280)} />
-
+                <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
                 <VideoPlayer
                     events={this.videoEvents}
-                    startTime={completed ? 0 : this.playerTime}
-                    title={state.info.title}
-                    src={`/api/${props.kind}/watch/${props.fid}`}
+                    startTime={completed ? 0 : this.initalTime}
+                    title={info.title}
+                    src={`/api/${kind}/watch/${fid}`}
                     poster={imageUrl(this.state.info.backdrop, 1280)}
 
-                    subtitles={state.info.subtitles.map(lang => ({
+                    subtitles={info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
-                        path: `/api/subtitle/${props.kind}/${props.fid}/${lang}`,
+                        path: `/api/subtitle/${kind}/${fid}/${lang}`,
                         default: lang === this.subtitleLanguage
                     }))}/>
             </div>
@@ -66,7 +63,6 @@ export default class Watch extends Component<Props, State> {
         this.saveProgress();
     }
 
-
     public componentDidMount(): void {
         this.previousUnload = window.onbeforeunload;
         window.onbeforeunload = this.saveProgress;
@@ -74,14 +70,22 @@ export default class Watch extends Component<Props, State> {
         this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", data => {
             this.playerTime = data.time;
             this.setState({ playerState: data.state });
-            if (data.state === 'ended' && kind === 'series') {
+            if (data.state === 'ended' && this.props.kind === 'series') {
                 http.getJson<ContinueWatching>(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(next => {
                     route(`/app/watch/${this.props.kind}/${next.fid}`);
                 })
             }
         });
         this.videoEvents.subscribe<{ time: number }>("time_changed", data => this.playerTime = data.time);
+        this.load();
+    }
+    public componentDidUpdate(previousProps: Readonly<Props>): void {
+        if (previousProps.fid !== this.props.fid) {
+            this.load();
+        }
+    }
 
+    private load = () => {
         const { kind, fid } = this.props;
         Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/info/${fid}`),
@@ -89,10 +93,10 @@ export default class Watch extends Component<Props, State> {
             http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
         ]).then(results => {
             this.subtitleLanguage = results[1];
-            this.playerTime = parseFloat(results[2]);
+            this.initalTime = parseFloat(results[2]);
             this.setState({ info: results[0] });
         });
-    }
+    };
 
     private saveProgress = () => {
         if (!this.state.info) {
