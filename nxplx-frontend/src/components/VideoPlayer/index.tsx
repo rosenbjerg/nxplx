@@ -61,7 +61,6 @@ export default class VideoPlayer extends Component<Props, State> {
     }
 
     public render({ poster, src, startTime, subtitles }: Props) {
-        console.log('video rendered', src, startTime);
         return (
             <video key={src}
                    ref={this.bindVideo}

@@ -38,7 +38,6 @@ export default class Watch extends Component<Props, State> {
         if (!info) {
             return (<Loading fullscreen/>);
         }
-        console.log('watch rendered', fid, info);
         const completed = (this.playerTime / info.duration) > 0.95;
         return (
             <div class={style.container}>
@@ -87,7 +86,6 @@ export default class Watch extends Component<Props, State> {
     }
 
     private load = () => {
-        console.log('load', this.props);
         const { kind, fid } = this.props;
         Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/info/${fid}`),
