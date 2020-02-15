@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
 using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper

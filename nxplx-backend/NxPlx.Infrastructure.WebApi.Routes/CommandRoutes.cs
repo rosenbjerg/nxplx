@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using NxPlx.Infrastructure.WebApi.Routes.Services;
+using NxPlx.Core.Services;
 using Red;
 using Red.Interfaces;
 

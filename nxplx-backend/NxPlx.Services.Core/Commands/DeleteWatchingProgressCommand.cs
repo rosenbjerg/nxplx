@@ -4,12 +4,11 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services.Commands
+namespace NxPlx.Core.Services.Commands
 {
-    public class DeleteSubtitlePreferencesCommand : CommandBase
+    public class DeleteWatchingProgressCommand : CommandBase
     {
-        public override string Description => "Deletes all subtitle preferences in the database";
-
+        public override string Description => "Deletes all watching progress in the database";
         public override async Task<string> Execute(string[] args)
         {
             await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>();
@@ -18,12 +17,12 @@ namespace NxPlx.Infrastructure.WebApi.Routes.Services.Commands
             await using var transaction = ctx.BeginTransactionedContext();
             foreach (var userId in userIds)
             {
-                var prefs = await transaction.SubtitlePreferences.Many(sp => sp.UserId == userId).ToListAsync();
-                transaction.SubtitlePreferences.Remove(prefs);
+                var progress = await transaction.WatchingProgresses.Many(wp => wp.UserId == userId).ToListAsync();
+                transaction.WatchingProgresses.Remove(progress);
                 await transaction.SaveChanges();
             }
 
-            return "All subtitle preferences has been removed";
+            return "All watching progress has been removed";
         }
     }
 }

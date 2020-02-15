@@ -3,7 +3,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.IoC;
 using NxPlx.Infrastructure.Session;
 
-namespace NxPlx.Infrastructure.WebApi.Routes.Services
+namespace NxPlx.Core.Services
 {
     public static class AuthenticationService
     {
