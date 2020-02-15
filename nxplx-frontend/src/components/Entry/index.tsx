@@ -17,7 +17,7 @@ const Entry = ({ href, image, key, progress, title, autosizeOverride, children }
         <Link key={key} class={style.link} title={title} href={href}>
             <img class={`${style.entry} ${autosizeOverride || style.autosize}`} src={image} alt={title}/>
             {children}
-            {(progress || false) && (
+            {!!progress && (
                 <span class={style.progress} style={{ "width": (progress * 100) + "%" }}>&nbsp;</span>
             )}
         </Link>
