@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class SubtitleRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/languages/:kind/:file_id", Authenticated.User, GetSubtitleLanguagesByFileId);
             router.Get("/preference/:kind/:file_id", Authenticated.User, GetLanguagePreferenceByFileId);

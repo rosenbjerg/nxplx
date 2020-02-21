@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class BroadcastRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             if (ConfigurationService.Current.Production) 
                 router.WebSocket("/connect", Authenticated.User, Connect);

@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     {
         private const int ImageMaxCacheAge = 60 * 60 * 24 * 365;
         
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get(":size/:image_name", Authenticated.User, GetImageBySize);
         }

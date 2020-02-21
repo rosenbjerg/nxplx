@@ -19,7 +19,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
     public static class OverviewRoutes
     {
         private const int MaxCacheAge = 15;
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/", Authenticated.User, GetOverview);
             router.Get("/genres", Authenticated.User, GetGenresOverview);

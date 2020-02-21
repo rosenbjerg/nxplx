@@ -12,7 +12,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class UserRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Post("/changepassword", Validated.ChangePasswordForm, Authenticated.User, ChangePassword);
             router.Get("", Authenticated.User, GetUser);

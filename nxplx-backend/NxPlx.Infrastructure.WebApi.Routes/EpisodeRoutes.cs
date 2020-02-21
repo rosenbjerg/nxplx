@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class EpisodeRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/detail/:series_id", Authenticated.User, GetSeriesDetails);
             router.Get("/detail/:series_id/:season_no", Authenticated.User, GetSeasonDetails);

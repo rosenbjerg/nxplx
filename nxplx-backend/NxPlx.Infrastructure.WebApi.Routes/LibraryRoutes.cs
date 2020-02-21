@@ -12,7 +12,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class LibraryRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/list", Authenticated.User, ListLibraries);
             router.Post("", Authenticated.Admin, CreateLibrary);

@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class ProgressRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/continue", Authenticated.User, GetContinueWatchingList);
             router.Get("season/:seriesId/:seasonNumber", Authenticated.User, GetEpisodeProgress);

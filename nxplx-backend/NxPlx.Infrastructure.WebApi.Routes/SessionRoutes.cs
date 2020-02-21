@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class SessionRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("", Authenticated.User, GetSessions);
             router.Delete("", Validated.RequireSessionIdQuery, Authenticated.User, CloseSession);

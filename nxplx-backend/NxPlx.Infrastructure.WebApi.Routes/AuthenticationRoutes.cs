@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class AuthenticationRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Post("/login", Validated.LoginForm, Login);
             router.Get("/verify", Authenticated.User, Verify);

@@ -15,7 +15,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class IndexingRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Post("", Authenticated.Admin, IndexLibraries);
         }

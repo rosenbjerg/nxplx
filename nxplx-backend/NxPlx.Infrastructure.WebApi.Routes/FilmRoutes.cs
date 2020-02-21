@@ -10,7 +10,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class FilmRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
             router.Get("/detail/:film_id", Authenticated.User, GetFilmDetails);
