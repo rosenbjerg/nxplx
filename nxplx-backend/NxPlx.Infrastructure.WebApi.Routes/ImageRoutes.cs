@@ -17,8 +17,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         
         private static Task<HandlerType> GetImageBySize(Request req, Response res)
         {
-            var size = req.Context.ExtractUrlParameter("size");
-            var filename = req.Context.ExtractUrlParameter("image_name");
+            var size = req.Context.Params["size"];
+            var filename = req.Context.Params["image_name"];
             var imageDir = Configuration.ConfigurationService.Current.ImageFolder;
             var fullPath = Path.Combine(imageDir, size, filename);
 

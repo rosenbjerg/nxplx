@@ -23,7 +23,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetNext(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            var fileId = int.Parse(req.Context.Params["file_id"]);
             
             var next = await EpisodeService.TryFindNextEpisode(fileId, session.User);
             return await res.SendJson(next);
@@ -32,7 +32,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> StreamFile(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            var id = int.Parse(req.Context.Params["file_id"]);
             
             var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.User);
 
@@ -43,7 +43,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            var id = int.Parse(req.Context.Params["file_id"]);
 
             var episode = await EpisodeService.FindEpisodeFileInfo(id, session.User);
 
@@ -54,8 +54,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
-            var no = int.Parse(req.Context.ExtractUrlParameter("season_no"));
+            var id = int.Parse(req.Context.Params["series_id"]);
+            var no = int.Parse(req.Context.Params["season_no"]);
             
             var seriesDto = await EpisodeService.FindSeriesDetails(id, no, session.User);
             
@@ -66,7 +66,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.ExtractUrlParameter("series_id"));
+            var id = int.Parse(req.Context.Params["series_id"]);
 
             var seriesDto = await EpisodeService.FindSeriesDetails(id, null, session.User);
 

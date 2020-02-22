@@ -221,7 +221,7 @@ services:
       NXPLX_PROBE_TOKEN: ${args.probeToken}
       TMDB_API_KEY: ${args.tmdbApiKey}
     volumes:
-      - ${args.dataDir}/webapi:/app/data
+      - ${args.dataDir}/webapi:/data
       - ${args.mediaRoot}:/media:ro
     depends_on:
       - nxplx-database

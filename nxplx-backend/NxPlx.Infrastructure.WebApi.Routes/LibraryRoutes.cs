@@ -45,9 +45,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> RemoveLibrary(Request req, Response res)
         {
-            var libraryId = req.ParseBody<JsonValue<int>>().value;
+            var libraryId = await req.ParseBodyAsync<JsonValue<int>>();
 
-            var ok = await LibraryService.RemoveLibrary(libraryId);
+            var ok = await LibraryService.RemoveLibrary(libraryId.value);
 
             if (!ok) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendStatus(HttpStatusCode.OK);

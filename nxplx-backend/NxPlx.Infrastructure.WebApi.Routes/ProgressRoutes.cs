@@ -21,9 +21,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> SetProgressByFileId(Request req, Response res)
         {
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
-            var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var progressValue = req.ParseBody<JsonValue<double>>();
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var fileId = int.Parse(req.Context.Params["file_id"]);
+            var progressValue = await req.ParseBodyAsync<JsonValue<double>>();
             var session = req.GetData<UserSession>();
 
             await ProgressService.SetUserWatchingProgress(session.User, kind, fileId, progressValue.value);
@@ -32,8 +32,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> GetProgressByFileId(Request req, Response res)
         {
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
-            var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var fileId = int.Parse(req.Context.Params["file_id"]);
             var session = req.GetData<UserSession>();
 
             var progress = await ProgressService.GetUserWatchingProgress(session.User, kind, fileId);
@@ -52,8 +52,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> GetEpisodeProgress(Request req, Response res)
         {
-            var seriesId = int.Parse(req.Context.ExtractUrlParameter("seriesId"));
-            var seasonNumber = int.Parse(req.Context.ExtractUrlParameter("seasonNumber"));
+            var seriesId = int.Parse(req.Context.Params["seriesId"]);
+            var seasonNumber = int.Parse(req.Context.Params["seasonNumber"]);
 
             var session = req.GetData<UserSession>();
 

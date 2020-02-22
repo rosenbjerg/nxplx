@@ -24,16 +24,16 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var container = ResolveContainer.Default;
 
-            var libIds = req.ParseBody<JsonValue<int[]>>().value;
+            var libIds = await req.ParseBodyAsync<JsonValue<int[]>>();
             
             IEnumerable<Library> libraries;
             await using (var ctx = container.Resolve<IReadNxplxContext>())
             {
-                libraries = await ctx.Libraries.Many(l => libIds.Contains(l.Id)).ToListAsync();
+                libraries = await ctx.Libraries.Many(l => libIds.value.Contains(l.Id)).ToListAsync();
             }
 
             await res.SendStatus(HttpStatusCode.OK);
-            await IndexAndBroadcast(container, libIds, libraries);
+            await IndexAndBroadcast(container, libIds.value, libraries);
             return HandlerType.Final;
         }
 
