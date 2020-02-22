@@ -46,7 +46,7 @@ export default class Collection extends Component<Props, State> {
                                     <Entry
                                         key={movie.id}
                                         title={movie.title}
-                                        href={`/app/${movie.kind}/${movie.id}`}
+                                        href={`/${movie.kind}/${movie.id}`}
                                         image={imageUrl(movie.poster, 342, details.poster)}/>
 
                                 )

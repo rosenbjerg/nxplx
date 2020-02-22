@@ -7,7 +7,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public class CommandRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/list", Authenticated.Admin, ListCommands);
             router.Post("/invoke", Authenticated.Admin, InvokeCommand);

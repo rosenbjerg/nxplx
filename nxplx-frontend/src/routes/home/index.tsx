@@ -53,7 +53,7 @@ export default class Home extends Component<Props, State> {
                                         <Entry
                                             key={p.kind[0] + p.fileId}
                                             title={p.title}
-                                            href={`/app/watch/${p.kind}/${p.fileId}`}
+                                            href={`/watch/${p.kind}/${p.fileId}`}
                                             image={imageUrl(p.poster, 342)}
                                             progress={p.progress}
                                         />
@@ -67,7 +67,7 @@ export default class Home extends Component<Props, State> {
                                     <Entry
                                         key={entry.id}
                                         title={entry.title}
-                                        href={`/app/${entry.kind}/${entry.id}`}
+                                        href={`/${entry.kind}/${entry.id}`}
                                         image={imageUrl(entry.poster, 342)}
                                     />
                                 )

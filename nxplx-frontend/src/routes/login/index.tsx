@@ -16,7 +16,7 @@ const actions = (store:Store<NxPlxStore>) => (
             const response = await http.post('/api/authentication/login', formdata, false);
             if (response.ok) {
                 const isAdmin = (await response.text()) === 'True';
-                route('/app/', true);
+                route('/', true);
                 store.setState({
                     isLoggedIn: true,
                     isAdmin

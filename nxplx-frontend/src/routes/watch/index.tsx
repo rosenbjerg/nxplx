@@ -72,7 +72,8 @@ export default class Watch extends Component<Props, State> {
             this.setState({ playerState: data.state });
             if (data.state === 'ended' && this.props.kind === 'series') {
                 http.getJson<ContinueWatching>(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(next => {
-                    route(`/app/watch/${this.props.kind}/${next.fid}`);
+                    this.saveProgress();
+                    route(`/watch/${this.props.kind}/${next.fid}`);
                 })
             }
         });

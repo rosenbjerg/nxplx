@@ -13,7 +13,7 @@ export const EpisodeEntry = ({ episode, progress }: Props) => (
     <Entry
         key={episode.number}
         image={imageUrl(episode.still, 300)}
-        href={`/app/watch/series/${episode.fileId}`}
+        href={`/watch/series/${episode.fileId}`}
         title={episode.name}
         progress={progress}
         autosizeOverride={style.autosize}>

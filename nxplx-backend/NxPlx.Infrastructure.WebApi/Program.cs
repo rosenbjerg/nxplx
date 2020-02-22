@@ -58,23 +58,23 @@ namespace NxPlx.WebApi
             await databaseContextManager.Initialize(logger);
 
             server.Get("/api/build", Authenticated.User, (req, res) => res.SendString(cfg.Build));
-            AuthenticationRoutes.Register(server.CreateRouter("/api/authentication"));
-            UserRoutes.Register(server.CreateRouter("/api/user"));
-            SessionRoutes.Register(server.CreateRouter("/api/session"));
-            LibraryRoutes.Register(server.CreateRouter("/api/library"));
-            OverviewRoutes.Register(server.CreateRouter("/api/overview"));
-            EpisodeRoutes.Register(server.CreateRouter("/api/series"));
-            FilmRoutes.Register(server.CreateRouter("/api/film"));
             
-            IndexingRoutes.Register(server.CreateRouter("/api/indexing"));
-            BroadcastRoutes.Register(server.CreateRouter("/api/websocket"));
-            SubtitleRoutes.Register(server.CreateRouter("/api/subtitle"));
-            ProgressRoutes.Register(server.CreateRouter("/api/progress"));
-            ImageRoutes.Register(server.CreateRouter("/api/image"));
-            CommandRoutes.Register(server.CreateRouter("/api/command"));
+            server.CreateRouter("/api/authentication", AuthenticationRoutes.BindHandlers);
+            server.CreateRouter("/api/user", UserRoutes.BindHandlers);
+            server.CreateRouter("/api/session", SessionRoutes.BindHandlers);
+            server.CreateRouter("/api/library", LibraryRoutes.BindHandlers);
+            server.CreateRouter("/api/overview", OverviewRoutes.BindHandlers);
+            server.CreateRouter("/api/series", EpisodeRoutes.BindHandlers);
+            server.CreateRouter("/api/film", FilmRoutes.BindHandlers);
+            
+            server.CreateRouter("/api/indexing", IndexingRoutes.BindHandlers);
+            server.CreateRouter("/api/websocket", BroadcastRoutes.BindHandlers);
+            server.CreateRouter("/api/subtitle", SubtitleRoutes.BindHandlers);
+            server.CreateRouter("/api/progress", ProgressRoutes.BindHandlers);
+            server.CreateRouter("/api/image", ImageRoutes.BindHandlers);
+            server.CreateRouter("/api/command", CommandRoutes.BindHandlers);
 
-            server.Get("/", Utils.SendSPA);
-            server.Get("/app/*", Utils.SendSPA);
+            server.Get("/*", Utils.SendSPA);
 
             logger.Trace("All routes registered, preparing to listen on port {Port}", cfg.HttpPort);
 

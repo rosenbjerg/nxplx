@@ -115,7 +115,7 @@ namespace NxPlx.Core.Services
 
         private static bool NotFinished((WatchingProgress wp, MediaFileBase fb) pair)
         {
-            return (pair.wp.Time / pair.fb.MediaDetails.Duration) < 0.98;
+            return (pair.wp.Time / pair.fb.MediaDetails.Duration) < 0.96;
         }
     }
 }

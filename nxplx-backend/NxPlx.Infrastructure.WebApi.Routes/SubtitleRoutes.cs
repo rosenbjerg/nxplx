@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class SubtitleRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Get("/languages/:kind/:file_id", Authenticated.User, GetSubtitleLanguagesByFileId);
             router.Get("/preference/:kind/:file_id", Authenticated.User, GetLanguagePreferenceByFileId);
@@ -21,9 +21,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
         private static async Task<HandlerType> GetSubtitleByFileId(Request req, Response res)
         {
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var lang = req.Context.ExtractUrlParameter("lang");
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var id = int.Parse(req.Context.Params["file_id"]);
+            var lang = req.Context.Params["lang"];
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
             var session = req.GetData<UserSession>();
             
             var subtitlePath = await SubtitleService.GetSubtitlePath(session.User, kind, id, lang);
@@ -32,9 +32,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> SetLanguagePreferenceByFileId(Request req, Response res)
         {
-            var fileId = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
-            var language = req.ParseBody<JsonValue<string>>();
+            var fileId = int.Parse(req.Context.Params["file_id"]);
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var language = await req.ParseBodyAsync<JsonValue<string>>();
             var session = req.GetData<UserSession>();
             
             await SubtitleService.SetLanguagePreference(session.User, kind, fileId, language.value);
@@ -43,8 +43,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> GetLanguagePreferenceByFileId(Request req, Response res)
         {
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var id = int.Parse(req.Context.Params["file_id"]);
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
             var session = req.GetData<UserSession>();
             
             var preference = await SubtitleService.GetLanguagePreference(session.User, kind, id);
@@ -53,8 +53,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> GetSubtitleLanguagesByFileId(Request req, Response res)
         {
-            var id = int.Parse(req.Context.ExtractUrlParameter("file_id"));
-            var kind = req.Context.ExtractUrlParameter("kind") == "film" ? MediaFileType.Film : MediaFileType.Episode;
+            var id = int.Parse(req.Context.Params["file_id"]);
+            var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
             var session = req.GetData<UserSession>();
             
             var subtitles = await SubtitleService.FindSubtitles(session.User, kind, id);

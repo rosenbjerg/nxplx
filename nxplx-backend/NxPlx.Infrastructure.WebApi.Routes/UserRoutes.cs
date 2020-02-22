@@ -12,7 +12,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 {
     public static class UserRoutes
     {
-        public static void Register(IRouter router)
+        public static void BindHandlers(IRouter router)
         {
             router.Post("/changepassword", Validated.ChangePasswordForm, Authenticated.User, ChangePassword);
             router.Get("", Authenticated.User, GetUser);
@@ -35,7 +35,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         }
         private static async Task<HandlerType> RemoveUser(Request req, Response res)
         {
-            var username = req.ParseBody<JsonValue<string>>();
+            var username = await req.ParseBodyAsync<JsonValue<string>>();
             var session = req.GetData<UserSession>();
             
             var ok = await UserService.RemoveUser(session.User, username.value);
