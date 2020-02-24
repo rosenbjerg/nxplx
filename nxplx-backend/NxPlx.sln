@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.WebApi", "NxPlx.Infrastructure.WebApi\NxPlx.Infrastructure.WebApi.csproj", "{BABFC2C5-CE58-4F81-BC75-B61221373F21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.WebApi", "NxPlx.Application.WebApi\NxPlx.Application.WebApi.csproj", "{BABFC2C5-CE58-4F81-BC75-B61221373F21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Database", "NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj", "{EEDF876C-DDE3-48C2-8B05-9EB312705ED8}"
 EndProject
@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Configuration", "NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj", "{CCD7AD3B-D96E-4CC7-9848-F76271FBFF20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Caching", "NxPlx.Services.Caching\NxPlx.Services.Caching.csproj", "{43199B9E-181B-44F8-B5F7-5371736C6042}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Caching", "NxPlx.Infrastructure.Caching\NxPlx.Infrastructure.Caching.csproj", "{43199B9E-181B-44F8-B5F7-5371736C6042}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.IoC", "NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj", "{AC04ADD7-C9E2-4D3B-A9DC-55D23F606CE1}"
 EndProject
@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Abstractions", "NxPlx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Logging", "NxPlx.Infrastructure.Logging\NxPlx.Infrastructure.Logging.csproj", "{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Models.Dto", "NxPlx.Models.Dto\NxPlx.Models.Dto.csproj", "{A13FCD67-45B1-4D42-B39F-622D558CDE57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Models", "NxPlx.Application.Models\NxPlx.Application.Models.csproj", "{A13FCD67-45B1-4D42-B39F-622D558CDE57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Broadcasting", "NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj", "{57188167-8274-417D-978B-507AFBDD214F}"
 EndProject
@@ -38,9 +38,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Abstractions.Database", "NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj", "{546E3000-69B2-4F32-8AF9-99371EA9CBE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.WebApi.Routes", "NxPlx.Infrastructure.WebApi.Routes\NxPlx.Infrastructure.WebApi.Routes.csproj", "{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.WebApi.Routes", "NxPlx.Application.WebApi.Routes\NxPlx.Application.WebApi.Routes.csproj", "{A1E163FB-CD60-4B0C-8FAD-635A3DA25E5C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Core", "NxPlx.Services.Core\NxPlx.Services.Core.csproj", "{2F945733-6917-4CF8-8228-F7356198C37E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Mapping", "NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj", "{FA39F7CE-D13B-41D7-A928-6372A73F8F45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,5 +134,9 @@ Global
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA39F7CE-D13B-41D7-A928-6372A73F8F45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA39F7CE-D13B-41D7-A928-6372A73F8F45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA39F7CE-D13B-41D7-A928-6372A73F8F45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA39F7CE-D13B-41D7-A928-6372A73F8F45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

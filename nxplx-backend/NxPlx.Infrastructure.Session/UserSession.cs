@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using NxPlx.Models;
 using Red.CookieSessions;
 

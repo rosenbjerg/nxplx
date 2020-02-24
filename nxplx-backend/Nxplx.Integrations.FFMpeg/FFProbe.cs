@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using Instances;
 using NxPlx.Models.File;
 
 namespace Nxplx.Integrations.FFMpeg
@@ -15,20 +16,9 @@ namespace Nxplx.Integrations.FFMpeg
                                    "bit_rate,bits_per_raw_sample,channel_layout";
             var arguments = $"-v error -show_entries {entries} -print_format json \"{file}\"";
 
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    UseShellExecute = false, 
-                    RedirectStandardOutput = true, 
-                    FileName = "ffprobe",
-                    Arguments = arguments
-                }
-            };
-
-            process.Start();
-            var output = process?.StandardOutput.ReadToEnd();
-            process.WaitForExit();
+            var ffprobe = new Instance("ffprobe", arguments);
+            ffprobe.BlockUntilFinished();
+            var output = string.Join("", ffprobe.OutputData);
             var parsedOutput = JsonSerializer.Deserialize<FFProbeOutput>(output);
 
             var videoStream = parsedOutput?.streams?.FirstOrDefault(stream => stream.codec_type == "video");

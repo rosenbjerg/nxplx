@@ -28,7 +28,7 @@ namespace NxPlx.WebApi
             var cfg = ConfigurationService.Current;
             var container = ResolveContainer.Default;
             var logger = container.Resolve<ILoggingService>();
-            logger.Info("NxPlx.Infrastructure.WebApi starting...");
+            logger.Info("NxPlx.Application.WebApi starting...");
 
             if (!cfg.Production)
             {
@@ -51,7 +51,7 @@ namespace NxPlx.WebApi
             {
                 logger.Error(
                     "Exception on url {ExceptionUrl}: {ExceptionType} with message {ExceptionMessage} :: {Stacktrace}",
-                    eventArgs.Exception, eventArgs.Exception.GetType().Name, eventArgs.Exception.Message,
+                    eventArgs.Path, eventArgs.Exception.GetType().Name, eventArgs.Exception.Message,
                     eventArgs.Exception.StackTrace);
             };
 
