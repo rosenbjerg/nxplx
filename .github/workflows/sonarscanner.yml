@@ -16,7 +16,7 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Prepare SonarScanner
-      run: dotnet tool install --global dotnet-sonarscanner
+      run: dotnet tool install dotnet-sonarscanner
     - name: Begin SonarScan
       run: dotnet-sonarscanner begin /k:"rosenbjerg_NxPlx" /d:"${{ secrets.SONAR_TOKEN }}"
     - name: Build backend
