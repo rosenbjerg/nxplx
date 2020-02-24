@@ -1,8 +1,6 @@
 name: .NET Core SonarScanner
 
-on: 
-  push:
-    branches: main
+on: push
 
 jobs:
   sonarScan:
