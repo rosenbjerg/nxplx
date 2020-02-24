@@ -12,7 +12,7 @@ namespace NxPlx.Infrastructure.Broadcasting
     {
         private readonly List<WebsocketSession> _all = new List<WebsocketSession>();
         private readonly object _lock = new object();
-        
+
         public Task BroadcastAdmin(object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
@@ -38,6 +38,7 @@ namespace NxPlx.Infrastructure.Broadcasting
             {
                 receivers = predicate == null ? _all.ToList() : _all.Where(predicate).ToList();
             }
+
             return receivers.Select(r => r.WebSocketDialog);
         }
 
