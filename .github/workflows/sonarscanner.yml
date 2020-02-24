@@ -5,8 +5,8 @@ on:
     branches: master
     
 jobs:
-  sonarScan:
-    name: SonarCloud Trigger
+  sonarscanner:
+    name: .NET Core SonarScanner
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -18,8 +18,9 @@ jobs:
     - name: Prepare SonarScanner
       run: dotnet new tool-manifest && dotnet tool install dotnet-sonarscanner
     - name: Begin SonarScan
-      run: dotnet-sonarscanner begin /k:"rosenbjerg_NxPlx" /d:"${{ secrets.SONAR_TOKEN }}"
+      run: dotnet sonarscanner begin /k:"rosenbjerg_NxPlx" /d:"${{ secrets.SONAR_TOKEN }}"
     - name: Build backend
       run: dotnet build nxplx-backend/NxPlx.sln -c Release
     - name: Complete SonarScan
-      run: dotnet-sonarscanner end /d:"${{ secrets.SONAR_TOKEN }}"
+      run: dotnet sonarscanner end /d:"${{ secrets.SONAR_TOKEN }}"
+      
