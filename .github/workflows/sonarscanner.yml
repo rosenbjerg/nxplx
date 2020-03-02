@@ -18,7 +18,7 @@ jobs:
     - name: Prepare SonarScanner
       run: dotnet new tool-manifest && dotnet tool install dotnet-sonarscanner
     - name: Begin SonarScan
-      run: dotnet tool run dotnet-sonarscanner begin /k:"rosenbjerg_NxPlx" /d:${{ secrets.SONAR_TOKEN }}
+      run: dotnet tool run dotnet-sonarscanner begin /k:"rosenbjerg_NxPlx" /d:sonar.login=${{ secrets.SONAR_TOKEN }}
     - name: Build backend
       run: dotnet build nxplx-backend/NxPlx.sln -c Release
     - name: Complete SonarScan
