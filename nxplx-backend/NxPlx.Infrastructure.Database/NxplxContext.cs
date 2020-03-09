@@ -157,7 +157,6 @@ namespace NxPlx.Services.Database
             optionsBuilder
                 .UseLazyLoadingProxies()
                 .UseNpgsql($"Host={cfg.SqlHost};Database={cfg.SqlDatabase};Username={cfg.SqlUsername};Password={cfg.SqlPassword}");
-            
         }
     }
 
