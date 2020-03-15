@@ -35,7 +35,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
                 await cache.SetAsync(key, cached, CacheKind.JsonResponse);
             }
             
-            res.AddHeader("Cache-Control", $"max-age={MaxCacheAge}");
+            res.Headers["Cache-Control"] = $"max-age={MaxCacheAge}";
             return await res.SendString(cached, "application/json");
         }
 
@@ -46,8 +46,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>();
 
-            var libs = session.User.LibraryAccessIds;
-            if (session.IsAdmin) libs = await ctx.Libraries.ProjectMany(null, l => l.Id).ToListAsync();
+            var libs = session!.User!.LibraryAccessIds;
+            if (session!.IsAdmin) libs = await ctx.Libraries.ProjectMany(null, l => l.Id).ToListAsync();
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
             return await res.SendCachedJson(overviewCacheKey, async () => await BuildOverview(container, ctx, libs));
         }

@@ -15,17 +15,24 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             if (ConfigurationService.Current.Production) 
                 router.WebSocket("/connect", Authenticated.User, Connect);
             else 
-                router.WebSocket("/connect", Connect);
+                router.WebSocket("/connect", ConnectDev);
         }
 
-        private static async Task<HandlerType> Connect(Request req, Response res, WebSocketDialog wsd)
+        private static Task<HandlerType> Connect(Request req, Response res, WebSocketDialog wsd)
         {
             var session = req.GetData<UserSession>();
 
             var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster<WebSocketDialog>>();
-            broadcaster.Subscribe(session.UserId, session.IsAdmin, wsd);
+            broadcaster.Subscribe(session!.UserId, session!.IsAdmin, wsd);
 
-            return wsd.Final();
+            return Task.FromResult(HandlerType.Continue);
+        }
+
+        private static Task<HandlerType> ConnectDev(Request req, Response res, WebSocketDialog wsd)
+        {
+            var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster<WebSocketDialog>>();
+            broadcaster.Subscribe(1, true, wsd);
+            return Task.FromResult(HandlerType.Continue);
         }
     }
 }

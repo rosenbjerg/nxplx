@@ -11,14 +11,13 @@ NxPlx is designed with deployment using Docker in mind
 * [x] persist subtitle choice
 * [x] persist watching progress
 * [x] fast seeking
-* [x] shaka-player
 * [x] automated [multi-arch docker](https://hub.docker.com/r/mrosenbjerg/nxplx-webapi/tags) build through GitHub Actions
 * [x] ffprobe file analysis
 
 ### Milestones
 * [ ] ffmpeg transcode profile generation
 * [ ] transcode servers
-* [ ] chromecast support (through shaka-player)
+* [ ] chromecast support
 
 ### Goals
 - (Very) low CPU usage during playback on multiple clients - fit for an SBC

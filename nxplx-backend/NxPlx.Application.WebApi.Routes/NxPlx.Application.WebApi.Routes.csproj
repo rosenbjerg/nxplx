@@ -4,21 +4,22 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
+        <RootNamespace>NxPlx.Infrastructure.WebApi.Routes</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
-      <ProjectReference Include="..\NxPlx.Models.Dto\NxPlx.Models.Dto.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Core\NxPlx.Services.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
+      <PackageReference Include="BCrypt.Net-Next" Version="3.3.3" />
       <PackageReference Include="Red.Validation" Version="1.0.0" />
     </ItemGroup>
 

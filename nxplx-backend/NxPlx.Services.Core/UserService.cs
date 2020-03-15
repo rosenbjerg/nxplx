@@ -101,7 +101,7 @@ namespace NxPlx.Core.Services
             await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>().Info("Created user {Username}", user.Username);
-            return container.Resolve<IDtoMapper>().Map<User, UserDto>(user);
+            return container.Resolve<IDtoMapper>().Map<User, UserDto>(user)!;
         }
     }
 }

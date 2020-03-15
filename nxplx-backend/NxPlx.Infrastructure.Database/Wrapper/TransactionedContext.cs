@@ -16,7 +16,6 @@ namespace NxPlx.Services.Database.Wrapper
 
         internal TransactionedNxplxContext(NxplxContext context) : base(context)
         {
-            _transaction = context.Database.BeginTransaction();
             _filmFiles = InitLazySet(context, context.FilmFiles);
             _episodeFiles = InitLazySet(context, context.EpisodeFiles);
             _libraries = InitLazySet(context, context.Libraries);
@@ -25,6 +24,7 @@ namespace NxPlx.Services.Database.Wrapper
             _users = InitLazySet(context, context.Users);
             _userSessions = InitLazySet(context, context.UserSessions);
             _genres = InitLazySet(context, context.Genre);
+            _transaction = context.Database.BeginTransaction();
         }
         
         private static Lazy<EntitySet<TEntity>> InitLazySet<TEntity>(DbContext context, DbSet<TEntity> set)

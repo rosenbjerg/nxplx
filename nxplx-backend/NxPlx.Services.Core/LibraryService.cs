@@ -34,7 +34,7 @@ namespace NxPlx.Core.Services
         }
 
 
-        public static IEnumerable<string> GetDirectoryEntries(string cwd)
+        public static IEnumerable<string?> GetDirectoryEntries(string cwd)
         {
             if (cwd == string.Empty || !Directory.Exists(cwd))
                 return Enumerable.Empty<string>();
@@ -99,7 +99,7 @@ namespace NxPlx.Core.Services
             await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>().Info("Created library {Name} with {Path}", lib.Name, lib.Path);
-            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib);
+            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib)!;
         }
     }
 }

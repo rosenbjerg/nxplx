@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>NxPlx.Services.Database</RootNamespace>
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
@@ -16,8 +16,8 @@
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
-      <ProjectReference Include="..\NxPlx.Models.Dto\NxPlx.Models.Dto.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
     </ItemGroup>

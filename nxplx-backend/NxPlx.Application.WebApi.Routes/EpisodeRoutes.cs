@@ -23,18 +23,18 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetNext(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var fileId = int.Parse(req.Context.Params["file_id"]);
+            var fileId = int.Parse(req.Context.Params["file_id"]!);
             
-            var next = await EpisodeService.TryFindNextEpisode(fileId, session.User);
+            var next = await EpisodeService.TryFindNextEpisode(fileId, session!.User);
             return await res.SendJson(next);
         }
 
         private static async Task<HandlerType> StreamFile(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.Params["file_id"]);
+            var id = int.Parse(req.Context.Params["file_id"]!);
             
-            var episodePath = await EpisodeService.FindEpisodeFilePath(id, session.User);
+            var episodePath = await EpisodeService.FindEpisodeFilePath(id, session!.User);
 
             if (episodePath == null || !File.Exists(episodePath)) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendFile(episodePath, "video/mp4");
@@ -43,9 +43,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetFileInfo(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.Params["file_id"]);
+            var id = int.Parse(req.Context.Params["file_id"]!);
 
-            var episode = await EpisodeService.FindEpisodeFileInfo(id, session.User);
+            var episode = await EpisodeService.FindEpisodeFileInfo(id, session!.User);
 
             if (episode == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(episode);
@@ -54,10 +54,10 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSeasonDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.Params["series_id"]);
-            var no = int.Parse(req.Context.Params["season_no"]);
+            var id = int.Parse(req.Context.Params["series_id"]!);
+            var no = int.Parse(req.Context.Params["season_no"]!);
             
-            var seriesDto = await EpisodeService.FindSeriesDetails(id, no, session.User);
+            var seriesDto = await EpisodeService.FindSeriesDetails(id, no, session!.User);
             
             if (seriesDto == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(seriesDto);
@@ -66,9 +66,9 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> GetSeriesDetails(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var id = int.Parse(req.Context.Params["series_id"]);
+            var id = int.Parse(req.Context.Params["series_id"]!);
 
-            var seriesDto = await EpisodeService.FindSeriesDetails(id, null, session.User);
+            var seriesDto = await EpisodeService.FindSeriesDetails(id, null, session!.User);
 
             if (seriesDto == null) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendJson(seriesDto);

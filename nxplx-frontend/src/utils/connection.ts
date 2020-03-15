@@ -32,12 +32,10 @@ export default class WebsocketMessenger implements Connection {
     private handlers:{ [index:string]:MessageHandler[] } = {};
 
     constructor() {
-        if (location.host === 'localhost:8080') {
-            this.webSocket = new ReconnectingWebSocket(`ws://localhost:5353/api/websocket/connect`);
-        } else {
-            const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
-            this.webSocket = new ReconnectingWebSocket(`${protocol}://${location.host}/api/websocket/connect`);
-        }
+        const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
+        const host = location.host !== 'localhost:8080' ? location.host : 'localhost:5353' ;
+        this.webSocket = new ReconnectingWebSocket(`${protocol}://${host}/api/websocket/connect`);
+
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);
         this.webSocket.addEventListener('message', this.onMessage);

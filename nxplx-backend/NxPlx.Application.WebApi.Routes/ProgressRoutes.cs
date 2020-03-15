@@ -22,21 +22,21 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> SetProgressByFileId(Request req, Response res)
         {
             var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
-            var fileId = int.Parse(req.Context.Params["file_id"]);
+            var fileId = int.Parse(req.Context.Params["file_id"]!);
             var progressValue = await req.ParseBodyAsync<JsonValue<double>>();
             var session = req.GetData<UserSession>();
 
-            await ProgressService.SetUserWatchingProgress(session.User, kind, fileId, progressValue.value);
+            await ProgressService.SetUserWatchingProgress(session!.User, kind, fileId, progressValue!.value);
 
             return await res.SendStatus(HttpStatusCode.OK);
         }
         private static async Task<HandlerType> GetProgressByFileId(Request req, Response res)
         {
             var kind = req.Context.Params["kind"] == "film" ? MediaFileType.Film : MediaFileType.Episode;
-            var fileId = int.Parse(req.Context.Params["file_id"]);
+            var fileId = int.Parse(req.Context.Params["file_id"]!);
             var session = req.GetData<UserSession>();
 
-            var progress = await ProgressService.GetUserWatchingProgress(session.User, kind, fileId);
+            var progress = await ProgressService.GetUserWatchingProgress(session!.User, kind, fileId);
 
             return await res.SendJson(progress);
         }
@@ -45,19 +45,19 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var session = req.GetData<UserSession>();
 
-            var continueWatchingList = await ProgressService.GetUserContinueWatchingList(session.User);
+            var continueWatchingList = await ProgressService.GetUserContinueWatchingList(session!.User);
 
             return await res.SendJson(continueWatchingList);
         }
 
         private static async Task<HandlerType> GetEpisodeProgress(Request req, Response res)
         {
-            var seriesId = int.Parse(req.Context.Params["seriesId"]);
-            var seasonNumber = int.Parse(req.Context.Params["seasonNumber"]);
+            var seriesId = int.Parse(req.Context.Params["seriesId"]!);
+            var seasonNumber = int.Parse(req.Context.Params["seasonNumber"]!);
 
             var session = req.GetData<UserSession>();
 
-            var continueWatchingList = await ProgressService.GetEpisodeProgress(session.User, seriesId, seasonNumber);
+            var continueWatchingList = await ProgressService.GetEpisodeProgress(session!.User, seriesId, seasonNumber);
 
             return await res.SendJson(continueWatchingList);
         }

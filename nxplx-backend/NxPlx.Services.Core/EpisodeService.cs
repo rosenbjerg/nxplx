@@ -73,7 +73,7 @@ namespace NxPlx.Core.Services
         public static SeriesDto MergeEpisodes(IMapper mapper, DbSeriesDetails series, IReadOnlyCollection<EpisodeFile> files)
         {
             var seriesDto = mapper.Map<DbSeriesDetails, SeriesDto>(series);
-            seriesDto.seasons = series.Seasons
+            seriesDto!.seasons = series.Seasons
                 .Select(s => MergeEpisodes(mapper, s, files.Where(f => f.SeasonNumber == s.SeasonNumber)))
                 .Where(s => s.episodes.Any())
                 .ToList();
@@ -82,7 +82,7 @@ namespace NxPlx.Core.Services
         public static SeasonDto MergeEpisodes(IMapper mapper, SeasonDetails seasonDetails, IEnumerable<EpisodeFile> files)
         {
             var seasonDto = mapper.Map<SeasonDetails, SeasonDto>(seasonDetails);
-            seasonDto.episodes = MergeEpisodes(seasonDetails.Episodes, files);
+            seasonDto!.episodes = MergeEpisodes(seasonDetails.Episodes, files);
             return seasonDto;
         }
         public static IEnumerable<EpisodeDto> MergeEpisodes(IEnumerable<EpisodeDetails> episodeDetails, IEnumerable<EpisodeFile> files)

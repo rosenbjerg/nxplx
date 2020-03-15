@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using NxPlx.Core.Services;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
@@ -37,7 +38,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var form = await req.GetFormDataAsync();
 
-            var lib = await LibraryService.CreateNewLibrary(form["name"], form["path"], form["language"], form["kind"]);
+            var lib = await LibraryService.CreateNewLibrary(form!["name"], form!["path"], form!["language"], form!["kind"]);
 
             return await res.SendJson(lib);
         }
@@ -47,7 +48,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var libraryId = await req.ParseBodyAsync<JsonValue<int>>();
 
-            var ok = await LibraryService.RemoveLibrary(libraryId.value);
+            var ok = await LibraryService.RemoveLibrary(libraryId!.value);
 
             if (!ok) return await res.SendStatus(HttpStatusCode.NotFound);
             return await res.SendStatus(HttpStatusCode.OK);
@@ -58,7 +59,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var session = req.GetData<UserSession>();
 
-            var libraries = await LibraryService.ListLibraries(session.User);
+            var libraries = await LibraryService.ListLibraries(session!.User);
 
             return await res.SendJson(libraries);
         }
@@ -66,8 +67,8 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> SetUserLibraryPermissions(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();
-            var userId = int.Parse(form["userId"]);
-            var libraryIds = form["libraries"].Select(int.Parse).ToList();
+            var userId = int.Parse(form!["userId"]);
+            var libraryIds = form!["libraries"].Select(int.Parse).ToList();
 
             var ok = await LibraryService.SetUserLibraryPermissions(userId, libraryIds);
 

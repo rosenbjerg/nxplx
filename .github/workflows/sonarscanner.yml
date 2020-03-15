@@ -1,0 +1,26 @@
+name: Sonar
+
+on: 
+  push:
+    branches: master
+    
+jobs:
+  sonarscanner:
+    name: .NET Core SonarScanner
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Prepare SonarScanner
+      run: dotnet new tool-manifest && dotnet tool install dotnet-sonarscanner
+    - name: Begin SonarScan
+      run: dotnet tool run dotnet-sonarscanner begin /k:rosenbjerg_NxPlx /n:NxPlx /v:1.0 d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+    - name: Build backend
+      run: dotnet build nxplx-backend/NxPlx.sln -c Release
+    - name: Complete SonarScan
+      run: dotnet tool run dotnet-sonarscanner end /k:rosenbjerg_NxPlx /n:NxPlx /v:1.0 d:sonar.host.url="https://sonarcloud.io" /d:sonar.login=${{ secrets.SONAR_TOKEN }}
+      

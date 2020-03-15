@@ -9,13 +9,13 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
-      <ProjectReference Include="..\NxPlx.Models.Dto\NxPlx.Models.Dto.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
+      <PackageReference Include="BCrypt.Net-Next" Version="3.3.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
     </ItemGroup>
 

@@ -30,7 +30,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var form = await req.GetFormDataAsync();
             var session = req.GetData<UserSession>();
             
-            await UserService.UpdateUser(session.User, form);
+            await UserService.UpdateUser(session!.User, form!);
             return await res.SendStatus(HttpStatusCode.OK);
         }
         private static async Task<HandlerType> RemoveUser(Request req, Response res)
@@ -38,32 +38,32 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var username = await req.ParseBodyAsync<JsonValue<string>>();
             var session = req.GetData<UserSession>();
             
-            var ok = await UserService.RemoveUser(session.User, username.value);
+            var ok = await UserService.RemoveUser(session!.User, username!.value);
             if (!ok) return await res.SendStatus(HttpStatusCode.BadRequest);
             return await res.SendStatus(HttpStatusCode.OK);
         }
         private static async Task<HandlerType> ListUsers(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var users = await UserService.GetUsers(session.User);
+            var users = await UserService.GetUsers(session!.User);
             return await res.SendJson(users);
         }
         private static async Task<HandlerType> ListOnlineUsers(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var users = await UserService.ListOnlineUsers(session.User);
+            var users = await UserService.ListOnlineUsers(session!.User);
             return await res.SendJson(users);
         }
         private static async Task<HandlerType> GetUser(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var user = await UserService.GetUser(session.UserId);
+            var user = await UserService.GetUser(session!.UserId);
             return await res.SendJson(user);
         }
         private static async Task<HandlerType> CreateUser(Request req, Response res)
         {
             var form = await req.GetFormDataAsync();
-            var user = await UserService.CreateUser(form["username"], form["email"], form["admin"] == "true", form["libraries"].Select(int.Parse), form["password1"]);
+            var user = await UserService.CreateUser(form!["username"], form!["email"], form!["admin"] == "true", form!["libraries"].Select(int.Parse), form!["password1"]);
             return await res.SendJson(user);
         }
         private static async Task<HandlerType> ChangePassword(Request req, Response res)
@@ -71,7 +71,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             var form = await req.GetFormDataAsync();
             var session = req.GetData<UserSession>();
 
-            var ok = await UserService.ChangeUserPassword(session.User, form["oldPassword"], form["password1"], form["password2"]);
+            var ok = await UserService.ChangeUserPassword(session!.User, form!["oldPassword"], form!["password1"], form!["password2"]);
 
             if (!ok) return await res.SendStatus(HttpStatusCode.BadRequest);
             return await res.SendStatus(HttpStatusCode.OK);
