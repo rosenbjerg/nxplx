@@ -7,7 +7,7 @@ RUN git clone https://github.com/rosenbjerg/NxPlx.git
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS backendBuilder
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
-RUN dotnet publish NxPlx.Infrastructure.WebApi/NxPlx.Infrastructure.WebApi.csproj -c Release -r linux-musl-x64 -o build
+RUN dotnet publish NxPlx.Application.WebApi/NxPlx.Application.WebApi.csproj -c Release -r linux-musl-x64 -o build
 
 
 FROM node:13-alpine3.10 AS frontendBuilder
