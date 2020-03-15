@@ -34,7 +34,7 @@ namespace NxPlx.Core.Services
         }
 
 
-        public static IEnumerable<string> GetDirectoryEntries(string cwd)
+        public static IEnumerable<string?> GetDirectoryEntries(string cwd)
         {
             if (cwd == string.Empty || !Directory.Exists(cwd))
                 return Enumerable.Empty<string>();
@@ -42,7 +42,7 @@ namespace NxPlx.Core.Services
             return Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
             {
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.Temporary | FileAttributes.System
-            }).Select(Path.GetFileName).Where(filename => filename != null);
+            }).Select(Path.GetFileName);
         }
         public static async Task<bool> RemoveLibrary(int libraryId)
         {

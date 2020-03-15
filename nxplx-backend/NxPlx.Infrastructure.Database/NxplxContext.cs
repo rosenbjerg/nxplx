@@ -19,16 +19,16 @@ namespace NxPlx.Services.Database
         private readonly int _userId;
         private readonly List<int> _libraryAccess;
         private readonly bool _isAdmin;
-        public DbSet<FilmFile> FilmFiles { get; set; }
-        public DbSet<EpisodeFile> EpisodeFiles { get; set; }
-        public DbSet<Library> Libraries { get; set; }
-        public DbSet<SubtitleFile> SubtitleFiles { get; set; }
+        public DbSet<FilmFile> FilmFiles { get; set; } = null!;
+        public DbSet<EpisodeFile> EpisodeFiles { get; set; } = null!;
+        public DbSet<Library> Libraries { get; set; } = null!;
+        public DbSet<SubtitleFile> SubtitleFiles { get; set; } = null!;
         
-        public DbSet<SubtitlePreference> SubtitlePreferences { get; set; }
-        public DbSet<WatchingProgress> WatchingProgresses { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserSession> UserSessions { get; set; }
-        public DbSet<Genre> Genre { get; set; }
+        public DbSet<SubtitlePreference> SubtitlePreferences { get; set; } = null!;
+        public DbSet<WatchingProgress> WatchingProgresses { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<UserSession> UserSessions { get; set; } = null!;
+        public DbSet<Genre> Genre { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
