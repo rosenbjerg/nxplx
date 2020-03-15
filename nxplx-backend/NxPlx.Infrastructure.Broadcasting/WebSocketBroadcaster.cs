@@ -13,22 +13,34 @@ namespace NxPlx.Infrastructure.Broadcasting
         private readonly List<WebsocketSession> _all = new List<WebsocketSession>();
         private readonly object _lock = new object();
 
-        public Task BroadcastAdmin(object obj)
+        public async Task BroadcastAdmin(object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return Task.WhenAll(GetSessions(s => s.Admin).Select(dialog => dialog.SendText(message)));
+            try
+            {
+                await Task.WhenAll(GetSessions(s => s.Admin).Select(dialog => dialog.SendText(message)));
+            }
+            catch (Exception) { }
         }
 
-        public Task BroadcastAll(object obj)
+        public async Task BroadcastAll(object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return Task.WhenAll(GetSessions().Select(dialog => dialog.SendText(message)));
+            try
+            {
+                await Task.WhenAll(GetSessions().Select(dialog => dialog.SendText(message)));
+            }
+            catch (Exception) { }
         }
 
-        public Task BroadcastTo(int key, object obj)
+        public async Task BroadcastTo(int key, object obj)
         {
             var message = JsonConvert.SerializeObject(obj);
-            return Task.WhenAll(GetSessions(s => s.UserId == key).Select(dialog => dialog.SendText(message)));
+            try
+            {
+                await Task.WhenAll(GetSessions(s => s.UserId == key).Select(dialog => dialog.SendText(message)));
+            }
+            catch (Exception) { }
         }
 
         private IEnumerable<WebSocketDialog> GetSessions(Func<WebsocketSession, bool> predicate = null)
