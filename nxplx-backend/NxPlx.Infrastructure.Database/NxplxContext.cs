@@ -60,7 +60,7 @@ namespace NxPlx.Services.Database
             modelBuilder.Entity<User>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.UserId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<User>().HasMany<WatchingProgress>().WithOne().HasForeignKey(wp => wp.UserId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<UserSession>().HasOne(us => us.User).WithMany().OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<User>()
                 .Property(sl => sl.LibraryAccessIds)
                 .HasConversion(

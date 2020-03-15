@@ -37,7 +37,7 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             /*if (relativePath != "index.html")
                 res.AddHeader("Cache-Control", $"max-age={FileMaxAge}");*/
             
-            return res.SendFile(fullPath);
+            return res.SendFile(fullPath, "text/html");
         }
 
     }
