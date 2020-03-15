@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BCrypt.Net-Next" Version="3.2.1" />
+      <PackageReference Include="BCrypt.Net-Next" Version="3.3.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.2" />
     </ItemGroup>
 

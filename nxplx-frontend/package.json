@@ -46,14 +46,14 @@
     "tslint-consistent-codestyle": "^1.14.1",
     "tslint-eslint-rules": "^5.4.0",
     "tslint-react": "^3.6.0",
-    "typescript": "^3.7.5",
+    "typescript": "^3.8.3",
     "typings-for-css-modules-loader": "^1.7.0"
   },
   "dependencies": {
     "@snackbar/core": "^1.7.0",
     "linkstate": "^1.1.1",
     "lodash": "^4.17.15",
-    "preact": "^10.3.2",
+    "preact": "^10.3.4",
     "preact-helmet": "^4.0.0-alpha-3",
     "preact-router": "^3.0.1",
     "reconnecting-websocket": "^4.4.0",
