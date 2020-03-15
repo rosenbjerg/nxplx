@@ -20,13 +20,13 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static Task<HandlerType> Verify(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            return res.SendString(session.IsAdmin.ToString());
+            return res.SendString(session!.IsAdmin.ToString());
         }
         
         private static async Task<HandlerType> Logout(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            await res.CloseSession(session);
+            await res.CloseSession(session!);
             return await res.SendStatus(HttpStatusCode.OK);
         }
 
@@ -34,11 +34,11 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         {
             var form = await req.GetFormDataAsync();
 
-            var session = await AuthenticationService.TryCreateSession(form["username"], form["password"], req.Headers["User-Agent"]);
+            var session = await AuthenticationService.TryCreateSession(form!["username"], form!["password"], req.Headers["User-Agent"]);
             if (session == null) return await res.SendStatus(HttpStatusCode.BadRequest);
             
             await res.OpenSession(session);
-            return await res.SendString(session.IsAdmin.ToString());
+            return await res.SendString(session!.IsAdmin.ToString());
         }
         
     }

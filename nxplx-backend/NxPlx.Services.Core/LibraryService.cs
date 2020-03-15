@@ -42,7 +42,7 @@ namespace NxPlx.Core.Services
             return Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
             {
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.Temporary | FileAttributes.System
-            }).Select(Path.GetFileName);
+            }).Select(Path.GetFileName).Where(filename => filename != null);
         }
         public static async Task<bool> RemoveLibrary(int libraryId)
         {
@@ -99,7 +99,7 @@ namespace NxPlx.Core.Services
             await transaction.SaveChanges();
 
             container.Resolve<ILoggingService>().Info("Created library {Name} with {Path}", lib.Name, lib.Path);
-            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib);
+            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib)!;
         }
     }
 }

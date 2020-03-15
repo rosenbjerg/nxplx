@@ -26,24 +26,26 @@ namespace NxPlx.Infrastructure.WebApi.Routes
 
             var libIds = await req.ParseBodyAsync<JsonValue<int[]>>();
             
-            IEnumerable<Library> libraries;
+            ICollection<Library> libraries;
             await using (var ctx = container.Resolve<IReadNxplxContext>())
             {
-                libraries = await ctx.Libraries.Many(l => libIds.value.Contains(l.Id)).ToListAsync();
+                libraries = await ctx.Libraries.Many(l => libIds!.value.Contains(l.Id)).ToListAsync();
             }
 
             await res.SendStatus(HttpStatusCode.OK);
-            await IndexAndBroadcast(container, libIds.value, libraries);
+            await IndexAndBroadcast(container, libIds!.value, libraries);
             return HandlerType.Final;
         }
 
-        private static async Task IndexAndBroadcast(ResolveContainer container, int[] libIds, IEnumerable<Library> libraries)
+        private static async Task IndexAndBroadcast(ResolveContainer container, int[] libIds, ICollection<Library> libraries)
         {
             var indexer = container.Resolve<IIndexer>();
             var broadcaster = container.Resolve<IBroadcaster>();
-            await broadcaster.BroadcastAll(new Broadcast<int[]>("indexing:started", libIds));
+            
+            var names = libraries.Select(l => l.Name).ToArray();
+            await broadcaster.BroadcastAll(new Broadcast<string[]>("indexing:started", names));
             await indexer.IndexLibraries(libraries);
-            await broadcaster.BroadcastAll(new Broadcast<int[]>("indexing:completed", libIds));
+            await broadcaster.BroadcastAll(new Broadcast<string[]>("indexing:completed", names));
         }
     }
 }

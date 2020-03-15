@@ -6,7 +6,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
-      <ProjectReference Include="..\NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />

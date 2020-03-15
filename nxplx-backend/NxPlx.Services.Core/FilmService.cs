@@ -31,7 +31,7 @@ namespace NxPlx.Core.Services
 
             var mapper = container.Resolve<IDtoMapper>();
             var collection = mapper.Map<MovieCollection, MovieCollectionDto>(filmFiles.First().FilmDetails.BelongsInCollection);
-            collection.movies = mapper.Map<DbFilmDetails, OverviewElementDto>(filmFiles.Select(ff => ff.FilmDetails)).ToList();
+            collection!.movies = mapper.Map<DbFilmDetails, OverviewElementDto>(filmFiles.Select(ff => ff.FilmDetails)).ToList();
             
             return collection;
         }
