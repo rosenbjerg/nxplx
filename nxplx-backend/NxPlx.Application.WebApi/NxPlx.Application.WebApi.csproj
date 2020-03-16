@@ -11,7 +11,7 @@
     <ItemGroup>
       <PackageReference Include="Red.CookieSessions" Version="5.1.0" />
       <PackageReference Include="Red.CookieSessions.EFCore" Version="4.0.0" />
-      <PackageReference Include="RHttpServer" Version="5.2.0" />
+      <PackageReference Include="RHttpServer" Version="5.2.1" />
     </ItemGroup>
 
     <ItemGroup>

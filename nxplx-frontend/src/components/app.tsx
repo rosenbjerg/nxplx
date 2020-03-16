@@ -67,9 +67,9 @@ export default class App extends Component {
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {
                 this.loadBuild();
+                WebsocketMessenger.Get();
             }
         });
-        WebsocketMessenger.Get();
     }
 
     private loadBuild() {
