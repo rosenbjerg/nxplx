@@ -29,4 +29,4 @@ COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
 ENV NXPLX_BUILD=$build
 EXPOSE 5353
-ENTRYPOINT ["dotnet", "NxPlx.Infrastructure.WebApi.dll"]
+ENTRYPOINT ["dotnet", "NxPlx.Application.WebApi.dll"]
