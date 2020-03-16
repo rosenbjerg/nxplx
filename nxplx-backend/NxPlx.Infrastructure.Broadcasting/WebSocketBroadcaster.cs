@@ -15,9 +15,9 @@ namespace NxPlx.Infrastructure.Broadcasting
 
         public async Task BroadcastAdmin(object obj)
         {
-            var message = JsonConvert.SerializeObject(obj);
             try
             {
+                var message = JsonConvert.SerializeObject(obj);
                 await Task.WhenAll(GetSessions(s => s.Admin).Select(dialog => dialog.SendText(message)));
             }
             catch (Exception) { }
@@ -25,9 +25,9 @@ namespace NxPlx.Infrastructure.Broadcasting
 
         public async Task BroadcastAll(object obj)
         {
-            var message = JsonConvert.SerializeObject(obj);
             try
             {
+                var message = JsonConvert.SerializeObject(obj);
                 await Task.WhenAll(GetSessions().Select(dialog => dialog.SendText(message)));
             }
             catch (Exception) { }
@@ -35,9 +35,9 @@ namespace NxPlx.Infrastructure.Broadcasting
 
         public async Task BroadcastTo(int key, object obj)
         {
-            var message = JsonConvert.SerializeObject(obj);
             try
             {
+                var message = JsonConvert.SerializeObject(obj);
                 await Task.WhenAll(GetSessions(s => s.UserId == key).Select(dialog => dialog.SendText(message)));
             }
             catch (Exception) { }
