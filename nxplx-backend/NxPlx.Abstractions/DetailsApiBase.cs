@@ -71,8 +71,8 @@ namespace NxPlx.Abstractions
             }
         }
         
-        public abstract Task<FilmResult[]> SearchMovies(string title, int year);
-        public abstract Task<SeriesResult[]> SearchTvShows(string name);
+        public abstract Task<DetailsSearchResult[]> SearchMovies(string title, int year);
+        public abstract Task<DetailsSearchResult[]> SearchTvShows(string name);
         public abstract Task<FilmDetails> FetchMovieDetails(int id, string language);
         public abstract Task<SeriesDetails> FetchTvDetails(int id, string language);
         public abstract Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language);

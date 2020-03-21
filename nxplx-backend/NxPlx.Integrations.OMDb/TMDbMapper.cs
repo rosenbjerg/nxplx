@@ -157,23 +157,88 @@ namespace NxPlx.Integrations.TMDb
                 
             });
             
-            SetMapping<SearchResult<TvShowResult>, DetailsSearchResult[]>(searchResult 
-                => Map<TvShowResult, DetailsSearchResult>(searchResult.results.Take(10)).ToArray());
+            SetMapping<DetailsSearchResult, SeriesResult[]>(searchResult 
+                => Map<TvShowResult, SeriesResult>(searchResult.results.Take(10)).ToArray());
             
-            SetMapping<SearchResult<MovieResult>, DetailsSearchResult[]>(searchResult 
-                => Map<MovieResult, DetailsSearchResult>(searchResult.results.Take(10)).ToArray());
+            SetMapping<DetailsSearchResult, FilmResult[]>(searchResult 
+                => Map<MovieResult, FilmResult>(searchResult.results.Take(10)).ToArray());
             
-            SetMapping<TvShowResult, DetailsSearchResult>(tvShowResult => new DetailsSearchResult
+            SetMapping<TvShowResult, SeriesResult>(tvShowResult => new SeriesResult
             {
                 Id = tvShowResult.id,
-                Title = tvShowResult.name
+                Overview = tvShowResult.overview,
+                Popularity = tvShowResult.popularity,
+                GenreIds = tvShowResult.genre_ids,
+                OriginalLanguage = tvShowResult.original_language,
+                Title = tvShowResult.name,
+                OriginalName = tvShowResult.original_name,
+                OriginCountry = tvShowResult.origin_country,
+                FirstAirDate = tvShowResult.first_air_date,
+                Votes = tvShowResult.vote_count
             });
             
-            SetMapping<MovieResult, DetailsSearchResult>(movieResult => new DetailsSearchResult
+            SetMapping<MovieResult, FilmResult>(movieResult => new FilmResult
             {
                 Id = movieResult.id,
-                Title = movieResult.title
+                Overview = movieResult.overview,
+                Popularity = movieResult.popularity,
+                Title = movieResult.title,
+                GenreIds = movieResult.genre_ids,
+                OriginalLanguage = movieResult.original_language,
+                OriginalTitle = movieResult.original_title,
+                ReleaseDate = movieResult.release_date,
+                Votes = movieResult.vote_count
             });
+        }
+        
+
+        
+        public List<TPropertyEntity> UniqueProperties<TRootEntity, TPropertyEntity, TPropertyKey>(IEnumerable<TRootEntity> entities, 
+            Func<TRootEntity, IEnumerable<TPropertyEntity>> selector, 
+            Func<TPropertyEntity, TPropertyKey> keySelector)
+            where TRootEntity : class
+            where TPropertyEntity : class
+        {
+            var uniqueProperties = new Dictionary<TPropertyKey, TPropertyEntity>();
+
+            
+            foreach (var rootEntity in entities)
+            {
+                var propertyContent = selector(rootEntity);
+                if (propertyContent == null) continue;
+                foreach (var propertyEntity in propertyContent)
+                {   
+                    if (propertyEntity == null) continue;
+                    var id = keySelector(propertyEntity);
+                    if (id == null) continue;
+                    if (uniqueProperties.ContainsKey(id)) continue;
+                    uniqueProperties[id] = propertyEntity;
+                }
+            };
+            
+            return uniqueProperties.Values.ToList();
+        }
+        
+        public List<TPropertyEntity> UniqueProperties<TRootEntity, TPropertyEntity, TPropertyKey>(IEnumerable<TRootEntity> entities, 
+            Func<TRootEntity, TPropertyEntity> selector, 
+            Func<TPropertyEntity, TPropertyKey> keySelector)
+            where TRootEntity : class
+            where TPropertyEntity : class
+        {
+            var uniqueProperties = new Dictionary<TPropertyKey, TPropertyEntity>();
+
+            foreach (var rootEntity in entities)
+            {
+                var propertyContent = selector(rootEntity);
+                if (propertyContent == null) continue;
+                var id = keySelector(propertyContent);
+                if (id == null) continue;
+                if (uniqueProperties.ContainsKey(id))
+                    continue;
+                uniqueProperties[id] = propertyContent;
+            };
+            
+            return uniqueProperties.Values.ToList();
         }
     }
 }

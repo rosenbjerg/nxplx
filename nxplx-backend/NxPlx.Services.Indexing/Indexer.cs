@@ -223,7 +223,7 @@ namespace NxPlx.Services.Index
                 }
                 
                 var actual = new Fastenshtein.Levenshtein(episodeFile.Name);
-                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Name)).First();
+                var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Title)).First();
                 
                 var seriesDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
                 episodeFile.SeriesDetailsId = seriesDetails.Id;

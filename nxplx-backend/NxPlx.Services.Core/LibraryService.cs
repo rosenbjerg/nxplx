@@ -65,7 +65,7 @@ namespace NxPlx.Core.Services
             container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
             return true;
         }
-        public static async Task<IEnumerable<LibraryDto>> ListLibraries(User user)
+        public static async Task<IEnumerable<AdminLibraryDto>> ListLibraries(User user)
         {
             var container = ResolveContainer.Default;
             await using var context = container.Resolve<IReadNxplxContext>(user);

@@ -6,27 +6,25 @@ using System.Web;
 using Newtonsoft.Json;
 using NxPlx.Abstractions;
 using NxPlx.Configuration;
-using NxPlx.Integrations.TMDb.Models.Movie;
-using NxPlx.Integrations.TMDb.Models.Search;
-using NxPlx.Integrations.TMDb.Models.Tv;
-using NxPlx.Integrations.TMDb.Models.TvSeason;
+using NxPlx.Integrations.OMDb.Models;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
 using TokenBucket;
+using SearchResult = NxPlx.Integrations.OMDb.Models.SearchResult;
 
 namespace NxPlx.Integrations.TMDb
 {
-    public class TMDbApi : DetailsApiBase
+    public class OMDbApi : DetailsApiBase
     {
-        private const string BaseUrl = "https://api.themoviedb.org/3";
+        private readonly string _baseUrl;
         private readonly TMDbMapper _mapper;
         
-        public TMDbApi(ICachingService cachingService, ILoggingService loggingService) 
+        public OMDbApi(ICachingService cachingService, ILoggingService loggingService) 
             : base(ConfigurationService.Current.ImageFolder, cachingService,loggingService)
         {
             _mapper = new TMDbMapper();
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ConfigurationService.Current.TMDbApiKey}");
+            _baseUrl = "https://www.omdbapi.com?apikey=815a3c61";
         }
 
 
@@ -34,28 +32,25 @@ namespace NxPlx.Integrations.TMDb
             .WithCapacity(10)
             .WithFixedIntervalRefillStrategy(10, TimeSpan.FromSeconds(3))
             .Build();
-        private readonly ITokenBucket _imageBucket = TokenBuckets.Construct()
-            .WithCapacity(100)
-            .WithFixedIntervalRefillStrategy(100, TimeSpan.FromSeconds(3))
-            .Build();
-        
-        private async Task<string> Fetch(string url)
+
+
+        private async Task<string?> Fetch(string url)
         {
             {
                 var cachedContent = await CachingService.GetAsync(url);
                 if (!string.IsNullOrEmpty(cachedContent)) return cachedContent;
             }
-
+            
             _bucket.Consume(1);
-            
-            var content = await FetchInternal(url);
-            
-            if (string.IsNullOrEmpty(content) || content.StartsWith("{\"status_code\":25"))
+            var response = await Client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
             {
-                return await Fetch(url);
+                var content = await response.Content.ReadAsStringAsync();
+                await CachingService.SetAsync(url, content, CacheKind.WebRequest);
+                return content;
             }
 
-            return content;
+            return null;
         }
 
         public override async Task<DetailsSearchResult[]> SearchMovies(string title, int year)
@@ -64,19 +59,19 @@ namespace NxPlx.Integrations.TMDb
 
             if (title == "" || encodedTitle == "")
             {
-                return new DetailsSearchResult[0];
+                return new FilmResult[0];
             }
             
-            var encodedYear = year < 2 ? "" : $"&year={year}";
-            var url = $"{BaseUrl}/search/movie?query={encodedTitle}{encodedYear}";
+            var encodedYear = year < 2 ? "" : $"&y={year}";
+            var url = $"{_baseUrl}&s={encodedTitle}{encodedYear}&type=movie";
 
             var content = await Fetch(url);
-            var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
+            var tmdbObj = JsonConvert.DeserializeObject<SearchResult>(content);
 
             try
             {
 
-                return _mapper.Map<SearchResult<MovieResult>, DetailsSearchResult[]>(tmdbObj);
+                return _mapper.Map<SearchResult, DetailsSearchResult[]>(tmdbObj);
             }
             catch (Exception e)
             {
@@ -85,22 +80,22 @@ namespace NxPlx.Integrations.TMDb
             }
         }
         
-        public override async Task<DetailsSearchResult[]> SearchTvShows(string name)
+        public override async Task<DetailsSearchResult[]> SearchTvShows(string title)
         {
-            var encodedTitle = HttpUtility.UrlEncode(name);
-            var url = $"{BaseUrl}/search/tv?query={encodedTitle}";
+            var encodedTitle = HttpUtility.UrlEncode(title);
+            var url = $"{_baseUrl}&s={encodedTitle}&type=series";
 
             var content = await Fetch(url);
-            var tmdbObj = JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
+            var tmdbObj = JsonConvert.DeserializeObject<SearchResult>(content);
 
-            var mapped = _mapper.Map<SearchResult<TvShowResult>, DetailsSearchResult[]>(tmdbObj);
+            var mapped = _mapper.Map<SearchResult, DetailsSearchResult[]>(tmdbObj);
             
             return mapped;
         }
 
         public override async Task<FilmDetails> FetchMovieDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/movie/{id}?language={language}";
+            var url = $"{_baseUrl}/movie/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<MovieDetails>(content);
@@ -110,7 +105,7 @@ namespace NxPlx.Integrations.TMDb
         
         public override async Task<SeriesDetails> FetchTvDetails(int id, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}?language={language}";
+            var url = $"{_baseUrl}/tv/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
@@ -124,7 +119,7 @@ namespace NxPlx.Integrations.TMDb
         
         public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}";
+            var url = $"{_baseUrl}/tv/{id}/season/{season}?language={language}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvSeasonDetails>(content);
@@ -134,8 +129,6 @@ namespace NxPlx.Integrations.TMDb
         public override async Task DownloadImage(string size, string imageUrl)
         {
             if (string.IsNullOrEmpty(imageUrl)) return;
-            
-            _imageBucket.Consume(1);
             var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
             await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", size, imageName);
         }
