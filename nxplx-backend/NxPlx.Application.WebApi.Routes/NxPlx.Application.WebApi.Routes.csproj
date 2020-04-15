@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BCrypt.Net-Next" Version="3.3.3" />
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.0" />
       <PackageReference Include="Red.Validation" Version="1.0.0" />
     </ItemGroup>
 
