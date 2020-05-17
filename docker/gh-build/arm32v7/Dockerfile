@@ -14,7 +14,7 @@ FROM node:13-alpine3.10 AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
-RUN yarn install --no-progress --silent
+RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
