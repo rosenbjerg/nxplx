@@ -16,29 +16,23 @@ namespace NxPlx.Core.Services
 {
     public static class EpisodeService
     {
-        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, User user)
+        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int seriesId, int? seasonNo, int? episodeNo,
+            string mode, User user)
         {
             var container = ResolveContainer.Default;
             await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var current = await ctx.EpisodeFiles.OneById(fileId);
 
-            if (current == null) return null;
-            
-            var season = await ctx.EpisodeFiles.Many(ef =>
-                ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
-                ef.EpisodeNumber > current.EpisodeNumber).ToListAsync();
-            
-            var next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
-
-            if (next == null)
+            var next = mode.ToLower() switch
             {
-                season = await ctx.EpisodeFiles.Many(ef =>
-                    ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1).ToListAsync();
-                next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
-            }
+                "longesttimesince" => await NextEpisodeService.LongestSinceLastWatch(ctx, seriesId, seasonNo, episodeNo, user),
+                "random" => await NextEpisodeService.Random(ctx, seriesId, seasonNo, episodeNo),
+                _ => await NextEpisodeService.Default(ctx, seriesId, seasonNo, episodeNo)
+            };
 
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, NextEpisodeDto>(next);
         }
+
+
         public static async Task<string?> FindEpisodeFilePath(int id, User user)
         {
             var container = ResolveContainer.Default;
@@ -47,6 +41,7 @@ namespace NxPlx.Core.Services
             return await ctx.EpisodeFiles
                 .ProjectOne(ef => ef.Id == id, ef => ef.Path);
         }
+
         public static async Task<InfoDto?> FindEpisodeFileInfo(int id, User user)
         {
             var container = ResolveContainer.Default;
@@ -55,6 +50,7 @@ namespace NxPlx.Core.Services
             var episode = await ctx.EpisodeFiles.One(ef => ef.Id == id, ef => ef.Subtitles);
             return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
         }
+
         public static async Task<SeriesDto?> FindSeriesDetails(int id, int? season, User user)
         {
             var container = ResolveContainer.Default;
@@ -64,13 +60,14 @@ namespace NxPlx.Core.Services
                 .Many(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season)).ToListAsync();
 
             if (!episodes.Any()) return default;
-            
+
             var dtoMapper = container.Resolve<IDtoMapper>();
             var seriesDetails = episodes.First().SeriesDetails;
             return MergeEpisodes(dtoMapper, seriesDetails, episodes);
         }
 
-        public static SeriesDto MergeEpisodes(IMapper mapper, DbSeriesDetails series, IReadOnlyCollection<EpisodeFile> files)
+        private static SeriesDto MergeEpisodes(IMapper mapper, DbSeriesDetails series,
+            IReadOnlyCollection<EpisodeFile> files)
         {
             var seriesDto = mapper.Map<DbSeriesDetails, SeriesDto>(series);
             seriesDto!.seasons = series.Seasons
@@ -79,20 +76,24 @@ namespace NxPlx.Core.Services
                 .ToList();
             return seriesDto;
         }
-        public static SeasonDto MergeEpisodes(IMapper mapper, SeasonDetails seasonDetails, IEnumerable<EpisodeFile> files)
+
+        private static SeasonDto MergeEpisodes(IMapper mapper, SeasonDetails seasonDetails,
+            IEnumerable<EpisodeFile> files)
         {
             var seasonDto = mapper.Map<SeasonDetails, SeasonDto>(seasonDetails);
             seasonDto!.episodes = MergeEpisodes(seasonDetails.Episodes, files);
             return seasonDto;
         }
-        public static IEnumerable<EpisodeDto> MergeEpisodes(IEnumerable<EpisodeDetails> episodeDetails, IEnumerable<EpisodeFile> files)
+
+        private static IEnumerable<EpisodeDto> MergeEpisodes(IEnumerable<EpisodeDetails> episodeDetails,
+            IEnumerable<EpisodeFile> files)
         {
             var mapping = episodeDetails.ToDictionary(d => (d.SeasonNumber, d.EpisodeNumber));
             return files.Select(f =>
             {
                 if (!mapping.TryGetValue((f.SeasonNumber, f.EpisodeNumber), out var details))
                 {
-                    details = new EpisodeDetails { Name = "" };
+                    details = new EpisodeDetails {Name = ""};
                 }
 
                 return new EpisodeDto

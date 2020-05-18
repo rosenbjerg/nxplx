@@ -22,19 +22,20 @@ interface Props {
 interface State {
 }
 
-const volume = getFloatEntry("player_volume") || 1.0;
-const muted = getBooleanEntry("player_muted");
-const autoplay = getBooleanEntry("player_autoplay");
+let volume = getFloatEntry("player_volume") || 1.0;
+let muted = getBooleanEntry("player_muted");
+let autoplay = getBooleanEntry("player_autoplay");
 
-const setVolume = vl => setEntry("player_volume", vl);
-const setAutoplay = ap => setEntry("player_autoplay", ap);
-const setMuted = mu => setEntry("player_muted", mu);
+const setVolume = vl => setEntry("player_volume", volume = vl);
+const setAutoplay = ap => setEntry("player_autoplay", autoplay = ap);
+const setMuted = mu => setEntry("player_muted", muted = mu);
 
 // declare const cast;
 // declare const chrome;
 
 export default class VideoPlayer extends Component<Props, State> {
     private video?: HTMLVideoElement;
+    private videoContainer?: HTMLElement;
 
     public componentDidMount(): void {
         if (this.video !== undefined) this.video.volume = volume;
@@ -62,24 +63,33 @@ export default class VideoPlayer extends Component<Props, State> {
 
     public render({ poster, src, startTime, subtitles }: Props) {
         return (
-            <video key={src}
-                   ref={this.bindVideo}
-                   class={style.video}
-                   muted={muted}
-                   autoPlay={autoplay || startTime < 3}
-                   poster={poster}
-                   controls
-                   onTimeUpdate={this.onTimeChange}
-                   onVolumeChange={this.onVolumeChange}
-                   onPlay={this.onPlay}
-                   onPause={this.onPause}
-                   onEnded={this.onEnded}>
-                <source src={`${src}#t=${startTime}`} type="video/mp4"/>
-                {subtitles.map(track => (
-                    <track default={track.default} src={`${track.path}#${(startTime)}`} kind="captions"
-                           srcLang={track.language} label={track.displayName}/>
-                ))}
-            </video>
+            <div ref={this.bindVideoContainer}
+                 class={style.videoContainer}>
+                <video key={src}
+                       ref={this.bindVideo}
+                       class={style.video}
+                       muted={muted}
+                       autoPlay={autoplay || startTime < 3}
+                       poster={poster}
+                       controls
+                       onTimeUpdate={this.onTimeChange}
+                       onVolumeChange={this.onVolumeChange}
+                       onPlay={this.onPlay}
+                       onPause={this.onPause}
+                       onEnded={this.onEnded}>
+                    <source src={`${src}#t=${startTime}`} type="video/mp4"/>
+                    {subtitles.map(track => (
+                        <track default={track.default} src={`${track.path}#${(startTime)}`} kind="captions"
+                               srcLang={track.language} label={track.displayName}/>
+                    ))}
+                </video>
+                <div>
+                    <button>playpause</button>
+                    <button>volume</button>
+                    <button>next</button>
+                    <button>fullscreen</button>
+                </div>
+            </div>
         );
     }
 
@@ -106,4 +116,5 @@ export default class VideoPlayer extends Component<Props, State> {
     };
 
     private bindVideo = ref => this.video = ref;
+    private bindVideoContainer = ref => this.videoContainer = ref;
 }

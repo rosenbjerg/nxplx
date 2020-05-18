@@ -1,6 +1,11 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
 using NxPlx.Core.Services;
 using NxPlx.Infrastructure.Session;
 using Red;
@@ -17,16 +22,27 @@ namespace NxPlx.Infrastructure.WebApi.Routes
             
             router.Get("/info/:file_id", Authenticated.User, GetFileInfo);
             router.Get("/watch/:file_id", Authenticated.User, StreamFile);
-            router.Get("/next/:file_id", Authenticated.User, GetNext);
+            router.Get("/next/:series_id", Authenticated.User, GetNext);
         }
 
         private static async Task<HandlerType> GetNext(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-            var fileId = int.Parse(req.Context.Params["file_id"]!);
+            var seriesId = int.Parse(req.Context.Params["series_id"]!);
+            var season = req.Queries["season"].SelectFirstOrNull(int.Parse);
+            var episode = req.Queries["episode"].SelectFirstOrNull(int.Parse);
+            var mode = (string)req.Queries["mode"] ?? "default";
             
-            var next = await EpisodeService.TryFindNextEpisode(fileId, session!.User);
+            var next = await EpisodeService.TryFindNextEpisode(seriesId, season, episode, mode, session!.User);
             return await res.SendJson(next);
+        }
+
+        private static T? SelectFirstOrNull<T>(this StringValues stringValues, Func<string, T> projection)
+            where T : struct
+        {
+            var found = stringValues.FirstOrDefault();
+            if (found == default) return null;
+            else return projection(found);
         }
 
         private static async Task<HandlerType> StreamFile(Request req, Response res)

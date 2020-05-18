@@ -9,6 +9,7 @@
   "language": "Language",
   "user-interface-language": "User-interface language",
   "path": "Path",
+  "create-library": "Create library",
   "index-all-libraries": "Index all libraries",
   "show-directories": "Show directories",
   "hide-directories": "Hide directories",

@@ -5,6 +5,7 @@ using NxPlx.Abstractions.Database;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
 using NxPlx.Models.Details;
+using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 
 namespace NxPlx.Services.Database.Wrapper

@@ -126,6 +126,9 @@ button.bordered:not(:disabled):hover {
 .fullwidth {
     width: 100%;
 }
+.gapped {
+    margin-bottom: 6px;
+}
 table {
     border-collapse: collapse;
     overflow-x: auto;
@@ -134,4 +137,8 @@ table {
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
+}
+
+.right {
+    float: right;
 }

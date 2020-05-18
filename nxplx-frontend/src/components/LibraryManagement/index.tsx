@@ -1,5 +1,6 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
+import Modal from 'react-responsive-modal';
 import { add, remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
@@ -11,69 +12,64 @@ interface Props {}
 interface State {
     libraries: Library[]
     showDirectories: boolean
+    createLibraryModalOpen: boolean
 }
 
 export default class LibraryManagement extends Component<Props, State> {
     public componentDidMount() {
         http.getJson<Library[]>('/api/library/list').then(libraries => this.setState({ libraries }));
     }
-    public render(_, { libraries, showDirectories }) {
+    public render(_, { libraries, showDirectories, createLibraryModalOpen }) {
         return (
             <div>
-                <form onSubmit={this.submitNewLibrary}>
-                    <table class="fullwidth">
-                        <thead>
-                            <tr>
-                                <td>{translate('name')}</td>
-                                <td>{translate('kind')}</td>
-                                <td>{translate('language')}</td>
-                                <td>{translate('path')}</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                !libraries ? (<Loading />) : libraries.map(lib => (
-                                    <tr key={lib.id}>
-                                        <td>{lib.name}</td>
-                                        <td>{translate(lib.kind)}</td>
-                                        <td>{lib.language}</td>
-                                        <td>{lib.path || translate('not specified')}</td>
-                                        <td>
-                                            <button type="button" onClick={this.indexLibrary(lib)} class="material-icons bordered">refresh</button>
-                                            <button type="button" onClick={this.deleteLibrary(lib)} class="material-icons bordered">close</button>
-                                        </td>
-                                    </tr>
-                                ))
-                            }
-                            <tr>
-                                <td>
-                                    <input class="inline-edit fullwidth" name="name" placeholder={translate('name')} type="text" required/>
-                                </td>
-                                <td>
-                                    <select class="inline-edit fullwidth" name="kind" required>
-                                        <option value={'film'}>{translate('film')}</option>
-                                        <option value={'series'}>{translate('series')}</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="inline-edit fullwidth" name="language" required>
-                                        <option value="en-UK">en-UK</option>
-                                        <option value="da-DK">da-DK</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <input class="inline-edit fullwidth" name="path" placeholder={translate('path')} type="text" required/>
-                                </td>
-                                <td>
-                                    <button class="material-icons bordered">done</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
+                <Modal open={createLibraryModalOpen || false} styles={{modal: 'background-color: #424242; border-radius: 2px;', closeIcon:'fill: white;'}} onClose={() => this.setState({createLibraryModalOpen: false})} center>
+                    <h2>{translate('create-library')}</h2>
+                    <form class="gapped" onSubmit={this.submitNewLibrary}>
+                        <input class="inline-edit fullwidth gapped" name="name" placeholder={translate('name')}
+                               type="text" required/>
+                        <select class="inline-edit fullwidth gapped" name="kind" required>
+                            <option value={'film'}>{translate('film')}</option>
+                            <option value={'series'}>{translate('series')}</option>
+                        </select>
+                        <select class="inline-edit fullwidth gapped" name="language" required>
+                            <option value="en-UK">en-UK</option>
+                            <option value="da-DK">da-DK</option>
+                        </select>
+                        <input class="inline-edit fullwidth gapped" name="path" placeholder={translate('path')} type="text" required/>
+                        <button type="submit" class="material-icons bordered right">done</button>
+                        <button type="button" class="bordered" onClick={() => this.setState({ showDirectories: !showDirectories })}>{translate(showDirectories ? 'hide-directories' : 'show-directories')}</button>
+                    </form>
+                    {showDirectories && (<DirectoryBrowser/>)}
+                </Modal>
+
+                <table class="fullwidth">
+                    <thead>
+                        <tr>
+                            <td>{translate('name')}</td>
+                            <td>{translate('kind')}</td>
+                            <td>{translate('language')}</td>
+                            <td>{translate('path')}</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            !libraries ? (<Loading />) : libraries.map(lib => (
+                                <tr key={lib.id}>
+                                    <td>{lib.name}</td>
+                                    <td>{translate(lib.kind)}</td>
+                                    <td>{lib.language}</td>
+                                    <td>{lib.path || translate('not specified')}</td>
+                                    <td>
+                                        <button type="button" onClick={this.indexLibrary(lib)} class="material-icons bordered">refresh</button>
+                                        <button type="button" onClick={this.deleteLibrary(lib)} class="material-icons bordered">close</button>
+                                    </td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+                <button class="bordered" onClick={() => this.setState({ createLibraryModalOpen: true })}>{translate('create-library')}</button>
                 <button class="bordered" onClick={this.indexAllLibraries}>{translate('index-all-libraries')}</button>
-                <button class="bordered" onClick={() => this.setState({ showDirectories: !showDirectories})}>{translate(showDirectories ? 'hide-directories' : 'show-directories')}</button>
-                {showDirectories && (<DirectoryBrowser/>)}
             </div>
         );
     }
@@ -101,8 +97,8 @@ export default class LibraryManagement extends Component<Props, State> {
         const form = new FormData(formElement);
         const response = await http.post('/api/library', form, false);
         if (response.ok) {
-            this.setState({ libraries: add(this.state.libraries, await response.json()) });
             formElement.reset();
+            this.setState({ libraries: add(this.state.libraries, await response.json()), createLibraryModalOpen: false });
         }
         else {
             createSnackbar('Unable to create new library :/', { timeout: 1500 });

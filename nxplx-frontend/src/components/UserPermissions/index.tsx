@@ -22,7 +22,6 @@ interface State {
 
 export default class UserPermissions extends Component<Props, State> {
 
-
     public componentDidUpdate(previousProps: Readonly<Props>): void {
         if (this.props.user && previousProps.user !== this.props.user) {
             this.setState({ currentUser: this.props.user }, () => {

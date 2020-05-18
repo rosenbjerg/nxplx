@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using NxPlx.Core.Services;
 using NxPlx.Infrastructure.Session;
 using NxPlx.Models;
+using NxPlx.Models.Dto.Models;
 using Red;
 using Red.Extensions;
 using Red.Interfaces;
@@ -58,10 +59,11 @@ namespace NxPlx.Infrastructure.WebApi.Routes
         private static async Task<HandlerType> ListLibraries(Request req, Response res)
         {
             var session = req.GetData<UserSession>();
-
-            var libraries = await LibraryService.ListLibraries(session!.User);
-
-            return await res.SendJson(libraries);
+            
+            if (session!.User.Admin)
+                return await res.SendJson(await LibraryService.ListLibraries<AdminLibraryDto>(session!.User));
+            else 
+                return await res.SendJson(await LibraryService.ListLibraries<LibraryDto>(session!.User));
         }
 
         private static async Task<HandlerType> SetUserLibraryPermissions(Request req, Response res)

@@ -24,7 +24,7 @@ export function translate(key:string, ...params:string[]) {
     let translation = dictionary[currentLocale][key];
     if (translation === undefined) {
         console.warn(`translation for ${key} not found for locale ${currentLocale}`);
-        translation = dictionary.en[key];
+        translation = dictionary.en[key] || `[${key}]`;
     }
     if (params.length) {
         const matches = translation.match(templateRegex);
