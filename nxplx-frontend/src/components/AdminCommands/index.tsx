@@ -22,10 +22,10 @@ export default class AdminCommands extends Component<Props, State> {
     public render(_, state) {
         return (
             <div>
-                <div class="center-content">
-                    <select onChange={this.onSelected} value={state.selectedCommand?.name ?? ''} class="inline-edit">
+                <div class="center-content">state.selectedCommand
+                    <select onChange={this.onSelected} class="inline-edit">
                         <option value="">- Select command</option>
-                        {state.commands?.map(command => <option key={command.name}
+                        {(state.commands || []).map(command => <option key={command.name}
                                                                 value={command.name}>{command.name}</option>)}
                     </select>
                     <button onClick={this.invoke} disabled={state.selectedCommand === undefined} class="bordered">Execute
