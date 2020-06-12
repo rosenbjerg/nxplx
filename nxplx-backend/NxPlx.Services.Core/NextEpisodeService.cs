@@ -2,18 +2,42 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions.Database;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
 using NxPlx.Models;
 using NxPlx.Models.File;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services
 {
-    public static class NextEpisodeService
+    public class NextEpisodeService
     {
-        public static async Task<EpisodeFile> Random(IReadNxplxContext context, int seriesId, int? seasonNo,
-            int? episodeNo)
+        private readonly OperationContext _operationContext;
+        private readonly DatabaseContext _context;
+        private readonly IDtoMapper _dtoMapper;
+
+        public NextEpisodeService(OperationContext operationContext, DatabaseContext context, IDtoMapper dtoMapper)
         {
-            var available = await context.EpisodeFiles.Many(ef =>
+            _operationContext = operationContext;
+            _context = context;
+            _dtoMapper = dtoMapper;
+        }
+        
+        public async Task<NextEpisodeDto?> TryFindNextEpisode(int seriesId, int? seasonNo, int? episodeNo, string mode)
+        {
+            var next = mode.ToLower() switch
+            {
+                "longesttimesince" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
+                "random" => await Random(seriesId, seasonNo, episodeNo),
+                _ => await Default(seriesId, seasonNo, episodeNo)
+            };
+
+            return _dtoMapper.Map<EpisodeFile, NextEpisodeDto>(next);
+        }
+        
+        public async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo)
+        {
+            var available = await _context.EpisodeFiles.Where(ef =>
                 ef.SeriesDetailsId == seriesId &&
                 (seasonNo == null || ef.SeasonNumber == seasonNo &&
                     (episodeNo == null || ef.EpisodeNumber != episodeNo))).ToListAsync();
@@ -21,18 +45,17 @@ namespace NxPlx.Core.Services
             return available[selectedIndex];
         }
 
-        public static async Task<EpisodeFile> LongestSinceLastWatch(IReadNxplxContext context, int seriesId,
-            int? seasonNo, int? episodeNo, User user)
+        public async Task<EpisodeFile> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
         {
-            var available = await context.EpisodeFiles.Many(ef =>
+            var available = await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber == seasonNo &&
                         (episodeNo == null || ef.EpisodeNumber != episodeNo)))
                 .ToListAsync();
             var availableIds = available.Select(ef => ef.Id).ToList();
 
-            var progress = await context.WatchingProgresses
-                .Many(wp => wp.UserId == user.Id && availableIds.Contains(wp.FileId))
+            var progress = await _context.WatchingProgresses
+                .Where(wp => wp.UserId == _operationContext.User.Id && availableIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId);
 
             return available
@@ -44,10 +67,9 @@ namespace NxPlx.Core.Services
                 .FirstOrDefault();
         }
 
-        public static async Task<EpisodeFile> Default(IReadNxplxContext context, int seriesId, int? seasonNo,
-            int? episodeNo)
+        public async Task<EpisodeFile> Default(int seriesId, int? seasonNo, int? episodeNo)
         {
-            return await context.EpisodeFiles.Many(ef =>
+            return await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber > seasonNo ||
                      ef.SeasonNumber == seasonNo && (episodeNo == null || ef.EpisodeNumber > episodeNo)))

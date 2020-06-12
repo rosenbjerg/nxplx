@@ -7,9 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
-      <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
       <ProjectReference Include="..\Nxplx.Integrations.FFMpeg\Nxplx.Integrations.FFMpeg.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
     </ItemGroup>

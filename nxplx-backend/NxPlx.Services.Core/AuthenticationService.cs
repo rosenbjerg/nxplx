@@ -1,29 +1,58 @@
-﻿using System.Threading.Tasks;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
-using NxPlx.Infrastructure.Session;
+﻿using System.Buffers.Text;
+using System.Security.Cryptography;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using NxPlx.Application.Core;
+using NxPlx.Models;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services
 {
-    public static class AuthenticationService
+    public class AuthenticationService
     {
-        public static async Task<UserSession?> TryCreateSession(string username, string password, string userAgent)
-        {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-            var user = await context.Users.One(u => u.Username == username);
+        private readonly DatabaseContext _databaseContext;
+        private readonly OperationContext _operationContext;
 
+        public AuthenticationService(DatabaseContext databaseContext, OperationContext operationContext)
+        {
+            _databaseContext = databaseContext;
+            _operationContext = operationContext;
+        }
+        public async Task<UserSession?> Login(string username, string password, string userAgent)
+        {
+            var user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
             {
-                return new UserSession
+                var session = new UserSession
                 {
+                    Id = GenerateToken(),
                     UserAgent = userAgent,
                     IsAdmin = user.Admin,
                     UserId = user.Id
                 };
+                _operationContext.User = user;
+                _databaseContext.UserSessions.Add(session);
+                await _databaseContext.SaveChangesAsync();
             }
 
             return default;
+        }
+
+        public async Task Logout()
+        {
+            _databaseContext.Remove(_operationContext.Session);
+            await _databaseContext.SaveChangesAsync();
+        }
+        
+        private static string GenerateToken()
+        {
+            using var rng = RandomNumberGenerator.Create();
+            var bytes = new byte[18];
+            rng.GetBytes(bytes);
+            
+            return WebEncoders.Base64UrlEncode(bytes);
         }
     }
 }

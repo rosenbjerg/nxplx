@@ -1,57 +1,21 @@
-﻿using System.IO;
-using NLog;
-using NLog.Layouts;
-using NLog.Targets;
-using NLog.Targets.Wrappers;
-using NxPlx.Abstractions;
-using NxPlx.Configuration;
+﻿using NLog;
+using NxPlx.Application.Core.Logging;
+using NxPlx.Application.Models;
 
 namespace NxPlx.Infrastructure.Logging
 {
-    public class NLoggingService : ILoggingService
+    public class NLoggingService : IStructuredLoggingService
     {
-        private readonly Logger _logger = LogManager.GetLogger("System");
+        private readonly Logger _logger;
 
-        public NLoggingService()
+        public NLoggingService(Logger logger)
         {
-            var cfg = ConfigurationService.Current;
-            
-            var config = new NLog.Config.LoggingConfiguration();
-            
-            var logfile = new AsyncTargetWrapper
-            {
-                WrappedTarget = new FileTarget("logfile")
-                {
-                    Layout = new JsonLayout
-                    {
-                        Attributes =
-                        {
-                            new JsonAttribute("Time", Layout.FromString("${longdate}")),
-                            new JsonAttribute("Level", Layout.FromString("${level}")),
-                            new JsonAttribute("Message", Layout.FromString("${message}")),
-                            new JsonAttribute("Template", Layout.FromString("${template}")),
-                        },
-                        IncludeAllProperties = true
-                    },
-                    FileName = Path.Combine(cfg.LogFolder, "log.current.json"),
-                    ArchiveFileName = Path.Combine(cfg.LogFolder, "archives", "log.{#}.json"),
-                    ArchiveAboveSize = 5000000,
-                    ArchiveEvery = FileArchivePeriod.Day,
-                    ArchiveNumbering = ArchiveNumberingMode.Date,
-                    MaxArchiveFiles = 50,
-                    OptimizeBufferReuse = true
-                }
-            };
-            
-            config.AddRule(LogLevel.Debug, LogLevel.Fatal, logfile);
-            
-            #if DEBUG
-            var logconsole = new ConsoleTarget("logconsole");
-            config.AddRule(LogLevel.Trace, LogLevel.Fatal, logconsole);
-            #endif
-            
-            
-            LogManager.Configuration = config;
+            _logger = logger;
+        }
+
+        public IStructuredLoggingService WithProperty(string key, object value)
+        {
+            return new NLoggingService(_logger.WithProperty(key, value));
         }
 
         public void Trace(string message, params object[] arguments) => _logger.Trace(message, arguments);

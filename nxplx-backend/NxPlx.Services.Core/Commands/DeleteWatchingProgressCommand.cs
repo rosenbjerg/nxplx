@@ -1,28 +1,33 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services.Commands
 {
     public class DeleteWatchingProgressCommand : CommandBase
     {
-        public override string Description => "Deletes all watching progress in the database";
+        private readonly DatabaseContext _context;
+
+        public DeleteWatchingProgressCommand(DatabaseContext context)
+        {
+            _context = context;
+        }
+        
         public override async Task<string> Execute(string[] args)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>();
-            var userIds = await ctx.Users.ProjectMany(null, u => u.Id).ToListAsync();
+            var userIds = await _context.Users.Select(u => u.Id).ToListAsync();
+            var deletedCount = 0;
 
-            await using var transaction = ctx.BeginTransactionedContext();
             foreach (var userId in userIds)
             {
-                var progress = await transaction.WatchingProgresses.Many(wp => wp.UserId == userId).ToListAsync();
-                transaction.WatchingProgresses.Remove(progress);
-                await transaction.SaveChanges();
+                var progress = await _context.WatchingProgresses.Where(wp => wp.UserId == userId).ToListAsync();
+                _context.WatchingProgresses.RemoveRange(progress);
+                await _context.SaveChangesAsync();
             }
 
-            return "All watching progress has been removed";
+            return $"Removed watching progress for {deletedCount} items across {userIds.Count} users";
         }
     }
 }

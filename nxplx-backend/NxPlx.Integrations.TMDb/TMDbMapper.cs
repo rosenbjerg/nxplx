@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NxPlx.Abstractions;
+using NxPlx.Application.Core;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;

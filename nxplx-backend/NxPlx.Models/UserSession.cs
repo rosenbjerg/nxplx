@@ -2,14 +2,13 @@
 
 namespace NxPlx.Models
 {
-    public interface IUserSession
+    public class UserSession
     {
-        DateTime Expiration { get; }
-        string Id { get; }
-
-        int UserId { get; }
-        User User { get; }
-        bool IsAdmin { get; }
-        string UserAgent { get; }
+        public string Id { get; set; }
+        public DateTime Expiration { get; set; }
+        public int UserId { get; set; }
+        public virtual User User { get; set; }
+        public bool IsAdmin { get; set; }
+        public string UserAgent { get; set; }
     }
 }

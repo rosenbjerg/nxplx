@@ -3,9 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
-using NxPlx.Abstractions;
-using NxPlx.Configuration;
+using NxPlx.Application.Core;
+using NxPlx.Application.Core.Logging;
+using NxPlx.Application.Core.Settings;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
@@ -22,13 +24,16 @@ namespace NxPlx.Integrations.TMDb
         private const string BaseUrl = "https://api.themoviedb.org/3";
         private readonly TMDbMapper _mapper;
         
-        public TMDbApi(ICachingService cachingService, ILoggingService loggingService) 
-            : base(ConfigurationService.Current.ImageFolder, cachingService,loggingService)
+        public TMDbApi(
+            FolderSettings folderSettings,
+            ApiKeySettings apiKeySettings,
+            IDistributedCache cachingService,
+            SystemLogger systemLogger) 
+            : base(folderSettings.Images, cachingService, systemLogger)
         {
             _mapper = new TMDbMapper();
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ConfigurationService.Current.TMDbApiKey}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKeySettings.TMDB}");
         }
-
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
             .WithCapacity(10)
@@ -42,7 +47,7 @@ namespace NxPlx.Integrations.TMDb
         private async Task<string> Fetch(string url)
         {
             {
-                var cachedContent = await CachingService.GetAsync(url);
+                var cachedContent = await CachingService.GetStringAsync(url);
                 if (!string.IsNullOrEmpty(cachedContent)) return cachedContent;
             }
 

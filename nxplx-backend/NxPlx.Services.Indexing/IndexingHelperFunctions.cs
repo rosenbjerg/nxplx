@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
+using NxPlx.Application.Core;
 using NxPlx.Models;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Film;
@@ -100,7 +100,7 @@ namespace NxPlx.Services.Index
             where T : class
         {
             List<TKey> unique;
-            using (var ctx = new NxplxContext())
+            using (var ctx = new DatabaseContext(new OperationContext()))
             {
                 unique = await ctx.Set<T>().Select(keySelector).ToListAsync();
             }

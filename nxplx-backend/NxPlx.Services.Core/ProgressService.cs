@@ -3,57 +3,53 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
 using NxPlx.Models.File;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services
 {
-    public static class ProgressService
+    public class ProgressService
     {
-        public static async Task<double> GetUserWatchingProgress(User user, MediaFileType mediaType, int fileId)
-        {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
+        private readonly DatabaseContext _context;
+        private readonly IDtoMapper _dtoMapper;
 
-            var progress =
-                await ctx.WatchingProgresses.ProjectOne(
-                    wp => wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType,
-                    wp => wp.Time);
-            return progress;
+        public ProgressService(DatabaseContext context, IDtoMapper dtoMapper)
+        {
+            _context = context;
+            _dtoMapper = dtoMapper;
         }
 
-        public static async Task SetUserWatchingProgress(
-            User user, MediaFileType mediaType, int fileId, double progressValue)
+        public Task<double> GetUserWatchingProgress(User user, MediaFileType mediaType, int fileId)
         {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>(user);
-            await using var transaction = context.BeginTransactionedContext();
+            return _context.WatchingProgresses
+                .Where(wp => wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType)
+                .Select(wp => wp.Time)
+                .FirstOrDefaultAsync();
+        }
 
-            var progress =
-                await transaction.WatchingProgresses.One(wp =>
-                    wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType);
+        public async Task SetUserWatchingProgress(User user, MediaFileType mediaType, int fileId, double progressValue)
+        {
+            var progress = await _context.WatchingProgresses
+                .FirstOrDefaultAsync(wp => wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType);
+
             if (progress == null)
             {
                 progress = new WatchingProgress {UserId = user.Id, FileId = fileId, MediaType = mediaType};
-                transaction.WatchingProgresses.Add(progress);
+                _context.WatchingProgresses.Add(progress);
             }
 
             progress.Time = progressValue;
             progress.LastWatched = DateTime.UtcNow;
 
-            await transaction.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public static async Task<IEnumerable<ContinueWatchingDto>> GetUserContinueWatchingList(User user)
+        public async Task<IEnumerable<ContinueWatchingDto>> GetUserContinueWatchingList(User user)
         {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>(user);
-
-            var progress = await context.WatchingProgresses.Many(wp => wp.UserId == user.Id)
+            var progress = await _context.WatchingProgresses.Where(wp => wp.UserId == user.Id)
                 .OrderByDescending(wp => wp.LastWatched)
                 .Take(40).ToListAsync();
 
@@ -63,54 +59,43 @@ namespace NxPlx.Core.Services
             var episodesIds = episodes.Keys.ToList();
             var filmIds = film.Keys.ToList();
 
-            var mapper = container.Resolve<IDtoMapper>();
             var list = new List<ContinueWatchingDto>();
 
-            var watchedEpisodes = await context.EpisodeFiles.Many(ef => episodesIds.Contains(ef.Id)).ToListAsync();
+            var watchedEpisodes = await _context.EpisodeFiles.Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
             var relevantEpisodes = watchedEpisodes.Select(ef => (wp: episodes[ef.Id], ef)).Where(ef => NotFinished(ef));
-            list.AddRange(mapper.Map<(WatchingProgress, EpisodeFile), ContinueWatchingDto>(relevantEpisodes));
+            list.AddRange(_dtoMapper.Map<(WatchingProgress, EpisodeFile), ContinueWatchingDto>(relevantEpisodes));
 
-            var watchedFilm = await context.FilmFiles.Many(ff => filmIds.Contains(ff.Id)).ToListAsync();
+            var watchedFilm = await _context.FilmFiles.Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
             var relevantFilm = watchedFilm.Select(ff => (wp: film[ff.Id], ff)).Where(ff => NotFinished(ff));
-            list.AddRange(mapper.Map<(WatchingProgress, FilmFile), ContinueWatchingDto>(relevantFilm));
+            list.AddRange(_dtoMapper.Map<(WatchingProgress, FilmFile), ContinueWatchingDto>(relevantFilm));
 
             return list.OrderByDescending(cw => cw.watched);
         }
 
-        public static async Task<IEnumerable<WatchingProgressDto>> GetEpisodeProgress(
+        public async Task<List<WatchingProgressDto>> GetEpisodeProgress(
             User user, int seriesId, int seasonNumber)
         {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>(user);
-
-            var episodeDuration =
-                await context.EpisodeFiles.ProjectMany(
-                        ef => ef.SeriesDetailsId == seriesId && ef.SeasonNumber == seasonNumber,
-                        ef => new Tuple<int, float>(ef.Id, ef.MediaDetails.Duration))
+            var episodeDuration = await _context.EpisodeFiles
+                    .Where(ef => ef.SeriesDetailsId == seriesId && ef.SeasonNumber == seasonNumber)
+                    .Select(ef => Tuple.Create(ef.Id, ef.MediaDetails.Duration))
                     .ToListAsync();
 
             var episodeIds = episodeDuration.Select(ed => ed.Item1).ToList();
 
-            var progressMap = await context.WatchingProgresses
-                .Many(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode &&
-                            episodeIds.Contains(wp.FileId))
+            var progressMap = await _context.WatchingProgresses
+                .Where(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode && episodeIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId, wp => wp.Time);
 
-            var progress = episodeDuration.Select(ed =>
+            return episodeDuration.Select(ed =>
             {
-                if (!progressMap.TryGetValue(ed.Item1, out var duration))
-                {
-                    duration = 0;
-                }
+                if (!progressMap.TryGetValue(ed.Item1, out var duration)) duration = 0;
 
                 return new WatchingProgressDto
                 {
                     fileId = ed.Item1,
                     progress = duration / ed.Item2
                 };
-            });
-
-            return progress;
+            }).ToList();
         }
 
         private static bool NotFinished((WatchingProgress wp, MediaFileBase fb) pair)

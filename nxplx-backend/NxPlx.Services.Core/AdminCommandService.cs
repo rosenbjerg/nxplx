@@ -1,35 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NxPlx.Abstractions;
 using NxPlx.Core.Services.Commands;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
 
 namespace NxPlx.Core.Services
 {
-    public static class AdminCommandService
+    public class AdminCommandService
     {
-        private static readonly Dictionary<string, CommandBase> Commands = new List<CommandBase>
-        {
-            new DeleteWatchingProgressCommand(),
-            new DeleteSubtitlePreferencesCommand(),
-        }.ToDictionary(c => c.Name);
+        private readonly IServiceProvider _serviceProvider;
 
-        public static IEnumerable<CommandDto> AvailableCommands()
+        public AdminCommandService(IServiceProvider serviceProvider)
         {
-            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<CommandBase, CommandDto>(Commands.Values);
+            _serviceProvider = serviceProvider;
         }
 
-        public static async Task<string?> InvokeCommand(string command, string[] args)
+        private static readonly Dictionary<string, Func<IServiceProvider, CommandBase>> Commands = new List<Type>
         {
-            if (Commands.TryGetValue(command, out var cmd))
-            {
-                return await cmd.Execute(args);
-            }
+            typeof(DeleteWatchingProgressCommand),
+            typeof(DeleteSubtitlePreferencesCommand)
+        }.ToDictionary(type => type.Name, GetResolver);
 
-            return null;
+        private static Func<IServiceProvider, CommandBase> GetResolver(Type type) => provider => (CommandBase) provider.GetService(type);
+
+        public async Task<string?> InvokeCommand(string commandName, string[] args)
+        {
+            if (!Commands.TryGetValue(commandName, out var commandResolver)) return null;
+            var command = commandResolver(_serviceProvider);
+            return await command.Execute(args);
+
         }
+
+        public IEnumerable<string> AvailableCommands() => Commands.Keys;
     }
 }

@@ -9,7 +9,7 @@ using NxPlx.Services.Database;
 
 namespace NxPlx.Services.Database.Migrations
 {
-    [DbContext(typeof(NxplxContext))]
+    [DbContext(typeof(DatabaseContext))]
     [Migration("20200112002322_RemoveWatchingProgressContraint")]
     partial class RemoveWatchingProgressContraint
     {

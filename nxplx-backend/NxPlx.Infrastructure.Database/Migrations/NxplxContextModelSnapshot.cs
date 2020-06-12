@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace NxPlx.Services.Database.Migrations
 {
-    [DbContext(typeof(NxplxContext))]
+    [DbContext(typeof(DatabaseContext))]
     partial class NxplxContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

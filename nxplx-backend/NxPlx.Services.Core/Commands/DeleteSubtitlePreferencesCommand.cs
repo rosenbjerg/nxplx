@@ -1,29 +1,34 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
 using NxPlx.Models;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services.Commands
 {
     public class DeleteSubtitlePreferencesCommand : CommandBase
     {
-        public override string Description => "Deletes all subtitle preferences in the database";
+        private readonly DatabaseContext _context;
+
+        public DeleteSubtitlePreferencesCommand(DatabaseContext context)
+        {
+            _context = context;
+        }
 
         public override async Task<string> Execute(string[] args)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>();
-            var userIds = await ctx.Users.ProjectMany(null, u => u.Id).ToListAsync();
+            var userIds = await _context.Users.Select(u => u.Id).ToListAsync();
+            var deletedCount = 0;
 
-            await using var transaction = ctx.BeginTransactionedContext();
             foreach (var userId in userIds)
             {
-                var prefs = await transaction.SubtitlePreferences.Many(sp => sp.UserId == userId).ToListAsync();
-                transaction.SubtitlePreferences.Remove(prefs);
-                await transaction.SaveChanges();
+                var prefs = await _context.SubtitlePreferences.Where(sp => sp.UserId == userId).ToListAsync();
+                _context.SubtitlePreferences.RemoveRange(prefs);
+                await _context.SaveChangesAsync();
+                deletedCount += prefs.Count;
             }
 
-            return "All subtitle preferences has been removed";
+            return $"Removed {deletedCount} subtitle preferences for {userIds.Count} users";
         }
     }
 }
