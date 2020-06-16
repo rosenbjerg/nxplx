@@ -85,25 +85,22 @@ namespace NxPlx.Services.Index
             return sizes.Select(size => (size, url));
         }
 
-        internal static Task<List<T>> GetUniqueNew<T>(this IEnumerable<T> entities)
+        internal static Task<List<T>> GetUniqueNew<T>(this IEnumerable<T> entities, DatabaseContext databaseContext)
             where T : EntityBase
-            => GetUniqueNew(entities, e => e.Id);
-        internal static async Task<List<T>> GetUniqueNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector)
+            => GetUniqueNew(entities, e => e.Id, databaseContext);
+        internal static async Task<List<T>> GetUniqueNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector, DatabaseContext databaseContext)
             where T : class
         {
             var keySelectorFunc = keySelector.Compile();
             var unique = GetUnique(entities, keySelectorFunc);
-            return await GetNew(unique, keySelector);
+            return await GetNew(unique, keySelector, databaseContext);
         }
         
-        private static async Task<List<T>> GetNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector)
+        private static async Task<List<T>> GetNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector, DatabaseContext databaseContext)
             where T : class
         {
             List<TKey> unique;
-            using (var ctx = new DatabaseContext(new OperationContext()))
-            {
-                unique = await ctx.Set<T>().Select(keySelector).ToListAsync();
-            }
+            unique = await databaseContext.Set<T>().Select(keySelector).ToListAsync();
 
             var uniqueHashset = unique.ToHashSet();
 

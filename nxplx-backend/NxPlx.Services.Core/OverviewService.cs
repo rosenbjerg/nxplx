@@ -36,12 +36,12 @@ namespace NxPlx.Core.Services
             return await CachedResult(overviewCacheKey, () => BuildOverview(libs));
         }
 
-        public async Task<IEnumerable<GenreDto>> GetGenresOverview()
+        public Task<IEnumerable<GenreDto>> GetGenresOverview()
         {
             var overviewCacheKey = "OVERVIEW:GENRES";
-            return await CachedResult(overviewCacheKey, async () =>
+            return CachedResult(overviewCacheKey, async () =>
             {
-                var genres = await _databaseContext.Genre.ToListAsync();
+                var genres = await _databaseContext.Genre.AsNoTracking().ToListAsync();
                 return _dtoMapper.Map<Genre, GenreDto>(genres);
             });
         }
@@ -61,7 +61,7 @@ namespace NxPlx.Core.Services
         {
             var seriesDetails = await _databaseContext.EpisodeFiles
                 .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
-                .Select(ef => ef.SeriesDetails)
+                .Select(ef => ef.SeriesDetails).Distinct()
                 .ToListAsync();
 
             var filmDetails = await _databaseContext.FilmFiles

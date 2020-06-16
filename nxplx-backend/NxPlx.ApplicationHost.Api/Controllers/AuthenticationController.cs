@@ -29,7 +29,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         {
             var session = await _authenticationService.Login(username, password, userAgent);
             if (session == default) return BadRequest("Invalid credentials");
-            _sessionService.AttachSessionToken(HttpContext.Response, session?.Id);
+            _sessionService.AttachSessionToken(HttpContext.Response, session?.Id, session?.Expiration);
             return Ok();
         }
         

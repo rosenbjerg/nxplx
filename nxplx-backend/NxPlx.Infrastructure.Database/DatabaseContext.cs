@@ -16,8 +16,8 @@ namespace NxPlx.Services.Database
     public class DatabaseContext : DbContext
     {
         private readonly OperationContext _operationContext;
-
-        public DatabaseContext(OperationContext operationContext)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options, OperationContext operationContext)
+            : base(options)
         {
             _operationContext = operationContext;
         }
@@ -71,7 +71,7 @@ namespace NxPlx.Services.Database
                     ls => string.Join(',', ls),
                     str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
 
-            if (_operationContext.User != null && !_operationContext.User.Admin)
+            if (_operationContext?.User != null && !_operationContext.User.Admin)
             {
                 modelBuilder.Entity<User>().HasQueryFilter(e => e.Id == _operationContext.User.Id);
                 modelBuilder.Entity<UserSession>().HasQueryFilter(e => e.UserId == _operationContext.User.Id);

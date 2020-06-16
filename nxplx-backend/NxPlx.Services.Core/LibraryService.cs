@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,10 +45,10 @@ namespace NxPlx.Core.Services
             if (cwd == string.Empty || !Directory.Exists(cwd))
                 return Enumerable.Empty<string>();
 
-            return Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
+            return Directory.EnumerateDirectories(cwd.Replace("\\", "/"), "*", new EnumerationOptions
             {
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.Temporary | FileAttributes.System
-            }).Select(Path.GetFileName);
+            }).Select(path => Path.GetFileName(path).Replace("\\", "/"));
         }
         public async Task<bool> RemoveLibrary(int libraryId)
         {

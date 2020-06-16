@@ -22,10 +22,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
 
         [HttpGet("{size}/{imageId}")]
-        public PhysicalFileResult GetImage(string size, string imageId)
+        public IActionResult GetImage(string size, string imageId)
         {
             var fullPath = Path.Combine(_imageFolder, size, imageId);
             HttpContext.Response.Headers["Cache-Control"] = $"max-age={ImageMaxCacheAge}";
+            if (!System.IO.File.Exists(fullPath)) return NotFound();
             return PhysicalFile(fullPath, "image/jpeg");
         }
     }

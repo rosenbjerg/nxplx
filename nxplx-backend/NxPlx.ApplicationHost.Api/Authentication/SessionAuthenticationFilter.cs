@@ -22,7 +22,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
 
             if (!string.IsNullOrEmpty(sessionToken))
             {
-                await using var databaseContext = context.RequestServices.GetService<DatabaseContext>();
+                var databaseContext = context.RequestServices.GetService<DatabaseContext>();
                 var session = await databaseContext.UserSessions
                     .Where(s => s.Id == sessionToken).Include(s => s.User)
                     .AsNoTracking().FirstOrDefaultAsync();

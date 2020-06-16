@@ -46,7 +46,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
         
         [HttpGet("list")]
-        public async Task<IEnumerable<LibraryDto>> List([FromBody, Required]int libraryId)
+        public async Task<IEnumerable<LibraryDto>> List()
         {
             if (_operationContext.User.Admin)
                 return await _libraryService.ListLibraries<AdminLibraryDto>();

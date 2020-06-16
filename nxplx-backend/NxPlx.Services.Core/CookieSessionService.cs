@@ -6,31 +6,35 @@ namespace NxPlx.Core.Services
 {
     public class CookieSessionService : IHttpSessionService
     {
-        public const string CookieName = "SessionToken";
-        private readonly string _sessionLength;
-
-        public CookieSessionService(IConfiguration configuration)
-        {
-            var sessionConfig = configuration.GetSection("Session");
-            _sessionLength = sessionConfig["LengthInDays"] ?? "20";
-        }
+        private const string CookieName = "SessionToken";
+        private static readonly DateTimeOffset ExpiredDateTimeOffset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         public string? ExtractSessionToken(HttpRequest request)
         {
             return request.Cookies.TryGetValue(CookieName, out var token) ? token : null;
         }
         
-        public void AttachSessionToken(HttpResponse response, string? sessionToken = null)
+        public void AttachSessionToken(HttpResponse response, string? sessionToken, DateTime? sessionExpiration)
         {
-            var cookie = sessionToken != null ? FreshCookie(sessionToken) : ExpiredCookie();
-            response.Cookies.Append("Set-Cookie", cookie);
+            var expiry = sessionToken != null && sessionExpiration != null ? sessionExpiration.Value : ExpiredDateTimeOffset;
+            var (cookie, options) = BuildCookie(sessionToken, expiry);
+            response.Cookies.Append(CookieName, cookie, options);
         }
 
-        private string FreshCookie(string sessionToken)
+        private (string, CookieOptions) BuildCookie(string? sessionToken, DateTimeOffset expiry)
         {
-            var expiry = DateTime.UtcNow.Add(TimeSpan.FromDays(int.Parse(_sessionLength)));
-            return $"{CookieName}={sessionToken}; Path=/; HttpOnly; Secure; SameSite=Strict; Expires={expiry:R}";
+            return (sessionToken ?? "", new CookieOptions
+            {
+                Path = "/",
+#if DEBUG
+#else
+                Secure = true,
+#endif
+                HttpOnly = true,
+                IsEssential = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = expiry
+            });
         }
-        private string ExpiredCookie() => $"{CookieName}=; Expires=Thu, 01 Jan 1970 00:00:00 GMT;";
     }
 }

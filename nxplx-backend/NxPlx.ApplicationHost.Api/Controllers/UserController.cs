@@ -13,6 +13,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 {
     [Route("api/user")]
     [ApiController]
+    [SessionAuthentication]
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;

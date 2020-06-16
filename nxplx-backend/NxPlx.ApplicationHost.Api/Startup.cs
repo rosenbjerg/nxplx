@@ -61,7 +61,7 @@ namespace NxPlx.ApplicationHost.Api
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
-            services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionStrings.Pgsql));
+            services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionStrings.Pgsql).UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
             services.AddSingleton(typeof(ILoggerProvider), typeof(NLoggingProvider));
@@ -83,6 +83,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(ProgressService));
             services.AddScoped(typeof(SessionService));
             services.AddScoped(typeof(SubtitleService));
+            services.AddScoped(typeof(OverviewService));
             services.AddScoped(typeof(UserService));
             
             Register(typeof(CommandBase), services.AddScoped!);
@@ -95,9 +96,10 @@ namespace NxPlx.ApplicationHost.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
-            
+            InitializeDatabase(databaseContext);
+
             app.UseForwardedHeaders();
             if (env.IsDevelopment())
             {
@@ -111,6 +113,21 @@ namespace NxPlx.ApplicationHost.Api
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
             app.UseSpaStaticFiles();
+        }
+
+        private static void InitializeDatabase(DatabaseContext databaseContext)
+        {
+            databaseContext.Database.Migrate();
+            if (!databaseContext.Users.Any(u => u.Username == "admin"))
+            {
+                databaseContext.Add(new User
+                {
+                    Username = "admin",
+                    PasswordHash = PasswordUtils.Hash("changemebaby"),
+                    Admin = true
+                });
+                databaseContext.SaveChanges();
+            }
         }
     }
 }

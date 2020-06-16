@@ -75,11 +75,11 @@ namespace NxPlx.Services.Index
             var details = await FindFilmDetails(newFilm, library);
             if (details.Any()) _systemLogger.Info("Downloaded details for the {NewAmount} new film found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
-            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew();
-            var productionCountries = await details.Where(d => d.ProductionCountries != null).SelectMany(d => d.ProductionCountries).GetUniqueNew(pc => pc.Iso3166_1);
-            var spokenLanguages = await details.Where(d => d.SpokenLanguages != null).SelectMany(d => d.SpokenLanguages).GetUniqueNew(sl => sl.Iso639_1);
-            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
-            var movieCollections = await details.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection).GetUniqueNew();
+            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
+            var productionCountries = await details.Where(d => d.ProductionCountries != null).SelectMany(d => d.ProductionCountries).GetUniqueNew(pc => pc.Iso3166_1, _context);
+            var spokenLanguages = await details.Where(d => d.SpokenLanguages != null).SelectMany(d => d.SpokenLanguages).GetUniqueNew(sl => sl.Iso639_1, _context);
+            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew(_context);
+            var movieCollections = await details.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection).GetUniqueNew(_context);
             
             _context.AddRange(genres);
             _context.AddRange(productionCountries);
@@ -89,7 +89,7 @@ namespace NxPlx.Services.Index
             _context.FilmFiles.AddRange(newFilm);
             var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
             databaseDetails.ForEach(film => film.Added = DateTime.UtcNow);
-            var newDetails = await databaseDetails.GetUniqueNew();
+            var newDetails = await databaseDetails.GetUniqueNew(_context);
             await _context.AddRangeAsync(newDetails);
             
             await _context.SaveChangesAsync();
@@ -187,10 +187,10 @@ namespace NxPlx.Services.Index
             var details = await FindSeriesDetails(newEpisodes, library);
             if (details.Any()) _systemLogger.Info("Downloaded details for the {NewAmount} new series found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
-            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew();
-            var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew();
-            var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew();
-            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew();
+            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
+            var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew(_context);
+            var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew(_context);
+            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew(_context);
             
             _context.AddRange(genres);
             _context.AddRange(networks);
