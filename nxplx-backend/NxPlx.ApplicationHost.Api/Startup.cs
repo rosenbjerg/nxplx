@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
-using System.Xml;
 using Hangfire;
-using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -13,22 +11,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
-using NxPlx.Application.Core.Logging;
-using NxPlx.Application.Core.Settings;
+using NxPlx.Application.Core.Options;
+using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
-using NxPlx.Infrastructure.Logging;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
 using NxPlx.Services.Database;
 using NxPlx.Services.Index;
+using Serilog.Core;
 
 namespace NxPlx.ApplicationHost.Api
 {
     public class Startup : ApplicationHostStartup
     {
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment) : base(configuration, hostEnvironment) { }
+        public Startup(IConfiguration configuration) : base(configuration) { }
         
         public override void ConfigureServiceCollection(IServiceCollection services)
         {
@@ -36,18 +34,19 @@ namespace NxPlx.ApplicationHost.Api
                 .AddMvc()
                 .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
 
-            AddOptions<HostingSettings>(services);
-            AddOptions<FolderSettings>(services);
-            AddOptions<ApiKeySettings>(services);
+            AddOptions<ApiKeyOptions>(services);
             AddOptions<ConnectionStrings>(services);
+            AddOptions<FolderOptions>(services);
+            AddOptions<HostingOptions>(services);
+            AddOptions<LoggingOptions>(services);
 
             services.AddSpaStaticFiles(options => options.RootPath = "public");
             services.AddHangfireServer(options => options.Queues = new[] { "default", "indexing" });
             
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
-            var hostingSettings = Configuration.GetSection("Hosting").Get<HostingSettings>();
-            if (hostingSettings.ApiDocumentation) 
+            var hostingSettings = Configuration.GetSection("Hosting").Get<HostingOptions>();
+            if (hostingSettings.Swagger) 
                 services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
             
             services.AddWebSockets(options => options.AllowedOrigins.Add(hostingSettings.Origin));
@@ -64,17 +63,16 @@ namespace NxPlx.ApplicationHost.Api
             services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionStrings.Pgsql).UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
-            services.AddSingleton(typeof(ILoggerProvider), typeof(NLoggingProvider));
             services.AddSingleton(typeof(IHttpSessionService), typeof(CookieSessionService));
             services.AddSingleton(typeof(IDatabaseMapper), typeof(DatabaseMapper));
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
             services.AddSingleton(typeof(AdminCommandService));
             
-            services.AddScoped(typeof(IIndexer), typeof(Indexer));
+            services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
+            services.AddScoped(typeof(IIndexer), typeof(IndexingService));
             services.AddScoped(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
-            services.AddScoped(typeof(SystemLogger));
             services.AddScoped(typeof(AuthenticationService));
             services.AddScoped(typeof(EpisodeService));
             services.AddScoped(typeof(FilmService));
@@ -95,24 +93,32 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
+            var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseForwardedHeaders();
-            if (env.IsDevelopment())
+            app.UseSpaStaticFiles();
+            app.UseCors(builder =>
             {
-                app.UseHangfireDashboard("/dashboard");
-                app.UseDeveloperExceptionPage();
-            };
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
+                builder.WithOrigins(hostingOptions.Origin)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+            app.UseForwardedHeaders();
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
+            if (hostingOptions.Swagger)
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
+            }
             
+            app.UseMiddleware<LoggingInterceptorMiddleware>();
+            app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
-            app.UseSpaStaticFiles();
         }
 
         private static void InitializeDatabase(DatabaseContext databaseContext)

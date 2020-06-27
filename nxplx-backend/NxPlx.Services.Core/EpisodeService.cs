@@ -34,14 +34,15 @@ namespace NxPlx.Core.Services
 
         public async Task<InfoDto?> FindEpisodeFileInfo(int id)
         {
-            var episode = await _context.EpisodeFiles.Include(ef => ef.Subtitles).FirstOrDefaultAsync(ef => ef.Id == id);
+            var episode = await _context.EpisodeFiles.AsNoTracking().Include(ef => ef.Subtitles).FirstOrDefaultAsync(ef => ef.Id == id);
             return _dtoMapper.Map<EpisodeFile, InfoDto>(episode);
         }
 
         public async Task<SeriesDto?> FindSeriesDetails(int id, int? season)
         {
-            var episodes = await _context.EpisodeFiles
-                .Where(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season)).ToListAsync();
+            var episodes = await _context.EpisodeFiles.AsNoTracking()
+                .Where(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season))
+                .ToListAsync();
 
             if (!episodes.Any()) return default;
 
@@ -53,9 +54,9 @@ namespace NxPlx.Core.Services
             IReadOnlyCollection<EpisodeFile> files)
         {
             var seriesDto = _dtoMapper.Map<DbSeriesDetails, SeriesDto>(series);
-            seriesDto!.seasons = series.Seasons
+            seriesDto!.Seasons = series.Seasons
                 .Select(s => MergeEpisodes(s, files.Where(f => f.SeasonNumber == s.SeasonNumber)))
-                .Where(s => s.episodes.Any())
+                .Where(s => s.Episodes.Any())
                 .ToList();
             return seriesDto;
         }
@@ -64,7 +65,7 @@ namespace NxPlx.Core.Services
             IEnumerable<EpisodeFile> files)
         {
             var seasonDto = _dtoMapper.Map<SeasonDetails, SeasonDto>(seasonDetails);
-            seasonDto!.episodes = MergeEpisodes(seasonDetails.Episodes, files);
+            seasonDto!.Episodes = MergeEpisodes(seasonDetails.Episodes, files);
             return seasonDto;
         }
 
@@ -79,11 +80,11 @@ namespace NxPlx.Core.Services
 
                 return new EpisodeDto
                 {
-                    name = details.Name,
-                    airDate = details.AirDate,
-                    number = f.EpisodeNumber,
-                    fileId = f.Id,
-                    still = details.StillPath,
+                    Name = details.Name,
+                    AirDate = details.AirDate,
+                    Number = f.EpisodeNumber,
+                    FileId = f.Id,
+                    Still = details.StillPath,
                 };
             });
         }

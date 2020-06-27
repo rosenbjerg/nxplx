@@ -4,9 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Models;
 using NxPlx.Services.Database;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
@@ -26,7 +24,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             _indexer = indexer;
         }
         
-        [HttpGet("")]
+        [HttpPost("")]
         public async Task<IActionResult> Index([FromBody, Required]int[] libraryIds)
         {
             var libraries = await _databaseContext.Libraries.Where(lib => libraryIds.Contains(lib.Id)).ToListAsync();

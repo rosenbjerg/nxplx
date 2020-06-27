@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
     </ItemGroup>

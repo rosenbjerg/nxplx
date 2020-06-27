@@ -39,7 +39,7 @@ namespace NxPlx.Core.Services
         }
         public async Task<string> GetLanguagePreference(MediaFileType mediaType, int fileId)
         {
-            var preference = await _context.SubtitlePreferences
+            var preference = await _context.SubtitlePreferences.AsNoTracking()
                 .Where(sp => sp.UserId == _operationContext.User.Id && sp.FileId == fileId && sp.MediaType == mediaType)
                 .Select(sp => sp.Language)
                 .FirstOrDefaultAsync();
@@ -55,8 +55,8 @@ namespace NxPlx.Core.Services
         {
             return mediaFileType switch
             {
-                MediaFileType.Film => await _context.FilmFiles.Include(ff => ff.Subtitles).FirstOrDefaultAsync(ff => ff.Id == fileId),
-                MediaFileType.Episode => await _context.EpisodeFiles.Include(ff => ff.Subtitles).FirstOrDefaultAsync(ef => ef.Id == fileId),
+                MediaFileType.Film => await _context.FilmFiles.AsNoTracking().Include(ff => ff.Subtitles).FirstOrDefaultAsync(ff => ff.Id == fileId),
+                MediaFileType.Episode => await _context.EpisodeFiles.AsNoTracking().Include(ff => ff.Subtitles).FirstOrDefaultAsync(ef => ef.Id == fileId),
                 _ => null
             };
         }

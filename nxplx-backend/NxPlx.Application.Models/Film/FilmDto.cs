@@ -5,30 +5,30 @@ namespace NxPlx.Application.Models.Film
 {
     public class FilmDto : IDto
     {
-        public int id { get; set; }
-        public int fid { get; set; }
+        public int Id { get; set; }
+        public int Fid { get; set; }
         
-        public string title { get; set; } = null!;
-        public string poster { get; set; } = null!;
-        public string backdrop { get; set; } = null!;
-        public long budget { get; set; }
-        public string imdbId { get; set; } = null!;
-        public int? belongsToCollectionId { get; set; }
-        public string originalTitle { get; set; } = null!;
-        public List<ProductionCountryDto> productionCountries { get; set; } = null!;
-        public DateTime? releaseDate { get; set; }
-        public long revenue { get; set; }
-        public int? runtime { get; set; }
-        public List<SpokenLanguageDto> spokenLanguages { get; set; } = null!;
-        public string tagline { get; set; } = null!;
-        public List<GenreDto> genres { get; set; } = null!;
-        public string originalLanguage { get; set; } = null!;
-        public string overview { get; set; } = null!;
-        public float popularity { get; set; }
-        public string posterPath { get; set; } = null!;
-        public List<ProductionCompanyDto> productionCompanies { get; set; } = null!;
-        public float voteAverage { get; set; }
-        public int voteCount { get; set; }
-        public int library { get; set; }
+        public string Title { get; set; } = null!;
+        public string Poster { get; set; } = null!;
+        public string Backdrop { get; set; } = null!;
+        public long Budget { get; set; }
+        public string ImdbId { get; set; } = null!;
+        public int? BelongsToCollectionId { get; set; }
+        public string OriginalTitle { get; set; } = null!;
+        public List<ProductionCountryDto> ProductionCountries { get; set; } = null!;
+        public DateTime? ReleaseDate { get; set; }
+        public long Revenue { get; set; }
+        public int? Runtime { get; set; }
+        public List<SpokenLanguageDto> SpokenLanguages { get; set; } = null!;
+        public string Tagline { get; set; } = null!;
+        public List<GenreDto> Genres { get; set; } = null!;
+        public string OriginalLanguage { get; set; } = null!;
+        public string Overview { get; set; } = null!;
+        public float Popularity { get; set; }
+        public string PosterPath { get; set; } = null!;
+        public List<ProductionCompanyDto> ProductionCompanies { get; set; } = null!;
+        public float VoteAverage { get; set; }
+        public int VoteCount { get; set; }
+        public int Library { get; set; }
     }
 }

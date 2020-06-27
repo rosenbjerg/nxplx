@@ -5,26 +5,26 @@ namespace NxPlx.Application.Models.Series
 {
     public class SeriesDto : IDto
     {
-        public int id { get; set; }
+        public int Id { get; set; }
 
-        public string backdrop { get; set; } = null!;
-        public string poster { get; set; } = null!;
+        public string Backdrop { get; set; } = null!;
+        public string Poster { get; set; } = null!;
 
-        public double voteAverage { get; set; }
+        public double VoteAverage { get; set; }
 
-        public int voteCount { get; set; }
+        public int VoteCount { get; set; }
 
-        public string name { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
-        public IEnumerable<NetworkDto> networks { get; set; } = null!;
+        public IEnumerable<NetworkDto> Networks { get; set; } = null!;
 
-        public IEnumerable<GenreDto> genres { get; set; } = null!;
+        public IEnumerable<GenreDto> Genres { get; set; } = null!;
 
-        public IEnumerable<CreatorDto> createdBy { get; set; } = null!;
+        public IEnumerable<CreatorDto> CreatedBy { get; set; } = null!;
 
-        public IEnumerable<ProductionCompanyDto> productionCompanies { get; set; } = null!;
+        public IEnumerable<ProductionCompanyDto> ProductionCompanies { get; set; } = null!;
 
-        public string overview { get; set; } = null!;
-        public IEnumerable<SeasonDto> seasons { get; set; } = null!;
+        public string Overview { get; set; } = null!;
+        public IEnumerable<SeasonDto> Seasons { get; set; } = null!;
     }
 }

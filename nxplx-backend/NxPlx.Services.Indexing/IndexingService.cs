@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
-using NxPlx.Application.Core.Logging;
 using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
@@ -16,24 +16,24 @@ using NxPlx.Services.Database;
 
 namespace NxPlx.Services.Index
 {
-    public class Indexer : IIndexer
+    public class IndexingService : IIndexer
     {
         private readonly IDetailsApi _detailsApi;
         private readonly IDatabaseMapper _databaseMapper;
-        private readonly ILoggingService _systemLogger;
+        private readonly ILogger<IndexingService> _logger;
         private readonly IDistributedCache _cachingService;
         private readonly DatabaseContext _context;
 
-        public Indexer(
+        public IndexingService(
             IDetailsApi detailsApi,
             IDatabaseMapper databaseMapper,
-            SystemLogger systemLogger,
+            ILogger<IndexingService> logger,
             IDistributedCache cachingService,
             DatabaseContext context)
         {
             _detailsApi = detailsApi;
             _databaseMapper = databaseMapper;
-            _systemLogger = systemLogger;
+            _logger = logger;
             _cachingService = cachingService;
             _context = context;
         }
@@ -61,7 +61,7 @@ namespace NxPlx.Services.Index
         private async Task IndexMovieLibrary(Library library)
         {
             var startTime = DateTime.UtcNow;
-            _systemLogger.Info("Started indexing {LibraryName}", library.Name);
+            _logger.LogInformation("Started indexing {LibraryName}", library.Name);
             
             var fileIndexer = new FileIndexer();
 
@@ -70,10 +70,10 @@ namespace NxPlx.Services.Index
             await RemoveDeletedMovies(library, currentFilm, _context, startTime);
 
             var newFilm = fileIndexer.IndexFilm(currentFilm, library);
-            if (newFilm.Any()) _systemLogger.Info("Found {NewAmount} new film files in {LibraryName} after {ScanTime} seconds", newFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            if (newFilm.Any()) _logger.LogInformation("Found {NewAmount} new film files in {LibraryName} after {ScanTime} seconds", newFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
             var details = await FindFilmDetails(newFilm, library);
-            if (details.Any()) _systemLogger.Info("Downloaded details for the {NewAmount} new film found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            if (details.Any()) _logger.LogInformation("Downloaded details for the {NewAmount} new film found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             
             var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
             var productionCountries = await details.Where(d => d.ProductionCountries != null).SelectMany(d => d.ProductionCountries).GetUniqueNew(pc => pc.Iso3166_1, _context);
@@ -93,12 +93,12 @@ namespace NxPlx.Services.Index
             await _context.AddRangeAsync(newDetails);
             
             await _context.SaveChangesAsync();
-            _systemLogger.Info("Finished saving new film, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            _logger.LogInformation("Finished saving new film, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var imageDownloads = IndexingHelperFunctions.AccumulateImageDownloads(details, productionCompanies, movieCollections);
             await IndexingHelperFunctions.DownloadImages(_detailsApi, imageDownloads);
             
-            _systemLogger.Info("Indexing film in {LibraryName} took {Elapsed} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            _logger.LogInformation("Indexing film in {LibraryName} took {Elapsed} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
         }
 
         private async Task RemoveDeletedMovies(
@@ -112,7 +112,7 @@ namespace NxPlx.Services.Index
                 databaseContext.FilmFiles.RemoveRange(deletedFilm);
 
                 await databaseContext.SaveChangesAsync();
-                _systemLogger.Info(
+                _logger.LogInformation(
                     "Deleted {DeletedAmount} film from {LibraryName} because files were removed, after {ScanTime} seconds",
                     deletedFilm.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             }
@@ -128,7 +128,7 @@ namespace NxPlx.Services.Index
                 databaseContext.EpisodeFiles.RemoveRange(deletedEpisodes);
 
                 await databaseContext.SaveChangesAsync();
-                _systemLogger.Info(
+                _logger.LogInformation(
                     "Deleted {DeletedAmount} episodes from {LibraryName} because files were removed, after {ScanTime} seconds",
                     deletedEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
             }
@@ -173,7 +173,7 @@ namespace NxPlx.Services.Index
         private async Task IndexSeriesLibrary(Library library)
         {
             var startTime = DateTime.UtcNow;
-            _systemLogger.Info("Started indexing {LibraryName}", library.Name);
+            _logger.LogInformation("Started indexing {LibraryName}", library.Name);
             
             var fileIndexer = new FileIndexer();
             
@@ -182,10 +182,10 @@ namespace NxPlx.Services.Index
             await RemoveDeletedEpisodes(library, currentEpisodes, _context, startTime);
             
             var newEpisodes = fileIndexer.IndexEpisodes(currentEpisodes, library);
-            if (newEpisodes.Any()) _systemLogger.Info("Found {NewAmount} new episode files in {LibraryName} after {ScanTime} seconds", newEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            if (newEpisodes.Any()) _logger.LogInformation("Found {NewAmount} new episode files in {LibraryName} after {ScanTime} seconds", newEpisodes.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var details = await FindSeriesDetails(newEpisodes, library);
-            if (details.Any()) _systemLogger.Info("Downloaded details for the {NewAmount} new series found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            if (details.Any()) _logger.LogInformation("Downloaded details for the {NewAmount} new series found in {LibraryName}, after {DownloadTime} seconds", details.Count, library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
             var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew(_context);
@@ -202,12 +202,12 @@ namespace NxPlx.Services.Index
             await _context.AddOrUpdate(databaseDetails);
             
             await _context.SaveChangesAsync();
-            _systemLogger.Info("Finished saving new series, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            _logger.LogInformation("Finished saving new series, found in {LibraryName}, to database after {SaveTime} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
 
             var imageDownloads = IndexingHelperFunctions.AccumulateImageDownloads(details, networks, productionCompanies);
             await IndexingHelperFunctions.DownloadImages(_detailsApi, imageDownloads);
             
-            _systemLogger.Info("Indexing episodes in {LibraryName} took {Elapsed} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
+            _logger.LogInformation("Indexing episodes in {LibraryName} took {Elapsed} seconds", library.Name, Math.Round(DateTime.UtcNow.Subtract(startTime).TotalSeconds, 3));
         }
 
 

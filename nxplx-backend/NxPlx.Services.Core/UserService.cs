@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
-using NxPlx.Application.Core.Logging;
 using NxPlx.Application.Models;
 using NxPlx.Models;
 using NxPlx.Services.Database;
@@ -13,14 +12,14 @@ namespace NxPlx.Core.Services
     public class UserService
     {
         private readonly DatabaseContext _context;
-        private readonly SystemLogger _systemLogger;
+        private readonly ILogger<UserService> _logger;
         private readonly IDtoMapper _dtoMapper;
         private readonly OperationContext _operationContext;
 
-        public UserService(DatabaseContext context, SystemLogger systemLogger, IDtoMapper dtoMapper, OperationContext operationContext)
+        public UserService(DatabaseContext context, ILogger<UserService> logger, IDtoMapper dtoMapper, OperationContext operationContext)
         {
             _context = context;
-            _systemLogger = systemLogger;
+            _logger = logger;
             _dtoMapper = dtoMapper;
             _operationContext = operationContext;
         }
@@ -46,7 +45,7 @@ namespace NxPlx.Core.Services
             _context.Users.Remove(existingUser);
             await _context.SaveChangesAsync();
 
-            _systemLogger.Info("Deleted user {Username}", existingUser.Username);
+            _logger.LogInformation("Deleted user {Username}", existingUser.Username);
             return true;
         }
         public async Task<bool> ChangeUserPassword(string oldPassword, string password1, string password2)
@@ -60,18 +59,18 @@ namespace NxPlx.Core.Services
             existingUser.HasChangedPassword = true;
             await _context.SaveChangesAsync();
 
-            _systemLogger.Info("User {Username} changed password", existingUser.Username);
+            _logger.LogInformation("User {Username} changed password", existingUser.Username);
             return true;
         }
         public async Task<IEnumerable<UserDto>> ListUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _context.Users.AsNoTracking().ToListAsync();
             return _dtoMapper.Map<User, UserDto>(users);
         }
         
         public async Task<UserDto?> GetUser(int userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
             return _dtoMapper.Map<User, UserDto>(user);
         }
         public async Task<UserDto> CreateUser(string username, string? email, bool isAdmin, List<int>? libraryIds, string password)
@@ -88,7 +87,7 @@ namespace NxPlx.Core.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            _systemLogger.Info("Created user {Username}", user.Username);
+            _logger.LogInformation("Created user {Username}", user.Username);
             return _dtoMapper.Map<User, UserDto>(user)!;
         }
     }

@@ -4,10 +4,10 @@ namespace NxPlx.Application.Models.Series
 {
     public class EpisodeDto : IDto
     {
-        public DateTime? airDate { get; set; }
-        public int number { get; set; }
-        public string name { get; set; } = null!;
-        public string still { get; set; } = null!;
-        public int fileId { get; set; }
+        public DateTime? AirDate { get; set; }
+        public int Number { get; set; }
+        public string Name { get; set; } = null!;
+        public string Still { get; set; } = null!;
+        public int FileId { get; set; }
     }
 }

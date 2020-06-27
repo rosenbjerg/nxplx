@@ -27,7 +27,7 @@ namespace NxPlx.Core.Services
         }
         public async Task<UserSession?> Login(string username, string password, string userAgent)
         {
-            var user = await _databaseContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
             if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
             {
                 var session = new UserSession

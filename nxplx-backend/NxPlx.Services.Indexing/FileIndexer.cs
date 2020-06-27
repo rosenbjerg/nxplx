@@ -23,17 +23,9 @@ namespace NxPlx.Services.Index
                 
                 if (uniqueSubs.ContainsKey(vtt))
                     continue;
-                
-                string language;
-                if (File.Exists(vtt))
-                {
-                    language = Utils.GetSubtitleLanguage(vtt);
-                }
-                else
-                {
-                    Utils.Srt2Vtt(file, vtt);
-                    language = Utils.GetSubtitleLanguage(vtt);
-                }
+
+                if (!File.Exists(vtt)) Utils.Srt2Vtt(file, vtt);
+                var language = Utils.GetSubtitleLanguage(vtt);
 
                 var fileInfo = new FileInfo(vtt);
                 uniqueSubs[vtt] = new SubtitleFile

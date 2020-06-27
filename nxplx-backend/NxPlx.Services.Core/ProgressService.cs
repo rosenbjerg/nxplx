@@ -24,7 +24,7 @@ namespace NxPlx.Core.Services
 
         public Task<double> GetUserWatchingProgress(User user, MediaFileType mediaType, int fileId)
         {
-            return _context.WatchingProgresses
+            return _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == user.Id && wp.FileId == fileId && wp.MediaType == mediaType)
                 .Select(wp => wp.Time)
                 .FirstOrDefaultAsync();
@@ -49,7 +49,7 @@ namespace NxPlx.Core.Services
 
         public async Task<IEnumerable<ContinueWatchingDto>> GetUserContinueWatchingList(User user)
         {
-            var progress = await _context.WatchingProgresses.Where(wp => wp.UserId == user.Id)
+            var progress = await _context.WatchingProgresses.AsNoTracking().Where(wp => wp.UserId == user.Id)
                 .OrderByDescending(wp => wp.LastWatched)
                 .Take(40).ToListAsync();
 
@@ -61,28 +61,28 @@ namespace NxPlx.Core.Services
 
             var list = new List<ContinueWatchingDto>();
 
-            var watchedEpisodes = await _context.EpisodeFiles.Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
+            var watchedEpisodes = await _context.EpisodeFiles.AsNoTracking().Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
             var relevantEpisodes = watchedEpisodes.Select(ef => (wp: episodes[ef.Id], ef)).Where(ef => NotFinished(ef));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, EpisodeFile), ContinueWatchingDto>(relevantEpisodes));
 
-            var watchedFilm = await _context.FilmFiles.Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
+            var watchedFilm = await _context.FilmFiles.AsNoTracking().Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
             var relevantFilm = watchedFilm.Select(ff => (wp: film[ff.Id], ff)).Where(ff => NotFinished(ff));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, FilmFile), ContinueWatchingDto>(relevantFilm));
 
-            return list.OrderByDescending(cw => cw.watched);
+            return list.OrderByDescending(cw => cw.Watched);
         }
 
         public async Task<List<WatchingProgressDto>> GetEpisodeProgress(
             User user, int seriesId, int seasonNumber)
         {
-            var episodeDuration = await _context.EpisodeFiles
+            var episodeDuration = await _context.EpisodeFiles.AsNoTracking()
                     .Where(ef => ef.SeriesDetailsId == seriesId && ef.SeasonNumber == seasonNumber)
                     .Select(ef => Tuple.Create(ef.Id, ef.MediaDetails.Duration))
                     .ToListAsync();
 
             var episodeIds = episodeDuration.Select(ed => ed.Item1).ToList();
 
-            var progressMap = await _context.WatchingProgresses
+            var progressMap = await _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode && episodeIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId, wp => wp.Time);
 
@@ -92,8 +92,8 @@ namespace NxPlx.Core.Services
 
                 return new WatchingProgressDto
                 {
-                    fileId = ed.Item1,
-                    progress = duration / ed.Item2
+                    FileId = ed.Item1,
+                    Progress = duration / ed.Item2
                 };
             }).ToList();
         }

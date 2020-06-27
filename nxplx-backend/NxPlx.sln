@@ -8,8 +8,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nxplx.Integrations.FFMpeg",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing", "NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj", "{E056F05E-69B2-4B52-BCFD-074AC70B589D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Logging", "NxPlx.Infrastructure.Logging\NxPlx.Infrastructure.Logging.csproj", "{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Models", "NxPlx.Application.Models\NxPlx.Application.Models.csproj", "{A13FCD67-45B1-4D42-B39F-622D558CDE57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Broadcasting", "NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj", "{57188167-8274-417D-978B-507AFBDD214F}"
@@ -46,10 +44,6 @@ Global
 		{E056F05E-69B2-4B52-BCFD-074AC70B589D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E056F05E-69B2-4B52-BCFD-074AC70B589D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E056F05E-69B2-4B52-BCFD-074AC70B589D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09ED76CD-D7B6-49B2-A3EB-1CBC9E3C95A9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A13FCD67-45B1-4D42-B39F-622D558CDE57}.Release|Any CPU.ActiveCfg = Release|Any CPU

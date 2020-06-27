@@ -59,12 +59,12 @@ namespace NxPlx.Core.Services
         
         private async Task<IEnumerable<OverviewElementDto>> BuildOverview(List<int> libs)
         {
-            var seriesDetails = await _databaseContext.EpisodeFiles
+            var seriesDetails = await _databaseContext.EpisodeFiles.AsNoTracking()
                 .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
                 .Select(ef => ef.SeriesDetails).Distinct()
                 .ToListAsync();
 
-            var filmDetails = await _databaseContext.FilmFiles
+            var filmDetails = await _databaseContext.FilmFiles.AsNoTracking()
                 .Where(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId))
                 .Select(ff => ff.FilmDetails)
                 .ToListAsync();
@@ -84,7 +84,7 @@ namespace NxPlx.Core.Services
             overview.AddRange(_dtoMapper.Map<DbFilmDetails, OverviewElementDto>(notInCollections));
             overview.AddRange(_dtoMapper.Map<MovieCollection, OverviewElementDto>(collections));
 
-            return overview.OrderBy(oe => oe.title).ToList();
+            return overview.OrderBy(oe => oe.Title).ToList();
         }
     }
 }

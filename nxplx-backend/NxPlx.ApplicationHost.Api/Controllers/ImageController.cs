@@ -1,10 +1,7 @@
 ﻿using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using NxPlx.Application.Core.Settings;
+using NxPlx.Application.Core.Options;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -16,9 +13,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         private const int ImageMaxCacheAge = 60 * 60 * 24 * 365;
         private readonly string _imageFolder;
 
-        public ImageController(FolderSettings folderSettings)
+        public ImageController(FolderOptions folderOptions)
         {
-            _imageFolder = folderSettings.Images;
+            _imageFolder = folderOptions.Images;
         }
 
         [HttpGet("{size}/{imageId}")]

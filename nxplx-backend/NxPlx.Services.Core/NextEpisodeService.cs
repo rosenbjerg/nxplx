@@ -37,7 +37,7 @@ namespace NxPlx.Core.Services
         
         public async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo)
         {
-            var available = await _context.EpisodeFiles.Where(ef =>
+            var available = await _context.EpisodeFiles.AsNoTracking().Where(ef =>
                 ef.SeriesDetailsId == seriesId &&
                 (seasonNo == null || ef.SeasonNumber == seasonNo &&
                     (episodeNo == null || ef.EpisodeNumber != episodeNo))).ToListAsync();
@@ -47,14 +47,14 @@ namespace NxPlx.Core.Services
 
         public async Task<EpisodeFile> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
         {
-            var available = await _context.EpisodeFiles.Where(ef =>
+            var available = await _context.EpisodeFiles.AsNoTracking().Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber == seasonNo &&
                         (episodeNo == null || ef.EpisodeNumber != episodeNo)))
                 .ToListAsync();
             var availableIds = available.Select(ef => ef.Id).ToList();
 
-            var progress = await _context.WatchingProgresses
+            var progress = await _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == _operationContext.User.Id && availableIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId);
 
@@ -69,7 +69,7 @@ namespace NxPlx.Core.Services
 
         public async Task<EpisodeFile> Default(int seriesId, int? seasonNo, int? episodeNo)
         {
-            return await _context.EpisodeFiles.Where(ef =>
+            return await _context.EpisodeFiles.AsNoTracking().Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber > seasonNo ||
                      ef.SeasonNumber == seasonNo && (episodeNo == null || ef.EpisodeNumber > episodeNo)))

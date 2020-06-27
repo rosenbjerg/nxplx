@@ -5,11 +5,11 @@ namespace NxPlx.Application.Models.Series
 {
     public class SeasonDto : IDto
     {
-        public DateTime? airDate { get; set; }
-        public string name { get; set; } = null!;
-        public string overview { get; set; } = null!;
-        public string poster { get; set; } = null!;
-        public int number { get; set; }
-        public IEnumerable<EpisodeDto> episodes { get; set; } = null!;
+        public DateTime? AirDate { get; set; }
+        public string Name { get; set; } = null!;
+        public string Overview { get; set; } = null!;
+        public string Poster { get; set; } = null!;
+        public int Number { get; set; }
+        public IEnumerable<EpisodeDto> Episodes { get; set; } = null!;
     }
 }

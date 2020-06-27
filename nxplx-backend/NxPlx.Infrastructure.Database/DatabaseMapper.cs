@@ -31,23 +31,23 @@ namespace NxPlx.Services.Database
                 VoteAverage = tvDetails.VoteAverage,
                 VoteCount = tvDetails.VoteCount,
                 
-                CreatedBy = tvDetails.CreatedBy?.Select(creator => new JoinEntity<DbSeriesDetails, Creator>()
+                CreatedBy = tvDetails.CreatedBy == null ? null : tvDetails.CreatedBy.Select(creator => new JoinEntity<DbSeriesDetails, Creator>()
                 {
                     Entity1Id = tvDetails.Id,
                     Entity2Id = creator.Id
                 }).ToList(),
-                Genres = tvDetails.Genres?.Select(g => new JoinEntity<DbSeriesDetails, Genre>()
+                Genres = tvDetails.Genres == null ? null : tvDetails.Genres.Select(g => new JoinEntity<DbSeriesDetails, Genre>()
                 {
                     Entity1Id = tvDetails.Id,
                     Entity2Id = g.Id
                 }).ToList(),
-                Networks = tvDetails.Networks?.Select(n => new JoinEntity<DbSeriesDetails, Network>()
+                Networks = tvDetails.Networks == null ? null : tvDetails.Networks.Select(n => new JoinEntity<DbSeriesDetails, Network>()
                 {
                     Entity1Id = tvDetails.Id,
                     Entity2Id = n.Id,
                 }).ToList(),
                 Seasons = tvDetails.Seasons,
-                ProductionCompanies = tvDetails.ProductionCompanies?.Select(pb => new JoinEntity<DbSeriesDetails, ProductionCompany>()
+                ProductionCompanies = tvDetails.ProductionCompanies == null ? null : tvDetails.ProductionCompanies.Select(pb => new JoinEntity<DbSeriesDetails, ProductionCompany>()
                 {
                     Entity1Id = tvDetails.Id,
                     Entity2Id = pb.Id,
@@ -72,24 +72,24 @@ namespace NxPlx.Services.Database
                 ImdbId = movieDetails.ImdbId,
                 OriginalTitle = movieDetails.OriginalTitle,
                 ReleaseDate = movieDetails.ReleaseDate,
-                BelongsInCollectionId = movieDetails.BelongsToCollection?.Id,
+                BelongsInCollectionId = movieDetails.BelongsToCollection == null ? null : movieDetails.BelongsToCollection.Id as int?,
                 
-                Genres = movieDetails.Genres?.Select(genre => new JoinEntity<DbFilmDetails, Genre>
+                Genres = movieDetails.Genres == null ? null : movieDetails.Genres.Select(genre => new JoinEntity<DbFilmDetails, Genre>
                 {
                     Entity1Id = movieDetails.Id,
                     Entity2Id = genre.Id
                 }).ToList(),
-                SpokenLanguages = movieDetails.SpokenLanguages?.Select(spokenLanguage => new JoinEntity<DbFilmDetails, SpokenLanguage, string>
+                SpokenLanguages = movieDetails.SpokenLanguages == null ? null : movieDetails.SpokenLanguages.Select(spokenLanguage => new JoinEntity<DbFilmDetails, SpokenLanguage, string>
                 {
                     Entity1Id = movieDetails.Id,
                     Entity2Id = spokenLanguage.Iso639_1
                 }).ToList(),
-                ProductionCountries = movieDetails.ProductionCountries?.Select(productionCountry => new JoinEntity<DbFilmDetails, ProductionCountry, string>
+                ProductionCountries = movieDetails.ProductionCountries == null ? null : movieDetails.ProductionCountries.Select(productionCountry => new JoinEntity<DbFilmDetails, ProductionCountry, string>
                 {
                     Entity1Id = movieDetails.Id,
                     Entity2Id = productionCountry.Iso3166_1
                 }).ToList(),
-                ProductionCompanies = movieDetails.ProductionCompanies?.Select(productionCompany => new JoinEntity<DbFilmDetails, ProductionCompany>()
+                ProductionCompanies = movieDetails.ProductionCompanies == null ? null : movieDetails.ProductionCompanies.Select(productionCompany => new JoinEntity<DbFilmDetails, ProductionCompany>()
                 {
                     Entity1Id = movieDetails.Id,
                     Entity2Id = productionCompany.Id

@@ -4,21 +4,18 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using NxPlx.Application.Core.Settings;
+using NxPlx.Application.Core.Options;
 
 namespace NxPlx.ApplicationHost.Api
 {
     public abstract class ApplicationHostStartup
     {
-        protected ApplicationHostStartup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        protected ApplicationHostStartup(IConfiguration configuration)
         {
-            HostEnvironment = hostEnvironment;
             Configuration = configuration;
         }
-
-        protected IHostEnvironment HostEnvironment { get; }
+        
         protected IConfiguration Configuration { get; set; }
 
         protected void ConfigureHangfire(IGlobalConfiguration hangfireConfiguration)
@@ -38,7 +35,7 @@ namespace NxPlx.ApplicationHost.Api
         }
         
         protected void AddOptions<TSettings>(IServiceCollection services)
-            where TSettings : class, ISettings, new()
+            where TSettings : class, INxplxOptions, new()
         {
             services.AddOptions<TSettings>()
                 .Bind(Configuration.GetSection(typeof(TSettings).Name.Replace("Settings", string.Empty)))

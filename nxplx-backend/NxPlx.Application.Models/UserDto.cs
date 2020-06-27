@@ -4,11 +4,11 @@ namespace NxPlx.Application.Models
 {
     public class UserDto : IDto
     {
-        public int id { get; set; }
-        public string username { get; set; } = null!;
-        public string email { get; set; } = null!;
-        public bool isAdmin { get; set; }
-        public bool passwordChanged { get; set; }
-        public List<int> libraries { get; set; } = null!;
+        public int Id { get; set; }
+        public string Username { get; set; } = null!;
+        public string Email { get; set; } = null!;
+        public bool IsAdmin { get; set; }
+        public bool PasswordChanged { get; set; }
+        public List<int> Libraries { get; set; } = null!;
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NxPlx.Application.Core;
-using NxPlx.Application.Core.Logging;
-using NxPlx.Application.Core.Settings;
+using NxPlx.Application.Core.Options;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
@@ -25,14 +25,14 @@ namespace NxPlx.Integrations.TMDb
         private readonly TMDbMapper _mapper;
         
         public TMDbApi(
-            FolderSettings folderSettings,
-            ApiKeySettings apiKeySettings,
+            FolderOptions folderSettings,
+            ApiKeyOptions apiKeySettings,
             IDistributedCache cachingService,
-            SystemLogger systemLogger) 
-            : base(folderSettings.Images, cachingService, systemLogger)
+            ILogger<TMDbApi> logger) 
+            : base(folderSettings.Images, cachingService, logger)
         {
             _mapper = new TMDbMapper();
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKeySettings.TMDB}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKeySettings.TmdbKey}");
         }
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
@@ -120,7 +120,7 @@ namespace NxPlx.Integrations.TMDb
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = _mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
+            var seasonDetailsTasks = mapped!.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             

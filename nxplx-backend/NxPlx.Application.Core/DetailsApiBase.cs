@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using NxPlx.Application.Core.Logging;
+using Microsoft.Extensions.Logging;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
@@ -13,8 +13,8 @@ namespace NxPlx.Application.Core
     public abstract class DetailsApiBase : IDetailsApi
     {
         protected readonly IDistributedCache CachingService;
-        protected ILoggingService SystemLogger;
-        private string _imageFolder;
+        protected readonly ILogger<IDetailsApi> Logger;
+        private readonly string _imageFolder;
         
         protected static readonly HttpClient Client = new HttpClient
         {
@@ -24,10 +24,10 @@ namespace NxPlx.Application.Core
             }
         };
 
-        protected DetailsApiBase(string imageFolder, IDistributedCache cachingService, ILoggingService systemLogger)
+        protected DetailsApiBase(string imageFolder, IDistributedCache cachingService, ILogger<IDetailsApi> logger)
         {
             CachingService = cachingService;
-            SystemLogger = systemLogger;
+            Logger = logger;
             _imageFolder = imageFolder;
         }
         
@@ -65,11 +65,11 @@ namespace NxPlx.Application.Core
                     if (first)
                         await DownloadImageInternal(url, size, imageName, false);
                     else 
-                        SystemLogger.Warn("Failed to download image {ImagePath} twice. Connection issues", outputPath);
+                        Logger.LogWarning("Failed to download image {ImagePath} twice. Connection issues", outputPath);
                 }
                 catch (IOException)
                 {
-                    SystemLogger.Trace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
+                    Logger.LogTrace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
                 }
             }
         }

@@ -4,8 +4,8 @@ namespace NxPlx.Application.Models
 {
     public class UserSessionDto : IDto
     {
-        public string id { get; set; } = null!;
-        public DateTime expiration { get; set; }
-        public string userAgent { get; set; } = null!;
+        public string Id { get; set; } = null!;
+        public DateTime Expiration { get; set; }
+        public string UserAgent { get; set; } = null!;
     }
 }

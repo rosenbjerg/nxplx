@@ -2,7 +2,7 @@
 {
     public class WatchingProgressDto
     {
-        public int fileId { get; set; }
-        public double progress { get; set; }
+        public int FileId { get; set; }
+        public double Progress { get; set; }
     }
 }

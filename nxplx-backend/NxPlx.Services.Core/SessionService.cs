@@ -33,7 +33,7 @@ namespace NxPlx.Core.Services
         }
         public async Task<IEnumerable<UserSessionDto>> GetUserSessions(int userId)
         {
-            var sessions = await _context.UserSessions.Where(s => s.UserId == userId).ToListAsync();
+            var sessions = await _context.UserSessions.AsNoTracking().Where(s => s.UserId == userId).ToListAsync();
             return _dtoMapper.Map<UserSession, UserSessionDto>(sessions);
         }
     }

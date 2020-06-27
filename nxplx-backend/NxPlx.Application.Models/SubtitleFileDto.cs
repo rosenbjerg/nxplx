@@ -2,8 +2,8 @@ namespace NxPlx.Application.Models
 {
     public class SubtitleFileDto : IDto
     {
-        public int id { get; set; }
+        public int Id { get; set; }
 
-        public string language { get; set; } = null!;
+        public string Language { get; set; } = null!;
     }
 }
