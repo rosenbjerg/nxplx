@@ -1,12 +1,12 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
-import Modal from 'react-responsive-modal';
 import { add, remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import { Library } from "../../utils/models";
 import DirectoryBrowser from "../DirectoryBrowser";
 import Loading from "../Loading";
+import Modal from "../Modal";
 
 interface Props {}
 interface State {
@@ -22,25 +22,27 @@ export default class LibraryManagement extends Component<Props, State> {
     public render(_, { libraries, showDirectories, createLibraryModalOpen }) {
         return (
             <div>
-                <Modal open={createLibraryModalOpen || false} styles={{modal: 'background-color: #424242; border-radius: 2px;', closeIcon:'fill: white;'}} onClose={() => this.setState({createLibraryModalOpen: false})} center>
-                    <h2>{translate('create-library')}</h2>
-                    <form class="gapped" onSubmit={this.submitNewLibrary}>
-                        <input class="inline-edit fullwidth gapped" name="name" placeholder={translate('name')}
-                               type="text" required/>
-                        <select class="inline-edit fullwidth gapped" name="kind" required>
-                            <option value={'film'}>{translate('film')}</option>
-                            <option value={'series'}>{translate('series')}</option>
-                        </select>
-                        <select class="inline-edit fullwidth gapped" name="language" required>
-                            <option value="en-UK">en-UK</option>
-                            <option value="da-DK">da-DK</option>
-                        </select>
-                        <input class="inline-edit fullwidth gapped" name="path" placeholder={translate('path')} type="text" required/>
-                        <button type="submit" class="material-icons bordered right">done</button>
-                        <button type="button" class="bordered" onClick={() => this.setState({ showDirectories: !showDirectories })}>{translate(showDirectories ? 'hide-directories' : 'show-directories')}</button>
-                    </form>
-                    {showDirectories && (<DirectoryBrowser/>)}
-                </Modal>
+                {createLibraryModalOpen && (
+                    <Modal onDismiss={() => this.setState({createLibraryModalOpen: false})}>
+                        <h2>{translate('create-library')}</h2>
+                        <form class="gapped" onSubmit={this.submitNewLibrary}>
+                            <input class="inline-edit fullwidth gapped" name="name" placeholder={translate('name')}
+                                   type="text" required/>
+                            <select class="inline-edit fullwidth gapped" name="kind" required>
+                                <option value={'film'}>{translate('film')}</option>
+                                <option value={'series'}>{translate('series')}</option>
+                            </select>
+                            <select class="inline-edit fullwidth gapped" name="language" required>
+                                <option value="en-UK">en-UK</option>
+                                <option value="da-DK">da-DK</option>
+                            </select>
+                            <input class="inline-edit fullwidth gapped" name="path" placeholder={translate('path')} type="text" required/>
+                            <button type="submit" class="material-icons bordered right">done</button>
+                            <button type="button" class="bordered" onClick={() => this.setState({ showDirectories: !showDirectories })}>{translate(showDirectories ? 'hide-directories' : 'show-directories')}</button>
+                        </form>
+                        {showDirectories && (<DirectoryBrowser/>)}
+                    </Modal>
+                )}
 
                 <table class="fullwidth">
                     <thead>

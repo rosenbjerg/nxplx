@@ -7,7 +7,8 @@ interface Props {
 }
 interface State {
     cwd:string,
-    dirs: string[]
+    dirs: string[],
+    loading: boolean
 }
 
 const getDirs = cwd => http.getJson<string[]>(`/api/library/browse?cwd=${cwd}`);
@@ -16,7 +17,8 @@ export default class DirectoryBrowser extends Component<Props, State> {
 
     public state = {
         cwd: '',
-        dirs: []
+        dirs: [],
+        loading: false
     };
 
     public componentDidMount(): void {
@@ -24,36 +26,36 @@ export default class DirectoryBrowser extends Component<Props, State> {
     }
 
     public setCwd(cwd:string){
-        getDirs(cwd).then(dirs => this.setState({ cwd, dirs }));
+        this.setState({ loading: true });
+        getDirs(cwd)
+            .then(dirs => this.setState({ cwd, dirs }))
+            .finally(() => this.setState({ loading: true }));
     }
 
     public up(cwd:string) {
-        const path = cwd.split('/').filter(p => p);
-        path.length--;
-        if (path.length === 0) { this.setCwd('/'); }
-        else {
-            this.setCwd(`/${path.join('/')}/`);
-        }
+        const index = cwd.lastIndexOf('/');
+        const path = index === 0 ? cwd : cwd.substr(0, index);
+        this.setCwd(path);
     }
 
-    public render(_, {cwd, dirs}:State) {
+    public render(_, {cwd, dirs, loading}:State) {
+        console.log('cwd', cwd)
         return (
             <div class={style.container}>
                 <div class="center-content">
-                    <button disabled={cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
+                    <button disabled={loading || cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
                     <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
-                    <button disabled={cwd === '/'} class="bordered">Copy current directory to c</button>
+                    <button disabled={cwd === '/'} class="bordered">Copy current directory to clipboard</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
                     {dirs.map(d => (
-                        <li onClick={() => this.setCwd(`${cwd}${d}/`)} key={d}>{d}</li>
+                        <li onClick={() => this.setCwd(`${cwd}/${d}`)} key={d}>{d}</li>
                     ))}
                 </ul>
             </div>);
     }
 
     public changeCwd = (ev) => {
-        const value = ev.target.value;
-        getDirs(value).then(dirs => this.setState({ cwd:value, dirs }));
+        this.setCwd(ev.target.value || '/');
     }
 }

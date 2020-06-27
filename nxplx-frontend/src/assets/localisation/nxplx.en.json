@@ -21,6 +21,7 @@
   "save-details": "Save details",
   "privileges": "Privileges",
   "has-changed-password": "Has changed password",
+  "create-user": "Create user",
   "initial-password": "Initial password",
   "initial-password-again": "Initial password (again)",
   "libraries-username-has-access-to": "Libraries that $USERNAME has access to",

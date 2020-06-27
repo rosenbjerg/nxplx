@@ -34,7 +34,7 @@ export default class WebsocketMessenger implements Connection {
     constructor() {
         const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
         const host = location.host !== 'localhost:8080' ? location.host : 'localhost:5353' ;
-        this.webSocket = new ReconnectingWebSocket(`${protocol}://${host}/api/websocket/connect`);
+        this.webSocket = new ReconnectingWebSocket(`${protocol}://${host}/api/connect`);
 
         this.webSocket.addEventListener('open', this.onOpen);
         this.webSocket.addEventListener('close', this.onClose);

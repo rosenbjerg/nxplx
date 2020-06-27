@@ -1,12 +1,12 @@
 import { createSnackbar } from "@snackbar/core";
 import { Component, h } from "preact";
-import Modal from "react-responsive-modal";
 import { add, remove } from "../../utils/arrays";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import { User } from "../../utils/models";
 import Loading from "../Loading";
 import UserPermissions from "../UserPermissions";
+import Modal from "../Modal";
 
 interface Props {}
 interface State {
@@ -22,21 +22,26 @@ export default class UserManagement extends Component<Props, State> {
     public render(_, { users, selectedUser, createUserModalOpen }) {
         return (
             <div>
-                <Modal open={createUserModalOpen || false} styles={{modal: 'background-color: #424242; border-radius: 2px;', closeIcon:'fill: white;'}} onClose={() => this.setState({createUserModalOpen: false})} center>
-                    <h2>{translate('create-user')}</h2>
-                    <form class="gapped" onSubmit={this.submitNewUser}>
-                        <input class="inline-edit fullwidth gapped" name="username" minLength={4} maxLength={20} placeholder={translate('username')} type="text" required/>
-                        <input class="inline-edit fullwidth gapped" name="email" placeholder={translate('email')} type="email"/>
-                        <select class="inline-edit fullwidth gapped" name="privileges" required>
-                            <option value="user">{translate('user')}</option>
-                            <option value="admin">{translate('admin')}</option>
-                        </select>
-                        <input class="inline-edit fullwidth gapped" name="password1" placeholder={translate('initial-password')} minLength={6} maxLength={50} type="password" required/>
-                        <input class="inline-edit fullwidth gapped" name="password2" placeholder={translate('initial-password-again')} minLength={6} maxLength={50} type="password" required/>
+                {createUserModalOpen && (
+                    <Modal onDismiss={() => this.setState({createUserModalOpen: false})}>
+                        <span>
+                            <h2>{translate('create-user')}</h2>
+                            <form class="gapped" onSubmit={this.submitNewUser}>
+                                <input class="inline-edit fullwidth gapped" name="username" minLength={4} maxLength={20} placeholder={translate('username')} type="text" required/>
+                                <input class="inline-edit fullwidth gapped" name="email" placeholder={translate('email')} type="email"/>
+                                <select class="inline-edit fullwidth gapped" name="privileges" required>
+                                    <option value="user">{translate('user')}</option>
+                                    <option value="admin">{translate('admin')}</option>
+                                </select>
+                                <input class="inline-edit fullwidth gapped" name="password1" placeholder={translate('initial-password')} minLength={6} maxLength={50} type="password" required/>
+                                <input class="inline-edit fullwidth gapped" name="password2" placeholder={translate('initial-password-again')} minLength={6} maxLength={50} type="password" required/>
 
-                        <button type="submit" class="material-icons bordered right">done</button>
-                    </form>
-                </Modal>
+                                <button type="submit" class="material-icons bordered right">done</button>
+                            </form>
+                        </span>
+                    </Modal>
+                )}
+
                 <table class="fullwidth">
                     <thead>
                     <tr>
