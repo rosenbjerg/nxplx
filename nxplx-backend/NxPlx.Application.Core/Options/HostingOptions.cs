@@ -7,8 +7,9 @@ namespace NxPlx.Application.Core.Options
         [Required]
         public string Origin { get; set; }
 
-        public bool Secure { get; set; } = false;
-        public bool Swagger { get; set; } = false;
+        [Required]
+        public bool Secure { get; set; } = true;
+        public bool ApiDocumentation { get; set; } = false;
         public bool HangfireDashboard { get; set; } = false;
     }
 }

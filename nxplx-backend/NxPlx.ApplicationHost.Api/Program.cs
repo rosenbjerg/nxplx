@@ -18,17 +18,11 @@ namespace NxPlx.ApplicationHost.Api
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((context, builder) =>
-                {
-                    builder.Sources.Clear();
-                    builder
-                        .AddJsonFile("appsettings.json")
-                        .AddEnvironmentVariables("NxPlx_");
-                })
-                .UseNxplxSerilog("Api")
+                .ConfigureAppConfiguration((context, builder) => builder.AddEnvironmentVariables("NxPlx_"))
                 .ConfigureWebHostDefaults(webBuilder => webBuilder
                     .UseKestrel()
                     .UseStartup<Startup>()
-                    .UseUrls(UseUrls));
+                    .UseUrls(UseUrls))
+                .UseNxplxSerilog("Api");
     }
 }

@@ -46,7 +46,7 @@ namespace NxPlx.ApplicationHost.Api
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
             var hostingSettings = Configuration.GetSection("Hosting").Get<HostingOptions>();
-            if (hostingSettings.Swagger) 
+            if (hostingSettings.ApiDocumentation) 
                 services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
             
             services.AddWebSockets(options => options.AllowedOrigins.Add(hostingSettings.Origin));
@@ -109,10 +109,10 @@ namespace NxPlx.ApplicationHost.Api
             app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
-            if (hostingOptions.Swagger)
+            if (hostingOptions.ApiDocumentation)
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/api.json", "NxPlx API"));
             }
             
             app.UseMiddleware<LoggingInterceptorMiddleware>();
