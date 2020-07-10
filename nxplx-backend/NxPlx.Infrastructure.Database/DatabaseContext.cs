@@ -21,9 +21,11 @@ namespace NxPlx.Services.Database
         {
             _operationContext = operationContext;
         }
-        
+
         public DbSet<FilmFile> FilmFiles { get; set; } = null!;
+        public DbSet<DbFilmDetails> FilmDetails { get; set; } = null!;
         public DbSet<EpisodeFile> EpisodeFiles { get; set; } = null!;
+        public DbSet<DbSeriesDetails> SeriesDetails { get; set; } = null!;
         public DbSet<Library> Libraries { get; set; } = null!;
         public DbSet<SubtitleFile> SubtitleFiles { get; set; } = null!;
         
