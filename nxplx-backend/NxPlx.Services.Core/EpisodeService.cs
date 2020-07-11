@@ -40,7 +40,7 @@ namespace NxPlx.Core.Services
 
         public async Task<SeriesDto?> FindSeriesDetails(int id, int? season)
         {
-            var episodes = await _context.EpisodeFiles.AsNoTracking()
+            var episodes = await _context.EpisodeFiles
                 .Where(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season))
                 .ToListAsync();
 

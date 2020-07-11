@@ -34,23 +34,15 @@ namespace NxPlx.ApplicationHost.Api
             options.Converters.Add(new JsonStringEnumConverter());
         }
         
-        protected void AddOptions<TSettings>(IServiceCollection services)
-            where TSettings : class, INxplxOptions, new()
+        protected void AddOptions<TOptions>(IServiceCollection services)
+            where TOptions : class, INxplxOptions, new()
         {
-            services.AddOptions<TSettings>()
-                .Bind(Configuration.GetSection(typeof(TSettings).Name.Replace("Settings", string.Empty)))
+            services.AddOptions<TOptions>()
+                .Bind(Configuration.GetSection(typeof(TOptions).Name.Replace("Options", string.Empty)))
                 .ValidateDataAnnotations();
-            services.AddSingleton(typeof(TSettings), provider => provider.GetService<IOptions<TSettings>>().Value);
+            services.AddSingleton(typeof(TOptions), provider => provider.GetService<IOptions<TOptions>>().Value);
         }
-        
-        public void ConfigureServices(IServiceCollection services)
-        {
-            ConfigureServiceCollection(services);
-            ConfigureDependencies(services);
-        }
-        
-        public abstract void ConfigureServiceCollection(IServiceCollection services);
-        
-        public abstract void ConfigureDependencies(IServiceCollection services);
+
+        public abstract void ConfigureServices(IServiceCollection services);
     }
 }

@@ -22,6 +22,7 @@ namespace NxPlx.Integrations.TMDb
     public class TMDbApi : DetailsApiBase
     {
         private const string BaseUrl = "https://api.themoviedb.org/3";
+        private const string CachePrefix = "TmdbCache";
         private readonly TMDbMapper _mapper;
         
         public TMDbApi(
@@ -46,14 +47,15 @@ namespace NxPlx.Integrations.TMDb
         
         private async Task<string> Fetch(string url)
         {
+            var cacheKey = $"{CachePrefix}:{url}";
             {
-                var cachedContent = await CachingService.GetStringAsync(url);
+                var cachedContent = await CachingService.GetStringAsync(cacheKey);
                 if (!string.IsNullOrEmpty(cachedContent)) return cachedContent;
             }
 
             _bucket.Consume(1);
             
-            var content = await FetchInternal(url);
+            var content = await FetchInternal(cacheKey, url);
             
             if (string.IsNullOrEmpty(content) || content.StartsWith("{\"status_code\":25"))
             {

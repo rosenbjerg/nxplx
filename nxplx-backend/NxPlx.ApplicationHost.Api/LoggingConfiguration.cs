@@ -36,8 +36,7 @@ namespace NxPlx.ApplicationHost.Api
                         restrictedToMinimumLevel: logSettings.LogLevel,
                         rollingInterval: RollingInterval.Day,
                         fileSizeLimitBytes: 50000000,
-                        retainedFileCountLimit: 90,
-                        buffered: true));
+                        retainedFileCountLimit: 90));
             };
         }
     }

@@ -23,6 +23,9 @@ namespace NxPlx.Core.Services
             _dtoMapper = dtoMapper;
             _operationContext = operationContext;
         }
+
+        public UserDto? GetCurrentUser() => _dtoMapper.Map<User, UserDto>(_operationContext.User);
+        
         public async Task UpdateUser(string? email)
         {
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _operationContext.User.Id);

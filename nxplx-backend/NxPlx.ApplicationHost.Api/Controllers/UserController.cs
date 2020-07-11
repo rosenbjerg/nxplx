@@ -17,12 +17,10 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly OperationContext _operationContext;
 
-        public UserController(UserService userService, OperationContext operationContext)
+        public UserController(UserService userService)
         {
             _userService = userService;
-            _operationContext = operationContext;
         }
         
         [HttpPost("changepassword")]
@@ -37,7 +35,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
         
         [HttpGet("")]
-        public User Get() => _operationContext.User;
+        public ActionResult<UserDto?> Get() => _userService.GetCurrentUser();
         
         [HttpPut("")]
         public Task Update([FromForm, EmailAddress] string? email) => _userService.UpdateUser(email);

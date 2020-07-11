@@ -59,12 +59,12 @@ namespace NxPlx.Core.Services
         
         private async Task<IEnumerable<OverviewElementDto>> BuildOverview(List<int> libs)
         {
-            var seriesDetails = await _databaseContext.EpisodeFiles.AsNoTracking()
+            var seriesDetails = await _databaseContext.EpisodeFiles
                 .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
                 .Select(ef => ef.SeriesDetails).Distinct()
                 .ToListAsync();
 
-            var filmDetails = await _databaseContext.FilmFiles.AsNoTracking()
+            var filmDetails = await _databaseContext.FilmFiles
                 .Where(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId))
                 .Select(ff => ff.FilmDetails)
                 .ToListAsync();

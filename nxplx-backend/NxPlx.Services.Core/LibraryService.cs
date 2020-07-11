@@ -47,7 +47,7 @@ namespace NxPlx.Core.Services
             return Directory.EnumerateDirectories(cwd.Replace("\\", "/"), "*", new EnumerationOptions
             {
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.Temporary | FileAttributes.System
-            }).Select(path => Path.GetFileName(path).Replace("\\", "/"));
+            }).Select(Path.GetFileName);
         }
         public async Task<bool> RemoveLibrary(int libraryId)
         {

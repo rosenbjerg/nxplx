@@ -28,7 +28,7 @@ namespace NxPlx.ApplicationHost.Api
     {
         public Startup(IConfiguration configuration) : base(configuration) { }
         
-        public override void ConfigureServiceCollection(IServiceCollection services)
+        public override void ConfigureServices(IServiceCollection services)
         {
             services
                 .AddMvc()
@@ -46,31 +46,30 @@ namespace NxPlx.ApplicationHost.Api
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
             var hostingSettings = Configuration.GetSection("Hosting").Get<HostingOptions>();
+            services.AddWebSockets(options => options.AllowedOrigins.Add(hostingSettings.Origin));
             if (hostingSettings.ApiDocumentation) 
                 services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
             
-            services.AddWebSockets(options => options.AllowedOrigins.Add(hostingSettings.Origin));
-        }
-
-        public override void ConfigureDependencies(IServiceCollection services)
-        {
+            
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
 
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
-            services.AddDbContext<DatabaseContext>(options => options.UseNpgsql(connectionStrings.Pgsql).UseLazyLoadingProxies());
+            services.AddDbContext<DatabaseContext>(options =>
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly("NxPlx.Infrastructure.Database"))
+                    .UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
             services.AddSingleton(typeof(IHttpSessionService), typeof(CookieSessionService));
             services.AddSingleton(typeof(IDatabaseMapper), typeof(DatabaseMapper));
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
+            services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
             
             services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
-            services.AddScoped(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
             services.AddScoped(typeof(AuthenticationService));
@@ -107,15 +106,16 @@ namespace NxPlx.ApplicationHost.Api
                     .AllowCredentials();
             });
             app.UseForwardedHeaders();
+            app.UseMiddleware<ExceptionInterceptorMiddleware>();
+            app.UseMiddleware<LoggingInterceptorMiddleware>();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
             if (hostingOptions.ApiDocumentation)
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/api.json", "NxPlx API"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
             }
             
-            app.UseMiddleware<LoggingInterceptorMiddleware>();
             app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
