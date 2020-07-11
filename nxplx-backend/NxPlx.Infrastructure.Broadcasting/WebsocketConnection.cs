@@ -34,7 +34,12 @@ namespace NxPlx.Infrastructure.Broadcasting
             var buffer = ArrayPool<byte>.Shared.Rent(4096);
             while (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open)
             {
-                var message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
+                WebSocketReceiveResult message;
+                try
+                {
+                    message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
+                }
+                catch (OperationCanceledException) { return; }
                 if (message.MessageType == WebSocketMessageType.Close)
                     break;
 

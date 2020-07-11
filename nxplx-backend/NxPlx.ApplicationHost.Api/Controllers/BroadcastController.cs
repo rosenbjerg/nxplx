@@ -32,12 +32,13 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> Connect()
+        public async Task Connect()
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
                 await _connectionAccepter.Accept(HttpContext);
-            
-            return StatusCode((int)HttpStatusCode.SwitchingProtocols);
+            else
+                HttpContext.Response.StatusCode = (int) HttpStatusCode.SwitchingProtocols;
+            await HttpContext.Response.CompleteAsync();
         }
 
 
