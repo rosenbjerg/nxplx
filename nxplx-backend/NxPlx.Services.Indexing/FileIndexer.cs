@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Hangfire;
 using Nxplx.Integrations.FFMpeg;
 using NxPlx.Models;
 using NxPlx.Models.File;
@@ -11,7 +12,7 @@ namespace NxPlx.Services.Index
 {
     public class FileIndexer
     {
-        private List<SubtitleFile> IndexSubtitles(string filepath)
+        public static List<SubtitleFile> IndexSubtitles(string filepath)
         {
             var filename = Path.GetFileNameWithoutExtension(filepath);
             var files = FindFiles(Path.GetDirectoryName(filepath), $"*{filename}.*", "srt", "vtt");
@@ -41,40 +42,19 @@ namespace NxPlx.Services.Index
 
             return uniqueSubs.Values.ToList();
         }
-        private static IEnumerable<string> FindFiles(string folder, string pattern, params string[] extensions)
+
+        public static IEnumerable<string> FindFiles(string folder, string pattern, params string[] extensions)
         {
             return extensions.SelectMany(ext => Directory.EnumerateFiles(folder, $"{pattern}.{ext}", SearchOption.AllDirectories));
         }
         
-        private readonly Regex _seriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
-        private readonly Regex _filmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
-        private readonly Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
+        private static readonly Regex _seriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
+        private static readonly Regex _filmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
+        private static readonly Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
 
-        private readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
+        private static readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
         
-        public List<EpisodeFile> IndexEpisodes(HashSet<string> existing, Library library)
-        {
-            var newFiles = FindFiles(library.Path, "*", "mp4").Where(filePath => !existing.Contains(filePath));
-            var episodes = IndexEpisodeFiles(newFiles);
-
-            return episodes
-                .AsParallel().WithDegreeOfParallelism(Environment.ProcessorCount * 3)
-                .Select(episode =>
-                {
-                    var fileInfo = new FileInfo(episode.Path);
-                    episode.Created = fileInfo.CreationTimeUtc;
-                    episode.LastWrite = fileInfo.LastWriteTimeUtc;
-                    episode.FileSizeBytes = fileInfo.Length;
-
-                    episode.PartOfLibraryId = library.Id;
-                    episode.MediaDetails = FFProbe.Analyse(episode.Path);
-                    episode.Subtitles = IndexSubtitles(episode.Path);
-                    
-                    return episode;
-                }).ToList();
-        }
-
-        public IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath)
+        public static IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath, Library library)
         {
             return filesPath
                 .Where(mp4 => _seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
@@ -92,34 +72,13 @@ namespace NxPlx.Services.Index
                     Name = TitleCleanup(name),
                     SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 1,
                     EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,
-                    Path = episodePath
+                    Path = episodePath,
+                    PartOfLibraryId = library.Id
                 };
             });
         }
         
-        public List<FilmFile> IndexFilm(HashSet<string> existing, Library library)
-        {
-            var newFiles = FindFiles(library.Path, "*", "mp4").Where(filePath => !existing.Contains(filePath));
-            var newFilm = IndexFilmFiles(newFiles);
-
-            return newFilm
-                .AsParallel().WithDegreeOfParallelism(Environment.ProcessorCount * 3)
-                .Select(film =>
-                {
-                    var fileInfo = new FileInfo(film.Path);
-                    film.Created = fileInfo.CreationTimeUtc;
-                    film.LastWrite = fileInfo.LastWriteTimeUtc;
-                    film.FileSizeBytes = fileInfo.Length;
-
-                    film.PartOfLibraryId = library.Id;
-                    film.MediaDetails = FFProbe.Analyse(film.Path);
-                    film.Subtitles = IndexSubtitles(film.Path);
-
-                    return film;
-                }).ToList();
-        }
-
-        public IEnumerable<FilmFile> IndexFilmFiles(IEnumerable<string> filesPath)
+        public static IEnumerable<FilmFile> IndexFilmFiles(IEnumerable<string> filesPath, int libraryId)
         {
             return filesPath
                 .Where(mp4 => !_seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
@@ -134,14 +93,14 @@ namespace NxPlx.Services.Index
 
                     return new FilmFile
                     {
-                        Added = DateTime.UtcNow,
                         Title = TitleCleanup(title),
-                        Year = yearGroup.Success ? int.Parse(yearGroup.Value) : 1,
                         Path = filmPath,
+                        Year = yearGroup.Success ? int.Parse(yearGroup.Value) : 1,
+                        PartOfLibraryId = libraryId
                     };
                 });
         }
-        private string TitleCleanup(string input)
+        private static string TitleCleanup(string input)
         {
             var step1 = _whitespaceRegex.Replace(input, " ").Trim(' ');
             if (string.IsNullOrEmpty(step1)) return step1;
@@ -152,6 +111,5 @@ namespace NxPlx.Services.Index
             
             return string.Join(" ", step2);
         }
-        
     }
 }

@@ -80,7 +80,7 @@ namespace NxPlx.Services.Index
             return imageDownloads;
         }
 
-        private static IEnumerable<(string, string)> ImageInMultipleSizes(string url, params string[] sizes)
+        public static IEnumerable<(string, string)> ImageInMultipleSizes(string url, params string[] sizes)
         {
             return sizes.Select(size => (size, url));
         }

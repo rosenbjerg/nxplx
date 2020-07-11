@@ -31,16 +31,16 @@ namespace NxPlx.Application.Core
             _imageFolder = imageFolder;
         }
         
-        protected async Task<string?> FetchInternal(string url)
+        protected async Task<string?> FetchInternal(string cacheKey, string url)
         {
             var response = await Client.GetAsync(url);
 
             if (!response.IsSuccessStatusCode) return default;
             
             var content = await response.Content.ReadAsStringAsync();
-            await CachingService.SetStringAsync(url, content, new DistributedCacheEntryOptions
+            await CachingService.SetStringAsync(cacheKey, content, new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1)
+                SlidingExpiration = TimeSpan.FromHours(6)
             });
             return content;
         }

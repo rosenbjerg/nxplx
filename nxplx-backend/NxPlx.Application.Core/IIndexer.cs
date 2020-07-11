@@ -6,6 +6,6 @@ namespace NxPlx.Application.Core
 {
     public interface IIndexer
     {
-        Task IndexLibraries(IEnumerable<Library> libraries);
+        Task IndexLibraries(int[] libraries);
     }
 }
