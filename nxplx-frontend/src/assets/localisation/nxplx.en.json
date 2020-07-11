@@ -13,7 +13,7 @@
   "index-all-libraries": "Index all libraries",
   "show-directories": "Show directories",
   "hide-directories": "Hide directories",
-  "copy-current-directory-to-clipboard": "Copy current directory to clipboard",
+  "select": "Select",
   "users": "Users",
   "username": "Username",
   "password": "Password",

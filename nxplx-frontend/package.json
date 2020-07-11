@@ -1,71 +1,44 @@
 {
-  "private": true,
-  "name": "nxplx-frontend",
-  "version": "1.0.0",
-  "license": "MIT",
-  "scripts": {
-    "start": "per-env",
-    "start:production": "npm run -s serve",
-    "start:development": "npm run -s dev",
-    "build": "preact build",
-    "serve": "preact build && preact serve",
-    "dev": "preact watch",
-    "lint": "tslint --project src",
-    "precommit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,css,md,scss}": [
-      "prettier --write",
-      "git add"
+    "private": true,
+    "name": "nxplx",
+    "version": "0.0.0",
+    "license": "AGPLv3",
+    "scripts": {
+        "build": "preact build",
+        "dev": "preact watch",
+        "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
+    },
+    "eslintIgnore": [
+        "build/*"
     ],
-    "*.{ts,tsx}": [
-      "tslint --fix",
-      "git add"
-    ]
-  },
-  "eslintConfig": {
-    "extends": "eslint-config-aerian"
-  },
-  "eslintIgnore": [
-    "build/*"
-  ],
-  "devDependencies": {
-    "@babel/core": "^7.9.6",
-    "@babel/preset-env": "^7.9.6",
-    "@types/lodash": "^4.14.149",
-    "@types/ua-parser-js": "^0.7.33",
-    "@types/webpack-env": "^1.13.9",
-    "babel-loader": "^8.1.0",
-    "css-loader": "^1.0.1",
-    "identity-obj-proxy": "^3.0.0",
-    "lint-staged": "^8.1.0",
-    "per-env": "^1.0.2",
-    "preact-cli": "^3.0.0-rc.14",
-    "preact-render-to-string": "^5.1.8",
-    "prettier": "^1.15.3",
-    "ts-loader": "^3.5.0",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.17.0",
-    "tslint-consistent-codestyle": "^1.14.1",
-    "tslint-eslint-rules": "^5.4.0",
-    "tslint-react": "^3.6.0",
-    "typescript": "3.9.2",
-    "typings-for-css-modules-loader": "^1.7.0"
-  },
-  "dependencies": {
-    "@snackbar/core": "^1.7.0",
-    "linkstate": "^1.1.1",
-    "lodash": "^4.17.15",
-    "preact": "^10.4.4",
-    "preact-helmet": "^4.0.0-alpha-3",
-    "preact-portal": "^1.1.3",
-    "preact-router": "^3.0.1",
-    "reconnecting-websocket": "^4.4.0",
-    "ua-parser-js": "^0.7.21",
-    "unistore": "^3.5.1"
-  },
-  "peerDependencies": {
-    "prettier": ">1.0.0",
-    "tslint": ">5.0.0"
-  }
+    "dependencies": {
+        "@snackbar/core": "^1.7.0",
+        "linkstate": "^1.1.1",
+        "lodash": "^4.17.15",
+        "preact": "^10.4.5",
+        "preact-helmet": "^4.0.0-alpha-3",
+        "preact-portal": "^1.1.3",
+        "preact-router": "^3.2.1",
+        "reconnecting-websocket": "^4.4.0",
+        "ua-parser-js": "^0.7.21",
+        "unistore": "^3.5.1"
+    },
+    "devDependencies": {
+        "@teamsupercell/typings-for-css-modules-loader": "^2.2.0",
+        "@types/lodash": "^4.14.149",
+        "@types/ua-parser-js": "^0.7.33",
+        "@types/webpack-env": "^1.15.1",
+        "@typescript-eslint/eslint-plugin": "^3.6.0",
+        "@typescript-eslint/parser": "^3.6.0",
+        "css-loader": "^3.5.3",
+        "eslint": "^7.4.0",
+        "eslint-config-prettier": "^6.10.1",
+        "eslint-plugin-prettier": "^3.1.2",
+        "eslint-plugin-react": "^7.19.0",
+        "eslint-plugin-react-hooks": "^4.0.7",
+        "preact-cli": "^3.0.0-rc.18",
+        "preact-render-to-string": "^5.1.4",
+        "prettier": "^2.0.5",
+        "typescript": "^3.9.6"
+    }
 }

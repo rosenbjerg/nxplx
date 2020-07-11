@@ -12,7 +12,7 @@
   "index-all-libraries": "Indekser alle biblioteker",
   "show-directories": "Vis mapper",
   "hide-directories": "Skjul mapper",
-  "copy-current-directory-to-clipboard": "Kopier nuværende sti til udklipsholder",
+  "select": "Vælg",
   "users": "Brugere",
   "username": "Brugernavn",
   "password": "Adgangskode",

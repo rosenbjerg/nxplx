@@ -10,13 +10,13 @@ const modalRoot = document.createElement('div');
 document.body.insertBefore(modalRoot, document.getElementById('app'));
 
 class Modal extends Component<Props> {
-    private readonly element = HTMLElement;
+    private readonly element: HTMLDivElement;
 
     constructor(props) {
         super(props);
-        this.element = document.createElement('div')!;
+        this.element = document.createElement('div');
         this.element.className = style.modalRoot;
-        this.element.onclick = ev => { if (ev.target === this.element) this.props.onDismiss() }
+        this.element.onclick = ev => ev.target === this.element && this.props.onDismiss()
     }
 
     public componentDidMount() {

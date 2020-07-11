@@ -2,9 +2,8 @@
     display: block;
     position: relative;
     margin: auto;
-    width: 60%;
-    min-width: 600px;
-    max-width: 100%;
+    width: calc(100% - 16px);
+    max-width: 640px;
 }
 
 .modalRoot {

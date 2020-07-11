@@ -29,7 +29,7 @@ interface State {
 
 export default class Season extends Component<Props, State> {
     public componentDidMount(): void {
-        http.getJson<SeriesDetails>(`/api/series/detail/${this.props.id}/${this.props.season}`)
+        http.getJson<SeriesDetails>(`/api/episode/${this.props.id}/${this.props.season}/detail`)
             .then(async seriesDetails => {
                 const seasonDetails: SeasonDetails = seriesDetails.seasons[0];
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(seriesDetails.backdrop, 1280)}");`;

@@ -78,11 +78,14 @@ button.material-icons:not(:disabled):hover {
     color: var(--focused-text);
     cursor: pointer;
 }
-button.bordered {
+button.noborder {
+    border: none;
+}
+.bordered {
     border: 2px solid var(--border-color);
     border-radius: 2px;
 }
-button.bordered:not(:disabled):hover {
+.bordered:not(:disabled):hover {
     color: var(--focused-text);
     border-color: var(--hover-border-color);
     box-shadow: 0 0 5px 0 var(--hover-border-color);

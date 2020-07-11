@@ -81,7 +81,7 @@ export default class App extends Component {
     private checkLoggedIn = async () => {
         const response = await http.get("/api/authentication/verify");
         if (response.ok) {
-            const isAdmin = await response.text() === "true";
+            const isAdmin = await response.json();
             store.setState({ isLoggedIn: true, isAdmin });
             if (location.pathname === "/login") {
                 route("/", true);

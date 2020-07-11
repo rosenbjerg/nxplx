@@ -17,9 +17,9 @@ export default class OnlineUsers extends Component<Props, State> {
         if (users === undefined) return <Loading/>;
 
         return <span>
-            <ul>
+            <ul style="color: #00c853">
                 {users.map(user => (
-                    <li>{user}</li>
+                    <li><span style="color: #fafafa">{user}</span></li>
                 ))}
             </ul>
         </span>

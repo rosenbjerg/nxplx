@@ -1,9 +1,10 @@
 import { Component, h } from "preact";
 import http from "../../utils/http";
 import * as style from './style.css'
+import { translate } from "../../utils/localisation";
 
 interface Props {
-
+    onSelected: (dir:string) => void;
 }
 interface State {
     cwd:string,
@@ -28,24 +29,20 @@ export default class DirectoryBrowser extends Component<Props, State> {
     public setCwd(cwd:string){
         this.setState({ loading: true });
         getDirs(cwd)
-            .then(dirs => this.setState({ cwd, dirs }))
-            .finally(() => this.setState({ loading: true }));
+            .then(dirs => this.setState({ cwd: cwd.replace(/\\/g, '/'), dirs }))
+            .finally(() => this.setState({ loading: false }));
+    }
+    public changeCwd = (ev) => {
+        this.setCwd(ev.target.value || '/');
     }
 
-    public up(cwd:string) {
-        const index = cwd.lastIndexOf('/');
-        const path = index === 0 ? cwd : cwd.substr(0, index);
-        this.setCwd(path);
-    }
-
-    public render(_, {cwd, dirs, loading}:State) {
-        console.log('cwd', cwd)
+    public render(_, {cwd, dirs}:State) {
         return (
             <div class={style.container}>
                 <div class="center-content">
-                    <button disabled={loading || cwd === '/'} class="bordered" onClick={() => this.up(cwd)}>..</button>
+                    <button disabled={cwd === '/'} class="bordered" onClick={this.up}>..</button>
                     <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
-                    <button disabled={cwd === '/'} class="bordered">Copy current directory to clipboard</button>
+                    <button disabled={cwd === '/'} class="bordered" onClick={this.selectDirectory}>{translate('select')}</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
                     {dirs.map(d => (
@@ -54,8 +51,14 @@ export default class DirectoryBrowser extends Component<Props, State> {
                 </ul>
             </div>);
     }
-
-    public changeCwd = (ev) => {
-        this.setCwd(ev.target.value || '/');
+    private selectDirectory = () => {
+        this.props.onSelected(this.state.cwd);
     }
+    private up = () => {
+        const cwd = this.state.cwd;
+        const index = cwd.lastIndexOf('/');
+        const path = index === 0 ? cwd : cwd.substr(0, index);
+        this.setCwd(path);
+    }
+
 }
