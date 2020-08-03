@@ -909,10 +909,10 @@
   dependencies:
     mkdirp "^1.0.4"
 
-"@preact/async-loader@^3.0.0-rc.12":
-  version "3.0.0-rc.12"
-  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.0-rc.12.tgz#c3deaa25006c325188c986983671b6d472409170"
-  integrity sha512-n6WM3dlUolgKbk/C9DnSNRttBTakzoCW0/YWvOzoe8YjPTS6UM/aJu80Il1KTHI1N2WczLQRSqDusyfoocp0jw==
+"@preact/async-loader@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.0.tgz#341620d881d06877427e47145de1324c5fbe72fb"
+  integrity sha512-IdDTfhALnfFEcCO7sweE9sM8N2Q68jqFvRqTk4zsflQSrcrdhA38Bn8U4+iOx4bHNCxNHffR0WtjdeA7hhfKwg==
   dependencies:
     kleur "^4.0.2"
     loader-utils "^2.0.0"
@@ -1768,6 +1768,11 @@ bluebird@^3.5.5:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
+
+blurhash@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/blurhash/-/blurhash-1.1.3.tgz#dc325af7da836d07a0861d830bdd63694382483e"
+  integrity sha512-yUhPJvXexbqbyijCIE/T2NCXcj9iNPhWmOKbPTuR/cm7Q5snXYIfnVnz6m7MWOXxODMz/Cr3UcVkRdHiuDVRDw==
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.4.0:
   version "4.11.9"
@@ -6623,10 +6628,10 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.16, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-preact-cli@^3.0.0-rc.18:
-  version "3.0.0-rc.18"
-  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.0-rc.18.tgz#be598f1f19efed48bd68e2b1485b2c5ebe7cfa73"
-  integrity sha512-GLlZ2tpe+24hnELmQV2eDSdyBTErjVgDcwuoWronowtwftW80dkxRMBR1hrG2YJxIYbyiPR75LyOzP1SxsKIeQ==
+preact-cli@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.0.tgz#a88abee99c89aac459849f2a9600fb4ac0d834f5"
+  integrity sha512-fRtrNAss8XYhtp8pAowmTJJYvv8kib9v60b2QQMzlsuUe4OHtvzaDmouPo8kVPo+TInKP7r1ofrXNrRTFcG2UA==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/plugin-proposal-class-properties" "^7.8.3"
@@ -6637,7 +6642,7 @@ preact-cli@^3.0.0-rc.18:
     "@babel/plugin-transform-react-jsx" "^7.9.0"
     "@babel/preset-env" "^7.9.0"
     "@babel/preset-typescript" "^7.9.0"
-    "@preact/async-loader" "^3.0.0-rc.12"
+    "@preact/async-loader" "^3.0.0"
     "@prefresh/webpack" "^0.8.1"
     autoprefixer "^9.6.0"
     babel-esm-plugin "^0.9.0"
@@ -6735,10 +6740,10 @@ preact-side-effect@^1.3.0:
   resolved "https://registry.yarnpkg.com/preact-side-effect/-/preact-side-effect-1.3.0.tgz#74345d6c7c6aa48d0567b23e81e71d8fb7e47af9"
   integrity sha512-5KfRhUES56pFIPk4uVucxe6pOjVQO7ppbXvR/jYB9KInPjovTxzIU31VheS3DB7vfs05uFvowy0uE+fYx+/vUw==
 
-preact@^10.4.5:
-  version "10.4.5"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.4.5.tgz#457fe034d558595864d0663574c2850f0b43d28e"
-  integrity sha512-/GyQOM44xNbM1nx1NWWdEO9RFjOVl3Ji6HTnEP+y9OkfyvJDHXnWJPQnuknrslzu5lZfAtFavS8gka91fbFAPg==
+preact@^10.4.6:
+  version "10.4.6"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.4.6.tgz#86cc43396e4bdd755726a2b4b1f0529e78067cd3"
+  integrity sha512-80WJfXH53yyINig5Wza/8MD9n4lMg9G6aN00ws0ptsAaY/Fu/M7xW4zICf7OLfocVltxS30wvNQ8oIbUyZS1tw==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
