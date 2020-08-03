@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Models;
 using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
@@ -14,12 +16,14 @@ namespace NxPlx.Core.Services
         private readonly OperationContext _operationContext;
         private readonly DatabaseContext _context;
         private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-        public SessionService(OperationContext operationContext, DatabaseContext context, IDtoMapper dtoMapper)
+        public SessionService(OperationContext operationContext, DatabaseContext context, IDtoMapper dtoMapper, IMapper mapper)
         {
             _operationContext = operationContext;
             _context = context;
             _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
         public async Task<bool> CloseUserSession(string sessionId)
         {
@@ -31,10 +35,12 @@ namespace NxPlx.Core.Services
             await _context.SaveChangesAsync();
             return true;
         }
-        public async Task<IEnumerable<UserSessionDto>> GetUserSessions(int userId)
+        public Task<List<UserSessionDto>> GetUserSessions(int userId)
         {
-            var sessions = await _context.UserSessions.AsNoTracking().Where(s => s.UserId == userId).ToListAsync();
-            return _dtoMapper.Map<UserSession, UserSessionDto>(sessions);
+            return _context.UserSessions
+                .Where(s => s.UserId == userId)
+                .ProjectTo<UserSessionDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
     }
 }

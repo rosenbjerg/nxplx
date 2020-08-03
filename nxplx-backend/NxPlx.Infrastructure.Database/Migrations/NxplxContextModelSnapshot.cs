@@ -16,7 +16,7 @@ namespace NxPlx.Services.Database.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("NxPlx.Models.Database.DbFilmDetails", b =>
@@ -31,6 +31,9 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<bool>("Adult")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
@@ -55,6 +58,9 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<float>("Popularity")
                         .HasColumnType("real");
+
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
@@ -97,6 +103,9 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<DateTime>("Added")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
 
@@ -123,6 +132,9 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<double>("Popularity")
                         .HasColumnType("double precision");
+
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
@@ -308,10 +320,16 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PosterBlurHash")
                         .HasColumnType("text");
 
                     b.Property<string>("PosterPath")
@@ -370,6 +388,9 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("LogoBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("LogoPath")
                         .HasColumnType("text");
 
@@ -427,6 +448,9 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<int>("SeasonNumber")
                         .HasColumnType("integer");
 
+                    b.Property<string>("StillBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("StillPath")
                         .HasColumnType("text");
 
@@ -449,6 +473,9 @@ namespace NxPlx.Services.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("LogoBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("LogoPath")
                         .HasColumnType("text");
@@ -481,6 +508,9 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Overview")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PosterBlurHash")
                         .HasColumnType("text");
 
                     b.Property<string>("PosterPath")
@@ -946,7 +976,7 @@ namespace NxPlx.Services.Database.Migrations
                         .HasForeignKey("SeriesDetailsId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                    b.OwnsOne("NxPlx.Models.File.MediaDetails", "MediaDetails", b1 =>
                         {
                             b1.Property<int>("EpisodeFileId")
                                 .ValueGeneratedOnAdd()
@@ -967,9 +997,6 @@ namespace NxPlx.Services.Database.Migrations
 
                             b1.Property<float>("Duration")
                                 .HasColumnType("real");
-
-                            b1.Property<int>("Id")
-                                .HasColumnType("integer");
 
                             b1.Property<string>("VideoAspectRatio")
                                 .HasColumnType("text");
@@ -1014,7 +1041,7 @@ namespace NxPlx.Services.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                    b.OwnsOne("NxPlx.Models.File.MediaDetails", "MediaDetails", b1 =>
                         {
                             b1.Property<int>("FilmFileId")
                                 .ValueGeneratedOnAdd()
@@ -1035,9 +1062,6 @@ namespace NxPlx.Services.Database.Migrations
 
                             b1.Property<float>("Duration")
                                 .HasColumnType("real");
-
-                            b1.Property<int>("Id")
-                                .HasColumnType("integer");
 
                             b1.Property<string>("VideoAspectRatio")
                                 .HasColumnType("text");

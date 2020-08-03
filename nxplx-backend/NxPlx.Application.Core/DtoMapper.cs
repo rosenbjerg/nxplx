@@ -18,12 +18,14 @@ namespace NxPlx.Application.Core
             SetMapping<DbSeriesDetails, SeriesDto>(seriesDetails => new SeriesDto
             {
                 Id = seriesDetails.Id,
-                Backdrop = seriesDetails.BackdropPath,
-                Poster = seriesDetails.PosterPath,
+                BackdropPath = seriesDetails.BackdropPath,
+                BackdropBlurHash = seriesDetails.BackdropBlurHash,
+                PosterPath = seriesDetails.PosterPath,
+                PosterBlurHash = seriesDetails.PosterBlurHash,
                 VoteAverage = seriesDetails.VoteAverage,
                 VoteCount = seriesDetails.VoteCount,
                 Name = seriesDetails.Name,
-                Networks = Map<Network, NetworkDto>(seriesDetails.Networks.Select(n => n.Entity2)).ToList(),
+                Networks = Map<Network, NetworkDto>(seriesDetails.Networks.Select(g => g.Entity2)).ToList(),
                 Genres = Map<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)).ToList(),
                 CreatedBy = Map<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)).ToList(),
                 ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)).ToList(),
@@ -34,23 +36,26 @@ namespace NxPlx.Application.Core
                 Name = seasonDetails.Name,
                 Number = seasonDetails.SeasonNumber,
                 AirDate = seasonDetails.AirDate,
-                Poster = seasonDetails.PosterPath,
+                PosterPath = seasonDetails.PosterPath,
+                PosterBlurHash = seasonDetails.PosterBlurHash,
                 Overview = seasonDetails.Overview,
             });
             SetMapping<DbSeriesDetails, OverviewElementDto>(seriesDetails => new OverviewElementDto
             {
                 Id = seriesDetails.Id,
                 Kind = "series",
-                Poster = seriesDetails.PosterPath,
+                PosterPath = seriesDetails.PosterPath,
+                PosterBlurHash = seriesDetails.PosterBlurHash,
                 Title = seriesDetails.Name,
-                Genres = seriesDetails.Genres.Select(g => g.Entity2Id).ToList(),
+                Genres = seriesDetails.Genres.Select(g => g.Entity2Id).Distinct().ToList(),
                 Year = seriesDetails.FirstAirDate == null ? 9999 : seriesDetails.FirstAirDate.Value.Year
             });
             SetMapping<DbFilmDetails, OverviewElementDto>(filmDetails => new OverviewElementDto
             {
                 Id = filmDetails.Id,
                 Kind = "film",
-                Poster = filmDetails.PosterPath,
+                PosterPath = filmDetails.PosterPath,
+                PosterBlurHash = filmDetails.PosterBlurHash,
                 Title = filmDetails.Title,
                 Genres = filmDetails.Genres.Select(g => g.Entity2Id).ToList(),
                 Year = filmDetails.ReleaseDate == null ? 9999 : filmDetails.ReleaseDate.Value.Year
@@ -59,7 +64,8 @@ namespace NxPlx.Application.Core
             {
                 Id = movieCollection.Id,
                 Kind = "collection",
-                Poster = movieCollection.PosterPath,
+                PosterPath = movieCollection.PosterPath,
+                PosterBlurHash = movieCollection.PosterBlurHash,
                 Title = movieCollection.Name,
                 Genres = movieCollection.Movies.SelectMany(f => f.Genres).Select(g => g.Entity2Id).Distinct().ToList(),
                 Year = movieCollection.Movies.Min(f => f.ReleaseDate == null ? 9999 : f.ReleaseDate.Value.Year)
@@ -68,7 +74,8 @@ namespace NxPlx.Application.Core
             {
                 FileId = pair.ef.Id,
                 Kind = "series",
-                Poster = pair.ef.SeasonDetails.PosterPath ?? pair.ef.SeriesDetails.PosterPath,
+                PosterPath = pair.ef.SeasonDetails.PosterPath ?? pair.ef.SeriesDetails.PosterPath,
+                PosterBlurHash = pair.ef.SeasonDetails.PosterBlurHash ?? pair.ef.SeriesDetails.PosterBlurHash,
                 Title = $"{(pair.ef.SeriesDetails == null ? "" : pair.ef.SeriesDetails.Name)} - {pair.ef.GetNumber()} - {(pair.ef.EpisodeDetails == null ? "" : pair.ef.EpisodeDetails.Name)}",
                 Watched = pair.wp.LastWatched,
                 Progress = pair.wp.Time / pair.ef.MediaDetails.Duration
@@ -77,7 +84,8 @@ namespace NxPlx.Application.Core
             {
                 FileId = pair.ff.Id,
                 Kind = "film",
-                Poster = pair.ff.FilmDetails.PosterPath,
+                PosterPath = pair.ff.FilmDetails.PosterPath,
+                PosterBlurHash = pair.ff.FilmDetails.PosterBlurHash,
                 Title = $"{(pair.ff.FilmDetails == null ? "" : pair.ff.FilmDetails.Title)}",
                 Watched = pair.wp.LastWatched,
                 Progress = pair.wp.Time / pair.ff.MediaDetails.Duration
@@ -88,8 +96,10 @@ namespace NxPlx.Application.Core
                 Id = filmFilm.FilmDetails.Id,
                 Fid = filmFilm.Id,
                 Library = filmFilm.PartOfLibraryId,
-                Backdrop = filmFilm.FilmDetails.BackdropPath,
-                Poster = filmFilm.FilmDetails.PosterPath,
+                BackdropPath = filmFilm.FilmDetails.BackdropPath,
+                BackdropBlurHash = filmFilm.FilmDetails.BackdropBlurHash,
+                PosterPath = filmFilm.FilmDetails.PosterPath,
+                PosterBlurHash = filmFilm.FilmDetails.PosterBlurHash,
                 Title = filmFilm.FilmDetails.Title,
                 Budget = filmFilm.FilmDetails.Budget,
                 Genres = Map<Genre, GenreDto>(filmFilm.FilmDetails.Genres.Select(e => e.Entity2)).ToList(),
@@ -101,7 +111,6 @@ namespace NxPlx.Application.Core
                 ImdbId = filmFilm.FilmDetails.ImdbId,
                 OriginalLanguage = filmFilm.FilmDetails.OriginalLanguage,
                 OriginalTitle = filmFilm.FilmDetails.OriginalTitle,
-                PosterPath = filmFilm.FilmDetails.PosterPath,
                 ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(filmFilm.FilmDetails.ProductionCompanies.Select(e => e.Entity2)).ToList(),
                 ProductionCountries = Map<ProductionCountry, ProductionCountryDto>(filmFilm.FilmDetails.ProductionCountries.Select(e => e.Entity2)).ToList(),
                 ReleaseDate = filmFilm.FilmDetails.ReleaseDate,
@@ -116,8 +125,10 @@ namespace NxPlx.Application.Core
                 Id = filmFile.FilmDetails.Id,
                 Fid = filmFile.Id,
                 Duration = filmFile.MediaDetails.Duration,
-                Backdrop = filmFile.FilmDetails.BackdropPath,
-                Poster = filmFile.FilmDetails.PosterPath,
+                BackdropPath = filmFile.FilmDetails.BackdropPath,
+                BackdropBlurHash = filmFile.FilmDetails.BackdropBlurHash,
+                PosterPath = filmFile.FilmDetails.PosterPath,
+                PosterBlurHash = filmFile.FilmDetails.PosterBlurHash,
                 Title = filmFile.FilmDetails.Title,
                 Subtitles = filmFile.Subtitles.Select(s => s.Language)
             });
@@ -133,15 +144,18 @@ namespace NxPlx.Application.Core
                 Id = episodeFile.SeriesDetails.Id,
                 Fid = episodeFile.Id,
                 Duration = episodeFile.MediaDetails.Duration,
-                Backdrop = episodeFile.SeriesDetails.BackdropPath,
-                Poster = episodeFile.SeriesDetails.PosterPath,
+                BackdropPath = episodeFile.SeriesDetails.BackdropPath,
+                BackdropBlurHash = episodeFile.SeriesDetails.BackdropBlurHash,
+                PosterPath = episodeFile.SeriesDetails.PosterPath,
+                PosterBlurHash = episodeFile.SeriesDetails.PosterBlurHash,
                 Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}",
                 Subtitles = episodeFile.Subtitles.Select(s => s.Language)
             });
             SetMapping<EpisodeFile, NextEpisodeDto>(episodeFile => new NextEpisodeDto
             {
                 Fid = episodeFile.Id,
-                Poster = episodeFile.SeriesDetails.PosterPath,
+                PosterPath = episodeFile.SeriesDetails.PosterPath,
+                PosterBlurHash = episodeFile.SeriesDetails.PosterBlurHash,
                 Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}"
             });
             SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto
@@ -160,6 +174,7 @@ namespace NxPlx.Application.Core
                 Id = productionCompany.Id,
                 Name = productionCompany.Name,
                 Logo = productionCompany.LogoPath,
+                LogoBlurHash = productionCompany.LogoBlurHash,
                 OriginCountry = productionCompany.OriginCountry
             });
             SetMapping<ProductionCountry, ProductionCountryDto>(productionCountry => new ProductionCountryDto
@@ -176,13 +191,16 @@ namespace NxPlx.Application.Core
             {
                 Id = movieCollection.Id,
                 Name = movieCollection.Name,
-                Backdrop = movieCollection.BackdropPath,
-                Poster = movieCollection.PosterPath,
+                BackdropPath = movieCollection.BackdropPath,
+                BackdropBlurHash = movieCollection.BackdropBlurHash,
+                PosterPath = movieCollection.PosterPath,
+                PosterBlurHash = movieCollection.PosterBlurHash,
             });
             SetMapping<Network, NetworkDto>(network => new NetworkDto
             {
                 Name = network.Name,
                 Logo = network.LogoPath,
+                LogoBlurHash = network.LogoBlurHash,
                 OriginCountry = network.OriginCountry
             });
             SetMapping<Creator, CreatorDto>(creator => new CreatorDto
@@ -195,9 +213,9 @@ namespace NxPlx.Application.Core
             {
                 Id = user.Id,
                 Username = user.Username,
-                IsAdmin = user.Admin,
+                Admin = user.Admin,
                 Email = user.Email,
-                PasswordChanged = user.HasChangedPassword,
+                HasChangedPassword = user.HasChangedPassword,
                 Libraries = user.LibraryAccessIds
             });
             SetMapping<Library, LibraryDto>(library => new LibraryDto

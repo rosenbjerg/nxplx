@@ -27,7 +27,7 @@ namespace NxPlx.Core.Services
         {
             var next = mode.ToLower() switch
             {
-                "longesttimesince" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
+                "longest-time-since" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
                 "random" => await Random(seriesId, seasonNo, episodeNo),
                 _ => await Default(seriesId, seasonNo, episodeNo)
             };

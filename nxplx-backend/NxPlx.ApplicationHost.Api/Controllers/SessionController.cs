@@ -25,7 +25,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
 
         [HttpGet("")]
-        public Task<IEnumerable<UserSessionDto>> GetSessions()
+        public Task<List<UserSessionDto>> GetSessions()
             => _sessionService.GetUserSessions(_operationContext.User.Id);
 
         [HttpDelete("")]
@@ -38,7 +38,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         
         [HttpGet("{userId}")]
         [RequiresAdminPermissions]
-        public Task<IEnumerable<UserSessionDto>> GetUserSessions([FromRoute, Required]int userId)
+        public Task<List<UserSessionDto>> GetUserSessions([FromRoute, Required]int userId)
             => _sessionService.GetUserSessions(userId);
     }
 }

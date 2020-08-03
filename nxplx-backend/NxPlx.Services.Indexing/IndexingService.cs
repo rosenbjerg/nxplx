@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
-using Nxplx.Integrations.FFMpeg;
 using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
@@ -51,17 +50,12 @@ namespace NxPlx.Services.Index
             var previousJob = string.Empty;
             foreach (var library in libraries)
             {
-                switch (library.Kind)
+                previousJob = library.Kind switch
                 {
-                    case LibraryKind.Film:
-                        previousJob = IndexMovieLibrary(library.Id, previousJob);
-                        break;
-                    case LibraryKind.Series:
-                        previousJob = IndexSeriesLibrary(library.Id, previousJob);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    LibraryKind.Film => IndexMovieLibrary(library.Id, previousJob),
+                    LibraryKind.Series => IndexSeriesLibrary(library.Id, previousJob),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
         }
 
@@ -72,6 +66,7 @@ namespace NxPlx.Services.Index
                 : BackgroundJob.Enqueue<IndexingService>(service => service.RemoveDeletedMovies(libraryId));
             return BackgroundJob.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewMovies(libraryId));
         }
+        
         private string IndexSeriesLibrary(int libraryId, string previousJob = "")
         {
             var deleteJobId = !string.IsNullOrEmpty(previousJob)
@@ -80,6 +75,7 @@ namespace NxPlx.Services.Index
             return BackgroundJob.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewEpisodes(libraryId));
         }
 
+        [Queue(JobQueueNames.FileAnalysis)]
         public async Task AnalyseFilmFile(int filmFileId, int libraryId)
         {
             var filmFile = await _context.FilmFiles.FindAsync(filmFileId);
@@ -88,11 +84,12 @@ namespace NxPlx.Services.Index
             filmFile.LastWrite = fileInfo.LastWriteTimeUtc;
             filmFile.FileSizeBytes = fileInfo.Length;
             filmFile.PartOfLibraryId = libraryId;
-            filmFile.MediaDetails = FFProbe.Analyse(filmFile.Path);
+            filmFile.MediaDetails = await AnalyseMedia(filmFile.Path);
             filmFile.Subtitles = FileIndexer.IndexSubtitles(filmFile.Path);
             await _context.SaveChangesAsync();
         }
         
+        [Queue(JobQueueNames.FileAnalysis)]
         public async Task AnalyseEpisodeFiles(int[] episodeFileIds, int libraryId)
         {
             var episodeFiles = await _context.EpisodeFiles.Where(e => episodeFileIds.Contains(e.Id)).ToListAsync();
@@ -103,12 +100,13 @@ namespace NxPlx.Services.Index
                 episodeFile.LastWrite = fileInfo.LastWriteTimeUtc;
                 episodeFile.FileSizeBytes = fileInfo.Length;
                 episodeFile.PartOfLibraryId = libraryId;
-                episodeFile.MediaDetails = FFProbe.Analyse(episodeFile.Path);
+                episodeFile.MediaDetails = await AnalyseMedia(episodeFile.Path);
                 episodeFile.Subtitles = FileIndexer.IndexSubtitles(episodeFile.Path);
             }
             await _context.SaveChangesAsync();
         }
         
+        [Queue(JobQueueNames.FileIndexing)]
         public async Task IndexNewMovies(int libraryId)
         {
             var library = await _context.Libraries.FindAsync(libraryId);
@@ -132,26 +130,30 @@ namespace NxPlx.Services.Index
             _context.AddRange(movieCollections);
             _context.FilmFiles.AddRange(newFilm);
             var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
-            databaseDetails.ForEach(film => film.Added = DateTime.UtcNow);
             var newDetails = await databaseDetails.GetUniqueNew(_context);
+            newDetails.ForEach(film => film.Added = DateTime.UtcNow);
             await _context.AddRangeAsync(newDetails);
             await _context.SaveChangesAsync();
             
-            var imageDownloads = IndexingHelperFunctions.AccumulateImageDownloads(details, productionCompanies, movieCollections);
-            await IndexingHelperFunctions.DownloadImages(_detailsApi, imageDownloads);
-            
+            foreach (var detail in details)
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
+            foreach (var movieCollection in movieCollections)
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessMovieCollection(movieCollection.Id));
+            if (productionCompanies.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(productionCompanies.Select(n => n.Id).ToArray()));
             foreach (var filmFile in newFilm)
-            {
                 BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseFilmFile(filmFile.Id, libraryId));
-            }
+            
         }
+
+        [Queue(JobQueueNames.FileIndexing)]
         public async Task IndexNewEpisodes(int libraryId)
         {
             var library = await _context.Libraries.FindAsync(libraryId);
             var currentEpisodePaths = new HashSet<string>(await _context.EpisodeFiles.Where(e => e.PartOfLibraryId == libraryId).Select(e => e.Path).ToListAsync());
             var newFiles = FileIndexer.FindFiles(library.Path, "*", "mp4").Where(filePath => !currentEpisodePaths.Contains(filePath));
             var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library).ToList();
-            var details = await FindSeriesDetails(newEpisodes, library);
+            var details = await Da(newEpisodes, library);
 
             var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
             var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew(_context);
@@ -168,15 +170,17 @@ namespace NxPlx.Services.Index
             await _context.AddOrUpdate(databaseDetails);
             
             await _context.SaveChangesAsync();
-            var imageDownloads = IndexingHelperFunctions.AccumulateImageDownloads(details, networks, productionCompanies);
-            await IndexingHelperFunctions.DownloadImages(_detailsApi, imageDownloads);
-            
+            foreach (var detail in details)
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
+            if (networks.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessNetworks(networks.Select(n => n.Id).ToArray()));
+            if (productionCompanies.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(productionCompanies.Select(n => n.Id).ToArray()));
             foreach (var episodes in newEpisodes.GroupBy(e => e.SeriesDetailsId))
-            {
-                var ids = episodes.Select(e => e.Id).ToArray();
-                BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseEpisodeFiles(ids, libraryId));
-            }
+                BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), libraryId));
         }
+        
+        [Queue(JobQueueNames.FileIndexing)]
         public async Task RemoveDeletedMovies(int libraryId)
         {
             var currentFilePaths = await _context.FilmFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path }).ToListAsync();
@@ -190,6 +194,8 @@ namespace NxPlx.Services.Index
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
             }
         }
+        
+        [Queue(JobQueueNames.FileIndexing)]
         public async Task RemoveDeletedEpisodes(int libraryId)
         {
             var currentFilePaths = await _context.EpisodeFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path }).ToListAsync();
@@ -202,6 +208,26 @@ namespace NxPlx.Services.Index
                 await _context.SaveChangesAsync();
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
             }
+        }
+
+        private static async Task<MediaDetails> AnalyseMedia(string path)
+        {
+            var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
+            return new MediaDetails
+            {
+                Duration = (float)analysis.Duration.TotalSeconds,
+                AudioBitrate = analysis.PrimaryAudioStream.BitRate,
+                AudioCodec = analysis.PrimaryAudioStream.CodecName,
+                AudioChannelLayout = analysis.PrimaryAudioStream.ChannelLayout,
+                AudioStreamIndex = analysis.PrimaryAudioStream.Index,
+                VideoBitrate = analysis.PrimaryVideoStream.BitRate,
+                VideoCodec = analysis.PrimaryVideoStream.CodecName,
+                VideoHeight = analysis.PrimaryVideoStream.Height,
+                VideoWidth = analysis.PrimaryVideoStream.Width,
+                VideoAspectRatio = $"{analysis.PrimaryVideoStream.DisplayAspectRatio.Width}x{analysis.PrimaryVideoStream.DisplayAspectRatio.Height}",
+                VideoBitDepth = analysis.PrimaryVideoStream.BitsPerRawSample,
+                VideoFrameRate = (float)analysis.PrimaryVideoStream.FrameRate
+            };
         }
         private async Task RemoveWatchingProgress(List<int> fileIds)
         {
@@ -242,14 +268,13 @@ namespace NxPlx.Services.Index
             return allDetails.Values.ToList();
         }
 
-        private async Task<List<SeriesDetails>> FindSeriesDetails(List<EpisodeFile> newEpisodes, Library library)
+        private async Task FindSeriesDetails(List<EpisodeFile> newEpisodes)
         {
-            var allDetails = new HashSet<SeriesDetails>();
-            var functionCache = new FunctionCache<int, string, SeriesDetails>(FetchSeriesDetails);
+            var functionCache = new FunctionCache<string, Models.Details.Search.SeriesResult[]>(_detailsApi.SearchTvShows);
             
             foreach (var episodeFile in newEpisodes)
             {
-                var searchResults = await _detailsApi.SearchTvShows(episodeFile.Name);
+                var searchResults = await functionCache.Invoke(episodeFile.Name);
                 if (searchResults == null || !searchResults.Any())
                 {
                     episodeFile.SeriesDetailsId = null;
@@ -259,14 +284,25 @@ namespace NxPlx.Services.Index
                 var actual = new Fastenshtein.Levenshtein(episodeFile.Name);
                 var selectedResult = searchResults.OrderBy(sr => actual.DistanceFrom(sr.Name)).First();
                 
-                var seriesDetails = await functionCache.Invoke(selectedResult.Id, library.Language);
-                episodeFile.SeriesDetailsId = seriesDetails.Id;
-                allDetails.Add(seriesDetails);
+                episodeFile.SeriesDetailsId = selectedResult.Id;
+            }
+        }
+
+        private async Task<List<SeriesDetails>> Da(List<EpisodeFile> newEpisodes, Library library)
+        {
+            await FindSeriesDetails(newEpisodes);
+            var details = new List<SeriesDetails>();
+            var newSeries = newEpisodes.ToLookup(e => e.SeriesDetailsId);
+            
+            foreach (var series in newSeries)
+            {
+                if (series.Key == null) continue;
+                var seasons = series.Select(e => e.SeasonNumber).Distinct().ToArray();
+                var seriesDetails = await _detailsApi.FetchTvDetails(series.Key.Value, library.Language, seasons);
+                details.Add(seriesDetails);
             }
 
-            return allDetails.ToList();
+            return details;
         }
-        private Task<SeriesDetails> FetchSeriesDetails(int id, string language) => _detailsApi.FetchTvDetails(id, language);
-
     }
 }

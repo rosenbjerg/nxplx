@@ -7,8 +7,8 @@ namespace NxPlx.Application.Models
         public int Id { get; set; }
         public string Username { get; set; } = null!;
         public string Email { get; set; } = null!;
-        public bool IsAdmin { get; set; }
-        public bool PasswordChanged { get; set; }
+        public bool Admin { get; set; }
+        public bool HasChangedPassword { get; set; }
         public List<int> Libraries { get; set; } = null!;
     }
 }

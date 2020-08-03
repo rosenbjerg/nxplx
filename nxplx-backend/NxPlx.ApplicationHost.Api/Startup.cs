@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
+using NxPlx.Application.Mapping;
 using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
@@ -21,6 +23,7 @@ using NxPlx.Models;
 using NxPlx.Services.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -33,7 +36,7 @@ namespace NxPlx.ApplicationHost.Api
             services
                 .AddMvc()
                 .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
-
+            
             AddOptions<ApiKeyOptions>(services);
             AddOptions<ConnectionStrings>(services);
             AddOptions<FolderOptions>(services);
@@ -41,7 +44,11 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<LoggingOptions>(services);
 
             services.AddSpaStaticFiles(options => options.RootPath = "public");
-            services.AddHangfireServer(options => options.Queues = new[] { "default", "indexing" });
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = Math.Max(Environment.ProcessorCount - 1, 2);
+                options.Queues = JobQueueNames.All;
+            });
             
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
@@ -53,6 +60,7 @@ namespace NxPlx.ApplicationHost.Api
             
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
 
+            services.AddAutoMapper(typeof(AssemblyMarker));
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
@@ -68,8 +76,10 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
             
-            services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
+            services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
+            services.AddScoped(typeof(TempFileService));
+            services.AddScoped(typeof(ImageCreator));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
             services.AddScoped(typeof(AuthenticationService));
@@ -82,6 +92,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(SubtitleService));
             services.AddScoped(typeof(OverviewService));
             services.AddScoped(typeof(UserService));
+            services.AddScoped(typeof(EditDetailsService));
             
             Register(typeof(CommandBase), services.AddScoped!);
         }
@@ -92,21 +103,18 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IMapper mapper)
         {
+#if DEBUG
+            // mapper.ConfigurationProvider.AssertConfigurationIsValid();
+#endif
+            
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
             app.UseSpaStaticFiles();
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins(hostingOptions.Origin)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials();
-            });
-            app.UseForwardedHeaders();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
+            app.UseForwardedHeaders();
             app.UseMiddleware<LoggingInterceptorMiddleware>();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");

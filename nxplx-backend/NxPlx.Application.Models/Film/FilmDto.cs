@@ -9,8 +9,8 @@ namespace NxPlx.Application.Models.Film
         public int Fid { get; set; }
         
         public string Title { get; set; } = null!;
-        public string Poster { get; set; } = null!;
-        public string Backdrop { get; set; } = null!;
+        public string PosterPath { get; set; } = null!;
+        public string BackdropPath { get; set; } = null!;
         public long Budget { get; set; }
         public string ImdbId { get; set; } = null!;
         public int? BelongsToCollectionId { get; set; }
@@ -25,10 +25,11 @@ namespace NxPlx.Application.Models.Film
         public string OriginalLanguage { get; set; } = null!;
         public string Overview { get; set; } = null!;
         public float Popularity { get; set; }
-        public string PosterPath { get; set; } = null!;
         public List<ProductionCompanyDto> ProductionCompanies { get; set; } = null!;
         public float VoteAverage { get; set; }
         public int VoteCount { get; set; }
         public int Library { get; set; }
+        public string BackdropBlurHash { get; set; } = null!;
+        public string PosterBlurHash { get; set; } = null!;
     }
 }

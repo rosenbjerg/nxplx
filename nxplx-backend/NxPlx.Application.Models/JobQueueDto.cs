@@ -2,7 +2,7 @@
 {
     public class JobQueueDto
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public long Length { get; set; }
     }
 }

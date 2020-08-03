@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Series;
-using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
@@ -17,11 +18,13 @@ namespace NxPlx.Core.Services
     {
         private readonly DatabaseContext _context;
         private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper)
+        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper, AutoMapper.IMapper mapper)
         {
             _context = context;
             _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
 
         public async Task<string?> FindEpisodeFilePath(int id)
@@ -34,8 +37,10 @@ namespace NxPlx.Core.Services
 
         public async Task<InfoDto?> FindEpisodeFileInfo(int id)
         {
-            var episode = await _context.EpisodeFiles.AsNoTracking().Include(ef => ef.Subtitles).FirstOrDefaultAsync(ef => ef.Id == id);
-            return _dtoMapper.Map<EpisodeFile, InfoDto>(episode);
+            return await _context.EpisodeFiles
+                .Where(ef => ef.Id == id)
+                .ProjectTo<InfoDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<SeriesDto?> FindSeriesDetails(int id, int? season)
@@ -84,7 +89,8 @@ namespace NxPlx.Core.Services
                     AirDate = details.AirDate,
                     Number = f.EpisodeNumber,
                     FileId = f.Id,
-                    Still = details.StillPath,
+                    StillPath = details.StillPath,
+                    StillBlurHash = details.StillBlurHash
                 };
             });
         }

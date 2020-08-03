@@ -34,7 +34,12 @@ namespace NxPlx.Services.Database
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<UserSession> UserSessions { get; set; } = null!;
         public DbSet<Genre> Genre { get; set; } = null!;
-        
+        public DbSet<MovieCollection> MovieCollection { get; set; } = null!;
+        public DbSet<Network> Network { get; set; } = null!;
+        public DbSet<ProductionCompany> ProductionCompany { get; set; } = null!;
+        public DbSet<EpisodeDetails> EpisodeDetails { get; set; } = null!;
+        public DbSet<SeasonDetails> SeasonDetails { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

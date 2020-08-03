@@ -6,5 +6,6 @@ namespace NxPlx.Application.Models.Film
         public string Logo { get; set; } = null!;
         public string Name { get; set; } = null!;
         public string OriginCountry { get; set; } = null!;
+        public string LogoBlurHash { get; set; } = null!;
     }
 }

@@ -5,7 +5,7 @@ using NxPlx.Models.Details.Series;
 
 namespace NxPlx.Models.Database
 {
-    public class DbSeriesDetails : EntityBase, IAdded
+    public class DbSeriesDetails : EntityBase, IAdded, IPosterImageOwner, IBackdropImageOwner
     {
         public virtual List<JoinEntity<DbSeriesDetails, Creator>> CreatedBy { get; set; }
         public DateTime? FirstAirDate { get; set; }
@@ -27,5 +27,7 @@ namespace NxPlx.Models.Database
         public int VoteCount { get; set; }
         
         public DateTime Added { get; set; }
+        public string PosterBlurHash { get; set; }
+        public string BackdropBlurHash { get; set; }
     }
 }

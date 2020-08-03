@@ -27,10 +27,13 @@ namespace NxPlx.ApplicationHost.Api
             {
                 var logSettings = hostingContext.Configuration.GetSection("Logging").Get<LoggingOptions>();
                 var logDirectory = logSettings.Directory;
-                loggerConfiguration.Filter.ByExcluding(Matching.FromSource("Microsoft"));
-                loggerConfiguration.Filter.ByExcluding(Matching.FromSource("Hangfire"));
-                loggerConfiguration.Enrich.FromLogContext()
-                    .WriteTo.Async(x => x.File(
+                loggerConfiguration
+                    .Filter.ByExcluding(Matching.FromSource("Microsoft"))
+                    .Filter.ByExcluding(Matching.FromSource("Hangfire"))
+#if DEBUG
+                    .Enrich.FromLogContext().WriteTo.Async(x => x.Console())
+#endif
+                    .Enrich.FromLogContext().WriteTo.Async(x => x.File(
                         formatter: new JsonFormatter(),
                         path: Path.Combine(logDirectory, $"{serviceName}-{Environment.MachineName}-.log"),
                         restrictedToMinimumLevel: logSettings.LogLevel,

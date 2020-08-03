@@ -21,8 +21,11 @@ namespace NxPlx.Core.Services
         }
         public async Task<string?> GetSubtitlePath(MediaFileType mediaType, int id, string lang)
         {
-            var file = await FindFile(id, mediaType);
-            return file?.Subtitles.FirstOrDefault(s => s.Language == lang)?.Path;
+            return await GetMediaFileQueryable(id, mediaType)
+                .SelectMany(f => f.Subtitles)
+                .Where(s => s.Language == lang)
+                .Select(s => s.Path)
+                .FirstOrDefaultAsync();
         }
         public async Task SetLanguagePreference(MediaFileType mediaType, int fileId, string language)
         {
@@ -47,16 +50,15 @@ namespace NxPlx.Core.Services
         }
         public async Task<IEnumerable<string>> FindSubtitles(MediaFileType mediaType, int id)
         {
-            var file = await FindFile(id, mediaType);
-            return file?.Subtitles.Select(sub => sub.Language) ?? Enumerable.Empty<string>();
+            return await GetMediaFileQueryable(id, mediaType).SelectMany(f => f.Subtitles).Select(s => s.Language).ToListAsync();
         }
 
-        private async Task<MediaFileBase?> FindFile(int fileId, MediaFileType mediaFileType)
+        private IQueryable<MediaFileBase>? GetMediaFileQueryable(int fileId, MediaFileType mediaFileType)
         {
             return mediaFileType switch
             {
-                MediaFileType.Film => await _context.FilmFiles.AsNoTracking().Include(ff => ff.Subtitles).FirstOrDefaultAsync(ff => ff.Id == fileId),
-                MediaFileType.Episode => await _context.EpisodeFiles.AsNoTracking().Include(ff => ff.Subtitles).FirstOrDefaultAsync(ef => ef.Id == fileId),
+                MediaFileType.Film => _context.FilmFiles.AsNoTracking().Where(ff => ff.Id == fileId),
+                MediaFileType.Episode => _context.EpisodeFiles.AsNoTracking().Where(ef => ef.Id == fileId),
                 _ => null
             };
         }

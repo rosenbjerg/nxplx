@@ -47,11 +47,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             [FromForm, EmailAddress]string? email,
             [FromForm, Required, MinLength(6), MaxLength(40)]string password1,
             [FromForm, Required, MinLength(6), MaxLength(40)]string password2,
-            [FromForm, Required]bool admin,
+            [FromForm, Required]string privileges,
             [FromForm]List<int>? libraryIds)
         {
             if (password1 != password2) return BadRequest();
-            return await _userService.CreateUser(username, email, admin, libraryIds, password1);
+            return await _userService.CreateUser(username, email, privileges == "admin", libraryIds, password1);
         }
 
         [HttpDelete("")]

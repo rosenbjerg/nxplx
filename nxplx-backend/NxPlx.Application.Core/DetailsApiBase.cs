@@ -45,40 +45,39 @@ namespace NxPlx.Application.Core
             return content;
         }
 
-        protected async Task DownloadImageInternal(string url, string size, string imageName, bool first = true)
+        protected async Task<bool> DownloadImageInternal(string imageUrl, string outputPath, bool first = true)
         {
-            var sizeDir = Path.Combine(_imageFolder, size);
-            var outputPath = Path.Combine(Path.Combine(sizeDir, $"{imageName}.jpg"));
-            Directory.CreateDirectory(sizeDir);
-            
-            if (!System.IO.File.Exists(outputPath))
+            if (!File.Exists(outputPath))
             {
                 try
                 {
-                    var response = await Client.GetAsync(url);
-                    using var imageStream = await response.Content.ReadAsStreamAsync();
-                    using var outputStream = System.IO.File.OpenWrite(outputPath);
+                    using var response = await Client.GetAsync(imageUrl);
+                    if (!response.IsSuccessStatusCode) return false;
+                    await using var imageStream = await response.Content.ReadAsStreamAsync();
+                    await using var outputStream = File.OpenWrite(outputPath);
                     await imageStream.CopyToAsync(outputStream);
+                    return outputStream.Length > 50;
                 }
                 catch (HttpRequestException)
                 {
                     if (first)
-                        await DownloadImageInternal(url, size, imageName, false);
-                    else 
-                        Logger.LogWarning("Failed to download image {ImagePath} twice. Connection issues", outputPath);
+                        return await DownloadImageInternal(imageUrl, outputPath, false);
+                    
+                    Logger.LogWarning("Failed to download image {ImagePath} twice. Connection issues", outputPath);
                 }
                 catch (IOException)
                 {
                     Logger.LogTrace("Failed to download image {ImagePath}. It is already being downloaded", outputPath);
                 }
+                return false;
             }
+            return false;
         }
         
         public abstract Task<FilmResult[]> SearchMovies(string title, int year);
         public abstract Task<SeriesResult[]> SearchTvShows(string name);
         public abstract Task<FilmDetails> FetchMovieDetails(int id, string language);
-        public abstract Task<SeriesDetails> FetchTvDetails(int id, string language);
-        public abstract Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language);
-        public abstract Task DownloadImage(string size, string imageUrl);
+        public abstract Task<SeriesDetails> FetchTvDetails(int id, string language, int[] seasons);
+        public abstract Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath);
     }
 }

@@ -15,17 +15,18 @@ namespace NxPlx.Application.Core
     }
     public abstract class MapperBase : IMapper
     {
-        private readonly Dictionary<(Type, Type), object> _dictionary = new Dictionary<(Type, Type), object>();
+        private readonly Dictionary<(Type, Type), object> _expressions = new Dictionary<(Type, Type), object>();
+        private readonly Dictionary<(Type, Type), object> _compiledCache = new Dictionary<(Type, Type), object>();
 
         public void SetMapping<TFrom, TTo>(Expression<Func<TFrom, TTo>> mapping)
             where TTo : class
         {
-            _dictionary[(typeof(TFrom), typeof(TTo))] = mapping;
+            _expressions[(typeof(TFrom), typeof(TTo))] = mapping;
         }
         
-        public Expression<Func<TFrom, TTo>>? GetProjectionExpression<TFrom, TTo>()
+        public Expression<Func<TFrom, TTo>> GetProjectionExpression<TFrom, TTo>()
         {
-            return _dictionary[(typeof(TFrom), typeof(TTo))] as Expression<Func<TFrom, TTo>>;
+            return (Expression<Func<TFrom, TTo>>)_expressions[(typeof(TFrom), typeof(TTo))];
         }
         
         public TTo? Map<TFrom, TTo>(TFrom? instance)
@@ -41,11 +42,14 @@ namespace NxPlx.Application.Core
             where TTo : class
         {
             if (instances == null) return Enumerable.Empty<TTo>();
+            var key = (typeof(TFrom), typeof(TTo));
 
-            if (_dictionary.TryGetValue((typeof(TFrom), typeof(TTo)), out var mapperObject))
+            if (_expressions.TryGetValue(key, out var mapperObject))
             {
-                var mapperExpression = (Expression<Func<TFrom, TTo>>) mapperObject;
-                var mapper = mapperExpression.Compile();
+                if (!_compiledCache.TryGetValue(key, out var cached))
+                    _compiledCache[key] = cached = ((Expression<Func<TFrom, TTo>>)mapperObject).Compile();
+
+                var mapper = (Func<TFrom, TTo>)cached;
                 return instances.Aggregate(new List<TTo>(), (acc, cur) =>
                 {
                     if (cur != null) acc.Add(mapper(cur));

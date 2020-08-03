@@ -115,21 +115,21 @@ namespace NxPlx.Integrations.TMDb
             return _mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
         }
         
-        public override async Task<SeriesDetails> FetchTvDetails(int id, string language)
+        public override async Task<SeriesDetails> FetchTvDetails(int id, string language, int[] seasons)
         {
             var url = $"{BaseUrl}/tv/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = _mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped!.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
+            var seasonDetailsTasks = mapped!.Seasons.Where(s => seasons.Contains(s.SeasonNumber)).Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             
             return mapped;
         }
-        
-        public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
+
+        private async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
         {
             var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}";
 
@@ -138,13 +138,12 @@ namespace NxPlx.Integrations.TMDb
             return _mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj);
         }
         
-        public override async Task DownloadImage(string size, string imageUrl)
+        public override async Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath)
         {
-            if (string.IsNullOrEmpty(imageUrl)) return;
+            if (string.IsNullOrEmpty(imageUrl)) return false;
             
             _imageBucket.Consume(1);
-            var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
-            await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", size, imageName);
+            return await DownloadImageInternal($"https://image.tmdb.org/t/p/w{width}/{imageUrl}", outputFilePath);
         }
     }
 }

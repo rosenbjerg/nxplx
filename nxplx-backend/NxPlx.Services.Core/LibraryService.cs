@@ -2,12 +2,14 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Models;
 using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
@@ -16,12 +18,14 @@ namespace NxPlx.Core.Services
         private readonly DatabaseContext _context;
         private readonly ILogger<LibraryService> _systemLogger;
         private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-        public LibraryService(DatabaseContext context, ILogger<LibraryService> systemLogger, IDtoMapper dtoMapper)
+        public LibraryService(DatabaseContext context, ILogger<LibraryService> systemLogger, IDtoMapper dtoMapper, IMapper mapper)
         {
             _context = context;
             _systemLogger = systemLogger;
             _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
         public async Task<bool> SetLibraryAccess(int userId, List<int> libraryIds)
         {
@@ -66,11 +70,10 @@ namespace NxPlx.Core.Services
             _systemLogger.LogInformation("Deleted library {Username}", library.Name);
             return true;
         }
-        public async Task<IEnumerable<TLibraryDto>> ListLibraries<TLibraryDto>()
+        public Task<List<TLibraryDto>> ListLibraries<TLibraryDto>()
             where TLibraryDto : LibraryDto
         {
-            var libraries = await _context.Libraries.ToListAsync();
-            return _dtoMapper.Map<Library, TLibraryDto>(libraries);
+            return _context.Libraries.ProjectTo<TLibraryDto>(_mapper.ConfigurationProvider).ToListAsync();
         } 
         public async Task<List<int>?> GetLibraryAccess(int userId)
         {

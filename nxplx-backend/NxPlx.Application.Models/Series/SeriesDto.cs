@@ -7,8 +7,8 @@ namespace NxPlx.Application.Models.Series
     {
         public int Id { get; set; }
 
-        public string Backdrop { get; set; } = null!;
-        public string Poster { get; set; } = null!;
+        public string BackdropPath { get; set; } = null!;
+        public string PosterPath { get; set; } = null!;
 
         public double VoteAverage { get; set; }
 
@@ -26,5 +26,7 @@ namespace NxPlx.Application.Models.Series
 
         public string Overview { get; set; } = null!;
         public IEnumerable<SeasonDto> Seasons { get; set; } = null!;
+        public string BackdropBlurHash { get; set; } = null!;
+        public string PosterBlurHash { get; set; } = null!;
     }
 }

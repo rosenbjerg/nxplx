@@ -7,7 +7,7 @@ namespace NxPlx.Application.Core.Options
     {
         [Required]
         public LogEventLevel LogLevel { get; set; }
-        [Required]
-        public string Directory { get; set; }
+
+        [Required] public string Directory { get; set; } = null!;
     }
 }

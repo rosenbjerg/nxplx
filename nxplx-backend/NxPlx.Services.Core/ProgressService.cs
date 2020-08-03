@@ -77,10 +77,10 @@ namespace NxPlx.Core.Services
         {
             var episodeDuration = await _context.EpisodeFiles.AsNoTracking()
                     .Where(ef => ef.SeriesDetailsId == seriesId && ef.SeasonNumber == seasonNumber)
-                    .Select(ef => Tuple.Create(ef.Id, ef.MediaDetails.Duration))
+                    .Select(ef => new { ef.Id, ef.MediaDetails.Duration })
                     .ToListAsync();
 
-            var episodeIds = episodeDuration.Select(ed => ed.Item1).ToList();
+            var episodeIds = episodeDuration.Select(ed => ed.Id).ToList();
 
             var progressMap = await _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode && episodeIds.Contains(wp.FileId))
@@ -88,12 +88,12 @@ namespace NxPlx.Core.Services
 
             return episodeDuration.Select(ed =>
             {
-                if (!progressMap.TryGetValue(ed.Item1, out var duration)) duration = 0;
+                if (!progressMap.TryGetValue(ed.Id, out var progress)) progress = 0;
 
                 return new WatchingProgressDto
                 {
-                    FileId = ed.Item1,
-                    Progress = duration / ed.Item2
+                    FileId = ed.Id,
+                    Progress = ed.Duration == 0 ? 0 : progress / ed.Duration
                 };
             }).ToList();
         }

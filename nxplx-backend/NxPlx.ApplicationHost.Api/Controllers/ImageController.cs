@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core.Options;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {

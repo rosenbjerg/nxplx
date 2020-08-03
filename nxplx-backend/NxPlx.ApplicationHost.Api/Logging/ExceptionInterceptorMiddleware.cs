@@ -11,7 +11,7 @@ namespace NxPlx.ApplicationHost.Api.Logging
 
         public ExceptionInterceptorMiddleware(RequestDelegate next)
         {
-            this._next = next;
+            _next = next;
         }
 
         public async Task Invoke(HttpContext context, ILogger<ExceptionInterceptorMiddleware> logger)
@@ -20,6 +20,7 @@ namespace NxPlx.ApplicationHost.Api.Logging
             {
                 await _next(context);
             }
+            catch (OperationCanceledException) { }
             catch (Exception e)
             {
                 logger.LogError(e, "Unexpected exception");

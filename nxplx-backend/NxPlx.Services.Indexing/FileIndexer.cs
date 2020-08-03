@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Hangfire;
-using Nxplx.Integrations.FFMpeg;
 using NxPlx.Models;
 using NxPlx.Models.File;
 
@@ -15,7 +13,7 @@ namespace NxPlx.Services.Index
         public static List<SubtitleFile> IndexSubtitles(string filepath)
         {
             var filename = Path.GetFileNameWithoutExtension(filepath);
-            var files = FindFiles(Path.GetDirectoryName(filepath), $"*{filename}.*", "srt", "vtt");
+            var files = FindFiles(Path.GetDirectoryName(filepath)!, $"*{filename}.*", "srt", "vtt");
             var uniqueSubs = new Dictionary<string, SubtitleFile>();
             
             foreach (var file in files)
@@ -48,19 +46,19 @@ namespace NxPlx.Services.Index
             return extensions.SelectMany(ext => Directory.EnumerateFiles(folder, $"{pattern}.{ext}", SearchOption.AllDirectories));
         }
         
-        private static readonly Regex _seriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
-        private static readonly Regex _filmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
-        private static readonly Regex _whitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
+        private static readonly Regex SeriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
+        private static readonly Regex FilmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
+        private static readonly Regex WhitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
 
         private static readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
         
         public static IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath, Library library)
         {
             return filesPath
-                .Where(mp4 => _seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
+                .Where(mp4 => SeriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
                 .Select(episodePath =>
             {
-                var match = _seriesRegex.Match(Path.GetFileNameWithoutExtension(episodePath));
+                var match = SeriesRegex.Match(Path.GetFileNameWithoutExtension(episodePath));
                 var nameGroup = match.Groups["name"];
                 var seasonGroup = match.Groups["season"];
                 var episodeGroup = match.Groups["episode"];
@@ -81,12 +79,12 @@ namespace NxPlx.Services.Index
         public static IEnumerable<FilmFile> IndexFilmFiles(IEnumerable<string> filesPath, int libraryId)
         {
             return filesPath
-                .Where(mp4 => !_seriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
+                .Where(mp4 => !SeriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
                 .Select(filmPath =>
                 {
                     var filename = Path.GetFileNameWithoutExtension(filmPath);
                     var trimmedName = StopWords.Aggregate(filename, (acc, stopword) => acc.Replace(stopword, ""));
-                    var match = _filmRegex.Match(trimmedName);
+                    var match = FilmRegex.Match(trimmedName);
                     var titleGroup = match.Groups["title"];
                     var yearGroup = match.Groups["year"];
                     var title = titleGroup.Value != "" ? titleGroup.Value : Path.GetFileNameWithoutExtension(trimmedName);
@@ -102,7 +100,7 @@ namespace NxPlx.Services.Index
         }
         private static string TitleCleanup(string input)
         {
-            var step1 = _whitespaceRegex.Replace(input, " ").Trim(' ');
+            var step1 = WhitespaceRegex.Replace(input, " ").Trim(' ');
             if (string.IsNullOrEmpty(step1)) return step1;
 
             var step2 = step1

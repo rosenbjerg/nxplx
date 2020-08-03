@@ -16,7 +16,7 @@ namespace NxPlx.Core.Services
     {
         private readonly DatabaseContext _databaseContext;
         private readonly OperationContext _operationContext;
-        private TimeSpan _sessionLength;
+        private readonly TimeSpan _sessionLength;
 
         public AuthenticationService(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration)
         {
