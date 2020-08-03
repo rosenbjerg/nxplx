@@ -1,16 +1,19 @@
 .modal {
     display: block;
     position: relative;
-    margin: auto;
     width: calc(100% - 16px);
     max-width: 640px;
+    margin: 72px auto auto;
+    padding: 16px 16px 40px;
+    background-color: rgba(0,0,0, 0.14);
+    border-radius: 4px;
 }
 
 .modalRoot {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 999;
+    z-index: 51;
     align-items: center;
     justify-content: center;
     width: 100%;

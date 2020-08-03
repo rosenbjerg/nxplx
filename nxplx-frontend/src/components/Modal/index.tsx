@@ -6,8 +6,14 @@ interface Props {
     children: VNode[] | VNode,
     onDismiss: () => any,
 }
-const modalRoot = document.createElement('div');
-document.body.insertBefore(modalRoot, document.getElementById('app'));
+
+const modalRootId = 'modal-root';
+let modalRoot: HTMLElement = document.getElementById(modalRootId)!;
+if (modalRoot === null){
+    modalRoot = document.createElement('div');
+    modalRoot.id = modalRootId;
+    document.body.insertBefore(modalRoot, document.getElementById('app'));
+}
 
 class Modal extends Component<Props> {
     private readonly element: HTMLDivElement;
@@ -16,15 +22,15 @@ class Modal extends Component<Props> {
         super(props);
         this.element = document.createElement('div');
         this.element.className = style.modalRoot;
-        this.element.onclick = ev => ev.target === this.element && this.props.onDismiss()
+        this.element.addEventListener('click', ev => ev.target === this.element && this.props.onDismiss());
     }
 
     public componentDidMount() {
-        modalRoot.appendChild( this.element );
+        modalRoot.appendChild(this.element);
     }
 
     public componentWillUnmount() {
-        modalRoot.removeChild( this.element );
+        modalRoot.removeChild(this.element);
         this.props.onDismiss()
     }
 

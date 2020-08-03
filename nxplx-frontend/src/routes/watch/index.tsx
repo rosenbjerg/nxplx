@@ -49,7 +49,7 @@ export default class Watch extends Component<Props, State> {
                     startTime={completed ? 0 : this.initialTime}
                     title={info.title}
                     src={`/api/${kind}/watch/${fid}`}
-                    poster={imageUrl(this.state.info.backdrop, 1280)}
+                    poster={imageUrl(this.state.info.backdropPath, 1280)}
 
                     subtitles={info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),

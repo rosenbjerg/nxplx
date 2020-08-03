@@ -38,7 +38,12 @@ export default class VideoPlayer extends Component<Props, State> {
     private videoContainer?: HTMLElement;
 
     public componentDidMount(): void {
-        if (this.video !== undefined) this.video.volume = volume;
+        if (this.video !== undefined) {
+            this.video.addEventListener('fullscreenchange', ev => {{
+                console.log(ev, this.videoContainer);
+            }})
+            this.video.volume = volume;
+        }
 
         // cast.framework.CastContext.getInstance().setOptions({
         //     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
@@ -83,12 +88,6 @@ export default class VideoPlayer extends Component<Props, State> {
                                srcLang={track.language} label={track.displayName}/>
                     ))}
                 </video>
-                <div>
-                    <button>playpause</button>
-                    <button>volume</button>
-                    <button>next</button>
-                    <button>fullscreen</button>
-                </div>
             </div>
         );
     }
