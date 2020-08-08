@@ -53,7 +53,7 @@ namespace NxPlx.Core.Services
                 .OrderByDescending(wp => wp.LastWatched)
                 .Take(40).ToListAsync();
 
-            var episodes = progress.Where(wp => wp.MediaType == MediaFileType.Episode).ToDictionary(wp => wp.FileId);
+            var episodes = progress.Where(wp => wp.MediaType == MediaFileType.Series).ToDictionary(wp => wp.FileId);
             var film = progress.Where(wp => wp.MediaType == MediaFileType.Film).ToDictionary(wp => wp.FileId);
 
             var episodesIds = episodes.Keys.ToList();
@@ -61,11 +61,11 @@ namespace NxPlx.Core.Services
 
             var list = new List<ContinueWatchingDto>();
 
-            var watchedEpisodes = await _context.EpisodeFiles.AsNoTracking().Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
+            var watchedEpisodes = await _context.EpisodeFiles.Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
             var relevantEpisodes = watchedEpisodes.Select(ef => (wp: episodes[ef.Id], ef)).Where(ef => NotFinished(ef));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, EpisodeFile), ContinueWatchingDto>(relevantEpisodes));
 
-            var watchedFilm = await _context.FilmFiles.AsNoTracking().Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
+            var watchedFilm = await _context.FilmFiles.AsNoTracking().Include(ff => ff.FilmDetails).Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
             var relevantFilm = watchedFilm.Select(ff => (wp: film[ff.Id], ff)).Where(ff => NotFinished(ff));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, FilmFile), ContinueWatchingDto>(relevantFilm));
 
@@ -75,15 +75,15 @@ namespace NxPlx.Core.Services
         public async Task<List<WatchingProgressDto>> GetEpisodeProgress(
             User user, int seriesId, int seasonNumber)
         {
-            var episodeDuration = await _context.EpisodeFiles.AsNoTracking()
+            var episodeDuration = await _context.EpisodeFiles
                     .Where(ef => ef.SeriesDetailsId == seriesId && ef.SeasonNumber == seasonNumber)
                     .Select(ef => new { ef.Id, ef.MediaDetails.Duration })
                     .ToListAsync();
 
             var episodeIds = episodeDuration.Select(ed => ed.Id).ToList();
 
-            var progressMap = await _context.WatchingProgresses.AsNoTracking()
-                .Where(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Episode && episodeIds.Contains(wp.FileId))
+            var progressMap = await _context.WatchingProgresses
+                .Where(wp => wp.UserId == user.Id && wp.MediaType == MediaFileType.Series && episodeIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId, wp => wp.Time);
 
             return episodeDuration.Select(ed =>

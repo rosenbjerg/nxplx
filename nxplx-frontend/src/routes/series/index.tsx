@@ -7,17 +7,11 @@ import { formatInfoPair } from "../../utils/common";
 import http from "../../utils/http";
 import { imageUrl, round, SeriesDetails } from "../../utils/models";
 import * as style from "./style.css";
-import Modal from "../../components/Modal";
-import { translate } from "../../utils/localisation";
 import { LazyImage } from "../../components/Entry";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
+import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
 
-const playbackModes = [
-    "default",
-    "leastrecent",
-    "random"
-]
 
 interface Props {
     id: string
@@ -33,7 +27,7 @@ interface State {
 
 export default class Series extends Component<Props, State> {
     public componentDidMount(): void {
-        http.get(`/api/episode/${this.props.id}/detail`)
+        http.get(`/api/series/${this.props.id}/detail`)
             .then(response => response.json())
             .then((details: SeriesDetails) => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
@@ -94,14 +88,7 @@ export default class Series extends Component<Props, State> {
                 </div>
 
                 {showPlaybackModeSelector && (
-                    <Modal onDismiss={() => this.setState({showPlaybackModeSelector: false})}>
-                        <div>
-                            <h2>{translate('which playback mode')}</h2>
-                            {playbackModes.map(mode => (
-                                <button key={mode} class="bordered" onClick={() => this.getNextEpisode(mode)}>{translate(mode)}</button>
-                            ))}
-                        </div>
-                    </Modal>
+                    <SelectPlaybackMode onDismiss={() => this.setState({ showPlaybackModeSelector: false })} seriesId={details.id}/>
                 )}
             </div>
         );
@@ -109,8 +96,5 @@ export default class Series extends Component<Props, State> {
 
     private showPlayModeDiv = () => {
         this.setState({ showPlaybackModeSelector: true });
-    }
-    private getNextEpisode = (mode:string) => {
-        http.getJson(`/api/episode/${this.state.details.id}/next?mode=${mode}`)
     }
 }

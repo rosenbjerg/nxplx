@@ -37,7 +37,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             => _progressService.GetUserWatchingProgress(_operationContext.User, kind, fileId);
 
         [HttpPut("{kind}/{fileId}")]
-        public Task SetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromBody, Required]double progress)
-            => _progressService.SetUserWatchingProgress(_operationContext.User, kind, fileId, progress);
+        public Task SetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromQuery, Required]double time)
+            => _progressService.SetUserWatchingProgress(_operationContext.User, kind, fileId, time);
     }
 }

@@ -8,11 +8,16 @@ interface Props {
 }
 
 const modalRootId = 'modal-root';
-let modalRoot: HTMLElement = document.getElementById(modalRootId)!;
-if (modalRoot === null){
-    modalRoot = document.createElement('div');
-    modalRoot.id = modalRootId;
-    document.body.insertBefore(modalRoot, document.getElementById('app'));
+let modalRoot: HTMLElement;
+
+const init = () => {
+    if (!document || modalRoot) return;
+    modalRoot = document.getElementById(modalRootId)!;
+    if (modalRoot === null){
+        modalRoot = document.createElement('div');
+        modalRoot.id = modalRootId;
+        document.body.insertBefore(modalRoot, document.getElementById('app'));
+    }
 }
 
 class Modal extends Component<Props> {
@@ -26,6 +31,7 @@ class Modal extends Component<Props> {
     }
 
     public componentDidMount() {
+        init();
         modalRoot.appendChild(this.element);
     }
 

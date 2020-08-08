@@ -148,7 +148,7 @@ namespace NxPlx.Application.Core
                 BackdropBlurHash = episodeFile.SeriesDetails.BackdropBlurHash,
                 PosterPath = episodeFile.SeriesDetails.PosterPath,
                 PosterBlurHash = episodeFile.SeriesDetails.PosterBlurHash,
-                Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}",
+                Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2} - {episodeFile.EpisodeDetails.Name}",
                 Subtitles = episodeFile.Subtitles.Select(s => s.Language)
             });
             SetMapping<EpisodeFile, NextEpisodeDto>(episodeFile => new NextEpisodeDto
@@ -156,7 +156,7 @@ namespace NxPlx.Application.Core
                 Fid = episodeFile.Id,
                 PosterPath = episodeFile.SeriesDetails.PosterPath,
                 PosterBlurHash = episodeFile.SeriesDetails.PosterBlurHash,
-                Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2}"
+                Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2} - {episodeFile.EpisodeDetails.Name}"
             });
             SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto
             {

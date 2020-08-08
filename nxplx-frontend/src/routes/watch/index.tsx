@@ -48,13 +48,13 @@ export default class Watch extends Component<Props, State> {
                     events={this.videoEvents}
                     startTime={completed ? 0 : this.initialTime}
                     title={info.title}
-                    src={`/api/${kind}/watch/${fid}`}
+                    src={`/api/${kind}/${fid}/watch`}
                     poster={imageUrl(this.state.info.backdropPath, 1280)}
 
                     subtitles={info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
-                        path: `/api/subtitle/${kind}/${fid}/${lang}`,
+                        path: `/api/subtitle/file/${kind}/${fid}/${lang}`,
                         default: lang === this.subtitleLanguage
                     }))}/>
             </div>
@@ -113,7 +113,7 @@ export default class Watch extends Component<Props, State> {
     private load = () => {
         const { kind, fid } = this.props;
         Promise.all([
-            http.getJson<FileInfo>(`/api/${kind}/info/${fid}`),
+            http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
             http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
             http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
         ]).then(results => {
@@ -126,7 +126,7 @@ export default class Watch extends Component<Props, State> {
     private saveProgress = () => {
         if (this.state.info) {
             if (this.playerTime > 5) {
-                http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}`, { value: this.playerTime });
+                http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}?time=${this.playerTime}`);
             }
             window.onbeforeunload = this.previousUnload;
         }

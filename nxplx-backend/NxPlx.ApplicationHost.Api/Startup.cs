@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using AutoMapper;
 using Hangfire;
@@ -43,7 +44,7 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<HostingOptions>(services);
             AddOptions<LoggingOptions>(services);
 
-            services.AddSpaStaticFiles(options => options.RootPath = "public");
+            services.AddSpaStaticFiles(options => options.RootPath = Path.Combine(Directory.GetCurrentDirectory(), "public"));
             services.AddHangfireServer(options =>
             {
                 options.WorkerCount = Math.Max(Environment.ProcessorCount - 1, 2);

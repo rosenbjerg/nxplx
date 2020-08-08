@@ -27,7 +27,7 @@ namespace NxPlx.Core.Services
         {
             var next = mode.ToLower() switch
             {
-                "longest-time-since" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
+                "leastrecent" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
                 "random" => await Random(seriesId, seasonNo, episodeNo),
                 _ => await Default(seriesId, seasonNo, episodeNo)
             };
@@ -37,7 +37,7 @@ namespace NxPlx.Core.Services
         
         public async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo)
         {
-            var available = await _context.EpisodeFiles.AsNoTracking().Where(ef =>
+            var available = await _context.EpisodeFiles.Where(ef =>
                 ef.SeriesDetailsId == seriesId &&
                 (seasonNo == null || ef.SeasonNumber == seasonNo &&
                     (episodeNo == null || ef.EpisodeNumber != episodeNo))).ToListAsync();
@@ -47,7 +47,7 @@ namespace NxPlx.Core.Services
 
         public async Task<EpisodeFile> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
         {
-            var available = await _context.EpisodeFiles.AsNoTracking().Where(ef =>
+            var available = await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber == seasonNo &&
                         (episodeNo == null || ef.EpisodeNumber != episodeNo)))
@@ -69,7 +69,7 @@ namespace NxPlx.Core.Services
 
         public async Task<EpisodeFile> Default(int seriesId, int? seasonNo, int? episodeNo)
         {
-            return await _context.EpisodeFiles.AsNoTracking().Where(ef =>
+            return await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
                     (seasonNo == null || ef.SeasonNumber > seasonNo ||
                      ef.SeasonNumber == seasonNo && (episodeNo == null || ef.EpisodeNumber > episodeNo)))

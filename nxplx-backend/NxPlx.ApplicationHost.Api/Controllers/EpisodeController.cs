@@ -10,7 +10,7 @@ using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
-    [Route("api/episode")]
+    [Route("api/series")]
     [ApiController]
     [SessionAuthentication]
     public class EpisodeController : ControllerBase
@@ -40,7 +40,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             => _episodeService.FindEpisodeFileInfo(fileId);
 
         [HttpGet("{fileId}/watch")]
-        public async Task<ActionResult<PhysicalFileResult>> Stream([FromRoute, Required] int fileId)
+        public async Task<IActionResult> Stream([FromRoute, Required] int fileId)
         {
             var filePath = await _episodeService.FindEpisodeFilePath(fileId);
             if (!System.IO.File.Exists(filePath)) return NotFound();

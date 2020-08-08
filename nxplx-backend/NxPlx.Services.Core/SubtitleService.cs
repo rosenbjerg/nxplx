@@ -58,7 +58,7 @@ namespace NxPlx.Core.Services
             return mediaFileType switch
             {
                 MediaFileType.Film => _context.FilmFiles.AsNoTracking().Where(ff => ff.Id == fileId),
-                MediaFileType.Episode => _context.EpisodeFiles.AsNoTracking().Where(ef => ef.Id == fileId),
+                MediaFileType.Series => _context.EpisodeFiles.AsNoTracking().Where(ef => ef.Id == fileId),
                 _ => null
             };
         }

@@ -1,6 +1,6 @@
 import { Component, h } from "preact";
 import { Events } from "../../utils/events";
-import { getBooleanEntry, getFloatEntry, setEntry } from "../../utils/localstorage";
+import storage from "../../utils/localstorage";
 import * as style from "./style.css";
 
 interface TextTrack {
@@ -22,13 +22,13 @@ interface Props {
 interface State {
 }
 
-let volume = getFloatEntry("player_volume") || 1.0;
-let muted = getBooleanEntry("player_muted");
-let autoplay = getBooleanEntry("player_autoplay");
+let volume = storage(localStorage).getFloatEntry("player_volume") || 1.0;
+let muted = storage(localStorage).getBooleanEntry("player_muted");
+let autoplay = storage(localStorage).getBooleanEntry("player_autoplay");
 
-const setVolume = vl => setEntry("player_volume", volume = vl);
-const setAutoplay = ap => setEntry("player_autoplay", autoplay = ap);
-const setMuted = mu => setEntry("player_muted", muted = mu);
+const setVolume = vl => storage(localStorage).setEntry("player_volume", volume = vl);
+const setAutoplay = ap => storage(localStorage).setEntry("player_autoplay", autoplay = ap);
+const setMuted = mu => storage(localStorage).setEntry("player_muted", muted = mu);
 
 // declare const cast;
 // declare const chrome;
