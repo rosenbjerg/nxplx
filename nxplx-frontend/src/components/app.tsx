@@ -13,7 +13,7 @@ import Series from "../routes/series";
 import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
-import { getEntry } from "../utils/localstorage";
+import storage from "../utils/localstorage";
 import Header from "./Header";
 import Loading from "./Loading";
 
@@ -62,7 +62,7 @@ export default class App extends Component {
     }
 
     public componentDidMount() {
-        setLocale(getEntry("locale", "en"));
+        setLocale(storage(localStorage).getEntry("locale", "en"));
         this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {
@@ -81,7 +81,7 @@ export default class App extends Component {
     private checkLoggedIn = async () => {
         const response = await http.get("/api/authentication/verify");
         if (response.ok) {
-            const isAdmin = await response.text() === "True";
+            const isAdmin = await response.json();
             store.setState({ isLoggedIn: true, isAdmin });
             if (location.pathname === "/login") {
                 route("/", true);

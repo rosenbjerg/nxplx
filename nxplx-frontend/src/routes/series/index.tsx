@@ -7,6 +7,11 @@ import { formatInfoPair } from "../../utils/common";
 import http from "../../utils/http";
 import { imageUrl, round, SeriesDetails } from "../../utils/models";
 import * as style from "./style.css";
+import { LazyImage } from "../../components/Entry";
+import AdminOnly from "../../components/AdminOnly";
+import { EditDetails } from "../../components/EditDetails";
+import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
+
 
 interface Props {
     id: string
@@ -14,33 +19,41 @@ interface Props {
 
 interface State {
     details: SeriesDetails,
-    bg: string
+    bg: string,
+    showPlaybackModeSelector: boolean
 }
+
+
 
 export default class Series extends Component<Props, State> {
     public componentDidMount(): void {
-        http.get(`/api/series/detail/${this.props.id}`)
+        http.get(`/api/series/${this.props.id}/detail`)
             .then(response => response.json())
             .then((details: SeriesDetails) => {
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
                 this.setState({ details, bg });
             });
     }
 
 
-    public render(_, { details, bg }: State) {
+    public render(_, { details, bg, showPlaybackModeSelector }: State) {
         if (!details) {
             return (<Loading fullscreen/>);
         }
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdrop}>
+            <div class={style.bg} style={bg} data-bg={details.backdropPath}>
                 <div class={`nx-scroll ${style.content}`}>
                     <Helmet title={`${details.name} - NxPlx`}/>
                     <div>
-                        <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
+                        <h2 class={[style.title, style.marked].join(" ")}>
+                            <button class="material-icons" style="border: none; padding: 0px 4px 0px 0px; font-size: 28pt" onClick={this.showPlayModeDiv}>play_arrow</button>
+                            {details.name}
+                        </h2>
+                        <AdminOnly>
+                            <EditDetails setPoster setBackdrop entityType={"series"} entityId={details.id} />
+                        </AdminOnly>
                     </div>
-                    <img class={style.poster} src={imageUrl(details.poster, 500)}
-                         alt=""/>
+                    <LazyImage src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32} blurhashWidth={20} class={style.poster}/>
                     <span class={[style.info, style.marked].join(" ")}>
                         <table>
                             {
@@ -73,7 +86,15 @@ export default class Series extends Component<Props, State> {
                             )}
                     </div>
                 </div>
+
+                {showPlaybackModeSelector && (
+                    <SelectPlaybackMode onDismiss={() => this.setState({ showPlaybackModeSelector: false })} seriesId={details.id}/>
+                )}
             </div>
         );
+    }
+
+    private showPlayModeDiv = () => {
+        this.setState({ showPlaybackModeSelector: true });
     }
 }

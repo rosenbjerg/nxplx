@@ -10,16 +10,16 @@ interface State {
 export default class OnlineUsers extends Component<Props, State> {
 
     public componentDidMount(): void {
-        http.getJson<string[]>('/api/user/list/online').then(users => this.setState({ users }));
+        http.getJson<string[]>('/api/connect/online').then(users => this.setState({ users }));
     }
 
     public render(_, { users }: State) {
         if (users === undefined) return <Loading/>;
 
         return <span>
-            <ul>
+            <ul style="color: #00c853">
                 {users.map(user => (
-                    <li>{user}</li>
+                    <li><span style="color: #fafafa">{user}</span></li>
                 ))}
             </ul>
         </span>

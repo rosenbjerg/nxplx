@@ -8,18 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.4" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.6" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NxPlx.Abstractions.Database\NxPlx.Abstractions.Database.csproj" />
-      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
       <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Infrastructure.Session\NxPlx.Infrastructure.Session.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Services.Configuration\NxPlx.Services.Configuration.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,5 +1,5 @@
 .profile {
-    padding: 15px 15px;
-    min-height: 100%;
+    padding: 10px 10px;
+    height: calc(100vh - 56px);
     width: 100%;
 }

@@ -54,8 +54,11 @@ export default class Home extends Component<Props, State> {
                                             key={p.kind[0] + p.fileId}
                                             title={p.title}
                                             href={`/watch/${p.kind}/${p.fileId}`}
-                                            image={imageUrl(p.poster, 342)}
+                                            image={imageUrl(p.posterPath, 190)}
+                                            imageBlurHash={p.posterBlurHash}
                                             progress={p.progress}
+                                            blurhashWidth={20}
+                                            blurhashHeight={32}
                                         />
                                     ))}
                                 </div>
@@ -68,7 +71,10 @@ export default class Home extends Component<Props, State> {
                                         key={entry.id}
                                         title={entry.title}
                                         href={`/${entry.kind}/${entry.id}`}
-                                        image={imageUrl(entry.poster, 342)}
+                                        image={imageUrl(entry.posterPath, 190)}
+                                        imageBlurHash={entry.posterBlurHash}
+                                        blurhashWidth={20}
+                                        blurhashHeight={32}
                                     />
                                 )
                             )}

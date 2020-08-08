@@ -1,107 +1,97 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using Microsoft.Extensions.Logging;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services
 {
-    public static class UserService
+    public class UserService
     {
-        public static async Task UpdateUser(User user, IFormCollection form)
-        {
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            await using var transaction = context.BeginTransactionedContext();
+        private readonly DatabaseContext _context;
+        private readonly ILogger<UserService> _logger;
+        private readonly IDtoMapper _dtoMapper;
+        private readonly OperationContext _operationContext;
 
-            var existingUser = await transaction.Users.OneById(user.Id);
+        public UserService(DatabaseContext context, ILogger<UserService> logger, IDtoMapper dtoMapper, OperationContext operationContext)
+        {
+            _context = context;
+            _logger = logger;
+            _dtoMapper = dtoMapper;
+            _operationContext = operationContext;
+        }
+
+        public UserDto? GetCurrentUser() => _dtoMapper.Map<User, UserDto>(_operationContext.User);
+        
+        public async Task UpdateUser(string? email)
+        {
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _operationContext.User.Id);
 
             if (existingUser != null)
             {
-                if (form.TryGetValue("email", out var email))
+                if (email != null)
                 {
                     existingUser.Email = email;
                 }
 
-                await transaction.SaveChanges();
+                await _context.SaveChangesAsync();
             }
         }
-        public static async Task<bool> RemoveUser(User user, string username)
+        public async Task<bool> RemoveUser(string username)
         {
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            await using var transaction = context.BeginTransactionedContext();
-
-            var existingUser = await transaction.Users.One(u => u.Username == username);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
             if (existingUser == default) return false;
 
-            transaction.Users.Remove(existingUser);
-            await transaction.SaveChanges();
+            _context.Users.Remove(existingUser);
+            await _context.SaveChangesAsync();
 
-            ResolveContainer.Default.Resolve<ILoggingService>().Info("Deleted user {Username}", existingUser.Username);
+            _logger.LogInformation("Deleted user {Username}", existingUser.Username);
             return true;
         }
-        public static async Task<bool> ChangeUserPassword(User user, string oldPassword, string password1, string password2)
+        public async Task<bool> ChangeUserPassword(string oldPassword, string password1, string password2)
         {
             if (string.IsNullOrWhiteSpace(password1) || password1 != password2) return false;
 
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            await using var transaction = context.BeginTransactionedContext();
-            
-            var existingUser = await transaction.Users.OneById(user.Id);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == _operationContext.User.Id);
             if (existingUser == null || !PasswordUtils.Verify(oldPassword, existingUser.PasswordHash)) return false;
 
             existingUser.PasswordHash = PasswordUtils.Hash(password1);
             existingUser.HasChangedPassword = true;
-            await transaction.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            ResolveContainer.Default.Resolve<ILoggingService>().Info("User {Username} changed password", existingUser.Username);
+            _logger.LogInformation("User {Username} changed password", existingUser.Username);
             return true;
         }
-        public static async Task<IEnumerable<UserDto>> GetUsers(User user)
+        public async Task<IEnumerable<UserDto>> ListUsers()
         {
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            var users = await context.Users.Many().ToListAsync();
-            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(users);
+            var users = await _context.Users.AsNoTracking().ToListAsync();
+            return _dtoMapper.Map<User, UserDto>(users);
         }
-        public static async Task<IReadOnlyList<string>> ListOnlineUsers(User user)
+        
+        public async Task<UserDto?> GetUser(int userId)
         {
-            var broadcaster = ResolveContainer.Default.Resolve<IBroadcaster>();
-            var onlineIds = broadcaster.UniqueIds();
-            
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            return await context.Users.ProjectMany(u => onlineIds.Contains(u.Id), u => u.Username).ToListAsync();
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
+            return _dtoMapper.Map<User, UserDto>(user);
         }
-        public static async Task<UserDto?> GetUser(int userId)
-        {
-            await using var context = ResolveContainer.Default.Resolve<IReadNxplxContext>();
-
-            var user = await context.Users.OneById(userId);
-            return ResolveContainer.Default.Resolve<IDtoMapper>().Map<User, UserDto>(user);
-        }
-        public static async Task<UserDto> CreateUser(string username, string email, bool isAdmin, IEnumerable<int> libraryIds, string password)
+        public async Task<UserDto> CreateUser(string username, string? email, bool isAdmin, List<int>? libraryIds, string password)
         {
             var user = new User
             {
                 Username = username,
                 Email = email,
                 Admin = isAdmin,
-                LibraryAccessIds = libraryIds.ToList(),
+                LibraryAccessIds = libraryIds ?? new List<int>(),
                 PasswordHash = PasswordUtils.Hash(password)
             };
 
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-            await using var transaction = context.BeginTransactionedContext();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
 
-            transaction.Users.Add(user);
-            await transaction.SaveChanges();
-
-            container.Resolve<ILoggingService>().Info("Created user {Username}", user.Username);
-            return container.Resolve<IDtoMapper>().Map<User, UserDto>(user)!;
+            _logger.LogInformation("Created user {Username}", user.Username);
+            return _dtoMapper.Map<User, UserDto>(user)!;
         }
     }
 }

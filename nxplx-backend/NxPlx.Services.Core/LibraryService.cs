@@ -2,86 +2,84 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using Microsoft.Extensions.Logging;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
 using NxPlx.Models;
-using NxPlx.Models.Dto.Models;
+using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
-    public static class LibraryService
+    public class LibraryService
     {
-        public static async Task<bool> SetUserLibraryPermissions(int userId, List<int> libraryIds)
-        {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-            await using var transaction = context.BeginTransactionedContext();
+        private readonly DatabaseContext _context;
+        private readonly ILogger<LibraryService> _systemLogger;
+        private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-            var user = await transaction.Users.OneById(userId);
+        public LibraryService(DatabaseContext context, ILogger<LibraryService> systemLogger, IDtoMapper dtoMapper, IMapper mapper)
+        {
+            _context = context;
+            _systemLogger = systemLogger;
+            _dtoMapper = dtoMapper;
+            _mapper = mapper;
+        }
+        public async Task<bool> SetLibraryAccess(int userId, List<int> libraryIds)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) return false;
 
-            var libraryCount = await context.Libraries.Many(l => libraryIds.Contains(l.Id)).CountAsync();
+            var libraryCount = await _context.Libraries.Where(l => libraryIds.Contains(l.Id)).CountAsync();
             if (libraryIds.Count != libraryCount) return false;
 
             user.LibraryAccessIds = libraryIds;
-            await transaction.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            container.Resolve<ILoggingService>()
-                .Info("Updated library permissions for user {Username}: {Permissions}", user.Username, string.Join(' ', user.LibraryAccessIds));
+            _systemLogger.LogInformation("Updated library permissions for user {Username}: {Permissions}", user.Username, string.Join(' ', user.LibraryAccessIds));
             return true;
         }
 
 
-        public static IEnumerable<string?> GetDirectoryEntries(string cwd)
+        public IEnumerable<string?> GetDirectoryEntries(string cwd)
         {
             if (cwd == string.Empty || !Directory.Exists(cwd))
                 return Enumerable.Empty<string>();
 
-            return Directory.EnumerateDirectories(cwd, "*", new EnumerationOptions
+            return Directory.EnumerateDirectories(cwd.Replace("\\", "/"), "*", new EnumerationOptions
             {
                 AttributesToSkip = FileAttributes.Hidden | FileAttributes.Temporary | FileAttributes.System
             }).Select(Path.GetFileName);
         }
-        public static async Task<bool> RemoveLibrary(int libraryId)
+        public async Task<bool> RemoveLibrary(int libraryId)
         {
-            var container = ResolveContainer.Default;
-
-            await using var context = container.Resolve<IReadNxplxContext>();
-            await using var transaction = context.BeginTransactionedContext();
-            foreach (var user in await transaction.Users.Many(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
+            foreach (var user in await _context.Users.Where(u => u.LibraryAccessIds.Contains(libraryId)).ToListAsync())
             {
                 user.LibraryAccessIds.Remove(libraryId);
             }
-            await transaction.SaveChanges();
-                
-            var library = await transaction.Libraries.OneById(libraryId);
+            await _context.SaveChangesAsync();
+
+            var library = await _context.Libraries.FirstOrDefaultAsync(l => l.Id == libraryId);
             if (library == null) return false;
 
-            transaction.Libraries.Remove(library);
-            await transaction.SaveChanges();
+            _context.Libraries.Remove(library);
+            await _context.SaveChangesAsync();
 
-            container.Resolve<ILoggingService>().Info("Deleted library {Username}", library.Name);
+            _systemLogger.LogInformation("Deleted library {Username}", library.Name);
             return true;
         }
-        public static async Task<IEnumerable<LibraryDto>> ListLibraries(User user)
+        public Task<List<TLibraryDto>> ListLibraries<TLibraryDto>()
+            where TLibraryDto : LibraryDto
         {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>(user);
-
-            var libraries = await context.Libraries.Many().ToListAsync();
-            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(libraries);
+            return _context.Libraries.ProjectTo<TLibraryDto>(_mapper.ConfigurationProvider).ToListAsync();
         } 
-        public static async Task<List<int>?> FindLibraryAccess(int userId)
+        public async Task<List<int>?> GetLibraryAccess(int userId)
         {
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-
-            var user = await context.Users.OneById(userId);
-            return user?.LibraryAccessIds;
+            return await _context.Users.Where(u => u.Id == userId).Select(u => u.LibraryAccessIds).FirstOrDefaultAsync();
         }
-        public static async Task<AdminLibraryDto> CreateNewLibrary(string name, string path, string language, string kind)
+        public async Task<AdminLibraryDto> CreateNewLibrary(string name, string path, string language, string kind)
         {
             var lib = new Library
             {
@@ -91,15 +89,11 @@ namespace NxPlx.Core.Services
                 Kind = kind == "film" ? LibraryKind.Film : LibraryKind.Series
             };
 
-            var container = ResolveContainer.Default;
-            await using var context = container.Resolve<IReadNxplxContext>();
-            await using var transaction = context.BeginTransactionedContext();
+            _context.Libraries.Add(lib);
+            await _context.SaveChangesAsync();
 
-            transaction.Libraries.Add(lib);
-            await transaction.SaveChanges();
-
-            container.Resolve<ILoggingService>().Info("Created library {Name} with {Path}", lib.Name, lib.Path);
-            return container.Resolve<IDtoMapper>().Map<Library, AdminLibraryDto>(lib)!;
+            _systemLogger.LogInformation("Created library {Name} with {Path}", lib.Name, lib.Path);
+            return _dtoMapper.Map<Library, AdminLibraryDto>(lib)!;
         }
     }
 }

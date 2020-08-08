@@ -1,107 +1,96 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
-using NxPlx.Models;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
+using NxPlx.Application.Models.Series;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
-using NxPlx.Models.Dto.Models;
-using NxPlx.Models.Dto.Models.Series;
 using NxPlx.Models.File;
+using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
-    public static class EpisodeService
+    public class EpisodeService
     {
-        public static async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, User user)
+        private readonly DatabaseContext _context;
+        private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
+
+        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper, AutoMapper.IMapper mapper)
         {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var current = await ctx.EpisodeFiles.OneById(fileId);
-
-            if (current == null) return null;
-            
-            var season = await ctx.EpisodeFiles.Many(ef =>
-                ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber &&
-                ef.EpisodeNumber > current.EpisodeNumber).ToListAsync();
-            
-            var next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
-
-            if (next == null)
-            {
-                season = await ctx.EpisodeFiles.Many(ef =>
-                    ef.SeriesDetailsId == current.SeriesDetailsId && ef.SeasonNumber == current.SeasonNumber + 1).ToListAsync();
-                next = season.OrderBy(ef => ef.EpisodeNumber).FirstOrDefault();
-            }
-
-            return container.Resolve<IDtoMapper>().Map<EpisodeFile, NextEpisodeDto>(next);
+            _context = context;
+            _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
-        public static async Task<string?> FindEpisodeFilePath(int id, User user)
-        {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            return await ctx.EpisodeFiles
-                .ProjectOne(ef => ef.Id == id, ef => ef.Path);
+        public async Task<string?> FindEpisodeFilePath(int id)
+        {
+            return await _context.EpisodeFiles
+                .Where(ef => ef.Id == id)
+                .Select(ef => ef.Path)
+                .FirstOrDefaultAsync();
         }
-        public static async Task<InfoDto?> FindEpisodeFileInfo(int id, User user)
-        {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            var episode = await ctx.EpisodeFiles.One(ef => ef.Id == id, ef => ef.Subtitles);
-            return container.Resolve<IDtoMapper>().Map<EpisodeFile, InfoDto>(episode);
+        public async Task<InfoDto?> FindEpisodeFileInfo(int id)
+        {
+            return await _context.EpisodeFiles
+                .Where(ef => ef.Id == id)
+                .ProjectTo<InfoDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
         }
-        public static async Task<SeriesDto?> FindSeriesDetails(int id, int? season, User user)
-        {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
 
-            var episodes = await ctx.EpisodeFiles
-                .Many(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season)).ToListAsync();
+        public async Task<SeriesDto?> FindSeriesDetails(int id, int? season)
+        {
+            var episodes = await _context.EpisodeFiles
+                .Where(ef => ef.SeriesDetailsId == id && (season == null || ef.SeasonNumber == season))
+                .ToListAsync();
 
             if (!episodes.Any()) return default;
-            
-            var dtoMapper = container.Resolve<IDtoMapper>();
+
             var seriesDetails = episodes.First().SeriesDetails;
-            return MergeEpisodes(dtoMapper, seriesDetails, episodes);
+            return MergeEpisodes(seriesDetails, episodes);
         }
 
-        public static SeriesDto MergeEpisodes(IMapper mapper, DbSeriesDetails series, IReadOnlyCollection<EpisodeFile> files)
+        private SeriesDto MergeEpisodes(DbSeriesDetails series,
+            IReadOnlyCollection<EpisodeFile> files)
         {
-            var seriesDto = mapper.Map<DbSeriesDetails, SeriesDto>(series);
-            seriesDto!.seasons = series.Seasons
-                .Select(s => MergeEpisodes(mapper, s, files.Where(f => f.SeasonNumber == s.SeasonNumber)))
-                .Where(s => s.episodes.Any())
+            var seriesDto = _dtoMapper.Map<DbSeriesDetails, SeriesDto>(series);
+            seriesDto!.Seasons = series.Seasons
+                .Select(s => MergeEpisodes(s, files.Where(f => f.SeasonNumber == s.SeasonNumber)))
+                .Where(s => s.Episodes.Any())
                 .ToList();
             return seriesDto;
         }
-        public static SeasonDto MergeEpisodes(IMapper mapper, SeasonDetails seasonDetails, IEnumerable<EpisodeFile> files)
+
+        private SeasonDto MergeEpisodes(SeasonDetails seasonDetails,
+            IEnumerable<EpisodeFile> files)
         {
-            var seasonDto = mapper.Map<SeasonDetails, SeasonDto>(seasonDetails);
-            seasonDto!.episodes = MergeEpisodes(seasonDetails.Episodes, files);
+            var seasonDto = _dtoMapper.Map<SeasonDetails, SeasonDto>(seasonDetails);
+            seasonDto!.Episodes = MergeEpisodes(seasonDetails.Episodes, files);
             return seasonDto;
         }
-        public static IEnumerable<EpisodeDto> MergeEpisodes(IEnumerable<EpisodeDetails> episodeDetails, IEnumerable<EpisodeFile> files)
+
+        private IEnumerable<EpisodeDto> MergeEpisodes(IEnumerable<EpisodeDetails> episodeDetails,
+            IEnumerable<EpisodeFile> files)
         {
             var mapping = episodeDetails.ToDictionary(d => (d.SeasonNumber, d.EpisodeNumber));
             return files.Select(f =>
             {
                 if (!mapping.TryGetValue((f.SeasonNumber, f.EpisodeNumber), out var details))
-                {
-                    details = new EpisodeDetails { Name = "" };
-                }
+                    details = new EpisodeDetails {Name = f.ToString()};
 
                 return new EpisodeDto
                 {
-                    name = details.Name,
-                    airDate = details.AirDate,
-                    number = f.EpisodeNumber,
-                    fileId = f.Id,
-                    still = details.StillPath,
+                    Name = details.Name,
+                    AirDate = details.AirDate,
+                    Number = f.EpisodeNumber,
+                    FileId = f.Id,
+                    StillPath = details.StillPath,
+                    StillBlurHash = details.StillBlurHash
                 };
             });
         }

@@ -14,7 +14,7 @@ export async function setLocale(locale:string) {
         dictionary[locale] = await response.json();
     }
     else {
-        console.warn(`locale not found: ${locale}. defaulting to en`);
+        console.warn(`locale not found: '${locale}'. defaulting to en`);
         currentLocale = 'en';
     }
 }
@@ -23,8 +23,8 @@ const templateRegex = /\$[A-Z]+/g;
 export function translate(key:string, ...params:string[]) {
     let translation = dictionary[currentLocale][key];
     if (translation === undefined) {
-        console.warn(`translation for ${key} not found for locale ${currentLocale}`);
-        translation = dictionary.en[key];
+        console.warn(`translation for '${key}' not found for locale '${currentLocale}'`);
+        translation = dictionary.en[key] || `[${key}]`;
     }
     if (params.length) {
         const matches = translation.match(templateRegex);

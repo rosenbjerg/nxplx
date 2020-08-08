@@ -1,56 +1,64 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using Microsoft.EntityFrameworkCore;
+using NxPlx.Application.Core;
 using NxPlx.Models;
 using NxPlx.Models.File;
+using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services
 {
-    public static class SubtitleService
+    public class SubtitleService
     {
-        public static async Task<string?> GetSubtitlePath(User user, MediaFileType mediaType, int id, string lang)
-        {
-            var file = await FindFile(user, id, mediaType);
-            return file?.Subtitles.FirstOrDefault(s => s.Language == lang)?.Path;
-        }
-        public static async Task SetLanguagePreference(User user, MediaFileType mediaType, int fileId, string language)
-        {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            await using var transaction = ctx.BeginTransactionedContext();
+        private readonly DatabaseContext _context;
+        private readonly OperationContext _operationContext;
 
-            var preference =
-                await transaction.SubtitlePreferences.One(sp => sp.UserId == user.Id && sp.FileId == fileId && sp.MediaType == mediaType);
+        public SubtitleService(DatabaseContext context, OperationContext operationContext)
+        {
+            _context = context;
+            _operationContext = operationContext;
+        }
+        public async Task<string?> GetSubtitlePath(MediaFileType mediaType, int id, string lang)
+        {
+            return await GetMediaFileQueryable(id, mediaType)
+                .SelectMany(f => f.Subtitles)
+                .Where(s => s.Language == lang)
+                .Select(s => s.Path)
+                .FirstOrDefaultAsync();
+        }
+        public async Task SetLanguagePreference(MediaFileType mediaType, int fileId, string language)
+        {
+            var preference = await _context.SubtitlePreferences
+                .FirstOrDefaultAsync(sp => sp.UserId == _operationContext.User.Id && sp.FileId == fileId && sp.MediaType == mediaType);
             if (preference == null)
             {
-                preference = new SubtitlePreference { UserId = user.Id, FileId = fileId, MediaType = mediaType};
-                transaction.SubtitlePreferences.Add(preference);
+                preference = new SubtitlePreference { UserId = _operationContext.User.Id, FileId = fileId, MediaType = mediaType};
+                _context.SubtitlePreferences.Add(preference);
             }
 
             preference.Language = language;
-            await transaction.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        public static async Task<string> GetLanguagePreference(User user, MediaFileType mediaType, int fileId)
+        public async Task<string> GetLanguagePreference(MediaFileType mediaType, int fileId)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-
-            var preference = await ctx.SubtitlePreferences.ProjectOne(sp => sp.UserId == user.Id && sp.FileId == fileId && sp.MediaType == mediaType, sp => sp.Language);
+            var preference = await _context.SubtitlePreferences.AsNoTracking()
+                .Where(sp => sp.UserId == _operationContext.User.Id && sp.FileId == fileId && sp.MediaType == mediaType)
+                .Select(sp => sp.Language)
+                .FirstOrDefaultAsync();
             return preference ?? "none";
         }
-        public static async Task<IEnumerable<string>> FindSubtitles(User user, MediaFileType mediaType, int id)
+        public async Task<IEnumerable<string>> FindSubtitles(MediaFileType mediaType, int id)
         {
-            var file = await FindFile(user, id, mediaType);
-            return file?.Subtitles.Select(sub => sub.Language) ?? Enumerable.Empty<string>();
+            return await GetMediaFileQueryable(id, mediaType).SelectMany(f => f.Subtitles).Select(s => s.Language).ToListAsync();
         }
 
-        private static async Task<MediaFileBase?> FindFile(User user, int fileId, MediaFileType mediaFileType)
+        private IQueryable<MediaFileBase>? GetMediaFileQueryable(int fileId, MediaFileType mediaFileType)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
             return mediaFileType switch
             {
-                MediaFileType.Film => await ctx.FilmFiles.One(ff => ff.Id == fileId, ff => ff.Subtitles),
-                MediaFileType.Episode => await ctx.EpisodeFiles.One(ef => ef.Id == fileId, ef => ef.Subtitles),
+                MediaFileType.Film => _context.FilmFiles.AsNoTracking().Where(ff => ff.Id == fileId),
+                MediaFileType.Series => _context.EpisodeFiles.AsNoTracking().Where(ef => ef.Id == fileId),
                 _ => null
             };
         }

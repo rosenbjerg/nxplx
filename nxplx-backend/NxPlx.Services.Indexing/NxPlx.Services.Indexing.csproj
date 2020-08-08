@@ -4,18 +4,19 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>NxPlx.Services.Index</RootNamespace>
         <LangVersion>8</LangVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
-      <ProjectReference Include="..\NxPlx.Infrastructure.IoC\NxPlx.Infrastructure.IoC.csproj" />
-      <ProjectReference Include="..\Nxplx.Integrations.FFMpeg\Nxplx.Integrations.FFMpeg.csproj" />
       <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Services.Core\NxPlx.Services.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
+      <PackageReference Include="Hangfire.Core" Version="1.7.12" />
+      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.55" />
     </ItemGroup>
 
 </Project>

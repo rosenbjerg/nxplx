@@ -1,53 +1,59 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Abstractions;
-using NxPlx.Abstractions.Database;
-using NxPlx.Infrastructure.IoC;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models;
+using NxPlx.Application.Models.Film;
 using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
-using NxPlx.Models.Dto.Models;
-using NxPlx.Models.Dto.Models.Film;
 using NxPlx.Models.File;
+using NxPlx.Services.Database;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
-    public static class FilmService
+    public class FilmService
     {
-        public static async Task<FilmDto?> FindFilmByDetails(int id, User user)
-        {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var filmFile = await ctx.FilmFiles.One(ff => ff.FilmDetailsId == id);
+        private readonly DatabaseContext _databaseContext;
+        private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-            return container.Resolve<IDtoMapper>().Map<FilmFile, FilmDto>(filmFile);
+        public FilmService(DatabaseContext databaseContext, IDtoMapper dtoMapper, IMapper mapper)
+        {
+            _databaseContext = databaseContext;
+            _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
-        public static async Task<MovieCollectionDto> FindCollectionByDetails(int id, User user)
+        
+        public async Task<FilmDto?> FindFilmByDetails(int id)
         {
-            var container = ResolveContainer.Default;
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var filmFiles = await ctx.FilmFiles.Many(ff => ff.FilmDetails.BelongsInCollectionId == id, ff => ff.FilmDetails).ToListAsync();
+            return await _databaseContext.FilmFiles
+                .Where(ff => ff.FilmDetailsId == id)
+                .ProjectTo<FilmDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+        }
+        public async Task<MovieCollectionDto> FindCollectionByDetails(int id)
+        {
+            var filmFiles = await _databaseContext.FilmFiles.AsNoTracking().Where(ff => ff.FilmDetails.BelongsInCollectionId == id).ToListAsync();
 
-            var mapper = container.Resolve<IDtoMapper>();
-            var collection = mapper.Map<MovieCollection, MovieCollectionDto>(filmFiles.First().FilmDetails.BelongsInCollection);
-            collection!.movies = mapper.Map<DbFilmDetails, OverviewElementDto>(filmFiles.Select(ff => ff.FilmDetails)).ToList();
+            var collection = _dtoMapper.Map<MovieCollection, MovieCollectionDto>(filmFiles.First().FilmDetails.BelongsInCollection);
+            collection!.Movies = _dtoMapper.Map<DbFilmDetails, OverviewElementDto>(filmFiles.Select(ff => ff.FilmDetails)).ToList();
             
             return collection;
         }
-        public static async Task<InfoDto?> FindFilmFileInfo(int fileId, User user)
+        public async Task<InfoDto?> FindFilmFileInfo(int fileId)
         {
-            var container = ResolveContainer.Default;
-
-            await using var ctx = container.Resolve<IReadNxplxContext>(user);
-            var filmFile = await ctx.FilmFiles.One(ff => ff.Id == fileId);
-            return container.Resolve<IDtoMapper>().Map<FilmFile, InfoDto>(filmFile);
+            return await _databaseContext.FilmFiles
+                .Where(ff => ff.Id == fileId)
+                .ProjectTo<InfoDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
             
         }
-        public static async Task<string> FindFilmFilePath(int fileId, User user)
+        public async Task<string> FindFilmFilePath(int fileId)
         {
-            await using var ctx = ResolveContainer.Default.Resolve<IReadNxplxContext>(user);
-            return await ctx.FilmFiles.ProjectOne(ff => ff.Id == fileId, ff => ff.Path);
+            return await _databaseContext.FilmFiles.Where(ff => ff.Id == fileId).Select(ff => ff.Path).FirstOrDefaultAsync();
         }
     }
 }

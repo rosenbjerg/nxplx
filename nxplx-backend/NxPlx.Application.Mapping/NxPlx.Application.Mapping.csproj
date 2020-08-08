@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+    </ItemGroup>
+
+</Project>
