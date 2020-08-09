@@ -75,5 +75,9 @@
   "series": "Serier",
   "none": "ingen",
   "admin": "admin",
-  "user": "bruger"
+  "user": "bruger",
+  "enqueued jobs": "Jobs i kø",
+  "processing jobs": "Jobs under behandling",
+  "failed jobs": "Fejlede jobs",
+  "succeeded jobs": "Færdigkørte jobs"
 }

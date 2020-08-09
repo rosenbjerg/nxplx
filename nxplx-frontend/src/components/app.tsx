@@ -36,6 +36,7 @@ function MakeLazy(importer: () => Promise<{ default: any }>): FunctionalComponen
 }
 
 const Admin = MakeLazy(() => import("../routes/admin"));
+const Jobs = MakeLazy(() => import("../routes/jobs"));
 const Profile = MakeLazy(() => import("../routes/profile"));
 const Watch = MakeLazy(() => import("../routes/watch"));
 
@@ -53,6 +54,7 @@ export default class App extends Component {
                         <Route path="/series/:id" component={Series}/>
                         <Route path="/series/:id/:season" component={Season}/>
                         <Route path="/admin" component={Admin}/>
+                        <Route path="/jobs" component={Jobs}/>
                         <Route path="/profile" component={Profile}/>
                         <Route path="/watch/:kind/:fid" component={Watch}/>
                     </Router>

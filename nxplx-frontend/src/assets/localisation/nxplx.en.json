@@ -75,5 +75,9 @@
   "series": "Series",
   "none": "none",
   "admin": "admin",
-  "user": "user"
+  "user": "user",
+  "enqueued jobs": "Enqueued jobs",
+  "processing jobs": "Processing jobs",
+  "failed jobs": "Failed jobs",
+  "succeeded jobs": "Succeeded jobs"
 }
