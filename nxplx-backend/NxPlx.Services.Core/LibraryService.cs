@@ -19,13 +19,15 @@ namespace NxPlx.Core.Services
         private readonly ILogger<LibraryService> _systemLogger;
         private readonly IDtoMapper _dtoMapper;
         private readonly IMapper _mapper;
+        private readonly ICacheClearer _cacheClearer;
 
-        public LibraryService(DatabaseContext context, ILogger<LibraryService> systemLogger, IDtoMapper dtoMapper, IMapper mapper)
+        public LibraryService(DatabaseContext context, ILogger<LibraryService> systemLogger, IDtoMapper dtoMapper, IMapper mapper, ICacheClearer cacheClearer)
         {
             _context = context;
             _systemLogger = systemLogger;
             _dtoMapper = dtoMapper;
             _mapper = mapper;
+            _cacheClearer = cacheClearer;
         }
         public async Task<bool> SetLibraryAccess(int userId, List<int> libraryIds)
         {
@@ -66,6 +68,7 @@ namespace NxPlx.Core.Services
 
             _context.Libraries.Remove(library);
             await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
 
             _systemLogger.LogInformation("Deleted library {Username}", library.Name);
             return true;
@@ -91,6 +94,7 @@ namespace NxPlx.Core.Services
 
             _context.Libraries.Add(lib);
             await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
 
             _systemLogger.LogInformation("Created library {Name} with {Path}", lib.Name, lib.Path);
             return _dtoMapper.Map<Library, AdminLibraryDto>(lib)!;

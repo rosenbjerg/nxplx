@@ -54,8 +54,8 @@ namespace NxPlx.Core.Services
         private async Task<T> CachedResult<T>(string key, Func<Task<T>> generator)
             where T : class
         {
-            // var cached = await _distributedCache.GetObjectAsync<T>(key);
-            // if (cached != null) return cached;
+            var cached = await _distributedCache.GetObjectAsync<T>(key);
+            if (cached != null) return cached;
             
             var generated = await generator();
             await _distributedCache.SetObjectAsync(key, generated, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(3) });

@@ -12,12 +12,14 @@ namespace NxPlx.Core.Services
         private readonly DatabaseContext _context;
         private readonly TempFileService _tempFileService;
         private readonly ImageCreationService _imageCreationService;
+        private readonly ICacheClearer _cacheClearer;
 
-        public EditDetailsService(DatabaseContext context, TempFileService tempFileService, ImageCreationService imageCreationService)
+        public EditDetailsService(DatabaseContext context, TempFileService tempFileService, ImageCreationService imageCreationService, ICacheClearer cacheClearer)
         {
             _context = context;
             _tempFileService = tempFileService;
             _imageCreationService = imageCreationService;
+            _cacheClearer = cacheClearer;
         }
         public async Task<bool> SetImage(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
         {
@@ -32,6 +34,7 @@ namespace NxPlx.Core.Services
             var success = await task;
             if (!success) return false;
             await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
             return true;
         }
 

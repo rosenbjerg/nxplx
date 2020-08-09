@@ -23,21 +23,21 @@ namespace NxPlx.Services.Index
         private readonly IDetailsApi _detailsApi;
         private readonly IDatabaseMapper _databaseMapper;
         private readonly ILogger<IndexingService> _logger;
-        private readonly IDistributedCache _cachingService;
         private readonly DatabaseContext _context;
+        private readonly ICacheClearer _cacheClearer;
 
         public IndexingService(
             IDetailsApi detailsApi,
             IDatabaseMapper databaseMapper,
             ILogger<IndexingService> logger,
-            IDistributedCache cachingService,
-            DatabaseContext context)
+            DatabaseContext context,
+            ICacheClearer cacheClearer)
         {
             _detailsApi = detailsApi;
             _databaseMapper = databaseMapper;
             _logger = logger;
-            _cachingService = cachingService;
             _context = context;
+            _cacheClearer = cacheClearer;
         }
 
         public async Task IndexLibraries(int[] libraryIds)
@@ -134,6 +134,7 @@ namespace NxPlx.Services.Index
             newDetails.ForEach(film => film.Added = DateTime.UtcNow);
             await _context.AddRangeAsync(newDetails);
             await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
             
             foreach (var detail in details)
                 BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
@@ -143,7 +144,6 @@ namespace NxPlx.Services.Index
                 BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(productionCompanies.Select(n => n.Id).ToArray()));
             foreach (var filmFile in newFilm)
                 BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseFilmFile(filmFile.Id, libraryId));
-            
         }
 
         [Queue(JobQueueNames.FileIndexing)]
@@ -168,8 +168,9 @@ namespace NxPlx.Services.Index
             var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
             databaseDetails.ForEach(series => series.Added = DateTime.UtcNow);
             await _context.AddOrUpdate(databaseDetails);
-            
             await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
+            
             foreach (var detail in details)
                 BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
             if (networks.Any())
@@ -191,6 +192,7 @@ namespace NxPlx.Services.Index
                 await RemoveSubtitlePreferences(deletedIds);
                 var deleted = await _context.FilmFiles.Where(f => deletedIds.Contains(f.Id)).DeleteAsync();
                 await _context.SaveChangesAsync();
+                await _cacheClearer.Clear("OVERVIEW");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
             }
         }
@@ -206,6 +208,7 @@ namespace NxPlx.Services.Index
                 await RemoveSubtitlePreferences(deletedIds);
                 var deleted = await _context.EpisodeFiles.Where(f => deletedIds.Contains(f.Id)).DeleteAsync();
                 await _context.SaveChangesAsync();
+                await _cacheClearer.Clear("OVERVIEW");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
             }
         }

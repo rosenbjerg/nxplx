@@ -78,6 +78,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(ConnectionHub));
             services.AddSingleton(typeof(IHttpSessionService), typeof(CookieSessionService));
             services.AddSingleton(typeof(IDatabaseMapper), typeof(DatabaseMapper));
+            services.AddSingleton(typeof(ICacheClearer), typeof(RedisCacheClearer));
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
