@@ -23,7 +23,8 @@ ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apk add --update --no-cache ffmpeg imagemagick libgdiplus
+RUN apk add --update --no-cache ffmpeg imagemagick
+RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
