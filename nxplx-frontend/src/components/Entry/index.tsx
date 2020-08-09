@@ -1,4 +1,4 @@
-import { h } from "preact";
+import { Component, h } from "preact";
 import { Link } from "preact-router";
 import * as style from "./style.css";
 import BlurhashCanvas from "../Blurhash/BlurhashCanvas";
@@ -26,29 +26,40 @@ interface Props2 {
     blurhashHeight: number
 }
 
-export const LazyImage = (props: Props2) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [loadStarted, setLoadStarted] = useState(false);
-    const [img] = useState(new Image());
-    if (!loadStarted) {
-        img.addEventListener('load', () => {
-            setLoadStarted(true);
-            setImageLoaded(true);
-        });
-        img.src = props.src;
+export class LazyImage extends Component<Props2> {
+    private mounted = false;
+    private loadStarted = false;
+    private image = new Image();
+
+    componentDidMount() {
+        this.mounted = true;
+    }
+    componentWillUnmount() {
+        this.mounted = false;
     }
 
-    if (imageLoaded)
-        return (<img class={props.class} src={props.src} alt={props.alt}/>);
-    return (
-        <BlurhashCanvas
-            hash={props.blurhash || 'LEHV6nWB2yk8pyo0adR*.7kCMdnj'}
-            width={props.blurhashWidth}
-            height={props.blurhashHeight}
-            class={props.class}
-            punch={1}
-        />
-    );
+    render() {
+        const [imageLoaded, setImageLoaded] = useState(false);
+        if (!this.loadStarted) {
+            this.image.addEventListener("load", () => {
+                if (this.mounted) setImageLoaded(true);
+            });
+            this.image.src = this.props.src;
+            this.loadStarted = true;
+        }
+
+        if (imageLoaded)
+            return (<img class={this.props.class} src={this.props.src} alt={this.props.alt}/>);
+        return (
+            <BlurhashCanvas
+                hash={this.props.blurhash || "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
+                width={this.props.blurhashWidth}
+                height={this.props.blurhashHeight}
+                class={this.props.class}
+                punch={1}
+            />
+        );
+    }
 }
 
 const Entry = ({ href, image, imageBlurHash, key, progress, title, autosizeOverride, children, blurhashWidth, blurhashHeight }: Props) => {

@@ -1,7 +1,7 @@
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
 import Helmet from "preact-helmet";
-import Entry from "../../components/Entry";
+import Entry, { LazyImage } from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { imageUrl, MovieCollection } from "../../utils/models";
@@ -44,7 +44,7 @@ export default class Collection extends Component<Props, State> {
                             <EditDetails setPoster setBackdrop entityType={"collection"} entityId={details.id} />
                         </AdminOnly>
                     </div>
-                    <img class={style.poster} src={imageUrl(details.posterPath, 270)} alt=""/>
+                    <LazyImage class={style.poster} src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32} blurhashWidth={20}/>
                     <div>
                         {orderBy(details.movies, ["year", "title"], ["asc"])
                             .map(movie => (
