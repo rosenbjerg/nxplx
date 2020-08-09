@@ -3,6 +3,6 @@
     public enum MediaFileType
     {
         Film,
-        Episode
+        Series
     }
 }

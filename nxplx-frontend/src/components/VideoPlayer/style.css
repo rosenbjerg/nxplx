@@ -1,7 +1,21 @@
-.video {
+.videoContainer {
     height: calc(100vh - 56px);
     width: 100%;
-    margin: auto;
     background-color: black;
     outline: none;
+}
+
+.video {
+    height: 100%;
+    width: 100%;
+    margin: auto;
+    outline: none;
+}
+
+.videoControls {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(25, 64, 46, 0.5);
 }

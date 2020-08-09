@@ -13,9 +13,7 @@ namespace NxPlx.Services.Indexing.Tests
         [TestCase("2001.a.space.odyssey.1968.1080p.mp4", "2001 A Space Odyssey", 1968)]
         public void IndexFilmWithResolutionInFilename(string filename, string expectedTitle, int expectedYear)
         {
-            var fileIndexer = new FileIndexer();
-
-            var indexed = fileIndexer.IndexFilmFiles(new [] { filename }).Single();
+            var indexed = FileIndexer.IndexFilmFiles(new [] { filename }, 0).Single();
             
             Assert.AreEqual(expectedTitle, indexed.Title, "Title is not the same");
             Assert.AreEqual(expectedYear, indexed.Year, "Year is not the same");
@@ -27,9 +25,7 @@ namespace NxPlx.Services.Indexing.Tests
         [TestCase("2001.a.space.odyssey.1968.mp4", "2001 A Space Odyssey", 1968)]
         public void IndexFilmWithYearInTitle(string filename, string expectedTitle, int expectedYear)
         {
-            var fileIndexer = new FileIndexer();
-
-            var indexed = fileIndexer.IndexFilmFiles(new [] { filename }).Single();
+            var indexed = FileIndexer.IndexFilmFiles(new [] { filename }, 0).Single();
             
             Assert.AreEqual(expectedTitle, indexed.Title, "Title is not the same");
             Assert.AreEqual(expectedYear, indexed.Year, "Year is not the same");

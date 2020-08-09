@@ -1,4 +1,4 @@
-name: Build multi-arch docker images
+name: Docker build
 
 on:
   pull_request:

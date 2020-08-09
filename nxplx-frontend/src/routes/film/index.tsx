@@ -7,6 +7,8 @@ import { formatInfoPair, formatRunTime } from "../../utils/common";
 import http from '../../utils/http';
 import { FilmDetails, imageUrl } from "../../utils/models";
 import * as style from './style.css';
+import AdminOnly from "../../components/AdminOnly";
+import { EditDetails } from "../../components/EditDetails";
 
 interface Props { id:string }
 
@@ -20,7 +22,7 @@ export default class Home extends Component<Props, State> {
     };
 
     public componentDidMount() : void {
-        http.get(`/api/film/detail/${this.props.id}`)
+        http.get(`/api/film/${this.props.id}/details`)
             .then(response => response.json())
             .then(details => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
@@ -33,18 +35,21 @@ export default class Home extends Component<Props, State> {
             return (<Loading fullscreen/>);
         }
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdrop}>
+            <div class={style.bg} style={bg} data-bg={details.backdropPath}>
                 <Helmet title={`${details.title} - NxPlx`} />
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.title}</h2>
+                        <AdminOnly>
+                            <EditDetails setPoster setBackdrop entityType={"film"} entityId={details.id} />
+                        </AdminOnly>
                     </div>
                     {details.tagline && (
                         <div>
                             <h4 class={[style.tag, style.marked].join(" ")}>{details.tagline}</h4>
                         </div>
                     )}
-                    <FilmPoster poster={details.poster} href={`/watch/film/${details.fid}`} />
+                    <FilmPoster poster={details.posterPath} blurhash={details.posterBlurHash} href={`/watch/film/${details.fid}`} />
                     <span class={[style.info, style.marked].join(" ")}>
                     <table>
                         {

@@ -3,9 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NxPlx.Abstractions;
-using NxPlx.Configuration;
+using NxPlx.Application.Core;
+using NxPlx.Application.Core.Options;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
@@ -20,15 +22,19 @@ namespace NxPlx.Integrations.TMDb
     public class TMDbApi : DetailsApiBase
     {
         private const string BaseUrl = "https://api.themoviedb.org/3";
+        private const string CachePrefix = "TmdbCache";
         private readonly TMDbMapper _mapper;
         
-        public TMDbApi(ICachingService cachingService, ILoggingService loggingService) 
-            : base(ConfigurationService.Current.ImageFolder, cachingService,loggingService)
+        public TMDbApi(
+            FolderOptions folderSettings,
+            ApiKeyOptions apiKeySettings,
+            IDistributedCache cachingService,
+            ILogger<TMDbApi> logger) 
+            : base(folderSettings.Images, cachingService, logger)
         {
             _mapper = new TMDbMapper();
-            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {ConfigurationService.Current.TMDbApiKey}");
+            Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKeySettings.TmdbKey}");
         }
-
 
         private readonly ITokenBucket _bucket = TokenBuckets.Construct()
             .WithCapacity(10)
@@ -41,14 +47,15 @@ namespace NxPlx.Integrations.TMDb
         
         private async Task<string> Fetch(string url)
         {
+            var cacheKey = $"{CachePrefix}:{url}";
             {
-                var cachedContent = await CachingService.GetAsync(url);
+                var cachedContent = await CachingService.GetStringAsync(cacheKey);
                 if (!string.IsNullOrEmpty(cachedContent)) return cachedContent;
             }
 
             _bucket.Consume(1);
             
-            var content = await FetchInternal(url);
+            var content = await FetchInternal(cacheKey, url);
             
             if (string.IsNullOrEmpty(content) || content.StartsWith("{\"status_code\":25"))
             {
@@ -108,21 +115,21 @@ namespace NxPlx.Integrations.TMDb
             return _mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
         }
         
-        public override async Task<SeriesDetails> FetchTvDetails(int id, string language)
+        public override async Task<SeriesDetails> FetchTvDetails(int id, string language, int[] seasons)
         {
             var url = $"{BaseUrl}/tv/{id}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = _mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped.Seasons.Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
+            var seasonDetailsTasks = mapped!.Seasons.Where(s => seasons.Contains(s.SeasonNumber)).Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             
             return mapped;
         }
-        
-        public override async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
+
+        private async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
         {
             var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}";
 
@@ -131,13 +138,12 @@ namespace NxPlx.Integrations.TMDb
             return _mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj);
         }
         
-        public override async Task DownloadImage(string size, string imageUrl)
+        public override async Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath)
         {
-            if (string.IsNullOrEmpty(imageUrl)) return;
+            if (string.IsNullOrEmpty(imageUrl)) return false;
             
             _imageBucket.Consume(1);
-            var imageName = Path.GetFileNameWithoutExtension(imageUrl.Trim('/'));
-            await DownloadImageInternal($"https://image.tmdb.org/t/p/{size}{imageUrl}", size, imageName);
+            return await DownloadImageInternal($"https://image.tmdb.org/t/p/w{width}/{imageUrl}", outputFilePath);
         }
     }
 }

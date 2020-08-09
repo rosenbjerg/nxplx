@@ -5,7 +5,7 @@ using NxPlx.Models.Details.Film;
 
 namespace NxPlx.Models.Database
 {
-    public class DbFilmDetails : EntityBase, IAdded
+    public class DbFilmDetails : EntityBase, IAdded, IPosterImageOwner, IBackdropImageOwner
     {
         public bool Adult { get; set; }
         public long Budget { get; set; }
@@ -31,5 +31,7 @@ namespace NxPlx.Models.Database
         public int VoteCount { get; set; }
         
         public DateTime Added { get; set; }
+        public string PosterBlurHash { get; set; }
+        public string BackdropBlurHash { get; set; }
     }
 }

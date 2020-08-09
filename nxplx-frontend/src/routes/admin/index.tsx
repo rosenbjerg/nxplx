@@ -8,7 +8,7 @@ import * as style from "./style.css";
 
 const Admin = () => (
     <div class={style.profile}>
-        <h1>{translate("admin-stuff")}</h1>
+        <h1>{translate("admin stuff")}</h1>
 
         <h2>{translate("libraries")}</h2>
         <LibraryManagement/>

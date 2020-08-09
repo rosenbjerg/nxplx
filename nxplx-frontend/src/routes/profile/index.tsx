@@ -5,7 +5,7 @@ import Loading from "../../components/Loading";
 import SessionManager from "../../components/SessionManager";
 import http from "../../utils/http";
 import { setLocale, translate } from "../../utils/localisation";
-import { getEntry, setEntry } from "../../utils/localstorage";
+import storage from "../../utils/localstorage";
 import { User } from "../../utils/models";
 import * as style from "./style.css";
 
@@ -28,28 +28,28 @@ export default class Profile extends Component<Props, State> {
         }
         return (
             <div class={style.profile}>
-                <h1>{translate("account-settings-for")} {user.username}</h1>
+                <h1>{translate("account settings for")} {user.username}</h1>
 
-                <h3>{translate("your-account-details")}</h3>
+                <h3>{translate("your account details")}</h3>
                 <form onSubmit={this.saveDetails}>
                     <div>
                         <label class="columns-1">{translate("email")}</label>
                         <input class="inline-edit" name="email" type="email" value={user.email}/>
                     </div>
-                    <button class="bordered">{translate('save-details')}</button>
+                    <button class="bordered">{translate('save details')}</button>
                 </form>
                 <br/>
-                <h3>{translate("change-your-password")}</h3>
+                <h3>{translate("change your password")}</h3>
                 <ChangePassword/>
                 <br/>
                 <h3>{translate("language")}</h3>
-                <label class="columns-1">{translate("user-interface-language")}</label>
-                <select class="inline-edit" onInput={this.setLocale} value={getEntry("locale", "en")}>
+                <label class="columns-1">{translate("user interface language")}</label>
+                <select class="inline-edit" onInput={this.setLocale} value={storage(localStorage).getEntry("locale", "en")}>
                     <option value="en">English</option>
                     <option value="da">Dansk</option>
                 </select>
                 <br/>
-                <h3>{translate("your-active-sessions")}</h3>
+                <h3>{translate("your active sessions")}</h3>
                 <SessionManager/>
             </div>
         );
@@ -59,7 +59,7 @@ export default class Profile extends Component<Props, State> {
         const target = (e as any).target;
         target.disabled = true;
         const value = target.value;
-        setEntry("locale", value);
+        storage(localStorage).setEntry("locale", value);
         await setLocale(value);
         target.disabled = false;
         this.setState({});

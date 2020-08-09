@@ -13,10 +13,13 @@ interface Props {
 export const SeasonEntry = ({ details, season, progress }: Props) => (
     <Entry
         key={season.number}
-        image={imageUrl(season.poster, 342, details.poster)}
+        image={imageUrl(season.posterPath, 190, details.posterPath)}
+        imageBlurHash={season.posterBlurHash}
         href={`/series/${details.id}/${season.number}`}
         title={`Season ${season.number}`}
-        progress={progress}>
+        progress={progress}
+        blurhashWidth={20}
+        blurhashHeight={32}>
         <b class={style.num}>S{season.number}</b>
     </Entry>
 );

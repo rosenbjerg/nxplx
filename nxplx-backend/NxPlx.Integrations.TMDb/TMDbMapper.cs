@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using NxPlx.Abstractions;
+using NxPlx.Application.Core;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
@@ -25,7 +23,7 @@ namespace NxPlx.Integrations.TMDb
             SetMapping<TvDetails, SeriesDetails>(tvDetails => new SeriesDetails
             {
                 Id = tvDetails.Id,
-                BackdropPath = tvDetails.backdrop_path,
+                BackdropPath = TrimStart(tvDetails.backdrop_path, '/'),
                 FirstAirDate = tvDetails.first_air_date,
                 InProduction = tvDetails.in_production,
                 LastAirDate = tvDetails.last_air_date,
@@ -35,7 +33,7 @@ namespace NxPlx.Integrations.TMDb
                 Type = tvDetails.type,
                 OriginalLanguage = tvDetails.original_language,
                 OriginalName = tvDetails.original_name,
-                PosterPath = tvDetails.poster_path,
+                PosterPath = TrimStart(tvDetails.poster_path, '/'),
                 VoteAverage = tvDetails.vote_average,
                 VoteCount = tvDetails.vote_count,
             
@@ -49,11 +47,11 @@ namespace NxPlx.Integrations.TMDb
             SetMapping<MovieDetails, FilmDetails>(movieDetails => new FilmDetails
             {
                 Id = movieDetails.Id,
-                BackdropPath = movieDetails.backdrop_path,
+                BackdropPath = TrimStart(movieDetails.backdrop_path, '/'),
                 Overview = movieDetails.overview,
                 Popularity = movieDetails.popularity,
                 OriginalLanguage = movieDetails.original_language,
-                PosterPath = movieDetails.poster_path,
+                PosterPath = TrimStart(movieDetails.poster_path, '/'),
                 VoteAverage = movieDetails.vote_average,
                 VoteCount = movieDetails.vote_count,
                 Adult = movieDetails.adult,
@@ -83,7 +81,7 @@ namespace NxPlx.Integrations.TMDb
             {
                 Id = productionCompany.id,
                 Name = productionCompany.name,
-                LogoPath = productionCompany.logo_path,
+                LogoPath = TrimStart(productionCompany.logo_path, '/'),
                 OriginCountry = productionCompany.origin_country
             });
             
@@ -91,8 +89,8 @@ namespace NxPlx.Integrations.TMDb
             {
                 Id = movieCollection.id,
                 Name = movieCollection.name,
-                BackdropPath = movieCollection.backdrop_path,
-                PosterPath = movieCollection.poster_path
+                BackdropPath = TrimStart(movieCollection.backdrop_path, '/'),
+                PosterPath = TrimStart(movieCollection.poster_path, '/')
             });
             
             SetMapping<Models.Movie.ProductionCountry, ProductionCountry>(productionCountry => new ProductionCountry
@@ -111,7 +109,7 @@ namespace NxPlx.Integrations.TMDb
             {
                 Id = network.id,
                 Name = network.name,
-                LogoPath = network.logo_path,
+                LogoPath = TrimStart(network.logo_path, '/'),
                 OriginCountry = network.origin_country
             });
             
@@ -127,7 +125,7 @@ namespace NxPlx.Integrations.TMDb
                 Name = tvSeasonDetails.name,
                 Overview = tvSeasonDetails.overview,
                 AirDate = tvSeasonDetails.air_date,
-                PosterPath = tvSeasonDetails.poster_path,
+                PosterPath = TrimStart(tvSeasonDetails.poster_path, '/'),
                 SeasonNumber = tvSeasonDetails.season_number,
                 Episodes = Map<Episode, EpisodeDetails>(tvSeasonDetails.episodes).ToList()
             });
@@ -137,7 +135,7 @@ namespace NxPlx.Integrations.TMDb
                 Name = tvSeasonDetails.name,
                 Overview = tvSeasonDetails.overview,
                 AirDate = tvSeasonDetails.air_date,
-                PosterPath = tvSeasonDetails.poster_path,
+                PosterPath = TrimStart(tvSeasonDetails.poster_path, '/'),
                 SeasonNumber = tvSeasonDetails.season_number
             });
 
@@ -150,7 +148,7 @@ namespace NxPlx.Integrations.TMDb
                 AirDate = episode.air_date,
                 EpisodeNumber = episode.episode_number,
                 ProductionCode = episode.production_code,
-                StillPath = episode.still_path,
+                StillPath = TrimStart(episode.still_path, '/'),
                 VoteAverage = episode.vote_average,
                 VoteCount = episode.vote_count
                 
@@ -190,55 +188,10 @@ namespace NxPlx.Integrations.TMDb
                 Votes = movieResult.vote_count
             });
         }
-        
 
-        
-        public List<TPropertyEntity> UniqueProperties<TRootEntity, TPropertyEntity, TPropertyKey>(IEnumerable<TRootEntity> entities, 
-            Func<TRootEntity, IEnumerable<TPropertyEntity>> selector, 
-            Func<TPropertyEntity, TPropertyKey> keySelector)
-            where TRootEntity : class
-            where TPropertyEntity : class
+        private static string TrimStart(string input, char trim)
         {
-            var uniqueProperties = new Dictionary<TPropertyKey, TPropertyEntity>();
-
-            
-            foreach (var rootEntity in entities)
-            {
-                var propertyContent = selector(rootEntity);
-                if (propertyContent == null) continue;
-                foreach (var propertyEntity in propertyContent)
-                {   
-                    if (propertyEntity == null) continue;
-                    var id = keySelector(propertyEntity);
-                    if (id == null) continue;
-                    if (uniqueProperties.ContainsKey(id)) continue;
-                    uniqueProperties[id] = propertyEntity;
-                }
-            };
-            
-            return uniqueProperties.Values.ToList();
-        }
-        
-        public List<TPropertyEntity> UniqueProperties<TRootEntity, TPropertyEntity, TPropertyKey>(IEnumerable<TRootEntity> entities, 
-            Func<TRootEntity, TPropertyEntity> selector, 
-            Func<TPropertyEntity, TPropertyKey> keySelector)
-            where TRootEntity : class
-            where TPropertyEntity : class
-        {
-            var uniqueProperties = new Dictionary<TPropertyKey, TPropertyEntity>();
-
-            foreach (var rootEntity in entities)
-            {
-                var propertyContent = selector(rootEntity);
-                if (propertyContent == null) continue;
-                var id = keySelector(propertyContent);
-                if (id == null) continue;
-                if (uniqueProperties.ContainsKey(id))
-                    continue;
-                uniqueProperties[id] = propertyContent;
-            };
-            
-            return uniqueProperties.Values.ToList();
+            return string.IsNullOrEmpty(input) ? input : input.Trim(trim);
         }
     }
 }

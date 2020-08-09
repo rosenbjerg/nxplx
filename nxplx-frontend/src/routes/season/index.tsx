@@ -8,6 +8,11 @@ import { formatInfoPair } from "../../utils/common";
 import http from "../../utils/http";
 import { imageUrl, SeasonDetails, SeriesDetails } from "../../utils/models";
 import * as style from "./style.css";
+import { LazyImage } from "../../components/Entry";
+import AdminOnly from "../../components/AdminOnly";
+import { EditDetails } from "../../components/EditDetails";
+import { Link } from "preact-router";
+import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
 
 interface EpisodeProgress {
     fileId: number
@@ -25,15 +30,16 @@ interface State {
     bg: string,
     bgImg: string
     progress?: Map<number, number>
+    showPlaybackModeSelector: boolean
 }
 
 export default class Season extends Component<Props, State> {
     public componentDidMount(): void {
-        http.getJson<SeriesDetails>(`/api/series/detail/${this.props.id}/${this.props.season}`)
+        http.getJson<SeriesDetails>(`/api/series/${this.props.id}/${this.props.season}/detail`)
             .then(async seriesDetails => {
                 const seasonDetails: SeasonDetails = seriesDetails.seasons[0];
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(seriesDetails.backdrop, 1280)}");`;
-                this.setState({ series: seriesDetails, season: seasonDetails, bg, bgImg: seriesDetails.backdrop });
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(seriesDetails.backdropPath, 1280)}");`;
+                this.setState({ series: seriesDetails, season: seasonDetails, bg, bgImg: seriesDetails.backdropPath });
 
                 const progressArray = await http.getJson<EpisodeProgress[]>(`/api/progress/season/${this.props.id}/${this.props.season}`);
                 const progress = toMap(progressArray, p => p.fileId, p => p.progress);
@@ -41,7 +47,7 @@ export default class Season extends Component<Props, State> {
             });
     }
 
-    public render(_, { series, season, bg, bgImg, progress }: State) {
+    public render(_, { series, season, bg, bgImg, progress, showPlaybackModeSelector }: State) {
         if (!series) {
             return (<Loading fullscreen/>);
         }
@@ -50,9 +56,16 @@ export default class Season extends Component<Props, State> {
                 <Helmet title={`Season ${season.number} - ${series.name} - NxPlx`}/>
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
-                        <h2 class={[style.title, style.marked].join(" ")}>{series.name} - Season {season.number}</h2>
+                        <h2 class={[style.title, style.marked].join(" ")}>
+                            <button class="material-icons" style="border: none; padding: 0px 4px 0px 0px; font-size: 28pt" onClick={this.showPlayModeDiv}>play_arrow</button>
+                            <Link style="color: white; text-decoration: none" href={`/series/${series.id}`}>{series.name}</Link> - Season {season.number}
+                        </h2>
+                        <AdminOnly>
+                            <EditDetails setPoster entityType={"season"} entityId={season.id} />
+                        </AdminOnly>
                     </div>
-                    <img class={style.poster} src={imageUrl(season.poster, 500)} alt=""/>
+
+                    <LazyImage src={imageUrl(season.posterPath, 270, series.posterPath)} blurhash={season.posterBlurHash || series.posterBlurHash} blurhashHeight={32} blurhashWidth={20} class={style.poster}/>
                     <span class={[style.info, style.marked].join(" ")}>
                     <table>
                         {
@@ -67,7 +80,15 @@ export default class Season extends Component<Props, State> {
                             .map(episode => (<EpisodeEntry key={episode.number} episode={episode} progress={progress && progress.get(episode.fileId)}/>))}
                     </div>
                 </div>
+
+                {showPlaybackModeSelector && (
+                    <SelectPlaybackMode onDismiss={() => this.setState({ showPlaybackModeSelector: false })} seriesId={series.id} season={season.number}/>
+                )}
             </div>
         );
+    }
+
+    private showPlayModeDiv = () => {
+        this.setState({ showPlaybackModeSelector: true });
     }
 }

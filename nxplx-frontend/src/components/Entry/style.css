@@ -29,75 +29,91 @@
     border-radius: 1px;
 }
 .autosize {
-    width: 126px;
+    width: 86px;
 }
 
-@media only screen and (max-width: 2029px) {
-    .autosize {
-        min-width: calc((100% / 14) - 8px);
-    }
-}
-@media only screen and (max-width: 1895px) {
+@media only screen and (min-width: 1890px) {
     .autosize {
         min-width: calc((100% / 13) - 8px);
     }
 }
-@media only screen and (max-width: 1761px) {
+@media only screen and (min-width: 2339px) {
+    .autosize {
+        min-width: calc((100% / 17) - 8px);
+    }
+}
+@media only screen and (min-width: 2808px) {
+    .autosize {
+        min-width: calc((100% / 20) - 8px);
+    }
+}
+@media only screen and (min-width: 3114px) {
+    .autosize {
+        min-width: calc((100% / 23) - 8px);
+    }
+}
+@media only screen and (min-width: 3726px) {
+    .autosize {
+        min-width: calc((100% / 29) - 8px);
+    }
+}
+
+@media only screen and (max-width: 1890px) {
     .autosize {
         min-width: calc((100% / 12) - 8px);
     }
 }
-@media only screen and (max-width: 1627px) {
+@media only screen and (max-width: 1737px) {
     .autosize {
         min-width: calc((100% / 11) - 8px);
     }
 }
-@media only screen and (max-width: 1493px) {
+@media only screen and (max-width: 1584px) {
     .autosize {
         min-width: calc((100% / 10) - 8px);
     }
 }
-@media only screen and (max-width: 1359px) {
+@media only screen and (max-width: 1431px) {
     .autosize {
         min-width: calc((100% / 9) - 8px);
     }
 }
-@media only screen and (max-width: 1225px) {
+@media only screen and (max-width: 1278px) {
     .autosize {
         min-width: calc((100% / 8) - 8px);
     }
 }
-@media only screen and (max-width: 1091px) {
+@media only screen and (max-width: 1125px) {
     .autosize {
         min-width: calc((100% / 7) - 8px);
     }
 }
-@media only screen and (max-width: 957px) {
+@media only screen and (max-width: 972px) {
     .autosize {
         min-width: calc((100% / 6) - 8px);
     }
 }
-@media only screen and (max-width: 823px) {
+@media only screen and (max-width: 819px) {
     .autosize {
         min-width: calc((100% / 5) - 8px);
     }
 }
-@media only screen and (max-width: 689px) {
+@media only screen and (max-width: 666px) {
     .autosize {
         min-width: calc((100% / 4) - 8px);
     }
 }
-@media only screen and (max-width: 555px) {
+@media only screen and (max-width: 513px) {
     .autosize {
         min-width: calc((100% / 3) - 8px);
     }
 }
-@media only screen and (max-width: 421px) {
+@media only screen and (max-width: 360px) {
     .autosize {
         min-width: calc((100% / 2) - 8px);
     }
 }
-@media only screen and (max-width: 287px) {
+@media only screen and (max-width: 207px) {
     .autosize {
         min-width: calc((100% / 1) - 8px);
     }

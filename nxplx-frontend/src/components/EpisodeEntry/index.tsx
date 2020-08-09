@@ -12,11 +12,14 @@ interface Props {
 export const EpisodeEntry = ({ episode, progress }: Props) => (
     <Entry
         key={episode.number}
-        image={imageUrl(episode.still, 300)}
+        image={imageUrl(episode.stillPath, 260)}
+        imageBlurHash={episode.stillBlurHash}
         href={`/watch/series/${episode.fileId}`}
         title={episode.name}
         progress={progress}
-        autosizeOverride={style.autosize}>
+        autosizeOverride={style.autosize}
+        blurhashWidth={32}
+        blurhashHeight={20}>
         <b class={style.num}>E{episode.number}</b>
     </Entry>
 );

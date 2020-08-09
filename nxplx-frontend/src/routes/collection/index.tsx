@@ -1,11 +1,13 @@
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
 import Helmet from "preact-helmet";
-import Entry from "../../components/Entry";
+import Entry, { LazyImage } from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { imageUrl, MovieCollection } from "../../utils/models";
 import * as style from "./style.css";
+import AdminOnly from "../../components/AdminOnly";
+import { EditDetails } from "../../components/EditDetails";
 
 interface Props {
     id: string
@@ -18,11 +20,11 @@ interface State {
 
 export default class Collection extends Component<Props, State> {
     public componentDidMount(): void {
-        http.get(`/api/film/collection/detail/${this.props.id}`)
+        http.get(`/api/film/collection/${this.props.id}/details`)
             .then(response => response.json())
             .then((details: MovieCollection) => {
                 console.log(details);
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;
+                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
                 this.setState({ details, bg });
             });
     }
@@ -33,13 +35,16 @@ export default class Collection extends Component<Props, State> {
             return (<Loading fullscreen/>);
         }
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdrop}>
+            <div class={style.bg} style={bg} data-bg={details.backdropPath}>
                 <div class={`nx-scroll ${style.content}`}>
                     <Helmet title={`${details.name} - NxPlx`}/>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
+                        <AdminOnly>
+                            <EditDetails setPoster setBackdrop entityType={"collection"} entityId={details.id} />
+                        </AdminOnly>
                     </div>
-                    <img class={style.poster} src={imageUrl(details.poster, 500)} alt=""/>
+                    <LazyImage class={style.poster} src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32} blurhashWidth={20}/>
                     <div>
                         {orderBy(details.movies, ["year", "title"], ["asc"])
                             .map(movie => (
@@ -47,8 +52,11 @@ export default class Collection extends Component<Props, State> {
                                         key={movie.id}
                                         title={movie.title}
                                         href={`/${movie.kind}/${movie.id}`}
-                                        image={imageUrl(movie.poster, 342, details.poster)}/>
-
+                                        image={imageUrl(movie.posterPath, 190, details.posterPath)}
+                                        imageBlurHash={movie.posterBlurHash || details.posterBlurHash}
+                                        blurhashWidth={20}
+                                        blurhashHeight={32}
+                                    />
                                 )
                             )}
                     </div>

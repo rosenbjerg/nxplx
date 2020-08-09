@@ -1,7 +1,8 @@
 
-export const imageUrl = (url:string, width:154|300|342|500|1280, fallbackUrl?:string) => {
+type imagesize = 100|190|260|270|1280;
+export const imageUrl = (url:string, width:imagesize, fallbackUrl?:string) => {
     if (!url && !fallbackUrl) return `/assets/images/w${width}.jpg`;
-    return `/api/image/w${width}${url || fallbackUrl}`;
+    return `/api/image/w${width}/${url || fallbackUrl}`;
 };
 
 export interface Genre {
@@ -27,8 +28,10 @@ export interface FilmDetails {
     id:number
     fid:number
     title:string
-    poster:string
-    backdrop:string
+    posterPath:string
+    posterBlurHash:string
+    backdropPath:string
+    backdropBlurHash:string
     subtitles:SubtitleFile[]
     budget:number
     imdbId:string
@@ -55,8 +58,10 @@ export interface SubtitleFile {
 export interface MovieCollection {
     id:number
     name:string
-    poster:string
-    backdrop:string
+    posterPath:string
+    posterBlurHash:string
+    backdropPath:string
+    backdropBlurHash:string
     movies:OverviewElement[]
 }
 export interface Library {
@@ -70,17 +75,18 @@ export interface User {
     id:number
     username:string
     email:string
-    isAdmin:boolean
-    passwordChanged:boolean
+    admin:boolean
+    hasChangedPassword:boolean
     libraries:number[]
 }
 
-export interface OverviewElement { id:number; title:string; poster:string; kind:'film'|'series' }
+export interface OverviewElement { id:number; title:string; posterPath:string; posterBlurHash:string; kind:'film'|'series' }
 
 export interface ContinueWatchingElement {
     fileId:number
     title:string
-    poster:string
+    posterPath:string
+    posterBlurHash:string
     kind:string
     watched:string
     progress:number
@@ -91,28 +97,29 @@ export interface FileInfo {
     fid:number
     duration:number
     title:string
-    poster:string
-    backdrop:string
+    posterPath:string
+    posterBlurHash:string
+    backdropPath:string
+    backdropBlurHash:string
     subtitles:string[]
 }
 
 export interface Creator {
-    id: number
-    creditId: string
     name: string
-    profilePath: string
 }
 export interface Network {
     name: string
-    id: number
     logoPath: string
+    logoBlurHash: string
     originCountry: string
 }
 export interface SeriesDetails {
     id: number;
     fid: number;
-    backdrop: string;
-    poster: string;
+    backdropPath: string;
+    backdropBlurHash: string;
+    posterPath: string;
+    posterBlurHash: string;
     voteAverage: number;
     voteCount: number;
     name: string;
@@ -128,7 +135,8 @@ export interface SeasonDetails {
     id: number
     name: string
     overview: string
-    poster: string
+    posterPath: string
+    posterBlurHash: string
     number: number
     episodes?: EpisodeDetails[]
 }
@@ -138,7 +146,8 @@ export interface EpisodeDetails {
     number: number
     overview: string;
     airDate: string;
-    still: string;
+    stillPath: string;
+    stillBlurHash: string;
     voteAverage: number;
     voteCount: number;
 }

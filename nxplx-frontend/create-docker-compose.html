@@ -216,10 +216,11 @@ services:
     image: mrosenbjerg/nxplx-webapi
     restart: always
     environment:
-      REDIS_PASSWORD: ${args.redisPassword}
-      POSTGRES_PASSWORD: ${args.postgresPassword}
-      NXPLX_PROBE_TOKEN: ${args.probeToken}
-      TMDB_API_KEY: ${args.tmdbApiKey}
+      NxPlx_ConnectionStrings__Redis: nxplx-cache,password=${args.redisPassword},name=NxPlx
+      NxPlx_ConnectionStrings__Pgsql: Host=nxplx-database;Database=nxplx_db;Username=postgres;Password=${args.postgresPassword}
+      NxPlx_ConnectionStrings__HangfirePgsql: Host=nxplx-database;Database=nxplx_job_db;Username=postgres;Password=${args.postgresPassword}
+      NxPlx_ApiKey__TmdbKey: ${args.tmdbApiKey}
+
     volumes:
       - ${args.dataDir}/webapi:/data
       - ${args.mediaRoot}:/media:ro

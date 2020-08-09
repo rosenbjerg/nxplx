@@ -37,7 +37,7 @@ export default class Home extends Component<Props, State> {
             <div class={style.home}>
                 <Helmet title="NxPlx"/>
                 <div class={style.top}>
-                    <input tabIndex={0} autofocus class={style.search} placeholder={translate("search-here")}
+                    <input tabIndex={0} autofocus class={style.search} placeholder={translate("search here")}
                            type="search" value={this.state.search} onInput={linkState(this, "search")}/>
                 </div>
 
@@ -47,15 +47,18 @@ export default class Home extends Component<Props, State> {
                     <div class={`${style.entryContainer} nx-scroll`}>
                         {!search && progress && progress.length > 0 && (
                             <span>
-                                <label>{translate("continue-watching")}</label>
+                                <label>{translate("continue watching")}</label>
                                 <div class={`nx-scroll ${style.continueWatchingContainer}`}>
                                     {progress.map(p => (
                                         <Entry
                                             key={p.kind[0] + p.fileId}
                                             title={p.title}
                                             href={`/watch/${p.kind}/${p.fileId}`}
-                                            image={imageUrl(p.poster, 342)}
+                                            image={imageUrl(p.posterPath, 190)}
+                                            imageBlurHash={p.posterBlurHash}
                                             progress={p.progress}
+                                            blurhashWidth={20}
+                                            blurhashHeight={32}
                                         />
                                     ))}
                                 </div>
@@ -68,7 +71,10 @@ export default class Home extends Component<Props, State> {
                                         key={entry.id}
                                         title={entry.title}
                                         href={`/${entry.kind}/${entry.id}`}
-                                        image={imageUrl(entry.poster, 342)}
+                                        image={imageUrl(entry.posterPath, 190)}
+                                        imageBlurHash={entry.posterBlurHash}
+                                        blurhashWidth={20}
+                                        blurhashHeight={32}
                                     />
                                 )
                             )}

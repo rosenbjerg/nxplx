@@ -18,19 +18,19 @@ const ChangePassword = () => {
         <div>
             <form onSubmit={changePassword}>
                 <div>
-                    <label class="columns-1">{translate("old-password")}</label>
+                    <label class="columns-1">{translate("old password")}</label>
                     <input class="inline-edit" type="password" name="oldPassword" required minLength={6} maxLength={50}/>
                 </div>
                 <br/>
                 <div>
-                    <label class="columns-1">{translate("new-password")}</label>
+                    <label class="columns-1">{translate("new password")}</label>
                     <input class="inline-edit" type="password" name="password1" required minLength={6} maxLength={50}/>
                 </div>
                 <div>
-                    <label class="columns-1">{translate("new-password-again")}</label>
+                    <label class="columns-1">{translate("new password again")}</label>
                     <input class="inline-edit" type="password" name="password2" required minLength={6} maxLength={50}/>
                 </div>
-                <button class="bordered">{translate("change-password")}</button>
+                <button class="bordered">{translate("change password")}</button>
             </form>
         </div>
     );
