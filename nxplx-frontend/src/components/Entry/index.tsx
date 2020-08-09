@@ -36,6 +36,7 @@ export class LazyImage extends Component<Props2> {
     }
     componentWillUnmount() {
         this.mounted = false;
+        if (this.image) this.image.src = '';
     }
 
     render() {
