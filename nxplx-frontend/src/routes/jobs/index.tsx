@@ -6,7 +6,6 @@ import Collapsible from "../../components/Collapsible";
 import { translate } from "../../utils/localisation";
 
 
-
 interface JobQueue<TJob> {
     name: string
     jobs: TJob[]
@@ -30,30 +29,54 @@ interface JobViewProps {
     type: "enqueued" | "processing" | "succeeded" | "failed"
     children: VNode
 }
+
 interface JobViewState {
     count: number
 }
 
 class JobView extends Component<JobViewProps, JobViewState> {
+    interval: any = null;
+
     componentDidMount() {
-        http.getJson<number>(`/api/jobs/${this.props.type}/count`).then(count => this.setState({ count }));
+        this.update();
+        this.interval = setInterval(this.update, 10000);
     }
+
+    componentWillUnmount() {
+        if (this.interval) clearInterval(this.interval);
+    }
+
+    update = () => http.getJson<number>(`/api/jobs/${this.props.type}/count`).then(count => this.setState({ count }));
+
     render({ children }: JobViewProps, { count }: JobViewState) {
         return (
-            <Collapsible title={`${translate(`${this.props.type} jobs`)}: ${count === undefined ? '?' : count}`}>
+            <Collapsible title={`${translate(`${this.props.type} jobs`)}: ${count === undefined ? "?" : count}`}>
                 {children}
             </Collapsible>
         );
     }
 }
 
-interface EnqueuedJobsListState { queues: JobQueue<Job>[] }
-class EnqueuedJobsList extends Component<{}, EnqueuedJobsListState>{
+interface EnqueuedJobsListState {
+    queues: JobQueue<Job>[]
+}
+
+class EnqueuedJobsList extends Component<{}, EnqueuedJobsListState> {
+    interval: any = null;
+
     componentDidMount() {
-        http.getJson<JobQueue<Job>[]>(`/api/jobs/enqueued`).then(jobs => this.setState({ queues: jobs }));
+        this.update();
+        this.interval = setInterval(this.update, 10000);
     }
+
+    componentWillUnmount() {
+        if (this.interval) clearInterval(this.interval);
+    }
+
+    update = () => http.getJson<JobQueue<Job>[]>(`/api/jobs/enqueued`).then(jobs => this.setState({ queues: jobs }));
+
     render(_, { queues }: EnqueuedJobsListState) {
-        if (queues === undefined) return (<Loading/>)
+        if (queues === undefined || queues === null) return (<Loading/>);
         return (queues.map(queue => (
             <div>
                 <h4>{queue.name}</h4>
@@ -65,31 +88,54 @@ class EnqueuedJobsList extends Component<{}, EnqueuedJobsListState>{
     }
 }
 
-interface ProcessingJobsListState { queues: JobQueue<Job>[] }
-class ProcessingJobsList extends Component<{}, ProcessingJobsListState>{
+interface ProcessingJobsListState {
+    jobs: Job[]
+}
+
+class ProcessingJobsList extends Component<{}, ProcessingJobsListState> {
+    interval: any = null;
+
     componentDidMount() {
-        http.getJson<JobQueue<Job>[]>(`/api/jobs/processing`).then(jobs => this.setState({ queues: jobs }));
+        this.update();
+        this.interval = setInterval(this.update, 10000);
     }
-    render(_, { queues }: ProcessingJobsListState) {
-        if (queues === undefined) return (<Loading/>)
-        return (queues.map(queue => (
-            <div>
-                <h4>{queue.name}</h4>
-                <ul>
-                    {queue.jobs.map(job => (<li><code>{job.method}</code></li>))}
-                </ul>
-            </div>
-        )));
+
+    componentWillUnmount() {
+        if (this.interval) clearInterval(this.interval);
+    }
+
+    update = () => http.getJson<Job[]>(`/api/jobs/processing`).then(jobs => this.setState({ jobs: jobs }));
+
+    render(_, { jobs }: ProcessingJobsListState) {
+        if (jobs === undefined || jobs === null) return (<Loading/>);
+        return (
+            <ul>
+                {jobs.map(job => (<li><code>{job.method}</code></li>))}
+            </ul>
+        );
     }
 }
 
-interface FailedJobsListState { queues: JobQueue<FailedJob>[] }
-class FailedJobsList extends Component<{}, FailedJobsListState>{
+interface FailedJobsListState {
+    queues: JobQueue<FailedJob>[]
+}
+
+class FailedJobsList extends Component<{}, FailedJobsListState> {
+    interval: any = null;
+
     componentDidMount() {
-        http.getJson<JobQueue<FailedJob>[]>(`/api/jobs/failed`).then(jobs => this.setState({ queues: jobs }));
+        this.update();
+        this.interval = setInterval(this.update, 10000);
     }
+
+    componentWillUnmount() {
+        if (this.interval) clearInterval(this.interval);
+    }
+
+    update = () => http.getJson<JobQueue<FailedJob>[]>(`/api/jobs/failed`).then(jobs => this.setState({ queues: jobs }));
+
     render(_, { queues }: FailedJobsListState) {
-        if (queues === undefined) return (<Loading/>)
+        if (queues === undefined || queues === null) return (<Loading/>);
         return (queues.map(queue => (
             <div>
                 <h4>{queue.name}</h4>
@@ -106,13 +152,26 @@ class FailedJobsList extends Component<{}, FailedJobsListState>{
     }
 }
 
-interface SucceededJobsListState { jobs: SucceededJob[] }
-class SucceededJobsList extends Component<{}, SucceededJobsListState>{
+interface SucceededJobsListState {
+    jobs: SucceededJob[]
+}
+
+class SucceededJobsList extends Component<{}, SucceededJobsListState> {
+    interval: any = null;
+
     componentDidMount() {
-        http.getJson<SucceededJob[]>(`/api/jobs/succeeded`).then(jobs => this.setState({ jobs }));
+        this.update();
+        this.interval = setInterval(this.update, 10000);
     }
+
+    componentWillUnmount() {
+        if (this.interval) clearInterval(this.interval);
+    }
+
+    update = () => http.getJson<SucceededJob[]>(`/api/jobs/succeeded`).then(jobs => this.setState({ jobs }));
+
     render(_, { jobs }: SucceededJobsListState) {
-        if (jobs === undefined) return (<Loading/>)
+        if (jobs === undefined || jobs === null) return (<Loading/>);
         return (<ul>
                 {jobs.map(job => (
                     <li>

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.Linq;
 using Hangfire.Storage;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Models;
@@ -34,11 +33,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public long SucceededCount() => _monitoringApi.SucceededListCount();
         
         [HttpGet("enqueued")]
-        public JobQueueDto<JobDto>[] Enqueued([FromRoute, Required]string queueName, [FromQuery]int? offset, [FromQuery]int? count) 
+        public JobQueueDto<JobDto>[] Enqueued([FromQuery]int? offset, [FromQuery]int? count) 
             => _monitoringApi.Queues().Select(queue => new JobQueueDto<JobDto>
             {
                 Name = queue.Name,
-                Jobs = _monitoringApi.EnqueuedJobs(queueName, offset ?? 0, count ?? 25).Select(j => new JobDto
+                Jobs = _monitoringApi.EnqueuedJobs(queue.Name, offset ?? 0, count ?? 25).Select(j => new JobDto
                 {
                     Method = $"{j.Value.Job.Type.Name}.{j.Value.Job.Method.Name}({string.Join(", ", j.Value.Job.Args.Select(a => a.ToString()))})",
                 }).ToArray()
