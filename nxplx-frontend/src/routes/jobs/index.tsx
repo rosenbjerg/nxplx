@@ -34,19 +34,20 @@ interface JobViewState {
     count: number
 }
 
-class JobView extends Component<JobViewProps, JobViewState> {
-    interval: any = null;
+const getIntervalTime = () => 9000 + (5000*Math.random());
 
+class JobView extends Component<JobViewProps, JobViewState> {
+    timeout: any = null;
     componentDidMount() {
         this.update();
-        this.interval = setInterval(this.update, 10000);
     }
-
     componentWillUnmount() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.timeout) clearTimeout(this.timeout);
     }
-
-    update = () => http.getJson<number>(`/api/jobs/${this.props.type}/count`).then(count => this.setState({ count }));
+    update = () => http.getJson<number>(`/api/jobs/${this.props.type}/count`).then(count => {
+        this.timeout = setTimeout(this.update, getIntervalTime());
+        this.setState({ count })
+    });
 
     render({ children }: JobViewProps, { count }: JobViewState) {
         return (
@@ -62,18 +63,17 @@ interface EnqueuedJobsListState {
 }
 
 class EnqueuedJobsList extends Component<{}, EnqueuedJobsListState> {
-    interval: any = null;
-
+    timeout: any = null;
     componentDidMount() {
         this.update();
-        this.interval = setInterval(this.update, 10000);
     }
-
     componentWillUnmount() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.timeout) clearTimeout(this.timeout);
     }
-
-    update = () => http.getJson<JobQueue<Job>[]>(`/api/jobs/enqueued`).then(jobs => this.setState({ queues: jobs }));
+    update = () => http.getJson<JobQueue<Job>[]>(`/api/jobs/enqueued`).then(jobs => {
+        this.timeout = setTimeout(this.update, getIntervalTime());
+        this.setState({ queues: jobs });
+    });
 
     render(_, { queues }: EnqueuedJobsListState) {
         if (queues === undefined || queues === null) return (<Loading/>);
@@ -93,18 +93,17 @@ interface ProcessingJobsListState {
 }
 
 class ProcessingJobsList extends Component<{}, ProcessingJobsListState> {
-    interval: any = null;
-
+    timeout: any = null;
     componentDidMount() {
         this.update();
-        this.interval = setInterval(this.update, 10000);
     }
-
     componentWillUnmount() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.timeout) clearTimeout(this.timeout);
     }
-
-    update = () => http.getJson<Job[]>(`/api/jobs/processing`).then(jobs => this.setState({ jobs: jobs }));
+    update = () => http.getJson<Job[]>(`/api/jobs/processing`).then(jobs => {
+        this.timeout = setTimeout(this.update, getIntervalTime());
+        this.setState({ jobs: jobs });
+    });
 
     render(_, { jobs }: ProcessingJobsListState) {
         if (jobs === undefined || jobs === null) return (<Loading/>);
@@ -121,18 +120,17 @@ interface FailedJobsListState {
 }
 
 class FailedJobsList extends Component<{}, FailedJobsListState> {
-    interval: any = null;
-
+    timeout: any = null;
     componentDidMount() {
         this.update();
-        this.interval = setInterval(this.update, 10000);
     }
-
     componentWillUnmount() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.timeout) clearTimeout(this.timeout);
     }
-
-    update = () => http.getJson<JobQueue<FailedJob>[]>(`/api/jobs/failed`).then(jobs => this.setState({ queues: jobs }));
+    update = () => http.getJson<JobQueue<FailedJob>[]>(`/api/jobs/failed`).then(jobs => {
+        this.timeout = setTimeout(this.update, getIntervalTime());
+        this.setState({ queues: jobs });
+    });
 
     render(_, { queues }: FailedJobsListState) {
         if (queues === undefined || queues === null) return (<Loading/>);
@@ -157,19 +155,17 @@ interface SucceededJobsListState {
 }
 
 class SucceededJobsList extends Component<{}, SucceededJobsListState> {
-    interval: any = null;
-
+    timeout: any = null;
     componentDidMount() {
         this.update();
-        this.interval = setInterval(this.update, 10000);
     }
-
     componentWillUnmount() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.timeout) clearTimeout(this.timeout);
     }
-
-    update = () => http.getJson<SucceededJob[]>(`/api/jobs/succeeded`).then(jobs => this.setState({ jobs }));
-
+    update = () => http.getJson<SucceededJob[]>(`/api/jobs/succeeded`).then(jobs => {
+        this.timeout = setTimeout(this.update, getIntervalTime());
+        this.setState({ jobs });
+    });
     render(_, { jobs }: SucceededJobsListState) {
         if (jobs === undefined || jobs === null) return (<Loading/>);
         return (<ul>
