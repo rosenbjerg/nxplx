@@ -21,9 +21,9 @@ RUN yarn build
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim-arm32v7 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
-LABEL description="NxPlx on dotnet 3.0"
+LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apt-get update && apt-get install -y ffmpeg && apt-get autoremove && apt-get clean
+RUN apt-get update && apt-get install -y ffmpeg imagemagick && apt-get autoremove && apt-get clean
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/

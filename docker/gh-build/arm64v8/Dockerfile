@@ -21,9 +21,9 @@ RUN yarn build
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine-arm64v8 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
-LABEL description="NxPlx on dotnet 3.0"
+LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apk add --update --no-cache ffmpeg
+RUN apk add --update --no-cache ffmpeg imagemagick
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/

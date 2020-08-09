@@ -4,7 +4,7 @@ using System.Drawing.Blurhash;
 using System.IO;
 using System.Threading.Tasks;
 using FFMpegCore;
-using ImageMagick;
+using Instances;
 using NxPlx.Application.Core.Options;
 using NxPlx.Models;
 
@@ -98,24 +98,14 @@ namespace NxPlx.Core.Services
         private static async Task ResizeImage(string imagePath, int width, int height, string outputPath)
         {
             var imageExtension = Path.GetExtension(outputPath);
-            await using var imageStream = File.OpenRead(imagePath);
-            using var image = new MagickImage(imageStream);
-            image.Resize(width, height);
-            image.Strip();
-            image.Quality = 80;
-            image.Trim();
+            var arg = $"\"{imagePath}\" -resize {height}x{width} -strip -trim -quality 80";
             if (imageExtension == ".png")
-            {
-                image.Format = MagickFormat.Png32;
-            }
-            else if (imageExtension == ".jpg" || imageExtension == ".jpeg")
-            {
-                image.Interlace = Interlace.Plane;
-                image.Format = MagickFormat.Jpeg;
-            }
+                arg += "-format PNG24";
+            else if (imageExtension == ".jpg" || imageExtension == ".jpeg") 
+                arg += " -interlace plane -format JPG";
 
-            await using var outputStream = File.OpenWrite(outputPath);
-            image.Write(outputStream);
+            arg += $" \"{outputPath}\"";
+            await Instance.FinishAsync("magick", arg);
         }
     }
 }
