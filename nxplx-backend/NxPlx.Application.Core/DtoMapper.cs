@@ -173,7 +173,7 @@ namespace NxPlx.Application.Core
             {
                 Id = productionCompany.Id,
                 Name = productionCompany.Name,
-                Logo = productionCompany.LogoPath,
+                LogoPath = productionCompany.LogoPath,
                 LogoBlurHash = productionCompany.LogoBlurHash,
                 OriginCountry = productionCompany.OriginCountry
             });
@@ -199,7 +199,7 @@ namespace NxPlx.Application.Core
             SetMapping<Network, NetworkDto>(network => new NetworkDto
             {
                 Name = network.Name,
-                Logo = network.LogoPath,
+                LogoPath = network.LogoPath,
                 LogoBlurHash = network.LogoBlurHash,
                 OriginCountry = network.OriginCountry
             });
