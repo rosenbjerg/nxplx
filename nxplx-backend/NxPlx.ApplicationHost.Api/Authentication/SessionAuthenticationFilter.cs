@@ -22,7 +22,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
 
             if (!string.IsNullOrEmpty(sessionToken))
             {
-                var databaseContext = context.RequestServices.GetService<DatabaseContext>();
+                await using var databaseContext = context.RequestServices.GetService<DatabaseContext>();
                 var session = await databaseContext.UserSessions
                     .Where(s => s.Id == sessionToken).Include(s => s.User)
                     .AsNoTracking().FirstOrDefaultAsync();
@@ -39,7 +39,6 @@ namespace NxPlx.ApplicationHost.Api.Authentication
                         return session;
                     }
                 }
-
                 sessionService.AttachSessionToken(context.Response, null);
             }
 
