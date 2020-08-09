@@ -59,13 +59,13 @@ export default class LibraryManagement extends Component<Props, State> {
         createSnackbar(msg, { timeout: 1500 });
     };
     private deleteLibrary = (library:Library) => async () => {
-        const response = await http.delete('/api/library', [ library.id ]);
+        const response = await http.delete('/api/library', library.id);
         if (response.ok) this.setState({ libraries: remove(this.state.libraries, library) });
         const msg = response.ok ? `${library.name} deleted!` : 'Unable to remove the library :/';
         createSnackbar(msg, { timeout: 1500 });
     };
     private indexAllLibraries = async () => {
-        const response = await http.post('/api/indexing', [ this.state.libraries.map(lib => lib.id) ]);
+        const response = await http.post('/api/indexing', this.state.libraries.map(lib => lib.id));
         const msg = response.ok ? 'Indexing all libraries..' : 'Unable to start indexing :/';
         createSnackbar(msg, { timeout: 1500 });
     };
