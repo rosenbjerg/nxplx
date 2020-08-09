@@ -3,6 +3,7 @@ nxplx-backend/NxPlx/database/**
 config.json
 *.dll
 **/.idea/**
+**/NxPlx.ApplicationHost.Api/public/*
 # Created by https://www.gitignore.io/api/node,rider,webstorm,visualstudio
 # Edit at https://www.gitignore.io/?templates=node,rider,webstorm,visualstudio
 
