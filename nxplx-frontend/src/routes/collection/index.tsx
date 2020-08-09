@@ -20,7 +20,7 @@ interface State {
 
 export default class Collection extends Component<Props, State> {
     public componentDidMount(): void {
-        http.get(`/api/film/collection/detail/${this.props.id}`)
+        http.get(`/api/film/collection/${this.props.id}/details`)
             .then(response => response.json())
             .then((details: MovieCollection) => {
                 console.log(details);
@@ -53,11 +53,10 @@ export default class Collection extends Component<Props, State> {
                                         title={movie.title}
                                         href={`/${movie.kind}/${movie.id}`}
                                         image={imageUrl(movie.posterPath, 190, details.posterPath)}
-                                        imageBlurHash={movie.posterPath}
+                                        imageBlurHash={movie.posterBlurHash || details.posterBlurHash}
                                         blurhashWidth={20}
                                         blurhashHeight={32}
                                     />
-
                                 )
                             )}
                     </div>

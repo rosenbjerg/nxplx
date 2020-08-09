@@ -11,13 +11,13 @@ namespace NxPlx.Core.Services
     {
         private readonly DatabaseContext _context;
         private readonly TempFileService _tempFileService;
-        private readonly ImageCreator _imageCreator;
+        private readonly ImageCreationService _imageCreationService;
 
-        public EditDetailsService(DatabaseContext context, TempFileService tempFileService, ImageCreator imageCreator)
+        public EditDetailsService(DatabaseContext context, TempFileService tempFileService, ImageCreationService imageCreationService)
         {
             _context = context;
             _tempFileService = tempFileService;
-            _imageCreator = imageCreator;
+            _imageCreationService = imageCreationService;
         }
         public async Task<bool> SetImage(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
         {
@@ -43,8 +43,8 @@ namespace NxPlx.Core.Services
             var tempFile = await SaveTempImage(imageExtension, imageStream);
             var task = imageType switch
             {
-                ImageType.Poster => _imageCreator.SetPoster(series, tempFile, $"{Guid.NewGuid()}.jpg"),
-                ImageType.Backdrop => _imageCreator.SetBackdrop(series, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Poster => _imageCreationService.SetPoster(series, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Backdrop => _imageCreationService.SetBackdrop(series, tempFile, $"{Guid.NewGuid()}.jpg"),
                 _ => throw new ArgumentOutOfRangeException()
             };
             
@@ -60,7 +60,7 @@ namespace NxPlx.Core.Services
             var tempFile = await SaveTempImage(imageExtension, imageStream);
             var task = imageType switch
             {
-                ImageType.Poster => _imageCreator.SetPoster(season, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Poster => _imageCreationService.SetPoster(season, tempFile, $"{Guid.NewGuid()}.jpg"),
                 _ => throw new ArgumentOutOfRangeException()
             };
             
@@ -75,8 +75,8 @@ namespace NxPlx.Core.Services
             var tempFile = await SaveTempImage(imageExtension, imageStream);
             var task = imageType switch
             {
-                ImageType.Poster => _imageCreator.SetPoster(film, tempFile, $"{Guid.NewGuid()}.jpg"),
-                ImageType.Backdrop => _imageCreator.SetBackdrop(film, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Poster => _imageCreationService.SetPoster(film, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Backdrop => _imageCreationService.SetBackdrop(film, tempFile, $"{Guid.NewGuid()}.jpg"),
                 _ => throw new ArgumentOutOfRangeException()
             };
             
@@ -91,8 +91,8 @@ namespace NxPlx.Core.Services
             var tempFile = await SaveTempImage(imageExtension, imageStream);
             var task = imageType switch
             {
-                ImageType.Poster => _imageCreator.SetPoster(collection, tempFile, $"{Guid.NewGuid()}.jpg"),
-                ImageType.Backdrop => _imageCreator.SetBackdrop(collection, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Poster => _imageCreationService.SetPoster(collection, tempFile, $"{Guid.NewGuid()}.jpg"),
+                ImageType.Backdrop => _imageCreationService.SetBackdrop(collection, tempFile, $"{Guid.NewGuid()}.jpg"),
                 _ => throw new ArgumentOutOfRangeException()
             };
             

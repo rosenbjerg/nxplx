@@ -46,8 +46,8 @@ export default class LibraryManagement extends Component<Props, State> {
                         ))
                     }
                 </ul>
-                <button class="bordered" onClick={() => this.setState({ createLibraryModalOpen: true })}>{translate('create-library')}</button>
-                <button class="bordered" onClick={this.indexAllLibraries}>{translate('index-all-libraries')}</button>
+                <button class="bordered" onClick={() => this.setState({ createLibraryModalOpen: true })}>{translate('create library')}</button>
+                <button class="bordered" onClick={this.indexAllLibraries}>{translate('index all libraries')}</button>
             </div>
         );
     }

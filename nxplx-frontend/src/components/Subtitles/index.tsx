@@ -55,6 +55,6 @@ export default class SubtitleSelector extends Component<Props, State> {
         // @ts-ignore
         const lang = event.target.value;
         if (!lang) { return; }
-        http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, { value: lang });
+        http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, lang);
     }
 }

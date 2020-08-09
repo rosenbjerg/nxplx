@@ -46,7 +46,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
                     {dirs.map(d => (
-                        <li onClick={() => this.setCwd(`${cwd}/${d}`)} key={d}>{d}</li>
+                        <li onClick={() => this.setCwd(`${cwd === '/' ? '' : cwd}/${d}`)} key={d}>{d}</li>
                     ))}
                 </ul>
             </div>);
@@ -57,8 +57,8 @@ export default class DirectoryBrowser extends Component<Props, State> {
     private up = () => {
         const cwd = this.state.cwd;
         const index = cwd.lastIndexOf('/');
-        const path = index === 0 ? cwd : cwd.substr(0, index);
-        this.setCwd(path);
+        const path = index === -1 ? cwd : cwd.substr(0, index);
+        this.setCwd(path || '/');
     }
 
 }

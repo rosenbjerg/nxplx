@@ -26,7 +26,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         
         [HttpGet("languages/{kind}/{fileId}")]
         public Task<IEnumerable<string>> LanguagesForFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
-            => _subtitleService.FindSubtitles(kind, fileId);
+            => _subtitleService.FindSubtitleLanguages(kind, fileId);
 
         [HttpGet("preference/{kind}/{fileId}")]
         public Task<string> GetLanguagePreference([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)

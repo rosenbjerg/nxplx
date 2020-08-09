@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Buffers;
+using System.IO;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -39,7 +40,9 @@ namespace NxPlx.Infrastructure.Broadcasting
                 {
                     message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
                 }
-                catch (OperationCanceledException) { return; }
+                catch (OperationCanceledException) { break; }
+                catch (IOException) { break; }
+                
                 if (message.MessageType == WebSocketMessageType.Close)
                     break;
 

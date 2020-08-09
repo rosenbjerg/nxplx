@@ -68,14 +68,14 @@ export default class SessionManager extends Component<Props, State> {
                     <tbody>
                     {sessions.map(session => (
                         <tr key={session.id}>
-                            <td title={translate('browser-on-device', `${session.browser.name} ${session.browser.version}`, `${session.os.name} ${session.os.version}`)}>
-                                {translate('browser-on-device', session.browser.name, session.os.name)}
+                            <td title={translate('browser on device', `${session.browser.name} ${session.browser.version}`, `${session.os.name} ${session.os.version}`)}>
+                                {translate('browser on device', session.browser.name, session.os.name)}
                             </td>
                             <td title={session.expiration.toLocaleString()}>
-                                {` - ${translate('expires-in')} ${session.expires}`}
+                                {` - ${translate('expires in')} ${session.expires}`}
                             </td>
                             <td>
-                                <button title={translate('close-this-session')} onClick={this.closeSession(session)}
+                                <button title={translate('close this session')} onClick={this.closeSession(session)}
                                         class="material-icons bordered">close
                                 </button>
                             </td>

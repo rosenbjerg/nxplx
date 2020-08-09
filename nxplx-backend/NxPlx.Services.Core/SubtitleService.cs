@@ -48,7 +48,7 @@ namespace NxPlx.Core.Services
                 .FirstOrDefaultAsync();
             return preference ?? "none";
         }
-        public async Task<IEnumerable<string>> FindSubtitles(MediaFileType mediaType, int id)
+        public async Task<IEnumerable<string>> FindSubtitleLanguages(MediaFileType mediaType, int id)
         {
             return await GetMediaFileQueryable(id, mediaType).SelectMany(f => f.Subtitles).Select(s => s.Language).ToListAsync();
         }

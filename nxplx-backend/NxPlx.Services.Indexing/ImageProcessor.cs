@@ -17,19 +17,19 @@ namespace NxPlx.Services.Index
         private readonly DatabaseContext _context;
         private readonly IDetailsApi _detailsApi;
         private readonly TempFileService _tempFileService;
-        private readonly ImageCreator _imageCreator;
+        private readonly ImageCreationService _imageCreationService;
 
-        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, ImageCreator imageCreator)
+        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, ImageCreationService imageCreationService)
         {
             _context = context;
             _detailsApi = detailsApi;
             _tempFileService = tempFileService;
-            _imageCreator = imageCreator;
+            _imageCreationService = imageCreationService;
         }
         
         [Queue(JobQueueNames.ImageProcessing)]
         [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessFilmDetails(long filmDetailsId)
+        public async Task ProcessFilmDetails(int filmDetailsId)
         {
             var filmDetails = await _context.FilmDetails.FindAsync(filmDetailsId);
 
@@ -42,7 +42,7 @@ namespace NxPlx.Services.Index
 
         [Queue(JobQueueNames.ImageProcessing)]
         [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessMovieCollection(long movieCollectionId)
+        public async Task ProcessMovieCollection(int movieCollectionId)
         {
             var movieCollection = await _context.MovieCollection.FindAsync(movieCollectionId);
 
@@ -121,8 +121,8 @@ namespace NxPlx.Services.Index
                 if (!paths.TryGetValue(episodeDetails.EpisodeNumber, out var path))
                     continue;
                 
-                var snapshotTempPath = await _imageCreator.CreateSnapshot(path, 0.2);
-                await _imageCreator.SetStill(episodeDetails, snapshotTempPath, $"{Guid.NewGuid()}.jpg");
+                var snapshotTempPath = await _imageCreationService.CreateSnapshot(path, 0.2);
+                await _imageCreationService.SetStill(episodeDetails, snapshotTempPath, $"{Guid.NewGuid()}.jpg");
             }
 
             await _context.SaveChangesAsync();
@@ -133,8 +133,10 @@ namespace NxPlx.Services.Index
             if (string.IsNullOrEmpty(imageOwner.PosterPath) || !string.IsNullOrEmpty(imageOwner.PosterBlurHash)) return false;
             
             var tempFile = _tempFileService.GetFilename("download", ".jpg");
-            await _detailsApi.DownloadImage(342, imageOwner.PosterPath, tempFile);
-            await _imageCreator.SetPoster(imageOwner, tempFile, imageOwner.PosterPath);
+            var downloaded = await _detailsApi.DownloadImage(342, imageOwner.PosterPath, tempFile);
+            if (!downloaded)
+                return false;
+            await _imageCreationService.SetPoster(imageOwner, tempFile, imageOwner.PosterPath);
             return true;
         }
 
@@ -143,8 +145,10 @@ namespace NxPlx.Services.Index
             if (string.IsNullOrEmpty(imageOwner.BackdropPath) || !string.IsNullOrEmpty(imageOwner.BackdropBlurHash)) return false;
             
             var tempFile = _tempFileService.GetFilename("download", ".jpg");
-            await _detailsApi.DownloadImage(1280, imageOwner.BackdropPath, tempFile);
-            await _imageCreator.SetBackdrop(imageOwner, tempFile, imageOwner.BackdropPath);
+            var downloaded = await _detailsApi.DownloadImage(1280, imageOwner.BackdropPath, tempFile);
+            if (!downloaded)
+                return false;
+            await _imageCreationService.SetBackdrop(imageOwner, tempFile, imageOwner.BackdropPath);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -153,8 +157,10 @@ namespace NxPlx.Services.Index
             if (string.IsNullOrEmpty(imageOwner.LogoPath) || !string.IsNullOrEmpty(imageOwner.LogoBlurHash)) return false;
             
             var tempFile = _tempFileService.GetFilename("download", Path.GetExtension(imageOwner.LogoPath));
-            await _detailsApi.DownloadImage(154, imageOwner.LogoPath, tempFile);
-            await _imageCreator.SetLogo(imageOwner, tempFile, imageOwner.LogoPath);
+            var downloaded = await _detailsApi.DownloadImage(154, imageOwner.LogoPath, tempFile);
+            if (!downloaded)
+                return false;
+            await _imageCreationService.SetLogo(imageOwner, tempFile, imageOwner.LogoPath);
             await _context.SaveChangesAsync();
             return true;
         }

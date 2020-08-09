@@ -22,7 +22,7 @@ export default class Home extends Component<Props, State> {
     };
 
     public componentDidMount() : void {
-        http.get(`/api/film/detail/${this.props.id}`)
+        http.get(`/api/film/${this.props.id}/details`)
             .then(response => response.json())
             .then(details => {
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdrop, 1280)}");`;

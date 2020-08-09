@@ -1,15 +1,20 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
@@ -44,7 +49,7 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<HostingOptions>(services);
             AddOptions<LoggingOptions>(services);
 
-            services.AddSpaStaticFiles(options => options.RootPath = Path.Combine(Directory.GetCurrentDirectory(), "public"));
+            services.AddSpaStaticFiles(options => options.RootPath = "public");
             services.AddHangfireServer(options =>
             {
                 options.WorkerCount = Math.Max(Environment.ProcessorCount - 1, 2);
@@ -80,7 +85,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
             services.AddScoped(typeof(TempFileService));
-            services.AddScoped(typeof(ImageCreator));
+            services.AddScoped(typeof(ImageCreationService));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
             services.AddScoped(typeof(AuthenticationService));
@@ -113,7 +118,6 @@ namespace NxPlx.ApplicationHost.Api
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseSpaStaticFiles();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
             app.UseForwardedHeaders();
             app.UseMiddleware<LoggingInterceptorMiddleware>();
@@ -125,9 +129,11 @@ namespace NxPlx.ApplicationHost.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
             }
             
+            app.UseStaticFiles();
             app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
+            app.Use(FallbackMiddlewareHandler);
         }
 
         private static void InitializeDatabase(DatabaseContext databaseContext)
@@ -143,6 +149,30 @@ namespace NxPlx.ApplicationHost.Api
                 });
                 databaseContext.SaveChanges();
             }
+        }
+        
+        private static Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
+        {
+            var path = context.Request.Path.ToString().TrimStart('/');
+            var extension = Path.GetExtension(path);
+            var file = Path.Combine("public", path);
+            var fileInfo = File.Exists(file)
+                ? new FileInfo(file)
+                : new FileInfo(Path.Combine("public", "index.html"));
+            if (!context.Response.HasStarted)
+            {
+                if (HashRegex.IsMatch(path))
+                    context.Response.Headers.Add("Cache-Control", "max-age=2592000");
+                
+                var provider = new FileExtensionContentTypeProvider();
+                if(!provider.TryGetContentType(fileInfo.Name, out var contentType))
+                    contentType = "application/octet-stream";
+                context.Response.ContentType = contentType;
+                context.Response.StatusCode = 200;
+            }
+            await context.Response.SendFileAsync(new PhysicalFileInfo(fileInfo));
+            await context.Response.CompleteAsync();
         }
     }
 }

@@ -10,12 +10,12 @@ using NxPlx.Models;
 
 namespace NxPlx.Core.Services
 {
-    public class ImageCreator
+    public class ImageCreationService
     {
         private readonly TempFileService _tempFileService;
         private readonly string _imageFolder;
 
-        public ImageCreator(FolderOptions folderOptions, TempFileService tempFileService)
+        public ImageCreationService(FolderOptions folderOptions, TempFileService tempFileService)
         {
             _tempFileService = tempFileService;
             _imageFolder = folderOptions.Images;
@@ -90,9 +90,9 @@ namespace NxPlx.Core.Services
             await using var imageStream = File.OpenRead(tempMiniature);
             using var image = Image.FromStream(imageStream);
             if (image.Width > image.Height)
-                return encoder.Encode(image, Math.Min((int)(3 * (image.Width / (double)image.Height)), 6), 3);
+                return encoder.Encode(image, 4, 3);
             else
-                return encoder.Encode(image, 3, Math.Min((int)(3 * (image.Height / (double)image.Width)), 6));
+                return encoder.Encode(image, 3, 4);
         }
         
         private static async Task ResizeImage(string imagePath, int width, int height, string outputPath)

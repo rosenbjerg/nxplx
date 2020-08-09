@@ -39,10 +39,8 @@ export default class VideoPlayer extends Component<Props, State> {
 
     public componentDidMount(): void {
         if (this.video !== undefined) {
-            this.video.addEventListener('fullscreenchange', ev => {{
-                console.log(ev, this.videoContainer);
-            }})
             this.video.volume = volume;
+            console.log(this.videoContainer);
         }
 
         // cast.framework.CastContext.getInstance().setOptions({
@@ -68,8 +66,7 @@ export default class VideoPlayer extends Component<Props, State> {
 
     public render({ poster, src, startTime, subtitles }: Props) {
         return (
-            <div ref={this.bindVideoContainer}
-                 class={style.videoContainer}>
+            <div ref={this.bindVideoContainer} class={style.videoContainer}>
                 <video key={src}
                        ref={this.bindVideo}
                        class={style.video}

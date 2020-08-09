@@ -14,6 +14,7 @@ interface UserPermission {
 
 interface Props {
     user?:User
+    onSave: () => any
 }
 interface State {
     currentUser?:User
@@ -63,20 +64,20 @@ export default class UserPermissions extends Component<Props, State> {
         const response = await http.put('/api/library/permissions', form, false);
         if (response.ok) {
             createSnackbar('Permissions saved!', { timeout: 2000 });
+            this.props.onSave();
             this.setState({
                 currentUser: undefined,
                 permissions: undefined
             })
-
         }
     };
 
     public render(props:Props, { permissions }:State) {
-        if (!props.user || permissions === undefined) return <span/>;
+        if (!props.user || permissions === undefined) return null;
 
         return (
             <div class={style.container}>
-                <h3>{translate('libraries-username-has-access-to', props.user.username)}</h3>
+                <h3>{translate('libraries username has access to', props.user.username)}</h3>
                 {permissions.map((up, i) => (
                     <div key={up.library.id}>
                         <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>

@@ -14,7 +14,7 @@ export default class CreateUserModal extends Component<Props> {
         return (
             <Modal onDismiss={props.onDismiss}>
             <span>
-                <h2>{translate('create-user')}</h2>
+                <h2>{translate('create user')}</h2>
                 <form class="gapped" onSubmit={this.submitNewUser}>
                     <input class="inline-edit fullwidth gapped" name="username" minLength={4} maxLength={20} placeholder={translate('username')} type="text" required/>
                     <input class="inline-edit fullwidth gapped" name="email" placeholder={translate('email')} type="email"/>
@@ -22,8 +22,8 @@ export default class CreateUserModal extends Component<Props> {
                         <option value="user">{translate('user')}</option>
                         <option value="admin">{translate('admin')}</option>
                     </select>
-                    <input class="inline-edit fullwidth gapped" name="password1" placeholder={translate('initial-password')} minLength={6} maxLength={50} type="password" required/>
-                    <input class="inline-edit fullwidth gapped" name="password2" placeholder={translate('initial-password-again')} minLength={6} maxLength={50} type="password" required/>
+                    <input class="inline-edit fullwidth gapped" name="password1" placeholder={translate('initial password')} minLength={6} maxLength={50} type="password" required/>
+                    <input class="inline-edit fullwidth gapped" name="password2" placeholder={translate('initial password again')} minLength={6} maxLength={50} type="password" required/>
 
                     <button type="submit" class="material-icons bordered right">done</button>
                 </form>

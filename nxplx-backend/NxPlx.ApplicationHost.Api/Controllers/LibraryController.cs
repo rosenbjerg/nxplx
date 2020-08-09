@@ -65,9 +65,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         
         [HttpPut("permissions")]
         [RequiresAdminPermissions]
-        public async Task<IActionResult> SetLibraryAccess([FromForm, Required]int userId, [FromForm, Required]List<int> libraryIds)
+        public async Task<IActionResult> SetLibraryAccess([FromForm, Required]int userId, [FromForm, Required]List<int> libraries)
         {
-            var success = await _libraryService.SetLibraryAccess(userId, libraryIds);
+            var success = await _libraryService.SetLibraryAccess(userId, libraries);
             if (!success) return BadRequest();
             return Ok();
         }

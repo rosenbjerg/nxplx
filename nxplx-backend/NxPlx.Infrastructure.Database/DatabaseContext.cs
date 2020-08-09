@@ -28,7 +28,6 @@ namespace NxPlx.Services.Database
         public DbSet<DbSeriesDetails> SeriesDetails { get; set; } = null!;
         public DbSet<Library> Libraries { get; set; } = null!;
         public DbSet<SubtitleFile> SubtitleFiles { get; set; } = null!;
-        
         public DbSet<SubtitlePreference> SubtitlePreferences { get; set; } = null!;
         public DbSet<WatchingProgress> WatchingProgresses { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
@@ -60,11 +59,11 @@ namespace NxPlx.Services.Database
 
             ConfigureSeriesDetailsJoinEntities(modelBuilder);
             
-            modelBuilder.Entity<SubtitlePreference>().HasKey(sp => new { sp.UserId, sp.FileId });
+            modelBuilder.Entity<SubtitlePreference>().HasKey(sp => new { sp.UserId, sp.FileId, sp.MediaType });
             modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.UserId);
             modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.FileId);
             
-            modelBuilder.Entity<WatchingProgress>().HasKey(wp => new { wp.UserId, wp.FileId });
+            modelBuilder.Entity<WatchingProgress>().HasKey(wp => new { wp.UserId, wp.FileId, wp.MediaType });
             modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.UserId);
             modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.FileId);
             

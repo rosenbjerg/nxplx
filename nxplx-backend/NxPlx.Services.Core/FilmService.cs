@@ -36,7 +36,7 @@ namespace NxPlx.Core.Services
         }
         public async Task<MovieCollectionDto> FindCollectionByDetails(int id)
         {
-            var filmFiles = await _databaseContext.FilmFiles.AsNoTracking().Where(ff => ff.FilmDetails.BelongsInCollectionId == id).ToListAsync();
+            var filmFiles = await _databaseContext.FilmFiles.Where(ff => ff.FilmDetails.BelongsInCollectionId == id).ToListAsync();
 
             var collection = _dtoMapper.Map<MovieCollection, MovieCollectionDto>(filmFiles.First().FilmDetails.BelongsInCollection);
             collection!.Movies = _dtoMapper.Map<DbFilmDetails, OverviewElementDto>(filmFiles.Select(ff => ff.FilmDetails)).ToList();

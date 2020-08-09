@@ -220,7 +220,7 @@ services:
       NxPlx_ConnectionStrings__Pgsql: Host=nxplx-database;Database=nxplx_db;Username=postgres;Password=${args.postgresPassword}
       NxPlx_ConnectionStrings__HangfirePgsql: Host=nxplx-database;Database=nxplx_job_db;Username=postgres;Password=${args.postgresPassword}
       NxPlx_ApiKey__TmdbKey: ${args.tmdbApiKey}
-      
+
     volumes:
       - ${args.dataDir}/webapi:/data
       - ${args.mediaRoot}:/media:ro

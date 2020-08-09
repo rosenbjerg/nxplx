@@ -31,8 +31,8 @@ export default class SelectPlaybackMode extends Component<Props> {
                     <h2>{translate('which playback mode')}</h2>
                     {playbackModes.map(mode => (
                         <div style="padding: 8px; margin-top: 8px" class="bordered" onClick={() => this.setPlaybackModeAndPlayNext(mode)}>
-                            <h3>{translate(`playback-${mode}`)}</h3>
-                            <p>{translate(`playback-${mode}-desc`)}</p>
+                            <h3>{translate(`playback ${mode}`)}</h3>
+                            <p>{translate(`playback ${mode} desc`)}</p>
                         </div>
                     ))}
                 </div>

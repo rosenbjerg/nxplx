@@ -43,8 +43,8 @@ export default class UserManagement extends Component<Props, State> {
                         </li>
                     ))}
                 </ul>
-                <button class="bordered" onClick={() => this.setState({ createUserModalOpen: true })}>{translate('create-user')}</button>
-                <UserPermissions user={selectedUser}/>
+                <button class="bordered" onClick={() => this.setState({ createUserModalOpen: true })}>{translate('create user')}</button>
+                <UserPermissions user={selectedUser} onSave={() => this.setState({ selectedUser: undefined })}/>
             </div>
         )
     }
