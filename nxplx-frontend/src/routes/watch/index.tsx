@@ -10,6 +10,7 @@ import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 import { createSnackbar } from "@snackbar/core";
+import storage from "../../utils/storage";
 
 
 interface ContinueWatching {
@@ -27,8 +28,6 @@ interface State {
 }
 
 export default class Watch extends Component<Props, State> {
-    private playNextMode = "default";
-
     private videoEvents = CreateEventBroker();
     private previousUnload?: any;
     private playerTime = 0;
@@ -63,6 +62,7 @@ export default class Watch extends Component<Props, State> {
 
     public componentWillUnmount(): void {
         this.saveProgress();
+        window.onbeforeunload = this.previousUnload;
     }
 
     public componentDidMount(): void {
@@ -88,11 +88,14 @@ export default class Watch extends Component<Props, State> {
                                 snackbar.destroy();
                                 this.tryPlayNext();
                             }
+                        },
+                        {
+                            text: 'X',
+                            callback: (_, snackbar) => snackbar.destroy()
                         }
                     ]
                 })
             }
-
         });
         this.load();
     }
@@ -104,7 +107,7 @@ export default class Watch extends Component<Props, State> {
     }
 
     private tryPlayNext() {
-        http.getJson<ContinueWatching>(`/api/series/next/${this.state.info.fid}?mode=${this.playNextMode}`).then(next => {
+        http.getJson<ContinueWatching>(`/api/series/file/${this.state.info.fid}/next?mode=${storage(sessionStorage).getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
@@ -112,6 +115,7 @@ export default class Watch extends Component<Props, State> {
 
     private load = () => {
         const { kind, fid } = this.props;
+        this.suggestNext = kind === 'series';
         Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
             http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
@@ -128,7 +132,6 @@ export default class Watch extends Component<Props, State> {
             if (this.playerTime > 5) {
                 http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}?time=${this.playerTime}`);
             }
-            window.onbeforeunload = this.previousUnload;
         }
     };
 }

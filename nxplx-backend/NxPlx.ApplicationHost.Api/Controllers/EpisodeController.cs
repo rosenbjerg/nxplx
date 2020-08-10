@@ -49,7 +49,12 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         
         [HttpGet("{seriesId}/next")]
         [Send404WhenNull]
-        public Task<NextEpisodeDto?> Next([FromRoute, Required] int seriesId, [FromQuery]int? season, [FromQuery]int? episode, [FromQuery]string? mode) 
+        public Task<NextEpisodeDto?> Next([FromRoute, Required] int seriesId, [FromQuery] int? season, [FromQuery] int? episode, [FromQuery] string? mode) 
             => _nextEpisodeService.TryFindNextEpisode(seriesId, season, episode, mode ?? "default");
+        
+        [HttpGet("file/{fileId}/next")]
+        [Send404WhenNull]
+        public Task<NextEpisodeDto?> Next([FromRoute, Required] int fileId, [FromQuery] string? mode) 
+            => _nextEpisodeService.TryFindNextEpisode(fileId, mode ?? "default");
     }
 }

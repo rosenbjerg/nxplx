@@ -77,5 +77,12 @@ namespace NxPlx.Core.Services
                 .ThenBy(episode => episode.EpisodeNumber)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<NextEpisodeDto?> TryFindNextEpisode(int fileId, string mode)
+        {
+            var episodeFile = await _context.EpisodeFiles.FirstOrDefaultAsync(ef => ef.Id == fileId);
+            if (episodeFile?.SeriesDetailsId == null) return null;
+            return await TryFindNextEpisode(episodeFile.SeriesDetailsId.Value, episodeFile.SeasonNumber, episodeFile.EpisodeNumber, mode);
+        }
     }
 }
