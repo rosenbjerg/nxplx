@@ -15,15 +15,24 @@ namespace NxPlx.ApplicationHost.Api.Authentication
 {
     public class SessionAuthenticationFilter : IAsyncAuthorizationFilter
     {
-        internal static async Task<UserSession?> FindSession(HttpContext context)
+        private readonly OperationContext _operationContext;
+        private readonly IHttpSessionService _sessionService;
+        private readonly DatabaseContext _databaseContext;
+
+        public SessionAuthenticationFilter(OperationContext operationContext, IHttpSessionService sessionService, DatabaseContext databaseContext)
         {
-            var sessionService = context.RequestServices.GetService<IHttpSessionService>();
-            var sessionToken = sessionService.ExtractSessionToken(context.Request);
+            _operationContext = operationContext;
+            _sessionService = sessionService;
+            _databaseContext = databaseContext;
+        }
+
+        private async Task<UserSession?> FindSession(HttpContext context)
+        {
+            var sessionToken = _sessionService.ExtractSessionToken(context.Request);
 
             if (!string.IsNullOrEmpty(sessionToken))
             {
-                var databaseContext = context.RequestServices.GetService<DatabaseContext>();
-                var session = await databaseContext.UserSessions
+                var session = await _databaseContext.UserSessions
                     .Where(s => s.Id == sessionToken).Include(s => s.User)
                     .AsNoTracking().FirstOrDefaultAsync();
 
@@ -31,8 +40,8 @@ namespace NxPlx.ApplicationHost.Api.Authentication
                 {
                     if (session.Expiration < DateTime.UtcNow)
                     {
-                        databaseContext.Remove(session);
-                        await databaseContext.SaveChangesAsync();
+                        _databaseContext.Remove(session);
+                        await _databaseContext.SaveChangesAsync();
                     }
                     else
                     {
@@ -40,7 +49,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
                     }
                 }
 
-                sessionService.AttachSessionToken(context.Response, null);
+                _sessionService.AttachSessionToken(context.Response, null);
             }
 
             return null;
@@ -52,9 +61,8 @@ namespace NxPlx.ApplicationHost.Api.Authentication
 
             if (session != null)
             {
-                var operationContext = context.HttpContext.RequestServices.GetService<OperationContext>();
-                operationContext.User = session.User;
-                operationContext.Session = session;
+                _operationContext.User = session.User;
+                _operationContext.Session = session;
             }
             else context.Result = new UnauthorizedResult();
         }
