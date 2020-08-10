@@ -989,15 +989,15 @@
     defer-to-connect "^1.0.1"
 
 "@teamsupercell/typings-for-css-modules-loader@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@teamsupercell/typings-for-css-modules-loader/-/typings-for-css-modules-loader-2.2.0.tgz#235b3ba7135cde3507c1d5daf06ae5a11088074f"
-  integrity sha512-lDIHyUL//uqiSLgvN++wAGODFn1dEqi3lvBdpEUQXqOSgAr5NwEK2Ggi3n61KvjLgu5/Z82uTsuyBXbDpccLtg==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@teamsupercell/typings-for-css-modules-loader/-/typings-for-css-modules-loader-2.2.1.tgz#747017a9688805ba14e5e46200af03d40ee22bc2"
+  integrity sha512-Pv+OXrZAVwTMhUUD5NkbjNsxNSzzWrtqwyJ3RQ6KONdlS5QBnR7RAU3ygt3XJykxjEknokZK0H47C3kjxSPTHA==
   dependencies:
     camelcase "^5.3.1"
     loader-utils "1.2.3"
     schema-utils "^2.0.1"
   optionalDependencies:
-    prettier "^1.18.2"
+    prettier "*"
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
@@ -6772,12 +6772,7 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^1.18.2:
-  version "1.19.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
-  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
-
-prettier@^2.0.5:
+prettier@*, prettier@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.0.5.tgz#d6d56282455243f2f92cc1716692c08aa31522d4"
   integrity sha512-7PtVymN48hGcO4fGjybyBSIWDsLU4H4XlvOHfq91pz9kkGlonzwTfYkaIEwiRg/dAJF9YlbsduBAgtYLi+8cFg==
