@@ -11,8 +11,10 @@ NxPlx is designed with deployment using Docker in mind
 * [x] persist subtitle choice
 * [x] persist watching progress
 * [x] fast seeking
+* [x] blurhash image placeholder
 * [x] automated [multi-arch docker](https://hub.docker.com/r/mrosenbjerg/nxplx-webapi/tags) build through GitHub Actions
 * [x] ffprobe file analysis
+* [x] snapshot creatin using ffmpeg
 
 ### Milestones
 * [ ] ffmpeg transcode profile generation
@@ -31,7 +33,7 @@ NxPlx is designed with deployment using Docker in mind
 
 #### Technologies used
 - Docker
-- RedHttpServer (ASP.NET Core)
+- ASP.NET Core
 - Postgres /w Entity Framework Core
 - Redis
 - Preact

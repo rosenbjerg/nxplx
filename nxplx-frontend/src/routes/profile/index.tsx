@@ -5,7 +5,7 @@ import Loading from "../../components/Loading";
 import SessionManager from "../../components/SessionManager";
 import http from "../../utils/http";
 import { setLocale, translate } from "../../utils/localisation";
-import storage from "../../utils/localstorage";
+import storage from "../../utils/storage";
 import { User } from "../../utils/models";
 import * as style from "./style.css";
 
