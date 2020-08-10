@@ -2,7 +2,7 @@ import Modal from "../../components/Modal";
 import { translate } from "../../utils/localisation";
 import { Component, h } from "preact";
 import http from "../../utils/http";
-import storage from "../../utils/localstorage";
+import storage from "../../utils/storage";
 import { route } from "preact-router";
 import { createSnackbar } from "@snackbar/core";
 

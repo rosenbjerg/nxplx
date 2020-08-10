@@ -1,6 +1,6 @@
 import { Component, h } from "preact";
 import { Events } from "../../utils/events";
-import storage from "../../utils/localstorage";
+import storage from "../../utils/storage";
 import * as style from "./style.css";
 
 interface TextTrack {

@@ -13,7 +13,7 @@ import Series from "../routes/series";
 import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
-import storage from "../utils/localstorage";
+import storage from "../utils/storage";
 import Header from "./Header";
 import Loading from "./Loading";
 
