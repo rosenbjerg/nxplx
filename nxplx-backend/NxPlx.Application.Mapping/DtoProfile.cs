@@ -98,8 +98,6 @@ namespace NxPlx.Application.Mapping
             
             CreateMap<EpisodeFile, NextEpisodeDto>()
                 .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dst => dst.PosterPath, opt => opt.MapFrom(src => src.SeriesDetails.PosterPath))
-                .ForMember(dst => dst.PosterBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.PosterBlurHash))
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"));
 
             CreateMap<SubtitleFile, SubtitleFileDto>();
