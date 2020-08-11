@@ -2,6 +2,8 @@ import { Component, h } from "preact";
 import { Events } from "../../utils/events";
 import Store from "../../utils/storage";
 import * as style from "./style.css";
+import { createSnackbar } from "@snackbar/core";
+import { useEffect } from "preact/hooks";
 
 interface TextTrack {
     displayName: string
@@ -36,8 +38,10 @@ const setMuted = mu => Store.local.setEntry("player_muted", muted = mu);
 export default class VideoPlayer extends Component<Props, State> {
     private video?: HTMLVideoElement;
     private videoContainer?: HTMLElement;
+    private latestTime: number = 0;
+    private fullscreen: boolean = false;
 
-    public componentDidMount(): void {
+    componentDidMount(): void {
         if (this.video !== undefined) {
             this.video.volume = volume;
             console.log(this.videoContainer);
@@ -60,13 +64,15 @@ export default class VideoPlayer extends Component<Props, State> {
         // });
     }
 
-    public shouldComponentUpdate(nextProps: Readonly<Props>): boolean {
+    shouldComponentUpdate(nextProps: Readonly<Props>): boolean {
         return this.props.src !== nextProps.src;
     }
 
-    public render({ poster, src, startTime, subtitles }: Props) {
+    render({ poster, src, startTime, subtitles }: Props) {
+        useEffect(this.fullscreenPrompt, [ src ]);
         return (
             <div ref={this.bindVideoContainer} class={style.videoContainer}>
+                <button style="z-index: 20" onClick={this.exitFullscreen} class="material-icons noborder">close</button>
                 <video key={src}
                        ref={this.bindVideo}
                        class={style.video}
@@ -79,18 +85,46 @@ export default class VideoPlayer extends Component<Props, State> {
                        onPlay={this.onPlay}
                        onPause={this.onPause}
                        onEnded={this.onEnded}>
-                    <source src={`${src}#t=${startTime}`} type="video/mp4"/>
+                    <source src={`${src}#t=${Math.max(startTime, this.latestTime)}`} type="video/mp4"/>
                     {subtitles.map(track => (
-                        <track default={track.default} src={`${track.path}#${(startTime)}`} kind="captions"
-                               srcLang={track.language} label={track.displayName}/>
+                        <track default={track.default} src={track.path} kind="captions" srcLang={track.language} label={track.displayName}/>
                     ))}
                 </video>
             </div>
         );
     }
 
+    private exitFullscreen = () => {
+        document.exitFullscreen();
+        this.fullscreen = false;
+    }
+
+    private fullscreenPrompt = () => {
+        if (!this.fullscreen) {
+            createSnackbar('Enter fullscreen?', {
+                timeout: 7000,
+                actions: [
+                    {
+                        text: 'Yes',
+                        callback: (_, snackbar) => {
+                            if (this.videoContainer) this.videoContainer.requestFullscreen().then(() => this.fullscreen = true);
+                            snackbar.destroy();
+                        }
+                    },
+                    {
+                        text: 'X',
+                        callback: (_, snackbar) => snackbar.destroy()
+                    }
+                ]
+            });
+        }
+        if (this.video) this.video.focus();
+    }
     private onTimeChange = () => {
-        if (this.video) this.props.events("time_changed", { time: this.video.currentTime });
+        if (this.video) {
+            this.latestTime = this.video.currentTime;
+            this.props.events("time_changed", { time: this.video.currentTime });
+        }
     };
     private onVolumeChange = () => {
         if (this.video)  {

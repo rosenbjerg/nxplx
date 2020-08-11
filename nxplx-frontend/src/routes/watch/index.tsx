@@ -8,11 +8,12 @@ import http from "../../utils/http";
 import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
-import { createSnackbar } from "@snackbar/core";
+import { createSnackbar, Snackbar } from "@snackbar/core";
 import Store from "../../utils/storage";
+import PageTitle from "../../components/PageTitle/index.";
 
 
-interface ContinueWatching {
+interface NextEpisode {
     fid:number
 }
 interface Props {
@@ -33,6 +34,7 @@ export default class Watch extends Component<Props, State> {
     private initialTime = 0;
     private subtitleLanguage = "none";
     private suggestNext = true;
+    private openSnackbar: Snackbar|null = null;
 
     public render({ fid, kind }: Props, { info }: State) {
         if (!info) {
@@ -79,14 +81,11 @@ export default class Watch extends Component<Props, State> {
             this.playerTime = time;
             if (this.suggestNext && time > this.state.info.duration - (40 + 2)) {
                 this.suggestNext = false;
-                createSnackbar('Play next?', {
+                this.openSnackbar = createSnackbar('Play next?', {
                     actions: [
                         {
                             text: 'Yes',
-                            callback: (_, snackbar) => {
-                                snackbar.destroy();
-                                this.tryPlayNext();
-                            }
+                            callback: this.tryPlayNext
                         },
                         {
                             text: 'X',
@@ -108,6 +107,8 @@ export default class Watch extends Component<Props, State> {
     private tryPlayNext() {
         http.getJson<NextEpisode>(`/api/series/file/${this.state.info.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
+            if (this.openSnackbar) this.openSnackbar.destroy();
+            this.suggestNext = true;
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
     }

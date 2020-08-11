@@ -23,7 +23,6 @@ export default class Collection extends Component<Props, State> {
         http.get(`/api/film/collection/${this.props.id}/details`)
             .then(response => response.json())
             .then((details: MovieCollection) => {
-                console.log(details);
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
                 this.setState({ details, bg });
             });
