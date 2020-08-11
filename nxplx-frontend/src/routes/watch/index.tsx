@@ -1,5 +1,4 @@
 import { Component, h } from "preact";
-import Helmet from "preact-helmet";
 import { route } from "preact-router";
 import Loading from "../../components/Loading";
 import { formatSubtitleName } from "../../components/Subtitles";
@@ -42,7 +41,7 @@ export default class Watch extends Component<Props, State> {
         const completed = (this.playerTime / info.duration) > 0.92;
         return (
             <div class={style.container}>
-                <Helmet title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
+                <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
                 <VideoPlayer
                     events={this.videoEvents}
                     startTime={completed ? 0 : this.initialTime}

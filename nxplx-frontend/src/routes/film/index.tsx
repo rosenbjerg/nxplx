@@ -1,5 +1,4 @@
 import { Component, h } from 'preact';
-import Helmet from 'preact-helmet';
 import { FilmPoster } from "../../components/FilmPoster";
 import Loading from '../../components/Loading';
 import Subtitles from '../../components/Subtitles';
@@ -9,6 +8,7 @@ import { FilmDetails, imageUrl } from "../../utils/models";
 import * as style from './style.css';
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
+import PageTitle from "../../components/PageTitle/index.";
 
 interface Props { id:string }
 
@@ -36,7 +36,7 @@ export default class Home extends Component<Props, State> {
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdropPath}>
-                <Helmet title={`${details.title} - NxPlx`} />
+                <PageTitle title={`${details.title} - NxPlx`} />
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.title}</h2>
