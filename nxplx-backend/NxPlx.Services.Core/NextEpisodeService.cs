@@ -22,25 +22,27 @@ namespace NxPlx.Core.Services
             _context = context;
             _dtoMapper = dtoMapper;
         }
-        
+
         public async Task<NextEpisodeDto?> TryFindNextEpisode(int seriesId, int? seasonNo, int? episodeNo, string mode)
         {
             var next = mode.ToLower() switch
             {
                 "leastrecent" => await LongestSinceLastWatch(seriesId, seasonNo, episodeNo),
-                "random" => await Random(seriesId, seasonNo, episodeNo),
+                "random" => await Random(seriesId, seasonNo, episodeNo, true),
+                "random_in_season" => await Random(seriesId, seasonNo, episodeNo, false),
                 _ => await Default(seriesId, seasonNo, episodeNo)
             };
 
             return _dtoMapper.Map<EpisodeFile, NextEpisodeDto>(next);
         }
-        
-        public async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo)
+
+        public async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo, bool allSeasons)
         {
-            var available = await _context.EpisodeFiles.Where(ef =>
-                ef.SeriesDetailsId == seriesId &&
-                (seasonNo == null || ef.SeasonNumber == seasonNo &&
-                    (episodeNo == null || ef.EpisodeNumber != episodeNo))).ToListAsync();
+            var available = await _context.EpisodeFiles.Where(ef => 
+                    ef.SeriesDetailsId == seriesId
+                    && (allSeasons || seasonNo == null || ef.SeasonNumber == seasonNo)
+                    && !(ef.SeasonNumber == seasonNo && ef.EpisodeNumber == episodeNo))
+                .ToListAsync();
             var selectedIndex = new Random().Next(0, available.Count - 1);
             return available[selectedIndex];
         }
@@ -82,7 +84,8 @@ namespace NxPlx.Core.Services
         {
             var episodeFile = await _context.EpisodeFiles.FirstOrDefaultAsync(ef => ef.Id == fileId);
             if (episodeFile?.SeriesDetailsId == null) return null;
-            return await TryFindNextEpisode(episodeFile.SeriesDetailsId.Value, episodeFile.SeasonNumber, episodeFile.EpisodeNumber, mode);
+            return await TryFindNextEpisode(episodeFile.SeriesDetailsId.Value, episodeFile.SeasonNumber,
+                episodeFile.EpisodeNumber, mode);
         }
     }
 }

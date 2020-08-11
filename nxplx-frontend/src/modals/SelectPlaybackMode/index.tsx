@@ -9,7 +9,7 @@ import { createSnackbar } from "@snackbar/core";
 interface Props {
     seriesId: number,
     season?: number,
-    onDismiss: () => any,
+    onDismiss: () => any
 }
 const playbackModes = [
     "default",
@@ -23,6 +23,7 @@ interface NextEpisode {
     posterPath: string
     posterBlurHash: string
 }
+
 export default class SelectPlaybackMode extends Component<Props> {
     public render(props: Props) {
         return (
@@ -41,6 +42,7 @@ export default class SelectPlaybackMode extends Component<Props> {
     }
 
     private setPlaybackModeAndPlayNext = async (mode:string) => {
+        if (this.props.season && mode === 'random') mode = 'random_in_season';
         const season = this.props.season ? `&season=${this.props.season}` : '';
         const next = await http.getJson<NextEpisode>(`/api/series/${this.props.seriesId}/next?mode=${mode}${season}`);
         console.log(mode, next);
