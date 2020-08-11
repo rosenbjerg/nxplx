@@ -9,7 +9,7 @@ import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 import { createSnackbar } from "@snackbar/core";
-import storage from "../../utils/storage";
+import Store from "../../utils/storage";
 
 
 interface ContinueWatching {
@@ -106,7 +106,7 @@ export default class Watch extends Component<Props, State> {
     }
 
     private tryPlayNext() {
-        http.getJson<ContinueWatching>(`/api/series/file/${this.state.info.fid}/next?mode=${storage(sessionStorage).getEntry('playback-mode', 'default')}`).then(next => {
+        http.getJson<NextEpisode>(`/api/series/file/${this.state.info.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
             route(`/watch/${this.props.kind}/${next.fid}`);
         });

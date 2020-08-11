@@ -6,7 +6,8 @@ function getEntry(store: any, key:string, defaultValue:any = '') {
 function setEntry(store: any, key:string, value:any) {
     store.setItem(key, value);
 }
-export default function storage(store: Storage) {
+
+function makeStore(store: Storage) {
     return {
         getEntry(key:string, defaultValue:any = '') {
             return getEntry(store, key, defaultValue);
@@ -25,3 +26,13 @@ export default function storage(store: Storage) {
         }
     }
 }
+
+const Store = {
+    get local() {
+        return makeStore(localStorage);
+    },
+    get session() {
+        return makeStore(sessionStorage);
+    }
+};
+export default Store;
