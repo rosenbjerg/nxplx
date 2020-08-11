@@ -909,10 +909,10 @@
   dependencies:
     mkdirp "^1.0.4"
 
-"@preact/async-loader@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.0.tgz#341620d881d06877427e47145de1324c5fbe72fb"
-  integrity sha512-IdDTfhALnfFEcCO7sweE9sM8N2Q68jqFvRqTk4zsflQSrcrdhA38Bn8U4+iOx4bHNCxNHffR0WtjdeA7hhfKwg==
+"@preact/async-loader@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@preact/async-loader/-/async-loader-3.0.1.tgz#aeca7b029ad1e3e70eda684191a3cf050b9055a4"
+  integrity sha512-BoUN24hxEfAQYnWjliAmkZLuliv+ONQi7AWn+/+VOJHTIHmbFiXrvmSxITf7PDkKiK0a5xy4OErZtVVLlk96Tg==
   dependencies:
     kleur "^4.0.2"
     loader-utils "^2.0.0"
@@ -6629,9 +6629,9 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.16, postcss@^7.0.2
     supports-color "^6.1.0"
 
 preact-cli@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.0.tgz#a88abee99c89aac459849f2a9600fb4ac0d834f5"
-  integrity sha512-fRtrNAss8XYhtp8pAowmTJJYvv8kib9v60b2QQMzlsuUe4OHtvzaDmouPo8kVPo+TInKP7r1ofrXNrRTFcG2UA==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.1.tgz#e8913998df38854e1f1efde21aa1da1e66146b84"
+  integrity sha512-C5fvHo/P9MScpUYp2cwu9w/UBQsVwnOugIbcikY6MS+nEiNX9nE4xpnEghUuZxC+Mr8R2z1WiMAWKQQA4/D78A==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/plugin-proposal-class-properties" "^7.8.3"
@@ -6642,7 +6642,7 @@ preact-cli@^3.0.0:
     "@babel/plugin-transform-react-jsx" "^7.9.0"
     "@babel/preset-env" "^7.9.0"
     "@babel/preset-typescript" "^7.9.0"
-    "@preact/async-loader" "^3.0.0"
+    "@preact/async-loader" "^3.0.1"
     "@prefresh/webpack" "^0.8.1"
     autoprefixer "^9.6.0"
     babel-esm-plugin "^0.9.0"
