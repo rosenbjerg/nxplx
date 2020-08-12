@@ -1,6 +1,5 @@
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
-import Helmet from "preact-helmet";
 import Entry, { LazyImage } from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
@@ -8,6 +7,7 @@ import { imageUrl, MovieCollection } from "../../utils/models";
 import * as style from "./style.css";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
+import PageTitle from "../../components/PageTitle/index.";
 
 interface Props {
     id: string
@@ -23,7 +23,6 @@ export default class Collection extends Component<Props, State> {
         http.get(`/api/film/collection/${this.props.id}/details`)
             .then(response => response.json())
             .then((details: MovieCollection) => {
-                console.log(details);
                 const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
                 this.setState({ details, bg });
             });
@@ -37,7 +36,7 @@ export default class Collection extends Component<Props, State> {
         return (
             <div class={style.bg} style={bg} data-bg={details.backdropPath}>
                 <div class={`nx-scroll ${style.content}`}>
-                    <Helmet title={`${details.name} - NxPlx`}/>
+                    <PageTitle title={`${details.name} - NxPlx`}/>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                         <AdminOnly>

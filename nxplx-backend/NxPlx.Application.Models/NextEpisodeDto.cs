@@ -4,7 +4,5 @@
     {
         public int Fid { get; set; }
         public string Title { get; set; } = null!;
-        public string PosterPath { get; set; } = null!;
-        public string PosterBlurHash { get; set; } = null!;
     }
 }

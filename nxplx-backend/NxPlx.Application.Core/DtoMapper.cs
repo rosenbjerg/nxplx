@@ -154,8 +154,6 @@ namespace NxPlx.Application.Core
             SetMapping<EpisodeFile, NextEpisodeDto>(episodeFile => new NextEpisodeDto
             {
                 Fid = episodeFile.Id,
-                PosterPath = episodeFile.SeriesDetails.PosterPath,
-                PosterBlurHash = episodeFile.SeriesDetails.PosterBlurHash,
                 Title = $"{episodeFile.SeriesDetails.Name} - S{episodeFile.SeasonNumber:D2}E{episodeFile.EpisodeNumber:D2} - {episodeFile.EpisodeDetails.Name}"
             });
             SetMapping<SubtitleFile, SubtitleFileDto>(subtitleFile => new SubtitleFileDto

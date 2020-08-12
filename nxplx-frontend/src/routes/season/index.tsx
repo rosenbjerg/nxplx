@@ -1,6 +1,5 @@
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
-import Helmet from "preact-helmet";
 import { EpisodeEntry } from "../../components/EpisodeEntry";
 import Loading from "../../components/Loading";
 import { toMap } from "../../utils/arrays";
@@ -13,6 +12,7 @@ import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import { Link } from "preact-router";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
+import PageTitle from "../../components/PageTitle/index.";
 
 interface EpisodeProgress {
     fileId: number
@@ -53,7 +53,7 @@ export default class Season extends Component<Props, State> {
         }
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>
-                <Helmet title={`Season ${season.number} - ${series.name} - NxPlx`}/>
+                <PageTitle title={`Season ${season.number} - ${series.name} - NxPlx`}/>
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>

@@ -51,7 +51,6 @@ export default class UserManagement extends Component<Props, State> {
     private deleteUser = (user:User) => () => {
         http.delete('/api/user', user.username).then(response => {
             if (response.ok) {
-                console.log(this.state.users, user);
                 this.setState({ users: remove(this.state.users, user) });
                 createSnackbar(`${user.username} deleted!`, { timeout: 1500 });
             } else {

@@ -1,13 +1,13 @@
 import linkState from "linkstate";
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
-import Helmet from "preact-helmet";
 import Entry from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import { ContinueWatchingElement, imageUrl, OverviewElement } from "../../utils/models";
 import * as style from "./style.css";
+import PageTitle from "../../components/PageTitle/index.";
 
 
 interface Props {
@@ -35,7 +35,7 @@ export default class Home extends Component<Props, State> {
     public render(_, { overview, search, progress }: State) {
         return (
             <div class={style.home}>
-                <Helmet title="NxPlx"/>
+                <PageTitle title="NxPlx"/>
                 <div class={style.top}>
                     <input tabIndex={0} autofocus class={style.search} placeholder={translate("search here")}
                            type="search" value={this.state.search} onInput={linkState(this, "search")}/>

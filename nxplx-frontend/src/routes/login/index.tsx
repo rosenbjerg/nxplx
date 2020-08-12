@@ -1,11 +1,11 @@
 import { h } from "preact";
-import Helmet from 'preact-helmet';
 import { route } from "preact-router";
 import { Store } from "unistore";
 import { connect } from "unistore/preact";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import * as style from "./style.css";
+import PageTitle from "../../components/PageTitle/index.";
 
 const actions = (store:Store<NxPlxStore>) => (
     {
@@ -32,7 +32,7 @@ const Login = connect([], actions)(
     // @ts-ignore
     ({ login }) => {
         return (<div class={style.login}>
-            <Helmet title={`Login at NxPlx`} />
+            <PageTitle title={`Login at NxPlx`} />
             <h1>NxPlx</h1>
             <form onSubmit={login}>
                 <div>

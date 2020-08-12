@@ -13,9 +13,9 @@ import Series from "../routes/series";
 import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
-import storage from "../utils/storage";
 import Header from "./Header";
 import Loading from "./Loading";
+import Store from "../utils/storage";
 
 if ((module as any).hot) {
     import("preact/debug");
@@ -64,7 +64,7 @@ export default class App extends Component {
     }
 
     public componentDidMount() {
-        setLocale(storage(localStorage).getEntry("locale", "en"));
+        setLocale(Store.local.getEntry("locale", "en"));
         this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {
