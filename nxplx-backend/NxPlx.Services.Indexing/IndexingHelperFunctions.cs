@@ -4,11 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Application.Core;
 using NxPlx.Models;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
 using NxPlx.Services.Database;
 
 namespace NxPlx.Services.Index

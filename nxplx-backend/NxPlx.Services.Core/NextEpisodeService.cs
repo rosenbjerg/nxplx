@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Models;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
 

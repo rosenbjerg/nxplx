@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using NxPlx.Models;
+﻿using System.Threading.Tasks;
 
 namespace NxPlx.Application.Core
 {

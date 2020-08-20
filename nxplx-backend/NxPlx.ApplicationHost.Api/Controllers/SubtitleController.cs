@@ -1,14 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using NxPlx.Application.Core;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Core.Services;
 using NxPlx.Models;
-using NxPlx.Services.Database;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {

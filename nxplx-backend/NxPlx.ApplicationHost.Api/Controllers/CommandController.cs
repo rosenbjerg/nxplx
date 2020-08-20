@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Models;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Core.Services;
 

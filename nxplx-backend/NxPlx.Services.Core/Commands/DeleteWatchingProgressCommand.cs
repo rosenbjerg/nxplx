@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Models;
 using NxPlx.Services.Database;
 
 namespace NxPlx.Core.Services.Commands
