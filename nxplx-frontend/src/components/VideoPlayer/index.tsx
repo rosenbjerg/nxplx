@@ -311,16 +311,18 @@ export default class VideoPlayer extends Component<Props, State> {
 
     private bindVideo = ref => this.video = ref;
     private bindVideoContainer = ref => {
-        ref.onmousemove = this.onFocused;
-        ref.onmousedown = this.onFocused;
-        ref.onfocusin = this.onFocused;
-        ref.onmouseover = this.onFocused;
-        ref.onhover = this.onFocused;
+        if (ref) {
+            ref.onmousemove = this.onFocused;
+            ref.onmousedown = this.onFocused;
+            ref.onfocusin = this.onFocused;
+            ref.onmouseover = this.onFocused;
+            ref.onhover = this.onFocused;
 
-        ref.onfocusout = this.onUnfocused;
-        ref.onmouseout = this.onUnfocused;
-        ref.onmouseleave = this.onUnfocused;
-        ref.onmouseup = this.onUnfocused;
+            ref.onfocusout = this.onUnfocused;
+            ref.onmouseout = this.onUnfocused;
+            ref.onmouseleave = this.onUnfocused;
+            ref.onmouseup = this.onUnfocused;
+        }
         this.videoContainer = ref;
     }
 }
