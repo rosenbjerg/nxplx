@@ -3,19 +3,80 @@
     width: 100%;
     background-color: black;
     outline: none;
+    overflow: hidden;
 }
-.videoContainer button {
+.videoContainer .topControls {
     position: absolute;
-    font-size: 24pt;
-    right: 10px;
     top: -100px;
-    transition: top 100ms;
+    transition: top 250ms;
+    z-index: 20;
+    text-shadow: 1px 1px 3px black;
 }
-.videoContainer:fullscreen:hover button {
-    top: 10px;
+.videoContainer .bottomControls {
+    z-index: 20;
+    position: absolute;
+    transition: bottom 250ms;
+    display: inline-block;
+    bottom: -200px;
+    text-shadow: 1px 1px 3px black;
+}
+.volumeControls {
+    display: inline-block;
+}
+.volumeControls input {
+    width: 0;
+    opacity: 0;
+    transition: opacity 300ms, width 300ms;
+    height: 26px;
+    cursor: pointer;
+}
+.volumeControls:hover input, .volumeControls.touch input {
+    width: 150px;
+    opacity: 1;
+}
+.videoContainer .centerPlayButton {
+    font-size: 100px;
+    color: white;
+    cursor: pointer;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    top: calc(50% + 28px);
+    margin-top: -50px;
+}
+.videoContainer:fullscreen .centerPlayButton {
+    top: 50%;
+}
+.touch {}
+.focused {}
+.title {
+    margin-top: 2px;
+    margin-left: 10px;
+    font-size: 24pt;
+    color: var(--focused-text);
+}
+.closeButton {
+    font-size: 32pt;
+    right: 10px;
     color: var(--focused-text);
     cursor: pointer;
 }
+.videoContainer.focused .topControls {
+    top: 66px;
+}
+.videoContainer.focused .closeButton {
+    top: -100px;
+}
+.videoContainer.focused:fullscreen .closeButton, .videoContainer.focused:fullscreen .topControls {
+    top: 10px;
+}
+.videoContainer.focused .bottomControls {
+    bottom: 0px;
+}
+
+
 .video {
     height: 100%;
     width: 100%;
@@ -29,4 +90,45 @@
     bottom: 0;
     right: 0;
     background-color: rgba(25, 64, 46, 0.5);
+}
+
+.track {
+
+}
+
+.range {
+    background-color: #444;
+    -webkit-appearance: none;
+    cursor: pointer;
+    height: 3px;
+    margin: 0;
+    transition: height 0.1s ease-in;
+    vertical-align: bottom;
+    width: 100%;
+}
+.track:hover .range,
+.track.hover .range { height: 8px; }
+
+.range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    background: #aeaeae;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 5px #eaeaea;
+    height: 0;
+    width: 0;
+    transition: height 0.1s ease-in, width 0.1s ease-in;
+}
+.track:hover .range::-webkit-slider-thumb,
+.track.hover .range::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+}
+
+.loaded .range,
+.loaded .range::-webkit-slider-thumb {
+    transition: 0.1s ease-in;
+}
+
+:focus {
+    outline: none;
 }

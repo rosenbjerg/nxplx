@@ -79,5 +79,7 @@
   "enqueued jobs": "Enqueued jobs",
   "processing jobs": "Processing jobs",
   "failed jobs": "Failed jobs",
-  "succeeded jobs": "Succeeded jobs"
+  "succeeded jobs": "Succeeded jobs",
+  "set library permissions": "Set library permissions",
+  "delete user": "Delete user"
 }

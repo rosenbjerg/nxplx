@@ -23,39 +23,42 @@ interface Props {
 
 type PlayerStates = "playing" | "paused" | "ended" | "loading";
 interface State {
-    info: FileInfo
-    playerState: PlayerStates;
+    info?: FileInfo
+    progress: number
+    playerState: PlayerStates
+    subtitleLanguage: string
 }
 
 export default class Watch extends Component<Props, State> {
     private videoEvents = CreateEventBroker();
     private previousUnload?: any;
     private playerTime = 0;
-    private initialTime = 0;
-    private subtitleLanguage = "none";
     private suggestNext = true;
     private openSnackbar: Snackbar|null = null;
 
-    public render({ fid, kind }: Props, { info }: State) {
-        if (!info) {
+    public render({ fid, kind }: Props, { info, subtitleLanguage, progress }: State) {
+        if (!info)
             return (<Loading fullscreen/>);
-        }
-        const completed = (this.playerTime / info.duration) > 0.92;
+
         return (
             <div class={style.container}>
                 <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
                 <VideoPlayer
+                    key={fid}
+                    isSeries={kind === 'series'}
+                    duration={info.duration}
                     events={this.videoEvents}
-                    startTime={completed ? 0 : this.initialTime}
+                    startTime={progress}
                     title={info.title}
                     src={`/api/${kind}/${fid}/watch`}
-                    poster={imageUrl(this.state.info.backdropPath, 1280)}
+                    poster={imageUrl(this.state.info!.backdropPath, 1280)}
+                    playNext={this.tryPlayNext}
 
                     subtitles={info.subtitles.map(lang => ({
                         displayName: formatSubtitleName(lang),
                         language: lang,
                         path: `/api/subtitle/file/${kind}/${fid}/${lang}`,
-                        default: lang === this.subtitleLanguage
+                        default: lang === subtitleLanguage
                     }))}/>
             </div>
         );
@@ -73,13 +76,12 @@ export default class Watch extends Component<Props, State> {
         this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", ({ time, state }) => {
             this.playerTime = time;
             this.setState({ playerState: state });
-            if (state === 'ended' && this.props.kind === 'series') {
+            if (state === 'ended' && this.props.kind === 'series')
                 this.tryPlayNext();
-            }
         });
         this.videoEvents.subscribe<{ time: number }>("time_changed", ({ time }) => {
             this.playerTime = time;
-            if (this.suggestNext && time > this.state.info.duration - (40 + 2)) {
+            if (this.suggestNext && time > this.state.info!.duration - (40 + 2)) {
                 this.suggestNext = false;
                 this.openSnackbar = createSnackbar('Play next?', {
                     actions: [
@@ -104,11 +106,15 @@ export default class Watch extends Component<Props, State> {
         }
     }
 
-    private tryPlayNext() {
-        http.getJson<NextEpisode>(`/api/series/file/${this.state.info.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
+    private tryPlayNext = () => {
+        http.getJson<NextEpisode>(`/api/series/file/${this.state.info!.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
             if (this.openSnackbar) this.openSnackbar.destroy();
             this.suggestNext = true;
+            this.playerTime = 0;
+            this.setState({
+                progress: 0, subtitleLanguage: "none", info: undefined, playerState: "loading"
+            })
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
     }
@@ -118,12 +124,12 @@ export default class Watch extends Component<Props, State> {
         this.suggestNext = kind === 'series';
         Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
-            http.get(`/api/subtitle/preference/${kind}/${fid}`).then(response => response.text()),
-            http.get(`/api/progress/${kind}/${fid}`).then(response => response.text())
+            http.get(`/api/subtitle/preference/${kind}/${fid}`).then(res => res.text()),
+            http.getJson<number>(`/api/progress/${kind}/${fid}`)
         ]).then(results => {
-            this.subtitleLanguage = results[1];
-            this.initialTime = parseFloat(results[2]);
-            this.setState({ info: results[0] });
+            const completed = (results[2] / results[0].duration) > 0.92;
+            this.playerTime = results[2];
+            this.setState({ info: results[0], subtitleLanguage: results[1], progress: completed ? 0 : results[2] });
         });
     };
 

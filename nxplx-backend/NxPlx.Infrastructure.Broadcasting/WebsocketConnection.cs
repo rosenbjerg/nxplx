@@ -29,34 +29,41 @@ namespace NxPlx.Infrastructure.Broadcasting
         public override async Task KeepConnectionOpen()
         {
             if (_websocket != null) throw new Exception("WebSocket has already been accepted");
-            
-            _websocket = await _httpContext.WebSockets.AcceptWebSocketAsync();
-            
-            var buffer = ArrayPool<byte>.Shared.Rent(4096);
-            while (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open)
-            {
-                WebSocketReceiveResult message;
-                try
-                {
-                    message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
-                }
-                catch (OperationCanceledException) { break; }
-                catch (IOException) { break; }
-                
-                if (message.MessageType == WebSocketMessageType.Close)
-                    break;
 
-                if (message.EndOfMessage && message.MessageType == WebSocketMessageType.Text)
+            try
+            {
+                _websocket = await _httpContext.WebSockets.AcceptWebSocketAsync();
+            
+                var buffer = ArrayPool<byte>.Shared.Rent(4096);
+                while (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open)
                 {
+                    WebSocketReceiveResult message;
                     try
                     {
-                        var parsed = JsonSerializer.Deserialize<Message>(buffer);
-                        OnMessageReceived(parsed);
+                        message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
                     }
-                    catch (JsonException) { }
+                    catch (OperationCanceledException) { break; }
+                    catch (WebSocketException) { break; }
+                    catch (IOException) { break; }
+                
+                    if (message.MessageType == WebSocketMessageType.Close)
+                        break;
+
+                    if (message.EndOfMessage && message.MessageType == WebSocketMessageType.Text)
+                    {
+                        try
+                        {
+                            var parsed = JsonSerializer.Deserialize<Message>(buffer);
+                            OnMessageReceived(parsed);
+                        }
+                        catch (JsonException) { }
+                    }
                 }
             }
-            OnDisconnected();
+            finally
+            {
+                OnDisconnected();
+            }
         }
     }
 }

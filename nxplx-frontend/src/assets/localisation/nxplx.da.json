@@ -79,5 +79,7 @@
   "enqueued jobs": "Jobs i kø",
   "processing jobs": "Jobs under behandling",
   "failed jobs": "Fejlede jobs",
-  "succeeded jobs": "Færdigkørte jobs"
+  "succeeded jobs": "Færdigkørte jobs",
+  "set library permissions": "Sæt biblioteks adgang",
+  "delete user": "Slet bruger"
 }
