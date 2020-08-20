@@ -138,7 +138,7 @@ export default class VideoPlayer extends Component<Props, State> {
 
 
                     <span style="margin-right: 10px; float: right;">
-                        {!!subtitles?.length && (
+                        {subtitles && subtitles.length > 0 && (
                             <select class="noborder">
                                 {subtitles.map(track => (<option value={track.language}>{track.displayName}</option>))}
                             </select>
