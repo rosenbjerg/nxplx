@@ -92,7 +92,7 @@ namespace NxPlx.Services.Index
                     return new FilmFile
                     {
                         Title = TitleCleanup(title),
-                        Path = filmPath,
+                        Path = Path.GetFullPath(filmPath),
                         Year = yearGroup.Success ? int.Parse(yearGroup.Value) : 1,
                         PartOfLibraryId = libraryId
                     };
