@@ -5,7 +5,6 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Models;
 using NxPlx.Services.Database;
 using IMapper = AutoMapper.IMapper;
 

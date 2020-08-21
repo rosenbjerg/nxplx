@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Series;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Core.Services;
-using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {

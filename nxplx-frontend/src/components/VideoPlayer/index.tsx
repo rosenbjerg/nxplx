@@ -47,13 +47,13 @@ const setMuted = mu => Store.local.setEntry("player_muted", muted = mu);
 const brightFontStyle = 'color: white; display: inline-block';
 
 const formatTime = totalSeconds => {
-    const seconds = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
-    const minutes = Math.floor(totalSeconds / 60);
-    if (minutes < 60)
-        return `${minutes}:${seconds}`;
-    const hours = Math.floor(minutes / 60);
-    return `${hours}:${minutes}:${seconds}`;
-
+    const hours = Math.floor(totalSeconds / 3600);
+    const remaining = totalSeconds - hours * 3600;
+    const minutes = Math.floor(remaining / 60);
+    const seconds = (remaining - minutes * 60).toFixed(0);
+    if (hours > 0)
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 interface FancyProps {
@@ -311,16 +311,18 @@ export default class VideoPlayer extends Component<Props, State> {
 
     private bindVideo = ref => this.video = ref;
     private bindVideoContainer = ref => {
-        ref.onmousemove = this.onFocused;
-        ref.onmousedown = this.onFocused;
-        ref.onfocusin = this.onFocused;
-        ref.onmouseover = this.onFocused;
-        ref.onhover = this.onFocused;
+        if (ref) {
+            ref.onmousemove = this.onFocused;
+            ref.onmousedown = this.onFocused;
+            ref.onfocusin = this.onFocused;
+            ref.onmouseover = this.onFocused;
+            ref.onhover = this.onFocused;
 
-        ref.onfocusout = this.onUnfocused;
-        ref.onmouseout = this.onUnfocused;
-        ref.onmouseleave = this.onUnfocused;
-        ref.onmouseup = this.onUnfocused;
+            ref.onfocusout = this.onUnfocused;
+            ref.onmouseout = this.onUnfocused;
+            ref.onmouseleave = this.onUnfocused;
+            ref.onmouseup = this.onUnfocused;
+        }
         this.videoContainer = ref;
     }
 }

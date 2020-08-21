@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Film;
-using NxPlx.Models;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
-using NxPlx.Models.File;
 using NxPlx.Services.Database;
 using IMapper = AutoMapper.IMapper;
 

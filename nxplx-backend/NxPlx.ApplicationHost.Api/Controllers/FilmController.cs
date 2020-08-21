@@ -21,7 +21,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
 
         [HttpGet("{fileId}/watch")]
-        public async Task<ActionResult<PhysicalFileResult>> StreamFile([FromRoute, Required] int fileId)
+        public async Task<IActionResult> StreamFile([FromRoute, Required] int fileId)
         {
             var filePath = await _filmService.FindFilmFilePath(fileId);
             if (!System.IO.File.Exists(filePath)) return NotFound();
