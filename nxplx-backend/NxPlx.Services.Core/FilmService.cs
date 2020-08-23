@@ -7,6 +7,7 @@ using NxPlx.Application.Models;
 using NxPlx.Application.Models.Film;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
+using NxPlx.Models.File;
 using NxPlx.Services.Database;
 using IMapper = AutoMapper.IMapper;
 
@@ -17,12 +18,14 @@ namespace NxPlx.Core.Services
         private readonly DatabaseContext _databaseContext;
         private readonly IDtoMapper _dtoMapper;
         private readonly IMapper _mapper;
+        private readonly StreamingService _streamingService;
 
-        public FilmService(DatabaseContext databaseContext, IDtoMapper dtoMapper, IMapper mapper)
+        public FilmService(DatabaseContext databaseContext, IDtoMapper dtoMapper, IMapper mapper, StreamingService streamingService)
         {
             _databaseContext = databaseContext;
             _dtoMapper = dtoMapper;
             _mapper = mapper;
+            _streamingService = streamingService;
         }
         
         public async Task<FilmDto?> FindFilmByDetails(int id)
@@ -43,15 +46,12 @@ namespace NxPlx.Core.Services
         }
         public async Task<InfoDto?> FindFilmFileInfo(int fileId)
         {
-            return await _databaseContext.FilmFiles
+            var filmFile = await _databaseContext.FilmFiles
                 .Where(ff => ff.Id == fileId)
-                .ProjectTo<InfoDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
-            
-        }
-        public async Task<string> FindFilmFilePath(int fileId)
-        {
-            return await _databaseContext.FilmFiles.Where(ff => ff.Id == fileId).Select(ff => ff.Path).FirstOrDefaultAsync();
+            var dto = _dtoMapper.Map<FilmFile, InfoDto>(filmFile);
+            dto!.FileToken = await _streamingService.CreateToken(filmFile.Path);
+            return dto;
         }
     }
 }

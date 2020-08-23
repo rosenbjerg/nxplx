@@ -12,7 +12,7 @@ namespace NxPlx.Core.Services
 {
     public class SessionService
     {
-        private const string CacheKey = "session";
+        private const string SessionPrefix = "session";
         private readonly IDistributedCache _distributedCache;
 
         public SessionService(IDistributedCache distributedCache)
@@ -20,11 +20,11 @@ namespace NxPlx.Core.Services
             _distributedCache = distributedCache;
         }
         
-        public Task<Session?> FindSession(string token, CancellationToken cancellationToken = default) => _distributedCache.GetObjectAsync<Session>($"{CacheKey}:{token}", cancellationToken);
+        public Task<Session?> FindSession(string token, CancellationToken cancellationToken = default) => _distributedCache.GetObjectAsync<Session>($"{SessionPrefix}:{token}", cancellationToken);
 
         public async Task<SessionDto[]> FindSessions(int userId, CancellationToken cancellationToken = default)
         {
-            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{CacheKey}:{userId}", cancellationToken);
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
             if (sessions == null)
                 return new SessionDto[0];
 
@@ -38,24 +38,24 @@ namespace NxPlx.Core.Services
 
         public async Task AddSession(int userId, string token, Session session, TimeSpan validity, CancellationToken cancellationToken = default)
         {
-            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{CacheKey}:{userId}", cancellationToken);
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
             sessions ??= new List<string>();
-            await _distributedCache.SetObjectAsync($"{CacheKey}:{token}", session, new DistributedCacheEntryOptions
+            await _distributedCache.SetObjectAsync($"{SessionPrefix}:{token}", session, new DistributedCacheEntryOptions
             {
                 SlidingExpiration = validity
             }, cancellationToken);
             
             sessions.Add(token);
-            await _distributedCache.SetObjectAsync($"{CacheKey}:{userId}", sessions, cancellationToken: cancellationToken);
+            await _distributedCache.SetObjectAsync($"{SessionPrefix}:{userId}", sessions, cancellationToken: cancellationToken);
         }
         
         public async Task RemoveSession(int userId, string token, CancellationToken cancellationToken = default)
         {
-            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{CacheKey}:{userId}", cancellationToken);
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
             await _distributedCache.RemoveAsync(token, cancellationToken);
             
             if (sessions != null && sessions.Remove(token))
-                await _distributedCache.SetObjectAsync($"{CacheKey}:{userId}", sessions, cancellationToken: cancellationToken);
+                await _distributedCache.SetObjectAsync($"{SessionPrefix}:{userId}", sessions, cancellationToken: cancellationToken);
         }
     }
 }

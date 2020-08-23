@@ -20,14 +20,6 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             _filmService = filmService;
         }
 
-        [HttpGet("{fileId}/watch")]
-        public async Task<IActionResult> StreamFile([FromRoute, Required] int fileId)
-        {
-            var filePath = await _filmService.FindFilmFilePath(fileId);
-            if (!System.IO.File.Exists(filePath)) return NotFound();
-            return PhysicalFile(filePath, "video/mp4", true);
-        }
-
         [HttpGet("{fileId}/info")]
         [Send404WhenNull]
         public Task<InfoDto?> FileInfo([FromRoute, Required] int fileId) 

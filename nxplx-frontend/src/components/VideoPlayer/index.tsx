@@ -44,7 +44,7 @@ const setMuted = mu => Store.local.setEntry("player_muted", muted = mu);
 
 // declare const cast;
 // declare const chrome;
-const brightFontStyle = 'color: white; display: inline-block';
+const brightFontStyle = 'color: white; display: inline-block; text-shadow: 1px 1px 3px black;';
 
 const formatTime = totalSeconds => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -205,12 +205,8 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.lastFocus + 500 > now) return;
         this.lastFocus = now;
         clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => this.setState({ focused: false }), 1800);
         this.setState({ focused: true });
-        this.onUnfocused();
-    }
-    private onUnfocused = () => {
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.setState({ focused: false }), 1000);
     }
     private seek = (seconds: number) => {
         if (!this.video) return;
@@ -313,11 +309,6 @@ export default class VideoPlayer extends Component<Props, State> {
             ref.onfocusin = this.onFocused;
             ref.onmouseover = this.onFocused;
             ref.onhover = this.onFocused;
-
-            ref.onfocusout = this.onUnfocused;
-            ref.onmouseout = this.onUnfocused;
-            ref.onmouseleave = this.onUnfocused;
-            ref.onmouseup = this.onUnfocused;
         }
         this.videoContainer = ref;
     }

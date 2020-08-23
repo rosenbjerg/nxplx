@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NxPlx.Application.Core;
@@ -30,7 +28,7 @@ namespace NxPlx.Core.Services
             var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
             if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
             {
-                var token = GenerateToken();
+                var token = TokenGenerator.Generate();
                 var expiry = DateTime.UtcNow.Add(_sessionLength);
                 var session = new Session
                 {
@@ -48,17 +46,7 @@ namespace NxPlx.Core.Services
 
         public async Task Logout()
         {
-            _databaseContext.Remove(_operationContext.Session);
-            await _databaseContext.SaveChangesAsync();
-        }
-        
-        private static string GenerateToken()
-        {
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[18];
-            rng.GetBytes(bytes);
-            
-            return WebEncoders.Base64UrlEncode(bytes);
+            await _sessionService.RemoveSession(_operationContext.Session.UserId, _operationContext.SessionId);
         }
     }
 }

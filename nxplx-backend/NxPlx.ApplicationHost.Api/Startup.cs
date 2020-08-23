@@ -83,6 +83,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
             services.AddSingleton(typeof(SessionService));
+            services.AddSingleton(typeof(StreamingService));
             
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
@@ -158,7 +159,6 @@ namespace NxPlx.ApplicationHost.Api
         private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
         {
             var path = context.Request.Path.ToString().TrimStart('/');
-            var extension = Path.GetExtension(path);
             var file = Path.Combine("public", path);
             var fileInfo = File.Exists(file)
                 ? new FileInfo(file)

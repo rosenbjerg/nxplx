@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Application.Core;
-using NxPlx.Models;
 
 namespace NxPlx.Infrastructure.Broadcasting
 {

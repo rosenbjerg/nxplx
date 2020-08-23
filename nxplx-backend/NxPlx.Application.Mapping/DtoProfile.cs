@@ -71,31 +71,9 @@ namespace NxPlx.Application.Mapping
                 .ForMember(dst => dst.VoteCount, opt => opt.MapFrom(src => src.FilmDetails.VoteCount))
                 .ForMember(dst => dst.BelongsToCollectionId, opt => opt.MapFrom(src => src.FilmDetails.BelongsInCollectionId));
 
-            CreateMap<FilmFile, InfoDto>()
-                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.FilmDetailsId))
-                .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dst => dst.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
-                .ForMember(dst => dst.BackdropPath, opt => opt.MapFrom(src => src.FilmDetails.BackdropPath))
-                .ForMember(dst => dst.BackdropBlurHash, opt => opt.MapFrom(src => src.FilmDetails.BackdropBlurHash))
-                .ForMember(dst => dst.PosterPath, opt => opt.MapFrom(src => src.FilmDetails.PosterPath))
-                .ForMember(dst => dst.PosterBlurHash, opt => opt.MapFrom(src => src.FilmDetails.PosterBlurHash))
-                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => src.FilmDetails.Title))
-                .ForMember(dst => dst.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)));
-
             CreateMap<EpisodeFile, EpisodeFileDto>()
                 .ForMember(dst => dst.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)));
 
-            CreateMap<EpisodeFile, InfoDto>()
-                .ForMember(dst => dst.Id, opt => opt.MapFrom(src => src.SeriesDetailsId))
-                .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dst => dst.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
-                .ForMember(dst => dst.BackdropPath, opt => opt.MapFrom(src => src.SeriesDetails.BackdropPath))
-                .ForMember(dst => dst.BackdropBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.BackdropBlurHash))
-                .ForMember(dst => dst.PosterPath, opt => opt.MapFrom(src => src.SeriesDetails.PosterPath))
-                .ForMember(dst => dst.PosterBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.PosterBlurHash))
-                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"))
-                .ForMember(dst => dst.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)));
-            
             CreateMap<EpisodeFile, NextEpisodeDto>()
                 .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"));

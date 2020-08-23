@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
@@ -10,7 +9,6 @@ using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Services.Database;
-using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services
 {
@@ -18,29 +16,23 @@ namespace NxPlx.Core.Services
     {
         private readonly DatabaseContext _context;
         private readonly IDtoMapper _dtoMapper;
-        private readonly IMapper _mapper;
+        private readonly StreamingService _streamingService;
 
-        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper, AutoMapper.IMapper mapper)
+        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper, StreamingService streamingService)
         {
             _context = context;
             _dtoMapper = dtoMapper;
-            _mapper = mapper;
-        }
-
-        public async Task<string?> FindEpisodeFilePath(int id)
-        {
-            return await _context.EpisodeFiles
-                .Where(ef => ef.Id == id)
-                .Select(ef => ef.Path)
-                .FirstOrDefaultAsync();
+            _streamingService = streamingService;
         }
 
         public async Task<InfoDto?> FindEpisodeFileInfo(int id)
         {
-            return await _context.EpisodeFiles
+            var episodeFile = await _context.EpisodeFiles
                 .Where(ef => ef.Id == id)
-                .ProjectTo<InfoDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+            var dto = _dtoMapper.Map<EpisodeFile, InfoDto>(episodeFile);
+            dto!.FileToken = await _streamingService.CreateToken(episodeFile.Path);
+            return dto;
         }
 
         public async Task<SeriesDto?> FindSeriesDetails(int id, int? season)

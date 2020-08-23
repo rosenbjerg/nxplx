@@ -50,7 +50,7 @@ export default class Watch extends Component<Props, State> {
                     events={this.videoEvents}
                     startTime={progress}
                     title={info.title}
-                    src={`/api/${kind}/${fid}/watch`}
+                    src={`/api/stream/${info.fileToken}.mp4`}
                     poster={imageUrl(this.state.info!.backdropPath, 1280)}
                     playNext={this.tryPlayNext}
 
@@ -107,7 +107,7 @@ export default class Watch extends Component<Props, State> {
     }
 
     private tryPlayNext = () => {
-        http.getJson<NextEpisode>(`/api/series/file/${this.state.info!.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
+        http.getJson<NextEpisode>(`/api/series/file/${this.props.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
             if (this.openSnackbar) this.openSnackbar.destroy();
             this.suggestNext = true;
@@ -136,7 +136,7 @@ export default class Watch extends Component<Props, State> {
     private saveProgress = () => {
         if (this.state.info) {
             if (this.playerTime > 5) {
-                http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}?time=${this.playerTime}`);
+                http.put(`/api/progress/${this.props.kind}/${this.props.fid}?time=${this.playerTime}`);
             }
         }
     };

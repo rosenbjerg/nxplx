@@ -36,14 +36,6 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [Send404WhenNull]
         public Task<InfoDto?> GetFileInfo([FromRoute, Required] int fileId) 
             => _episodeService.FindEpisodeFileInfo(fileId);
-
-        [HttpGet("{fileId}/watch")]
-        public async Task<IActionResult> Stream([FromRoute, Required] int fileId)
-        {
-            var filePath = await _episodeService.FindEpisodeFilePath(fileId);
-            if (!System.IO.File.Exists(filePath)) return NotFound();
-            return PhysicalFile(filePath, "video/mp4", true);
-        }
         
         [HttpGet("{seriesId}/next")]
         [Send404WhenNull]
