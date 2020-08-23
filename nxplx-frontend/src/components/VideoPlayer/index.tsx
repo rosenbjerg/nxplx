@@ -68,10 +68,10 @@ interface FancyProps {
 
 const FancyTrack = ({ primaryPct, secondaryPct = 0, innerStyle, outerStyle, onSeek }: FancyProps) => {
     const handleSeek = useCallback((ev) => onSeek(ev.target.value / 100), [onSeek]);
-    const line = `background: linear-gradient(to right, #48BBF4 0%, #48BBF4 ${primaryPct - 0.1}%, #1562af ${primaryPct - 0.1}%, #1562af ${secondaryPct}%, #444 ${secondaryPct}%, #444 100%);`;
+    const line = `background: linear-gradient(to right, #48BBF4 0%, #48BBF4 ${primaryPct - 0.03}%, #1562af ${primaryPct - 0.03}%, #1562af ${secondaryPct}%, #444 ${secondaryPct}%, #444 100%);`;
     return (
         <div class={style.track} style={outerStyle || "width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}>
-            <input class={style.range} style={`${(innerStyle || 'width: 100%')}; ${line}`} type="range" step="0.01" min="0" max="100" value={primaryPct} onInput={handleSeek}/>
+            <input class={style.range} style={`${(innerStyle || 'width: 100%')}; ${line}`} type="range" step="0.01" min="0" max="100" value={primaryPct || 0} onInput={handleSeek}/>
         </div>
     );
 }
@@ -91,8 +91,6 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.video !== undefined) {
             this.video.volume = volume;
             this.isTouch = isTouchscreen();
-
-
             this.setState({ volume, muted });
         }
         // cast.framework.CastContext.getInstance().setOptions({
@@ -295,12 +293,10 @@ export default class VideoPlayer extends Component<Props, State> {
     };
 
     private onPlay = () => {
-        setAutoplay(true);
         if (this.video) this.props.events("state_changed", { state: "playing", time: this.video.currentTime });
         this.setState({ playing: true });
     };
     private onPause = () => {
-        setAutoplay(false);
         if (this.video) this.props.events("state_changed", { state: "paused", time: this.video.currentTime });
         this.setState({ playing: false });
     };
