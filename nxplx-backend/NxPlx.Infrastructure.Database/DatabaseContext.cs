@@ -69,7 +69,6 @@ namespace NxPlx.Services.Database
             
             modelBuilder.Entity<User>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.UserId).OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<User>().HasMany<WatchingProgress>().WithOne().HasForeignKey(wp => wp.UserId).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<UserSession>().HasOne(us => us.User).WithMany().OnDelete(DeleteBehavior.Cascade);
             
             modelBuilder.Entity<User>()
                 .Property(sl => sl.LibraryAccessIds)
@@ -77,16 +76,11 @@ namespace NxPlx.Services.Database
                     ls => string.Join(',', ls),
                     str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
 
-            if (_operationContext?.User != null && !_operationContext.User.Admin)
+            if (_operationContext.Session != null && !_operationContext.Session.IsAdmin)
             {
-                modelBuilder.Entity<User>().HasQueryFilter(e => e.Id == _operationContext.User.Id);
-                modelBuilder.Entity<UserSession>().HasQueryFilter(e => e.UserId == _operationContext.User.Id);
-                modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _operationContext.User.Id);
-                modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _operationContext.User.Id);
-                
-                modelBuilder.Entity<Library>().HasQueryFilter(e => _operationContext.User.LibraryAccessIds.Contains(e.Id));
-                modelBuilder.Entity<FilmFile>().HasQueryFilter(e => _operationContext.User.LibraryAccessIds.Contains(e.PartOfLibraryId));
-                modelBuilder.Entity<EpisodeFile>().HasQueryFilter(e => _operationContext.User.LibraryAccessIds.Contains(e.PartOfLibraryId));
+                modelBuilder.Entity<User>().HasQueryFilter(e => e.Id == _operationContext.Session.UserId);
+                modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
+                modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
             }
         }
 

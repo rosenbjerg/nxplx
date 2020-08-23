@@ -123,8 +123,6 @@ namespace NxPlx.Application.Mapping
             
             CreateMap<Library, AdminLibraryDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(src => src.Kind.ToString().ToLowerInvariant()));
-            
-            CreateMap<UserSession, UserSessionDto>();
         }
     }
 }

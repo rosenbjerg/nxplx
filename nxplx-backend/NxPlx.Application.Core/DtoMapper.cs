@@ -231,12 +231,6 @@ namespace NxPlx.Application.Core
                 Kind = library.Kind.ToString().ToLowerInvariant(),
                 Path = library.Path
             });
-            SetMapping<UserSession, UserSessionDto>(userSession => new UserSessionDto
-            {
-                Id = userSession.Id,
-                UserAgent = userSession.UserAgent,
-                Expiration = userSession.Expiration
-            });
         }
     }
 }

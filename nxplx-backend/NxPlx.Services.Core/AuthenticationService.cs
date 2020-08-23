@@ -14,32 +14,33 @@ namespace NxPlx.Core.Services
     {
         private readonly DatabaseContext _databaseContext;
         private readonly OperationContext _operationContext;
+        private readonly SessionService _sessionService;
         private readonly TimeSpan _sessionLength;
 
-        public AuthenticationService(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration)
+        public AuthenticationService(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration, SessionService sessionService)
         {
             _databaseContext = databaseContext;
             _operationContext = operationContext;
+            _sessionService = sessionService;
             var sessionConfig = configuration.GetSection("Session");
             _sessionLength = TimeSpan.FromDays(int.Parse(sessionConfig["LengthInDays"] ?? "20"));
         }
-        public async Task<UserSession?> Login(string username, string password, string userAgent)
+        public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Login(string username, string password, string userAgent)
         {
             var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
             if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
             {
-                var session = new UserSession
+                var token = GenerateToken();
+                var expiry = DateTime.UtcNow.Add(_sessionLength);
+                var session = new Session
                 {
-                    Id = GenerateToken(),
                     UserAgent = userAgent,
                     IsAdmin = user.Admin,
                     UserId = user.Id,
-                    Expiration = DateTime.UtcNow.Add(_sessionLength)
                 };
-                _operationContext.User = user;
-                _databaseContext.UserSessions.Add(session);
-                await _databaseContext.SaveChangesAsync();
-                return session;
+                await _sessionService.AddSession(user.Id, token, session, _sessionLength);
+                _operationContext.Session = session;
+                return (token, expiry, user.Admin);
             }
 
             return default;

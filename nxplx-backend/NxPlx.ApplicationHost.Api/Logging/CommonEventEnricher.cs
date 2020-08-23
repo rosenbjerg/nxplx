@@ -15,8 +15,8 @@ namespace NxPlx.ApplicationHost.Api.Logging
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(OperationContext.Session), _operationContext.Session.Id));
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(OperationContext.User), _operationContext.User.Id));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(OperationContext.SessionId), _operationContext.SessionId));
+            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(OperationContext.Session.UserId), _operationContext.Session));
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(OperationContext.CorrelationId), _operationContext.CorrelationId.ToString()));
         }
     }

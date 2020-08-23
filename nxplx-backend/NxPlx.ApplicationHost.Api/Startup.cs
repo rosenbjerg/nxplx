@@ -82,6 +82,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
+            services.AddSingleton(typeof(SessionService));
             
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
@@ -94,6 +95,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(FilmService));
             services.AddScoped(typeof(LibraryService));
             services.AddScoped(typeof(NextEpisodeService));
+            services.AddScoped(typeof(UserContextService));
             services.AddScoped(typeof(ProgressService));
             services.AddScoped(typeof(SessionService));
             services.AddScoped(typeof(SubtitleService));

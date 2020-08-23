@@ -32,7 +32,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
         
         [HttpGet("")]
-        public ActionResult<UserDto?> Get() => _userService.GetCurrentUser();
+        public async Task<ActionResult<UserDto?>> Get() => await _userService.GetCurrentUser();
         
         [HttpPut("")]
         public Task Update([FromForm, EmailAddress] string? email) => _userService.UpdateUser(email);

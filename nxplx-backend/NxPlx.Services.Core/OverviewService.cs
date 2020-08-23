@@ -16,25 +16,26 @@ namespace NxPlx.Core.Services
 {
     public class OverviewService
     {
-        private readonly OperationContext _operationContext;
         private readonly DatabaseContext _databaseContext;
         private readonly IDistributedCache _distributedCache;
         private readonly IDtoMapper _dtoMapper;
         private readonly IMapper _mapper;
+        private readonly UserContextService _userContextService;
 
-        public OverviewService(OperationContext operationContext, DatabaseContext databaseContext, IDistributedCache distributedCache, IDtoMapper dtoMapper, IMapper mapper)
+        public OverviewService(DatabaseContext databaseContext, IDistributedCache distributedCache, IDtoMapper dtoMapper, IMapper mapper, UserContextService userContextService)
         {
-            _operationContext = operationContext;
             _databaseContext = databaseContext;
             _distributedCache = distributedCache;
             _dtoMapper = dtoMapper;
             _mapper = mapper;
+            _userContextService = userContextService;
         }
         
         public async Task<IEnumerable<OverviewElementDto>> GetOverview()
         {
-            var libs = _operationContext.User.LibraryAccessIds;
-            if (_operationContext.User.Admin) libs = await _databaseContext.Libraries.Select(l => l.Id).ToListAsync();
+            var currentUser = await _userContextService.GetUser();
+            var libs = currentUser.LibraryAccessIds;
+            if (currentUser.Admin) libs = await _databaseContext.Libraries.Select(l => l.Id).ToListAsync();
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
             return await CachedResult(overviewCacheKey, () => BuildOverview(libs));
         }
