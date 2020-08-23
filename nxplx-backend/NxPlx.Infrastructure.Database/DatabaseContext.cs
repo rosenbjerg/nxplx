@@ -31,7 +31,6 @@ namespace NxPlx.Services.Database
         public DbSet<SubtitlePreference> SubtitlePreferences { get; set; } = null!;
         public DbSet<WatchingProgress> WatchingProgresses { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
-        public DbSet<UserSession> UserSessions { get; set; } = null!;
         public DbSet<Genre> Genre { get; set; } = null!;
         public DbSet<MovieCollection> MovieCollection { get; set; } = null!;
         public DbSet<Network> Network { get; set; } = null!;
