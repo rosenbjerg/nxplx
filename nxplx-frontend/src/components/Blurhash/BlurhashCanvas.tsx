@@ -41,8 +41,8 @@ export default class BlurhashCanvas extends Component<Props> {
   };
 
   render() {
-    const { hash, height, width, ...rest } = this.props;
+    const { hash, height, width, style, ...rest } = this.props;
 
-    return <canvas {...rest} height={height} width={width} ref={this.handleRef} />;
+    return <canvas {...rest} style={style} height={height} width={width} ref={this.handleRef} />;
   }
 }

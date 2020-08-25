@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Core.Services;
@@ -16,12 +15,12 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class LibraryController : ControllerBase
     {
         private readonly LibraryService _libraryService;
-        private readonly OperationContext _operationContext;
+        private readonly UserContextService _userContextService;
 
-        public LibraryController(LibraryService libraryService, OperationContext operationContext)
+        public LibraryController(LibraryService libraryService, UserContextService userContextService)
         {
             _libraryService = libraryService;
-            _operationContext = operationContext;
+            _userContextService = userContextService;
         }
         
         [HttpGet("browse")]
@@ -46,7 +45,8 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("list")]
         public async Task<IEnumerable<LibraryDto>> List()
         {
-            if (_operationContext.User.Admin)
+            var currentUser = await _userContextService.GetUser();
+            if (currentUser.Admin)
                 return await _libraryService.ListLibraries<AdminLibraryDto>();
             else
                 return await _libraryService.ListLibraries<LibraryDto>();

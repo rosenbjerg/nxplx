@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
@@ -16,28 +15,22 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     {
         private readonly OperationContext _operationContext;
         private readonly SessionService _sessionService;
+        private readonly UserContextService _userContextService;
 
-        public SessionController(OperationContext operationContext, SessionService sessionService)
+        public SessionController(OperationContext operationContext, SessionService sessionService, UserContextService userContextService)
         {
             _operationContext = operationContext;
             _sessionService = sessionService;
+            _userContextService = userContextService;
         }
 
         [HttpGet("")]
-        public Task<List<UserSessionDto>> GetSessions()
-            => _sessionService.GetUserSessions(_operationContext.User.Id);
+        public Task<SessionDto[]> GetSessions()
+            => _sessionService.FindSessions(_operationContext.Session.UserId);
 
-        [HttpDelete("")]
-        public async Task<IActionResult> CloseSession()
-        {
-            var success = await _sessionService.CloseUserSession(_operationContext.Session.Id);
-            if (success) return Ok();
-            return BadRequest();
-        }
-        
         [HttpGet("{userId}")]
         [RequiresAdminPermissions]
-        public Task<List<UserSessionDto>> GetUserSessions([FromRoute, Required]int userId)
-            => _sessionService.GetUserSessions(userId);
+        public Task<SessionDto[]> GetUserSessions([FromRoute, Required]int userId)
+            => _sessionService.FindSessions(userId);
     }
 }

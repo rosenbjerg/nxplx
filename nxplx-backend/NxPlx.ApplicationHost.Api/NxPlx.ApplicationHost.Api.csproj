@@ -31,4 +31,28 @@
       <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="public\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="public\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="public\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="public\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="public\assets\localisation\nxplx.da.json" />
+      <_ContentIncludedByDefault Remove="public\assets\localisation\nxplx.en.json" />
+      <_ContentIncludedByDefault Remove="public\manifest.json" />
+      <_ContentIncludedByDefault Remove="public\preact_prerender_data.json" />
+      <_ContentIncludedByDefault Remove="public\push-manifest.json" />
+    </ItemGroup>
+
 </Project>

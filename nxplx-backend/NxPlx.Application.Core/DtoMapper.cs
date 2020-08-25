@@ -123,7 +123,6 @@ namespace NxPlx.Application.Core
             SetMapping<FilmFile, InfoDto>(filmFile => new InfoDto
             {
                 Id = filmFile.FilmDetails.Id,
-                Fid = filmFile.Id,
                 Duration = filmFile.MediaDetails.Duration,
                 BackdropPath = filmFile.FilmDetails.BackdropPath,
                 BackdropBlurHash = filmFile.FilmDetails.BackdropBlurHash,
@@ -142,7 +141,6 @@ namespace NxPlx.Application.Core
             SetMapping<EpisodeFile, InfoDto>(episodeFile => new InfoDto
             {
                 Id = episodeFile.SeriesDetails.Id,
-                Fid = episodeFile.Id,
                 Duration = episodeFile.MediaDetails.Duration,
                 BackdropPath = episodeFile.SeriesDetails.BackdropPath,
                 BackdropBlurHash = episodeFile.SeriesDetails.BackdropBlurHash,
@@ -230,12 +228,6 @@ namespace NxPlx.Application.Core
                 Language = library.Language,
                 Kind = library.Kind.ToString().ToLowerInvariant(),
                 Path = library.Path
-            });
-            SetMapping<UserSession, UserSessionDto>(userSession => new UserSessionDto
-            {
-                Id = userSession.Id,
-                UserAgent = userSession.UserAgent,
-                Expiration = userSession.Expiration
             });
         }
     }

@@ -11,15 +11,15 @@ namespace NxPlx.Core.Services
 {
     public class NextEpisodeService
     {
-        private readonly OperationContext _operationContext;
         private readonly DatabaseContext _context;
         private readonly IDtoMapper _dtoMapper;
+        private readonly UserContextService _userContextService;
 
-        public NextEpisodeService(OperationContext operationContext, DatabaseContext context, IDtoMapper dtoMapper)
+        public NextEpisodeService(DatabaseContext context, IDtoMapper dtoMapper, UserContextService userContextService)
         {
-            _operationContext = operationContext;
             _context = context;
             _dtoMapper = dtoMapper;
+            _userContextService = userContextService;
         }
 
         public async Task<NextEpisodeDto?> TryFindNextEpisode(int seriesId, int? seasonNo, int? episodeNo, string mode)
@@ -46,7 +46,7 @@ namespace NxPlx.Core.Services
             return available[selectedIndex];
         }
 
-        public async Task<EpisodeFile> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
+        public async Task<EpisodeFile?> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
         {
             var available = await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
@@ -55,8 +55,9 @@ namespace NxPlx.Core.Services
                 .ToListAsync();
             var availableIds = available.Select(ef => ef.Id).ToList();
 
+            var currentUser = await _userContextService.GetUser();
             var progress = await _context.WatchingProgresses.AsNoTracking()
-                .Where(wp => wp.UserId == _operationContext.User.Id && availableIds.Contains(wp.FileId))
+                .Where(wp => wp.UserId == currentUser.Id && availableIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId);
 
             return available

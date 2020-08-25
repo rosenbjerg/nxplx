@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Application.Core;
-using NxPlx.Models;
 
 namespace NxPlx.Infrastructure.Broadcasting
 {
@@ -15,7 +14,7 @@ namespace NxPlx.Infrastructure.Broadcasting
         
         public void Add(Connection connection)
         {
-            var userConnections = _connectionTable.GetOrAdd(connection.OperationContext.User.Id, _ => new UserConnections(connection.OperationContext.User));
+            var userConnections = _connectionTable.GetOrAdd(connection.OperationContext.Session.UserId, _ => new UserConnections(connection.OperationContext.Session.IsAdmin));
             lock (userConnections.Sync) userConnections.Connections.Add(connection);
             connection.Disconnected += OnDisconnected;
             connection.MessageReceived += OnMessageReceived;
@@ -61,22 +60,22 @@ namespace NxPlx.Infrastructure.Broadcasting
             connection.Disconnected -= OnDisconnected;
             connection.MessageReceived -= OnMessageReceived;
 
-            if (!_connectionTable.TryGetValue(connection.OperationContext.User.Id, out var userConnections))
+            if (!_connectionTable.TryGetValue(connection.OperationContext.Session.UserId, out var userConnections))
                 return;
             
             lock (userConnections.Sync)
             {
                 userConnections.Connections.Remove(connection);
                 if (userConnections.Connections.Count == 0)
-                    _connectionTable.TryRemove(connection.OperationContext.User.Id, out var deleted);
-            };
+                    _connectionTable.TryRemove(connection.OperationContext.Session.UserId, out _);
+            }
         }
 
         class UserConnections
         {
-            public UserConnections(User user)
+            public UserConnections(bool isAdminUser)
             {
-                Admin = user.Admin;
+                Admin = isAdminUser;
             }
             internal readonly object Sync = new object();
             internal readonly List<Connection> Connections = new List<Connection>();

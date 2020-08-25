@@ -15,29 +15,13 @@ interface State {
 }
 interface UserSession {
     id: string
-    expiration: string
     userAgent: string
 }
 interface Session {
     id: string
-    expiration: Date
-    expires: string
     browser: any
     os: any
 }
-
-const formatTime = (from, to) => {
-    const minutes = (to.getTime() - from.getTime()) / 1000 / 60;
-
-    if (minutes / 60 > 48) {
-        return `${Math.floor(minutes / 60 / 24)} ${translate('days')}`;
-    }
-    if (minutes > 120) {
-        return `${Math.floor(minutes / 60)} ${translate('hours')}`;
-    }
-
-    return `${Math.floor(minutes)} ${translate('minutes')}`;
-};
 
 export default class SessionManager extends Component<Props, State> {
 
@@ -47,11 +31,8 @@ export default class SessionManager extends Component<Props, State> {
             const parser = new UAParser();
             const parsed = sessions.map(session => {
                 parser.setUA(session.userAgent);
-                const exp = new Date(session.expiration);
                 return {
                     id: session.id,
-                    expiration: exp,
-                    expires: formatTime(new Date(), exp),
                     browser: parser.getBrowser(),
                     os: parser.getOS()
                 };
@@ -70,9 +51,6 @@ export default class SessionManager extends Component<Props, State> {
                         <tr key={session.id}>
                             <td title={translate('browser on device', `${session.browser.name} ${session.browser.version}`, `${session.os.name} ${session.os.version}`)}>
                                 {translate('browser on device', session.browser.name, session.os.name)}
-                            </td>
-                            <td title={session.expiration.toLocaleString()}>
-                                {` - ${translate('expires in')} ${session.expires}`}
                             </td>
                             <td>
                                 <button title={translate('close this session')} onClick={this.closeSession(session)}

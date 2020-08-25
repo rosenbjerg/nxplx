@@ -1,45 +1,61 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Services.Database;
-using IMapper = AutoMapper.IMapper;
+using NxPlx.Models;
 
 namespace NxPlx.Core.Services
 {
     public class SessionService
     {
-        private readonly OperationContext _operationContext;
-        private readonly DatabaseContext _context;
-        private readonly IDtoMapper _dtoMapper;
-        private readonly IMapper _mapper;
+        private const string SessionPrefix = "session";
+        private readonly IDistributedCache _distributedCache;
 
-        public SessionService(OperationContext operationContext, DatabaseContext context, IDtoMapper dtoMapper, IMapper mapper)
+        public SessionService(IDistributedCache distributedCache)
         {
-            _operationContext = operationContext;
-            _context = context;
-            _dtoMapper = dtoMapper;
-            _mapper = mapper;
+            _distributedCache = distributedCache;
         }
-        public async Task<bool> CloseUserSession(string sessionId)
-        {
-            var session = await _context.UserSessions.FirstOrDefaultAsync(us => us.Id == sessionId);
-            if (session == default || session.UserId != _operationContext.User.Id && !session.User.Admin)
-                return false;
+        
+        public Task<Session?> FindSession(string token, CancellationToken cancellationToken = default) => _distributedCache.GetObjectAsync<Session>($"{SessionPrefix}:{token}", cancellationToken);
 
-            _context.UserSessions.Remove(session);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-        public Task<List<UserSessionDto>> GetUserSessions(int userId)
+        public async Task<SessionDto[]> FindSessions(int userId, CancellationToken cancellationToken = default)
         {
-            return _context.UserSessions
-                .Where(s => s.UserId == userId)
-                .ProjectTo<UserSessionDto>(_mapper.ConfigurationProvider)
-                .ToListAsync();
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
+            if (sessions == null)
+                return new SessionDto[0];
+
+            var foundSessions = await Task.WhenAll(sessions.Select(async token => (token, session: await FindSession(token, cancellationToken))));
+            return foundSessions.Where(s => s.session != null).Select(s => new SessionDto
+            {
+                Token = s.token,
+                UserAgent = s.session!.UserAgent
+            }).ToArray()!;
+        }
+
+        public async Task AddSession(int userId, string token, Session session, TimeSpan validity, CancellationToken cancellationToken = default)
+        {
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
+            sessions ??= new List<string>();
+            await _distributedCache.SetObjectAsync($"{SessionPrefix}:{token}", session, new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = validity
+            }, cancellationToken);
+            
+            sessions.Add(token);
+            await _distributedCache.SetObjectAsync($"{SessionPrefix}:{userId}", sessions, cancellationToken: cancellationToken);
+        }
+        
+        public async Task RemoveSession(int userId, string token, CancellationToken cancellationToken = default)
+        {
+            var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{userId}", cancellationToken);
+            await _distributedCache.RemoveAsync(token, cancellationToken);
+            
+            if (sessions != null && sessions.Remove(token))
+                await _distributedCache.SetObjectAsync($"{SessionPrefix}:{userId}", sessions, cancellationToken: cancellationToken);
         }
     }
 }

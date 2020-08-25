@@ -94,7 +94,7 @@ export interface ContinueWatchingElement {
 
 export interface FileInfo {
     id:number
-    fid:number
+    fileToken:string
     duration:number
     title:string
     posterPath:string

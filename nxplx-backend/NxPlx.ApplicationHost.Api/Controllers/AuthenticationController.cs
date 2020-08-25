@@ -28,8 +28,8 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         {
             var session = await _authenticationService.Login(username, password, userAgent);
             if (session == default) return BadRequest("Invalid credentials");
-            _sessionService.AttachSessionToken(HttpContext.Response, session?.Id, session?.Expiration);
-            return Ok(session?.IsAdmin);
+            _sessionService.AttachSessionToken(HttpContext.Response, session.Token, session.Expiry);
+            return Ok(session.IsAdmin);
         }
         
         [HttpPost("logout")]
@@ -44,6 +44,6 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("verify")]
         [SessionAuthentication]
         public ActionResult Verify() 
-            => Ok(_operationContext.User!.Admin);
+            => Ok(_operationContext.Session.IsAdmin);
     }
 }

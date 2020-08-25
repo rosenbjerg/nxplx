@@ -44,7 +44,7 @@ const setMuted = mu => Store.local.setEntry("player_muted", muted = mu);
 
 // declare const cast;
 // declare const chrome;
-const brightFontStyle = 'color: white; display: inline-block';
+const brightFontStyle = 'color: white; display: inline-block; text-shadow: 1px 1px 3px black;';
 
 const formatTime = totalSeconds => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -68,10 +68,10 @@ interface FancyProps {
 
 const FancyTrack = ({ primaryPct, secondaryPct = 0, innerStyle, outerStyle, onSeek }: FancyProps) => {
     const handleSeek = useCallback((ev) => onSeek(ev.target.value / 100), [onSeek]);
-    const line = `background: linear-gradient(to right, #48BBF4 0%, #48BBF4 ${primaryPct - 0.1}%, #1562af ${primaryPct - 0.1}%, #1562af ${secondaryPct}%, #444 ${secondaryPct}%, #444 100%);`;
+    const line = `background: linear-gradient(to right, #48BBF4 0%, #48BBF4 ${primaryPct - 0.03}%, #1562af ${primaryPct - 0.03}%, #1562af ${secondaryPct}%, #444 ${secondaryPct}%, #444 100%);`;
     return (
         <div class={style.track} style={outerStyle || "width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}>
-            <input class={style.range} style={`${(innerStyle || 'width: 100%')}; ${line}`} type="range" step="0.01" min="0" max="100" value={primaryPct} onInput={handleSeek}/>
+            <input class={style.range} style={`${(innerStyle || 'width: 100%')}; ${line}`} type="range" step="0.01" min="0" max="100" value={primaryPct || 0} onInput={handleSeek}/>
         </div>
     );
 }
@@ -91,8 +91,6 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.video !== undefined) {
             this.video.volume = volume;
             this.isTouch = isTouchscreen();
-
-
             this.setState({ volume, muted });
         }
         // cast.framework.CastContext.getInstance().setOptions({
@@ -119,11 +117,7 @@ export default class VideoPlayer extends Component<Props, State> {
             <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}`}>
                 <span class={`${style.title} ${style.topControls}`}>{title}</span>
                 <div class={style.bottomControls}>
-
-                    {/*<div class={style.track} style={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}>*/}
-                    {/*    <input class={style.range} style="width: 100%" type="range" step="0.01" min="1" max="100" value={((currentTime / duration) * 100) || 0} onInput={this.onSeek}/>*/}
-                    {/*</div>*/}
-                    <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}/>
+                    <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px; margin-bottom: 2px"}/>
                     <span style="margin-left: 10px; display: inline-block;">
                             {playing
                                 ? (<IconButton style={brightFontStyle} onClick={this.pauseVideo} icon="pause"/>)
@@ -135,8 +129,6 @@ export default class VideoPlayer extends Component<Props, State> {
                         </span>
                         <span style="vertical-align: super;">{`${formatTime(currentTime || 0)} / ${formatTime(duration)}`}</span>
                     </span>
-
-
                     <span style="margin-right: 10px; float: right;">
                         {subtitles && subtitles.length > 0 && (
                             <select class="noborder">
@@ -207,12 +199,8 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.lastFocus + 500 > now) return;
         this.lastFocus = now;
         clearTimeout(this.timeout);
+        this.timeout = setTimeout(() => this.setState({ focused: false }), 2000);
         this.setState({ focused: true });
-        this.onUnfocused();
-    }
-    private onUnfocused = () => {
-        clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.setState({ focused: false }), 1000);
     }
     private seek = (seconds: number) => {
         if (!this.video) return;
@@ -251,6 +239,7 @@ export default class VideoPlayer extends Component<Props, State> {
         this.videoContainer.requestFullscreen().then(() => this.setState({ fullscreen: true }));
     }
     private clickOnVideo = () => {
+        const shouldPlay = !this.isTouch || (this.isTouch && this.state.focused);
         if (this.videoClickTimer) {
             clearTimeout(this.videoClickTimer);
             this.videoClickTimer = null;
@@ -259,7 +248,7 @@ export default class VideoPlayer extends Component<Props, State> {
         else {
             this.videoClickTimer = setTimeout(() => {
                 this.videoClickTimer = null;
-                this.playPause();
+                if (shouldPlay) this.playPause();
             }, 200);
         }
     }
@@ -295,12 +284,10 @@ export default class VideoPlayer extends Component<Props, State> {
     };
 
     private onPlay = () => {
-        setAutoplay(true);
         if (this.video) this.props.events("state_changed", { state: "playing", time: this.video.currentTime });
         this.setState({ playing: true });
     };
     private onPause = () => {
-        setAutoplay(false);
         if (this.video) this.props.events("state_changed", { state: "paused", time: this.video.currentTime });
         this.setState({ playing: false });
     };
@@ -311,17 +298,13 @@ export default class VideoPlayer extends Component<Props, State> {
 
     private bindVideo = ref => this.video = ref;
     private bindVideoContainer = ref => {
+        if (ref === this.videoContainer) return;
         if (ref) {
             ref.onmousemove = this.onFocused;
             ref.onmousedown = this.onFocused;
             ref.onfocusin = this.onFocused;
             ref.onmouseover = this.onFocused;
             ref.onhover = this.onFocused;
-
-            ref.onfocusout = this.onUnfocused;
-            ref.onmouseout = this.onUnfocused;
-            ref.onmouseleave = this.onUnfocused;
-            ref.onmouseup = this.onUnfocused;
         }
         this.videoContainer = ref;
     }

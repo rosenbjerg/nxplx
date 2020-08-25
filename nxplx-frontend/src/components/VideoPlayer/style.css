@@ -20,6 +20,7 @@
     bottom: -200px;
     text-shadow: 1px 1px 3px black;
 }
+
 .volumeControls {
     display: inline-block;
 }
@@ -45,6 +46,7 @@
     margin-left: -50px;
     top: calc(50% + 28px);
     margin-top: -50px;
+    text-shadow: 1px 1px 3px black;
 }
 .videoContainer:fullscreen .centerPlayButton {
     top: 50%;
@@ -69,13 +71,12 @@
 .videoContainer.focused .closeButton {
     top: -100px;
 }
-.videoContainer.focused:fullscreen .closeButton, .videoContainer.focused:fullscreen .topControls {
+.videoContainer.focused:fullscreen .closeButton, .videoContainer:fullscreen.focused .topControls {
     top: 10px;
 }
 .videoContainer.focused .bottomControls {
     bottom: 0px;
 }
-
 
 .video {
     height: 100%;

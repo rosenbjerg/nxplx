@@ -31,7 +31,7 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
     ({ isLoggedIn, isAdmin, build, logout }) => (
         <header class={style.header}>
             <Link title={`NxPlx - v.${build}`} href={'/'}>
-                <img src="/assets/images/nxplx-cropped-h120-light-small.png" alt="NxPlx"/>
+                <img src="/assets/images/nxplx-logo.svg" alt="NxPlx"/>
             </Link>
             {isLoggedIn && (
                 <nav class={style.menu}>

@@ -37,20 +37,17 @@ export default class Watch extends Component<Props, State> {
     private openSnackbar: Snackbar|null = null;
 
     public render({ fid, kind }: Props, { info, subtitleLanguage, progress }: State) {
-        if (!info)
-            return (<Loading fullscreen/>);
-
+        if (!info) return (<Loading fullscreen/>);
         return (
             <div class={style.container}>
                 <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
                 <VideoPlayer
-                    key={fid}
                     isSeries={kind === 'series'}
                     duration={info.duration}
                     events={this.videoEvents}
                     startTime={progress}
                     title={info.title}
-                    src={`/api/${kind}/${fid}/watch`}
+                    src={`/api/stream/${info.fileToken}.mp4`}
                     poster={imageUrl(this.state.info!.backdropPath, 1280)}
                     playNext={this.tryPlayNext}
 
@@ -107,14 +104,11 @@ export default class Watch extends Component<Props, State> {
     }
 
     private tryPlayNext = () => {
-        http.getJson<NextEpisode>(`/api/series/file/${this.state.info!.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
+        http.getJson<NextEpisode>(`/api/series/file/${this.props.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress();
             if (this.openSnackbar) this.openSnackbar.destroy();
             this.suggestNext = true;
             this.playerTime = 0;
-            this.setState({
-                progress: 0, subtitleLanguage: "none", info: undefined, playerState: "loading"
-            })
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
     }
@@ -136,7 +130,7 @@ export default class Watch extends Component<Props, State> {
     private saveProgress = () => {
         if (this.state.info) {
             if (this.playerTime > 5) {
-                http.put(`/api/progress/${this.props.kind}/${this.state.info.fid}?time=${this.playerTime}`);
+                http.put(`/api/progress/${this.props.kind}/${this.props.fid}?time=${this.playerTime}`);
             }
         }
     };
