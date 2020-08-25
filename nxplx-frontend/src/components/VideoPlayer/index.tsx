@@ -117,11 +117,7 @@ export default class VideoPlayer extends Component<Props, State> {
             <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}`}>
                 <span class={`${style.title} ${style.topControls}`}>{title}</span>
                 <div class={style.bottomControls}>
-
-                    {/*<div class={style.track} style={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}>*/}
-                    {/*    <input class={style.range} style="width: 100%" type="range" step="0.01" min="1" max="100" value={((currentTime / duration) * 100) || 0} onInput={this.onSeek}/>*/}
-                    {/*</div>*/}
-                    <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px;"}/>
+                    <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px; margin-bottom: 2px"}/>
                     <span style="margin-left: 10px; display: inline-block;">
                             {playing
                                 ? (<IconButton style={brightFontStyle} onClick={this.pauseVideo} icon="pause"/>)
@@ -133,8 +129,6 @@ export default class VideoPlayer extends Component<Props, State> {
                         </span>
                         <span style="vertical-align: super;">{`${formatTime(currentTime || 0)} / ${formatTime(duration)}`}</span>
                     </span>
-
-
                     <span style="margin-right: 10px; float: right;">
                         {subtitles && subtitles.length > 0 && (
                             <select class="noborder">
@@ -205,7 +199,7 @@ export default class VideoPlayer extends Component<Props, State> {
         if (this.lastFocus + 500 > now) return;
         this.lastFocus = now;
         clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => this.setState({ focused: false }), 1800);
+        this.timeout = setTimeout(() => this.setState({ focused: false }), 2000);
         this.setState({ focused: true });
     }
     private seek = (seconds: number) => {
@@ -245,6 +239,7 @@ export default class VideoPlayer extends Component<Props, State> {
         this.videoContainer.requestFullscreen().then(() => this.setState({ fullscreen: true }));
     }
     private clickOnVideo = () => {
+        const shouldPlay = !this.isTouch || (this.isTouch && this.state.focused);
         if (this.videoClickTimer) {
             clearTimeout(this.videoClickTimer);
             this.videoClickTimer = null;
@@ -253,7 +248,7 @@ export default class VideoPlayer extends Component<Props, State> {
         else {
             this.videoClickTimer = setTimeout(() => {
                 this.videoClickTimer = null;
-                this.playPause();
+                if (shouldPlay) this.playPause();
             }, 200);
         }
     }
@@ -303,6 +298,7 @@ export default class VideoPlayer extends Component<Props, State> {
 
     private bindVideo = ref => this.video = ref;
     private bindVideoContainer = ref => {
+        if (ref === this.videoContainer) return;
         if (ref) {
             ref.onmousemove = this.onFocused;
             ref.onmousedown = this.onFocused;

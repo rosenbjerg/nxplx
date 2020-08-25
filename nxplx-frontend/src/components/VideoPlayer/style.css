@@ -71,7 +71,7 @@
 .videoContainer.focused .closeButton {
     top: -100px;
 }
-.videoContainer.focused:fullscreen .closeButton, .videoContainer.focused:fullscreen .topControls {
+.videoContainer.focused:fullscreen .closeButton, .videoContainer:fullscreen.focused .topControls {
     top: 10px;
 }
 .videoContainer.focused .bottomControls {

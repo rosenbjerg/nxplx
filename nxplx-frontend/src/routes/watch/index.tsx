@@ -37,14 +37,11 @@ export default class Watch extends Component<Props, State> {
     private openSnackbar: Snackbar|null = null;
 
     public render({ fid, kind }: Props, { info, subtitleLanguage, progress }: State) {
-        if (!info)
-            return (<Loading fullscreen/>);
-
+        if (!info) return (<Loading fullscreen/>);
         return (
             <div class={style.container}>
                 <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
                 <VideoPlayer
-                    key={fid}
                     isSeries={kind === 'series'}
                     duration={info.duration}
                     events={this.videoEvents}
@@ -112,9 +109,6 @@ export default class Watch extends Component<Props, State> {
             if (this.openSnackbar) this.openSnackbar.destroy();
             this.suggestNext = true;
             this.playerTime = 0;
-            this.setState({
-                progress: 0, subtitleLanguage: "none", info: undefined, playerState: "loading"
-            })
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
     }
