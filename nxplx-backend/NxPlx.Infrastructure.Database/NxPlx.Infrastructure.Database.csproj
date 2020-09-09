@@ -12,7 +12,7 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="3.1.8" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.4" />
     </ItemGroup>
 
