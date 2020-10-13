@@ -79,7 +79,6 @@ namespace NxPlx.Services.Index
         {
             var filmFile = await _context.FilmFiles.FindAsync(filmFileId);
             var fileInfo = new FileInfo(filmFile.Path);
-            filmFile.Created = fileInfo.CreationTimeUtc;
             filmFile.LastWrite = fileInfo.LastWriteTimeUtc;
             filmFile.FileSizeBytes = fileInfo.Length;
             filmFile.PartOfLibraryId = libraryId;
@@ -95,7 +94,6 @@ namespace NxPlx.Services.Index
             foreach (var episodeFile in episodeFiles)
             {
                 var fileInfo = new FileInfo(episodeFile.Path);
-                episodeFile.Created = fileInfo.CreationTimeUtc;
                 episodeFile.LastWrite = fileInfo.LastWriteTimeUtc;
                 episodeFile.FileSizeBytes = fileInfo.Length;
                 episodeFile.PartOfLibraryId = libraryId;
@@ -130,7 +128,6 @@ namespace NxPlx.Services.Index
             _context.FilmFiles.AddRange(newFilm);
             var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
             var newDetails = await databaseDetails.GetUniqueNew(_context);
-            newDetails.ForEach(film => film.Added = DateTime.UtcNow);
             await _context.AddRangeAsync(newDetails);
             await _context.SaveChangesAsync();
             await _cacheClearer.Clear("OVERVIEW");
@@ -152,7 +149,7 @@ namespace NxPlx.Services.Index
             var currentEpisodePaths = new HashSet<string>(await _context.EpisodeFiles.Where(e => e.PartOfLibraryId == libraryId).Select(e => e.Path).ToListAsync());
             var newFiles = FileIndexer.FindFiles(library.Path, "*", "mp4").Where(filePath => !currentEpisodePaths.Contains(filePath));
             var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library).ToList();
-            var details = await Da(newEpisodes, library);
+            var details = await FetchSeasons(newEpisodes, library);
 
             var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
             var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew(_context);
@@ -165,7 +162,6 @@ namespace NxPlx.Services.Index
             _context.AddRange(productionCompanies);
             _context.EpisodeFiles.AddRange(newEpisodes);
             var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
-            databaseDetails.ForEach(series => series.Added = DateTime.UtcNow);
             await _context.AddOrUpdate(databaseDetails);
             await _context.SaveChangesAsync();
             await _cacheClearer.Clear("OVERVIEW");
@@ -290,7 +286,7 @@ namespace NxPlx.Services.Index
             }
         }
 
-        private async Task<List<SeriesDetails>> Da(List<EpisodeFile> newEpisodes, Library library)
+        private async Task<List<SeriesDetails>> FetchSeasons(List<EpisodeFile> newEpisodes, Library library)
         {
             await FindSeriesDetails(newEpisodes);
             var details = new List<SeriesDetails>();

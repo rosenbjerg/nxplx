@@ -72,7 +72,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly("NxPlx.Infrastructure.Database"))
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
                     .UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
@@ -122,9 +122,10 @@ namespace NxPlx.ApplicationHost.Api
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseMiddleware<ExceptionInterceptorMiddleware>();
-            app.UseForwardedHeaders();
             app.UseMiddleware<LoggingInterceptorMiddleware>();
+            app.UseMiddleware<ExceptionInterceptorMiddleware>();
+            app.UseMiddleware<PerformanceInterceptorMiddleware>();
+            app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
             if (hostingOptions.ApiDocumentation)
@@ -142,6 +143,9 @@ namespace NxPlx.ApplicationHost.Api
 
         private static void InitializeDatabase(DatabaseContext databaseContext)
         {
+            var applied = databaseContext.Database.GetAppliedMigrations().ToArray();
+            var migrations = databaseContext.Database.GetPendingMigrations().ToArray();
+            databaseContext.Database.EnsureCreated();
             databaseContext.Database.Migrate();
             if (!databaseContext.Users.Any(u => u.Username == "admin"))
             {
@@ -155,7 +159,8 @@ namespace NxPlx.ApplicationHost.Api
             }
         }
         
-        private static Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new FileExtensionContentTypeProvider(); 
         private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
         {
             var path = context.Request.Path.ToString().TrimStart('/');
@@ -168,8 +173,7 @@ namespace NxPlx.ApplicationHost.Api
                 if (HashRegex.IsMatch(path))
                     context.Response.Headers.Add("Cache-Control", "max-age=2592000");
                 
-                var provider = new FileExtensionContentTypeProvider();
-                if(!provider.TryGetContentType(fileInfo.Name, out var contentType))
+                if(!FileExtensionContentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType))
                     contentType = "application/octet-stream";
                 context.Response.ContentType = contentType;
                 context.Response.StatusCode = 200;

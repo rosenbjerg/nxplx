@@ -4,6 +4,7 @@
     background-color: black;
     outline: none;
     overflow: hidden;
+    cursor: none;
 }
 .videoContainer .topControls {
     position: absolute;
@@ -64,6 +65,9 @@
     right: 10px;
     color: var(--focused-text);
     cursor: pointer;
+}
+.videoContainer.focused {
+    cursor: default;
 }
 .videoContainer.focused .topControls {
     top: 66px;

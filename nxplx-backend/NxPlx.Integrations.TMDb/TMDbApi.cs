@@ -67,28 +67,15 @@ namespace NxPlx.Integrations.TMDb
         public override async Task<FilmResult[]> SearchMovies(string title, int year)
         {
             var encodedTitle = HttpUtility.UrlEncode(title);
-
             if (title == "" || encodedTitle == "")
-            {
                 return new FilmResult[0];
-            }
             
             var encodedYear = year < 2 ? "" : $"&year={year}";
             var url = $"{BaseUrl}/search/movie?query={encodedTitle}{encodedYear}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
-
-            try
-            {
-
-                return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
         }
         
         public override async Task<SeriesResult[]> SearchTvShows(string name)

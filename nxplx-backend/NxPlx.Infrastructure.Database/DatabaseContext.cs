@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
@@ -21,6 +22,15 @@ namespace NxPlx.Services.Database
         {
             _operationContext = operationContext;
         }
+        // public DatabaseContext()
+        // {
+        //     _operationContext = new OperationContext();
+        // }
+        //
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //     base.OnConfiguring(optionsBuilder.UseNpgsql("Host=localhost;Database=nxplx_db;Username=postgres;Password=o8e4v7wjnt39w82380947n5v209"));
+        // }
 
         public DbSet<FilmFile> FilmFiles { get; set; } = null!;
         public DbSet<DbFilmDetails> FilmDetails { get; set; } = null!;
@@ -58,16 +68,27 @@ namespace NxPlx.Services.Database
 
             ConfigureSeriesDetailsJoinEntities(modelBuilder);
             
-            modelBuilder.Entity<SubtitlePreference>().HasKey(sp => new { sp.UserId, sp.FileId, sp.MediaType });
-            modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.UserId);
-            modelBuilder.Entity<SubtitlePreference>().HasIndex(sp => sp.FileId);
+            modelBuilder.Entity<SubtitlePreference>(builder =>
+            {
+                builder.HasKey(sp => new { sp.UserId, sp.FileId, sp.MediaType });
+                builder.HasIndex(sp => sp.UserId);
+                builder.HasIndex(sp => sp.FileId);
+                builder.HasIndex(sp => sp.MediaType);
+            });
             
-            modelBuilder.Entity<WatchingProgress>().HasKey(wp => new { wp.UserId, wp.FileId, wp.MediaType });
-            modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.UserId);
-            modelBuilder.Entity<WatchingProgress>().HasIndex(wp => wp.FileId);
+            modelBuilder.Entity<WatchingProgress>(builder =>
+            {
+                builder.HasKey(wp => new { wp.UserId, wp.FileId, wp.MediaType });
+                builder.HasIndex(wp => wp.UserId);
+                builder.HasIndex(wp => wp.FileId);
+                builder.HasIndex(wp => wp.MediaType);
+            });
             
-            modelBuilder.Entity<User>().HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.UserId).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<User>().HasMany<WatchingProgress>().WithOne().HasForeignKey(wp => wp.UserId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<User>(builder =>
+            {
+                builder.HasMany<SubtitlePreference>().WithOne().HasForeignKey(sp => sp.UserId).OnDelete(DeleteBehavior.Cascade);
+                builder.HasMany<WatchingProgress>().WithOne().HasForeignKey(wp => wp.UserId).OnDelete(DeleteBehavior.Cascade);
+            });
             
             modelBuilder.Entity<User>()
                 .Property(sl => sl.LibraryAccessIds)
@@ -85,60 +106,110 @@ namespace NxPlx.Services.Database
 
         private static void ConfigureSeriesDetailsJoinEntities(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+                
+            });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
         private static void ConfigureFilmDetailsJoinEntities(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasKey(e => new { e.Entity1Id, e.Entity2Id });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>().HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>(builder =>
+            {
+                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
+                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
         private static void ConfigureFilmFileEntity(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FilmFile>().HasIndex(ff => ff.PartOfLibraryId);
-            modelBuilder.Entity<FilmFile>().HasOne(ff => ff.FilmDetails).WithMany().HasForeignKey(ff => ff.FilmDetailsId).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<FilmFile>().HasOne(ff => ff.PartOfLibrary).WithMany().HasForeignKey(ff => ff.PartOfLibraryId).OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<FilmFile>().HasMany(ff => ff.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<FilmFile>().OwnsOne(ff => ff.MediaDetails);
+            modelBuilder.Entity<FilmFile>(builder =>
+            {
+                builder.HasIndex(ff => ff.PartOfLibraryId);
+                builder.OwnsOne(ff => ff.MediaDetails);
+                builder.HasOne(ff => ff.PartOfLibrary).WithMany().HasForeignKey(ff => ff.PartOfLibraryId).OnDelete(DeleteBehavior.Cascade);
+                builder.HasOne(ff => ff.FilmDetails).WithMany().HasForeignKey(ff => ff.FilmDetailsId).OnDelete(DeleteBehavior.Restrict);
+                builder.HasOne(ff => ff.FilmDetails).WithMany().HasForeignKey(ff => ff.FilmDetailsId).OnDelete(DeleteBehavior.Restrict);
+                builder.HasMany(ff => ff.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
         private static void ConfigureEpisodeFileEntity(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.SeasonNumber);
-            modelBuilder.Entity<EpisodeFile>().HasIndex(ef => ef.PartOfLibraryId);
-            modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.SeriesDetails).WithMany().OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<EpisodeFile>().Ignore(ef => ef.SeasonDetails).Ignore(ef => ef.EpisodeDetails);
-            modelBuilder.Entity<EpisodeFile>().HasOne(ef => ef.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<EpisodeFile>().HasMany(ef => ef.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<EpisodeFile>().OwnsOne(ef => ef.MediaDetails);
+            modelBuilder.Entity<EpisodeFile>(builder =>
+            {
+                builder.HasIndex(ef => ef.SeasonNumber);
+                builder.HasIndex(ef => ef.PartOfLibraryId);
+                builder.HasOne(ef => ef.SeriesDetails).WithMany().OnDelete(DeleteBehavior.Restrict);
+                builder.Ignore(ef => ef.SeasonDetails).Ignore(ef => ef.EpisodeDetails);
+                builder.HasOne(ef => ef.PartOfLibrary).WithMany().OnDelete(DeleteBehavior.Cascade);
+                builder.HasMany(ef => ef.Subtitles).WithOne().OnDelete(DeleteBehavior.Cascade);
+                builder.OwnsOne(ef => ef.MediaDetails);
+            });
+        }
+        
+        
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is ITrackedEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                var entity = (ITrackedEntity)entityEntry.Entity;
+                
+                if (entityEntry.State == EntityState.Added)
+                {
+                    entity.Created = DateTime.UtcNow;
+                    entity.CreatedCorrelationId = _operationContext.CorrelationId;
+                }
+                
+                entity.Updated = DateTime.UtcNow;
+                entity.UpdatedCorrelationId = _operationContext.CorrelationId;
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
         }
     }
 
