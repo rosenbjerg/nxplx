@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders.Physical;
@@ -65,14 +67,14 @@ namespace NxPlx.ApplicationHost.Api
             
             
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
-
+            
             services.AddAutoMapper(typeof(AssemblyMarker));
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly("NxPlx.Infrastructure.Database"))
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
                     .UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
@@ -113,14 +115,14 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
 #if DEBUG
             // mapper.ConfigurationProvider.AssertConfigurationIsValid();
 #endif
             
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
-            InitializeDatabase(app);
+            InitializeDatabase(databaseContext);
 
             app.UseMiddleware<LoggingInterceptorMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
@@ -141,11 +143,8 @@ namespace NxPlx.ApplicationHost.Api
             app.Use(FallbackMiddlewareHandler);
         }
 
-        private static void InitializeDatabase(IApplicationBuilder applicationBuilder)
+        private static void InitializeDatabase(DatabaseContext databaseContext)
         {
-            var scopeProvider = applicationBuilder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
-            using var scope = scopeProvider.CreateScope();
-            using var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             databaseContext.Database.Migrate();
             if (!databaseContext.Users.Any(u => u.Username == "admin"))
             {
