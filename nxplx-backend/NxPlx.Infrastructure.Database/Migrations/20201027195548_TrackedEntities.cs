@@ -304,6 +304,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 nullable: false,
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Created",
+                table: "EpisodeDetails",
+                nullable: false,
+                defaultValue: now);
+            
             migrationBuilder.AddColumn<Guid>(
                 name: "CreatedCorrelationId",
                 table: "EpisodeDetails",
@@ -550,9 +556,8 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 name: "UpdatedCorrelationId",
                 table: "EpisodeFiles");
 
-            migrationBuilder.RenameColumn(
+            migrationBuilder.DropColumn(
                 name: "Created",
-                newName: "Added",
                 table: "EpisodeDetails");
 
             migrationBuilder.DropColumn(
