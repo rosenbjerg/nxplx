@@ -113,14 +113,14 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceScopeFactory scopeFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
 #if DEBUG
             // mapper.ConfigurationProvider.AssertConfigurationIsValid();
 #endif
             
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
-            InitializeDatabase(scopeFactory);
+            InitializeDatabase(app);
 
             app.UseMiddleware<LoggingInterceptorMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
@@ -141,9 +141,10 @@ namespace NxPlx.ApplicationHost.Api
             app.Use(FallbackMiddlewareHandler);
         }
 
-        private static void InitializeDatabase(IServiceScopeFactory serviceScopeFactory)
+        private static void InitializeDatabase(IApplicationBuilder applicationBuilder)
         {
-            using var scope = serviceScopeFactory.CreateScope();
+            var scopeProvider = applicationBuilder.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using var scope = scopeProvider.CreateScope();
             using var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             databaseContext.Database.Migrate();
             if (!databaseContext.Users.Any(u => u.Username == "admin"))
