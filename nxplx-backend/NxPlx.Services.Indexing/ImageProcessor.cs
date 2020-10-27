@@ -120,8 +120,8 @@ namespace NxPlx.Services.Index
             {
                 if (!paths.TryGetValue(episodeDetails.EpisodeNumber, out var path))
                     continue;
-                
-                var snapshotTempPath = await _imageCreationService.CreateSnapshot(path, 0.2);
+
+                var snapshotTempPath = await _imageCreationService.CreateSnapshot(path, 0.2, 260, 200);
                 await _imageCreationService.SetStill(episodeDetails, snapshotTempPath, $"{Guid.NewGuid()}.jpg");
             }
 
