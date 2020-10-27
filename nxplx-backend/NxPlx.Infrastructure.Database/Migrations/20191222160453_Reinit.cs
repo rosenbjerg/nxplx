@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Infrastructure.Database.Migrations
 {
     public partial class Reinit : Migration
     {

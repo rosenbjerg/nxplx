@@ -8,7 +8,7 @@ using NxPlx.Application.Models.Film;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services

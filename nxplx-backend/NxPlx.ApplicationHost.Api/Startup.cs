@@ -26,7 +26,7 @@ using NxPlx.Core.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
 using IMapper = AutoMapper.IMapper;

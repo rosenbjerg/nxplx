@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Core.Services;
 using NxPlx.Models;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Services.Index
 {

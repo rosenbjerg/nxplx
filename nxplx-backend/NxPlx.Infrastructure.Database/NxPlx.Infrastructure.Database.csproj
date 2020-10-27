@@ -2,8 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>NxPlx.Services.Database</RootNamespace>
-        <LangVersion>default</LangVersion>
+        <LangVersion>8</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 

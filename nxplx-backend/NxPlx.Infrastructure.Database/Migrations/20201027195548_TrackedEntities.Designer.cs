@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     [Migration("20201027195548_TrackedEntities")]

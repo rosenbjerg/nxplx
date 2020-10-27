@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     partial class NxplxContextModelSnapshot : ModelSnapshot

@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Core.Services
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace NxPlx.Services.Database
+namespace NxPlx.Infrastructure.Database
 {
     public class HangfireContext : DbContext
     {

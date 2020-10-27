@@ -12,7 +12,7 @@ using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 using Z.EntityFramework.Plus;
 
 namespace NxPlx.Services.Index

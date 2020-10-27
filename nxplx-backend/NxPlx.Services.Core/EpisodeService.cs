@@ -8,7 +8,7 @@ using NxPlx.Application.Models.Series;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Core.Services
 {

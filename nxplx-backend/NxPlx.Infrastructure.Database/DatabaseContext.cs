@@ -12,7 +12,7 @@ using NxPlx.Models.Details.Film;
 using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 
-namespace NxPlx.Services.Database
+namespace NxPlx.Infrastructure.Database
 {
     public class DatabaseContext : DbContext
     {
