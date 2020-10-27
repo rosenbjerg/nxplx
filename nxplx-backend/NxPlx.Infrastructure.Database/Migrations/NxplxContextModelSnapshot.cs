@@ -26,6 +26,9 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<bool>("Adult")
                         .HasColumnType("boolean");
 
@@ -40,12 +43,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<long>("Budget")
                         .HasColumnType("bigint");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("ImdbId")
                         .HasColumnType("text");
@@ -83,12 +80,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<float>("VoteAverage")
                         .HasColumnType("real");
 
@@ -109,17 +100,14 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("BackdropBlurHash")
                         .HasColumnType("text");
 
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("FirstAirDate")
                         .HasColumnType("timestamp without time zone");
@@ -153,12 +141,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("Type")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<double>("VoteAverage")
                         .HasColumnType("double precision");
@@ -344,12 +326,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
@@ -358,12 +334,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -403,20 +373,8 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -430,12 +388,6 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("LogoBlurHash")
                         .HasColumnType("text");
 
@@ -447,12 +399,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("OriginCountry")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -466,20 +412,8 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -495,12 +429,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<DateTime?>("AirDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("integer");
@@ -526,12 +454,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<string>("StillPath")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<float>("VoteAverage")
                         .HasColumnType("real");
 
@@ -552,12 +474,6 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("LogoBlurHash")
                         .HasColumnType("text");
 
@@ -569,12 +485,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("OriginCountry")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -590,12 +500,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<DateTime?>("AirDate")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<int?>("DbSeriesDetailsId")
                         .HasColumnType("integer");
@@ -615,12 +519,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<int>("SeasonNumber")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("DbSeriesDetailsId");
@@ -634,6 +532,12 @@ namespace NxPlx.Services.Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("integer");
@@ -677,6 +581,12 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
 
@@ -714,6 +624,12 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Added")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<int?>("EpisodeFileId")
                         .HasColumnType("integer");
 
@@ -748,12 +664,6 @@ namespace NxPlx.Services.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Kind")
                         .HasColumnType("integer");
 
@@ -765,12 +675,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("Path")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -795,8 +699,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.HasIndex("FileId");
 
-                    b.HasIndex("MediaType");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("SubtitlePreferences");
@@ -812,12 +714,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.Property<bool>("Admin")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("CreatedCorrelationId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
@@ -829,12 +725,6 @@ namespace NxPlx.Services.Database.Migrations
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("Updated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UpdatedCorrelationId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("Username")
                         .HasColumnType("text");
@@ -864,8 +754,6 @@ namespace NxPlx.Services.Database.Migrations
                     b.HasKey("UserId", "FileId", "MediaType");
 
                     b.HasIndex("FileId");
-
-                    b.HasIndex("MediaType");
 
                     b.HasIndex("UserId");
 
