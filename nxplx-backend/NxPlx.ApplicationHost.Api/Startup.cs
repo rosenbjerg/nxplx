@@ -72,7 +72,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly("NxPlx.Infrastructure.Database"))
                     .UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
@@ -113,14 +113,14 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IMapper mapper)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceScopeFactory scopeFactory)
         {
 #if DEBUG
             // mapper.ConfigurationProvider.AssertConfigurationIsValid();
 #endif
             
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
-            InitializeDatabase(databaseContext);
+            InitializeDatabase(scopeFactory);
 
             app.UseMiddleware<LoggingInterceptorMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
@@ -141,11 +141,10 @@ namespace NxPlx.ApplicationHost.Api
             app.Use(FallbackMiddlewareHandler);
         }
 
-        private static void InitializeDatabase(DatabaseContext databaseContext)
+        private static void InitializeDatabase(IServiceScopeFactory serviceScopeFactory)
         {
-            var applied = databaseContext.Database.GetAppliedMigrations().ToArray();
-            var migrations = databaseContext.Database.GetPendingMigrations().ToArray();
-            databaseContext.Database.EnsureCreated();
+            using var scope = serviceScopeFactory.CreateScope();
+            using var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             databaseContext.Database.Migrate();
             if (!databaseContext.Users.Any(u => u.Username == "admin"))
             {
