@@ -29,7 +29,7 @@ namespace NxPlx.Infrastructure.Database
         //
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         // {
-        //     base.OnConfiguring(optionsBuilder.UseNpgsql("Host=localhost;Database=nxplx_db;Username=postgres;Password=o8e4v7wjnt39w82380947n5v209"));
+        //     base.OnConfiguring(optionsBuilder.UseNpgsql("Host=localhost;Database=nxplx_db;Username=postgres;Password=dev"));
         // }
 
         public DbSet<FilmFile> FilmFiles { get; set; } = null!;
