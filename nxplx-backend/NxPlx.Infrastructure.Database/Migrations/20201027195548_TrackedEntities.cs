@@ -8,6 +8,19 @@ namespace NxPlx.Services.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             var now = DateTime.UtcNow;
+            migrationBuilder.DropColumn(
+                name: "Created",
+                table: "SubtitleFiles");
+
+            migrationBuilder.DropColumn(
+                name: "Created",
+                table: "FilmFiles");
+
+            migrationBuilder.DropColumn(
+                name: "Created",
+                table: "EpisodeFiles");
+            
+            
             migrationBuilder.RenameColumn(
                 name: "Added",
                 newName: "Created",
@@ -346,6 +359,7 @@ namespace NxPlx.Services.Database.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            var now = DateTime.UtcNow;
             migrationBuilder.DropIndex(
                 name: "IX_WatchingProgresses_MediaType",
                 table: "WatchingProgresses");
@@ -568,6 +582,24 @@ namespace NxPlx.Services.Database.Migrations
             migrationBuilder.DropColumn(
                 name: "UpdatedCorrelationId",
                 table: "Creator");
+            
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Created",
+                table: "SubtitleFiles",
+                nullable: false,
+                defaultValue: now);
+            
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Created",
+                table: "FilmFiles",
+                nullable: false,
+                defaultValue: now);
+            
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Created",
+                table: "EpisodeFiles",
+                nullable: false,
+                defaultValue: now);
         }
     }
 }
