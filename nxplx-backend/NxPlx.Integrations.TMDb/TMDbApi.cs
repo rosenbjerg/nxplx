@@ -91,9 +91,9 @@ namespace NxPlx.Integrations.TMDb
             return mapped;
         }
 
-        public override async Task<FilmDetails> FetchMovieDetails(int id, string language)
+        public override async Task<FilmDetails> FetchMovieDetails(int seriesId, string language)
         {
-            var url = $"{BaseUrl}/movie/{id}?language={language}";
+            var url = $"{BaseUrl}/movie/{seriesId}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<MovieDetails>(content);
@@ -101,23 +101,23 @@ namespace NxPlx.Integrations.TMDb
             return _mapper.Map<MovieDetails, FilmDetails>(tmdbObj);
         }
         
-        public override async Task<SeriesDetails> FetchTvDetails(int id, string language, int[] seasons)
+        public override async Task<SeriesDetails> FetchTvDetails(int seriesId, string language, int[] seasons)
         {
-            var url = $"{BaseUrl}/tv/{id}?language={language}";
+            var url = $"{BaseUrl}/tv/{seriesId}?language={language}";
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
             var mapped = _mapper.Map<TvDetails, SeriesDetails>(tmdbObj);
-            var seasonDetailsTasks = mapped!.Seasons.Where(s => seasons.Contains(s.SeasonNumber)).Select(s => FetchTvSeasonDetails(id, s.SeasonNumber, language));
+            var seasonDetailsTasks = mapped!.Seasons.Where(s => seasons.Contains(s.SeasonNumber)).Select(s => FetchTvSeasonDetails(seriesId, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
             
             return mapped;
         }
 
-        private async Task<SeasonDetails> FetchTvSeasonDetails(int id, int season, string language)
+        public override async Task<SeasonDetails> FetchTvSeasonDetails(int seriesId, int seasonNo, string language)
         {
-            var url = $"{BaseUrl}/tv/{id}/season/{season}?language={language}";
+            var url = $"{BaseUrl}/tv/{seriesId}/season/{seasonNo}?language={language}";
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvSeasonDetails>(content);

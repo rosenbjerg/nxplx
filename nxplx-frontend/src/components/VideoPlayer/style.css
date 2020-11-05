@@ -60,25 +60,16 @@
     font-size: 24pt;
     color: var(--focused-text);
 }
-.closeButton {
-    font-size: 32pt;
-    right: 10px;
-    color: var(--focused-text);
-    cursor: pointer;
-}
 .videoContainer.focused {
     cursor: default;
 }
-.videoContainer.focused .topControls {
+.videoContainer.focused .topControls, .topControls:hover {
     top: 66px;
 }
-.videoContainer.focused .closeButton {
-    top: -100px;
-}
-.videoContainer.focused:fullscreen .closeButton, .videoContainer:fullscreen.focused .topControls {
+.videoContainer:fullscreen.focused .topControls, .videoContainer:fullscreen .topControls:hover {
     top: 10px;
 }
-.videoContainer.focused .bottomControls {
+.videoContainer.focused .bottomControls, .bottomControls:hover {
     bottom: 0px;
 }
 

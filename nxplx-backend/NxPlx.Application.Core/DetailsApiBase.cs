@@ -76,8 +76,9 @@ namespace NxPlx.Application.Core
         
         public abstract Task<FilmResult[]> SearchMovies(string title, int year);
         public abstract Task<SeriesResult[]> SearchTvShows(string name);
-        public abstract Task<FilmDetails> FetchMovieDetails(int id, string language);
-        public abstract Task<SeriesDetails> FetchTvDetails(int id, string language, int[] seasons);
+        public abstract Task<FilmDetails> FetchMovieDetails(int seriesId, string language);
+        public abstract Task<SeriesDetails> FetchTvDetails(int seriesId, string language, int[] seasons);
+        public abstract Task<SeasonDetails> FetchTvSeasonDetails(int seriesId, int seasonNo, string language);
         public abstract Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath);
     }
 }

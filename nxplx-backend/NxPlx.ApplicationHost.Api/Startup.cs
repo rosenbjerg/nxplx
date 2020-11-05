@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
@@ -136,7 +137,10 @@ namespace NxPlx.ApplicationHost.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
             }
             
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.GetFullPath("public"))
+            });
             app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
