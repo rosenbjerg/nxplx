@@ -26,6 +26,7 @@ using NxPlx.Application.Mapping;
 using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
+using NxPlx.Core.Services.EventHandlers;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
@@ -86,7 +87,6 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
             services.AddSingleton(typeof(AdminCommandService));
             services.AddSingleton(typeof(SessionService));
-            services.AddSingleton(typeof(StreamingService));
             
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
@@ -96,7 +96,6 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
             services.AddScoped(typeof(AuthenticationService));
             services.AddScoped(typeof(EpisodeService));
-            services.AddScoped(typeof(FilmService));
             services.AddScoped(typeof(LibraryService));
             services.AddScoped(typeof(NextEpisodeService));
             services.AddScoped(typeof(UserContextService));
@@ -106,14 +105,17 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(OverviewService));
             services.AddScoped(typeof(UserService));
             services.AddScoped(typeof(EditDetailsService));
-            
-            Register(typeof(CommandBase), services.AddScoped!);
-        }
 
-        private static void Register(Type type, Func<Type, IServiceCollection> register)
-        {
-            var types = type.Assembly.ExportedTypes.Where(t => !t.IsAbstract && type.IsAssignableFrom(t)).ToList();
-            foreach (var t in types) register(t);
+            services.AddScoped<IEventDispatcher, EventDispatcher>();
+            services.Scan(scan => scan
+                .FromAssemblyOf<IEventHandler>()
+                    .AddClasses(classes => classes.AssignableTo<IEventHandler>())
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
+                    .AddClasses(classes => classes.AssignableTo<CommandBase>())
+                        .AsSelf()
+                        .WithScopedLifetime()
+            );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)

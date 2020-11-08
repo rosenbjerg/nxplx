@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.Application.Models.Series;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Series;
@@ -15,14 +16,14 @@ namespace NxPlx.Core.Services
     public class EpisodeService
     {
         private readonly DatabaseContext _context;
+        private readonly IEventDispatcher _eventDispatcher;
         private readonly IDtoMapper _dtoMapper;
-        private readonly StreamingService _streamingService;
 
-        public EpisodeService(DatabaseContext context, IDtoMapper dtoMapper, StreamingService streamingService)
+        public EpisodeService(DatabaseContext context, IEventDispatcher eventDispatcher, IDtoMapper dtoMapper)
         {
             _context = context;
+            _eventDispatcher = eventDispatcher;
             _dtoMapper = dtoMapper;
-            _streamingService = streamingService;
         }
 
         public async Task<InfoDto?> FindEpisodeFileInfo(int id)
@@ -31,7 +32,7 @@ namespace NxPlx.Core.Services
                 .Where(ef => ef.Id == id)
                 .FirstOrDefaultAsync();
             var dto = _dtoMapper.Map<EpisodeFile, InfoDto>(episodeFile);
-            dto!.FileToken = await _streamingService.CreateToken(episodeFile.Path);
+            dto!.FileToken = await _eventDispatcher.Dispatch<FileTokenRequestEvent, string>(new FileTokenRequestEvent(episodeFile.Path));
             return dto;
         }
 

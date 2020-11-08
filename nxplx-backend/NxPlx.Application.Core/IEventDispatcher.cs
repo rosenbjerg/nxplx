@@ -6,6 +6,6 @@ namespace NxPlx.Application.Core
     public interface IEventDispatcher
     {
         Task<TResult> Dispatch<TEvent, TResult>(TEvent @event)
-            where TEvent : IEvent;
+            where TEvent : IEvent<TResult>;
     }
 }

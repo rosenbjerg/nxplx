@@ -17,7 +17,7 @@ namespace NxPlx.Core.Services
         }
 
         public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event)
-            where TEvent : IEvent
+            where TEvent : IEvent<TResult>
         {
             var handlerType = typeof(IEventHandler<,>).MakeGenericType(typeof(TEvent), typeof(TResult));
             var handler = _serviceProvider.GetRequiredService(handlerType);

@@ -5,7 +5,7 @@ using NxPlx.Application.Models.Events;
 
 namespace NxPlx.Core.Services.EventHandlers
 {
-    public class FileTokenLookupHandler : IEventHandler<FileTokenLookupEvent, string>
+    public class FileTokenLookupHandler : IEventHandler<FileTokenLookupEvent, string?>
     {
         private const string StreamPrefix = "stream";
         private readonly IDistributedCache _distributedCache;
@@ -14,7 +14,7 @@ namespace NxPlx.Core.Services.EventHandlers
         {
             _distributedCache = distributedCache;
         }
-        public Task<string> Handle(FileTokenLookupEvent @event, CancellationToken cancellationToken = default)
+        public Task<string?> Handle(FileTokenLookupEvent @event, CancellationToken cancellationToken = default)
         {
             return _distributedCache.GetStringAsync($"{StreamPrefix}:{@event.Token}", cancellationToken);
         }
