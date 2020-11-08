@@ -3,7 +3,6 @@ declare namespace StyleCssNamespace {
     export interface IStyleCss {
         bottomControls: string;
         centerPlayButton: string;
-        closeButton: string;
         focused: string;
         hover: string;
         loaded: string;
