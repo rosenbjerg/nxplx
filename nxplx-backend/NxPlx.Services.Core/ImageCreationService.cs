@@ -65,11 +65,11 @@ namespace NxPlx.Core.Services
             }
         }
 
-        public async Task<string> CreateSnapshot(string inputVideoFilePath, double seek)
+        public async Task<string> CreateSnapshot(string inputVideoFilePath, double seek, int width, int height)
         {
             var tempFile = _tempFileService.GetFilename("generated", ".png");
             var analysis = await FFProbe.AnalyseAsync(inputVideoFilePath);
-            await FFMpeg.SnapshotAsync(analysis, tempFile, null, analysis.Duration * seek);
+            await FFMpeg.SnapshotAsync(analysis, tempFile, new Size(width, height), analysis.Duration * seek);
             return tempFile;
         }
 

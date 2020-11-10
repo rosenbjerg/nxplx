@@ -7,7 +7,7 @@ using NxPlx.Models.Details.Series;
 using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
 using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 
-namespace NxPlx.Services.Database
+namespace NxPlx.Infrastructure.Database
 {
     public class DatabaseMapper : MapperBase, IDatabaseMapper
     {

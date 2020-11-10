@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Infrastructure.Broadcasting;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
