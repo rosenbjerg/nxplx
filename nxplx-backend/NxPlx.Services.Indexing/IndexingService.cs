@@ -160,9 +160,9 @@ namespace NxPlx.Services.Index
             _context.AddRange(networks);
             _context.AddRange(creators);
             _context.AddRange(productionCompanies);
-            _context.EpisodeFiles.AddRange(newEpisodes);
+            _context.AddRange(newEpisodes);
             var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
-            await _context.AddOrUpdate(databaseDetails);
+            await AddOrUpdateSeries(databaseDetails);
             await _context.SaveChangesAsync();
             await _cacheClearer.Clear("OVERVIEW");
             
@@ -208,6 +208,44 @@ namespace NxPlx.Services.Index
             }
         }
 
+        private async Task AddOrUpdateSeries(List<DbSeriesDetails> seriesDetails)
+        {
+            var seriesIds = seriesDetails.Select(sd => sd.Id).ToList();
+            var existingSeriesDetails = await _context.SeriesDetails
+                .Where(sd => seriesIds.Contains(sd.Id))
+                .ToDictionaryAsync(sd => sd.Id);
+            
+            foreach (var seriesDetail in seriesDetails)
+            {
+                if (existingSeriesDetails.TryGetValue(seriesDetail.Id, out var existing))
+                {
+                    existing.Popularity = seriesDetail.Popularity;
+                    existing.VoteAverage = seriesDetail.VoteAverage;
+                    existing.VoteCount = seriesDetail.VoteCount;
+                    existing.InProduction = seriesDetail.InProduction;
+                    existing.LastAirDate = seriesDetail.LastAirDate;
+                    
+                    foreach (var season in seriesDetail.Seasons)
+                    {
+                        var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
+                        if (existingSeason != null)
+                        {
+                            var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id));
+                            existingSeason.Episodes.AddRange(missingEpisodes);
+                        }
+                        else
+                        {
+                            existing.Seasons.Add(season);
+                        }
+                    }
+                }
+                else
+                {
+                    _context.Add(seriesDetail);
+                }
+            }
+        }
+        
         private static async Task<MediaDetails> AnalyseMedia(string path)
         {
             var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
