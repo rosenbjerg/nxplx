@@ -12,8 +12,11 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
@@ -26,7 +29,7 @@ using NxPlx.Core.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
 using IMapper = AutoMapper.IMapper;
@@ -65,14 +68,14 @@ namespace NxPlx.ApplicationHost.Api
             
             
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
-
+            
             services.AddAutoMapper(typeof(AssemblyMarker));
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly("NxPlx.Infrastructure.Database"))
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
                     .UseLazyLoadingProxies());
             
             services.AddSingleton(typeof(ConnectionHub));
@@ -113,7 +116,7 @@ namespace NxPlx.ApplicationHost.Api
             foreach (var t in types) register(t);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IMapper mapper)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
 #if DEBUG
             // mapper.ConfigurationProvider.AssertConfigurationIsValid();
@@ -122,9 +125,10 @@ namespace NxPlx.ApplicationHost.Api
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseMiddleware<ExceptionInterceptorMiddleware>();
-            app.UseForwardedHeaders();
             app.UseMiddleware<LoggingInterceptorMiddleware>();
+            app.UseMiddleware<ExceptionInterceptorMiddleware>();
+            app.UseMiddleware<PerformanceInterceptorMiddleware>();
+            app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
             if (hostingOptions.ApiDocumentation)
@@ -133,7 +137,10 @@ namespace NxPlx.ApplicationHost.Api
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
             }
             
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.GetFullPath("public"))
+            });
             app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
@@ -155,7 +162,8 @@ namespace NxPlx.ApplicationHost.Api
             }
         }
         
-        private static Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new FileExtensionContentTypeProvider(); 
         private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
         {
             var path = context.Request.Path.ToString().TrimStart('/');
@@ -168,8 +176,7 @@ namespace NxPlx.ApplicationHost.Api
                 if (HashRegex.IsMatch(path))
                     context.Response.Headers.Add("Cache-Control", "max-age=2592000");
                 
-                var provider = new FileExtensionContentTypeProvider();
-                if(!provider.TryGetContentType(fileInfo.Name, out var contentType))
+                if(!FileExtensionContentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType))
                     contentType = "application/octet-stream";
                 context.Response.ContentType = contentType;
                 context.Response.StatusCode = 200;

@@ -32,8 +32,6 @@ namespace NxPlx.Services.Index
                     Path = vtt,
                     Language = language,
                     FileSizeBytes = fileInfo.Length,
-                    Added = DateTime.UtcNow,
-                    Created = fileInfo.CreationTimeUtc,
                     LastWrite = fileInfo.LastWriteTimeUtc
                 };
             }
@@ -66,7 +64,6 @@ namespace NxPlx.Services.Index
 
                 return new EpisodeFile
                 {
-                    Added = DateTime.UtcNow,
                     Name = TitleCleanup(name),
                     SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 1,
                     EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,

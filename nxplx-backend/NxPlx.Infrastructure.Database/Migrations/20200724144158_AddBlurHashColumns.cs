@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace NxPlx.Services.Database.Migrations
+namespace NxPlx.Infrastructure.Database.Migrations
 {
     public partial class AddBlurHashColumns : Migration
     {

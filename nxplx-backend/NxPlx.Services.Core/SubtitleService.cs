@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Models;
 using NxPlx.Models.File;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Core.Services
 {

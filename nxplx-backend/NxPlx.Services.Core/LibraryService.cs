@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Models;
-using NxPlx.Services.Database;
+using NxPlx.Infrastructure.Database;
 using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services

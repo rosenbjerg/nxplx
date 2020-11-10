@@ -10,40 +10,16 @@ using NxPlx.Infrastructure.Database;
 namespace NxPlx.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20200114233511_AddMediaTypePropToWatchingProgress")]
-    partial class AddMediaTypePropToWatchingProgress
+    [Migration("20201027195548_TrackedEntities")]
+    partial class TrackedEntities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.0")
+                .HasAnnotation("ProductVersion", "3.1.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            modelBuilder.Entity("NxPlx.Infrastructure.Session.UserSession", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Expiration")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsAdmin")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserAgent")
-                        .HasColumnType("text");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserSessions");
-                });
 
             modelBuilder.Entity("NxPlx.Models.Database.DbFilmDetails", b =>
                 {
@@ -52,11 +28,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<bool>("Adult")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
@@ -66,6 +42,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<long>("Budget")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ImdbId")
                         .HasColumnType("text");
@@ -81,6 +63,9 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<float>("Popularity")
                         .HasColumnType("real");
+
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
@@ -100,6 +85,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<float>("VoteAverage")
                         .HasColumnType("real");
 
@@ -110,7 +101,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.HasIndex("BelongsInCollectionId");
 
-                    b.ToTable("DbFilmDetails");
+                    b.ToTable("FilmDetails");
                 });
 
             modelBuilder.Entity("NxPlx.Models.Database.DbSeriesDetails", b =>
@@ -120,11 +111,17 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
 
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("FirstAirDate")
                         .HasColumnType("timestamp without time zone");
@@ -150,11 +147,20 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<double>("Popularity")
                         .HasColumnType("double precision");
 
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<double>("VoteAverage")
                         .HasColumnType("double precision");
@@ -164,7 +170,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DbSeriesDetails");
+                    b.ToTable("SeriesDetails");
                 });
 
             modelBuilder.Entity("NxPlx.Models.Database.JoinEntity<NxPlx.Models.Database.DbFilmDetails, NxPlx.Models.Details.Film.ProductionCountry, string>", b =>
@@ -334,14 +340,32 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("BackdropBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("BackdropPath")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -381,8 +405,20 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -396,6 +432,15 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("LogoBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("LogoPath")
                         .HasColumnType("text");
 
@@ -404,6 +449,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<string>("OriginCountry")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -417,8 +468,20 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Name")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -435,6 +498,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("AirDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("integer");
 
@@ -447,14 +516,23 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<string>("ProductionCode")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SeasonDetailsId")
+                    b.Property<int>("SeasonDetailsId")
                         .HasColumnType("integer");
 
                     b.Property<int>("SeasonNumber")
                         .HasColumnType("integer");
 
+                    b.Property<string>("StillBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("StillPath")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<float>("VoteAverage")
                         .HasColumnType("real");
@@ -476,6 +554,15 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("LogoBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("LogoPath")
                         .HasColumnType("text");
 
@@ -484,6 +571,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<string>("OriginCountry")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -500,6 +593,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<DateTime?>("AirDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<int?>("DbSeriesDetailsId")
                         .HasColumnType("integer");
 
@@ -509,11 +608,20 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<string>("Overview")
                         .HasColumnType("text");
 
+                    b.Property<string>("PosterBlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("PosterPath")
                         .HasColumnType("text");
 
                     b.Property<int>("SeasonNumber")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -529,11 +637,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("integer");
@@ -559,6 +667,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<int?>("SeriesDetailsId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PartOfLibraryId");
@@ -577,11 +691,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
@@ -600,6 +714,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<string>("Title")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Year")
                         .HasColumnType("integer");
@@ -620,11 +740,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("Added")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<int?>("EpisodeFileId")
                         .HasColumnType("integer");
@@ -644,6 +764,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<string>("Path")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EpisodeFileId");
@@ -660,6 +786,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Kind")
                         .HasColumnType("integer");
 
@@ -671,6 +803,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<string>("Path")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -685,12 +823,19 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<int>("FileId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("MediaType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Language")
                         .HasColumnType("text");
 
-                    b.HasKey("UserId", "FileId");
+                    b.HasKey("UserId", "FileId", "MediaType");
 
                     b.HasIndex("FileId");
+
+                    b.HasIndex("MediaType");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("SubtitlePreferences");
                 });
@@ -705,6 +850,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<bool>("Admin")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("CreatedCorrelationId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
@@ -716,6 +867,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("Updated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("UpdatedCorrelationId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Username")
                         .HasColumnType("text");
@@ -733,27 +890,24 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<int>("FileId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastWatched")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<int>("MediaType")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime>("LastWatched")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<double>("Time")
                         .HasColumnType("double precision");
 
-                    b.HasKey("UserId", "FileId");
+                    b.HasKey("UserId", "FileId", "MediaType");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("MediaType");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("WatchingProgresses");
-                });
-
-            modelBuilder.Entity("NxPlx.Infrastructure.Session.UserSession", b =>
-                {
-                    b.HasOne("NxPlx.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("NxPlx.Models.Database.DbFilmDetails", b =>
@@ -773,7 +927,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
                         .WithMany()
                         .HasForeignKey("Entity1Id")
-                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFil~1")
+                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_FilmD~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -793,7 +947,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
                         .WithMany()
                         .HasForeignKey("Entity1Id")
-                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDe~1")
+                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_FilmDeta~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -832,7 +986,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", "Entity1")
                         .WithMany()
                         .HasForeignKey("Entity1Id")
-                        .HasConstraintName("FK_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetails~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -871,7 +1024,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", "Entity1")
                         .WithMany()
                         .HasForeignKey("Entity1Id")
-                        .HasConstraintName("FK_JoinEntity<DbSeriesDetails, ProductionCompany>_DbSeriesDet~1")
+                        .HasConstraintName("FK_JoinEntity<DbSeriesDetails, ProductionCompany>_SeriesDetai~1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -925,7 +1078,8 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.HasOne("NxPlx.Models.Details.Series.SeasonDetails", null)
                         .WithMany("Episodes")
                         .HasForeignKey("SeasonDetailsId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("NxPlx.Models.Details.Series.SeasonDetails", b =>
@@ -949,10 +1103,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .HasForeignKey("SeriesDetailsId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                    b.OwnsOne("NxPlx.Models.File.MediaDetails", "MediaDetails", b1 =>
                         {
                             b1.Property<int>("EpisodeFileId")
-                                .HasColumnType("integer");
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
+                                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                             b1.Property<int>("AudioBitrate")
                                 .HasColumnType("integer");
@@ -968,9 +1124,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                             b1.Property<float>("Duration")
                                 .HasColumnType("real");
-
-                            b1.Property<int>("Id")
-                                .HasColumnType("integer");
 
                             b1.Property<string>("VideoAspectRatio")
                                 .HasColumnType("text");
@@ -1015,10 +1168,12 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("NxPlx.Models.File.FFMpegProbeDetails", "MediaDetails", b1 =>
+                    b.OwnsOne("NxPlx.Models.File.MediaDetails", "MediaDetails", b1 =>
                         {
                             b1.Property<int>("FilmFileId")
-                                .HasColumnType("integer");
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer")
+                                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
                             b1.Property<int>("AudioBitrate")
                                 .HasColumnType("integer");
@@ -1034,9 +1189,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                             b1.Property<float>("Duration")
                                 .HasColumnType("real");
-
-                            b1.Property<int>("Id")
-                                .HasColumnType("integer");
 
                             b1.Property<string>("VideoAspectRatio")
                                 .HasColumnType("text");
@@ -1083,18 +1235,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("NxPlx.Models.SubtitlePreference", b =>
                 {
-                    b.HasOne("NxPlx.Models.File.EpisodeFile", null)
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NxPlx.Models.File.FilmFile", null)
-                        .WithMany()
-                        .HasForeignKey("FileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NxPlx.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
