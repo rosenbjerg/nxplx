@@ -230,12 +230,14 @@ namespace NxPlx.Services.Index
                         var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
                         if (existingSeason != null)
                         {
-                            var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id));
+                            var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id)).ToList();
                             existingSeason.Episodes.AddRange(missingEpisodes);
+                            _context.AddRange(missingEpisodes);
                         }
                         else
                         {
                             existing.Seasons.Add(season);
+                            _context.Add(season);
                         }
                     }
                 }
