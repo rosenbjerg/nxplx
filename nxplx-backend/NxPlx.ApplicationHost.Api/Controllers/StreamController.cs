@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models.Events;
-using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -24,7 +22,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
         private async Task<IActionResult> SendFile(string token, string mime)
         {
-            var path = await _eventDispatcher.Dispatch<FileTokenLookupEvent, string?>(new FileTokenLookupEvent(token));
+            var path = await _eventDispatcher.Dispatch(new FileTokenLookupEvent(token));
             if (path == null) return NotFound();
             return PhysicalFile(path, mime, true);
         }

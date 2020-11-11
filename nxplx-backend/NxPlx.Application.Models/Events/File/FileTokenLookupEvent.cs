@@ -7,6 +7,6 @@
             Token = token;
         }
 
-        public string Token { get; set; }
+        public string Token { get; }
     }
 }

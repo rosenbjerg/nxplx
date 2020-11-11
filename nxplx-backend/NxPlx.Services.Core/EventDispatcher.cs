@@ -16,12 +16,11 @@ namespace NxPlx.Core.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event)
-            where TEvent : IEvent<TResult>
+        public async Task<TResult> Dispatch<TResult>(IEvent<TResult> @event)
         {
-            var handlerType = typeof(IEventHandler<,>).MakeGenericType(typeof(TEvent), typeof(TResult));
+            var handlerType = typeof(IEventHandler<,>).MakeGenericType(@event.GetType(), typeof(TResult));
             var handler = _serviceProvider.GetRequiredService(handlerType);
-            var handlerMethod = handlerType.GetMethod(nameof(IEventHandler<TEvent, TResult>.Handle));
+            var handlerMethod = handlerType.GetMethod("Handle");
             var resultTask = (Task<TResult>)handlerMethod!.Invoke(handler, new object?[] { @event })!;
             return await resultTask;
         }

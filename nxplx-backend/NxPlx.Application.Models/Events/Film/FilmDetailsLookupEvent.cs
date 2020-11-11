@@ -9,6 +9,6 @@ namespace NxPlx.Application.Models.Events
             FileDetailsId = fileDetailsId;
         }
 
-        public int FileDetailsId { get; set; }
+        public int FileDetailsId { get; }
     }
 }

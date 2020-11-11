@@ -27,6 +27,7 @@ using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
 using NxPlx.Core.Services.EventHandlers;
+using NxPlx.Core.Services.EventHandlers.File;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
@@ -85,7 +86,6 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(ICacheClearer), typeof(RedisCacheClearer));
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
-            services.AddSingleton(typeof(AdminCommandService));
             services.AddSingleton(typeof(SessionService));
             
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
@@ -94,17 +94,13 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped(typeof(ImageCreationService));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
-            services.AddScoped(typeof(AuthenticationService));
             services.AddScoped(typeof(EpisodeService));
-            services.AddScoped(typeof(LibraryService));
             services.AddScoped(typeof(NextEpisodeService));
             services.AddScoped(typeof(UserContextService));
             services.AddScoped(typeof(ProgressService));
             services.AddScoped(typeof(SessionService));
             services.AddScoped(typeof(SubtitleService));
             services.AddScoped(typeof(OverviewService));
-            services.AddScoped(typeof(UserService));
-            services.AddScoped(typeof(EditDetailsService));
 
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.Scan(scan => scan

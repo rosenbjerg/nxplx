@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -12,20 +13,20 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [RequiresAdminPermissions]
     public class CommandController : ControllerBase
     {
-        private readonly AdminCommandService _adminCommandService;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public CommandController(AdminCommandService adminCommandService)
+        public CommandController(IEventDispatcher eventDispatcher)
         {
-            _adminCommandService = adminCommandService;
+            _eventDispatcher = eventDispatcher;
         }
 
         [HttpGet("list")]
-        public IEnumerable<string> List()
-            => _adminCommandService.AvailableCommands();
+        public async Task<IEnumerable<string>> List()
+            => await _eventDispatcher.Dispatch(new AdminCommandListRequestEvent());
 
         [HttpPost("invoke")]
         [Send404WhenNull]
         public Task<string?> Invoke([FromQuery]string command, [FromQuery]string[] arguments)
-            => _adminCommandService.InvokeCommand(command, arguments);
+            => _eventDispatcher.Dispatch(new AdminCommandInvocationEvent(command, arguments));
     }
 }

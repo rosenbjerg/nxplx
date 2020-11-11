@@ -6,7 +6,6 @@ using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events;
 using NxPlx.Application.Models.Film;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -25,16 +24,16 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("{fileId}/info")]
         [Send404WhenNull]
         public Task<InfoDto?> FileInfo([FromRoute, Required] int fileId) 
-            => _eventDispatcher.Dispatch<FilmInfoLookupEvent, InfoDto?>(new FilmInfoLookupEvent(fileId));
+            => _eventDispatcher.Dispatch(new FilmInfoLookupEvent(fileId));
 
         [HttpGet("{filmId}/details")]
         [Send404WhenNull]
         public Task<FilmDto?> FilmDetails([FromRoute, Required]int filmId)
-            => _eventDispatcher.Dispatch<FilmDetailsLookupEvent, FilmDto?>(new FilmDetailsLookupEvent(filmId));
+            => _eventDispatcher.Dispatch(new FilmDetailsLookupEvent(filmId));
 
         [HttpGet("collection/{collectionId}/details")]
         [Send404WhenNull]
         public Task<MovieCollectionDto> CollectionDetails([FromRoute, Required] int collectionId) 
-            => _eventDispatcher.Dispatch<CollectionDetailsLookupEvent, MovieCollectionDto>(new CollectionDetailsLookupEvent(collectionId));
+            => _eventDispatcher.Dispatch(new CollectionDetailsLookupEvent(collectionId));
     }
 }

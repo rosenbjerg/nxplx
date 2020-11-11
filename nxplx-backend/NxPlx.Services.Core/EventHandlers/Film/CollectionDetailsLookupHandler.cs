@@ -6,12 +6,11 @@ using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events;
 using NxPlx.Application.Models.Film;
-using NxPlx.Core.Services.EventHandlers;
+using NxPlx.Infrastructure.Database;
 using NxPlx.Models.Database;
 using NxPlx.Models.Details.Film;
-using NxPlx.Infrastructure.Database;
 
-namespace NxPlx.Core.Services
+namespace NxPlx.Core.Services.EventHandlers.Film
 {
     public class CollectionDetailsLookupHandler : IEventHandler<CollectionDetailsLookupEvent, MovieCollectionDto>
     {

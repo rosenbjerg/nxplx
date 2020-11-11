@@ -1,21 +1,23 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NxPlx.Application.Core;
-using NxPlx.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.Infrastructure.Database;
+using NxPlx.Models;
 
-namespace NxPlx.Core.Services
+namespace NxPlx.Core.Services.EventHandlers.Authentication
 {
-    public class AuthenticationService
+    public class LoginAttemptEventHandler : IEventHandler<LoginAttemptEvent, (string Token, DateTime Expiry, bool IsAdmin)>
     {
         private readonly DatabaseContext _databaseContext;
         private readonly OperationContext _operationContext;
         private readonly SessionService _sessionService;
         private readonly TimeSpan _sessionLength;
 
-        public AuthenticationService(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration, SessionService sessionService)
+        public LoginAttemptEventHandler(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration, SessionService sessionService)
         {
             _databaseContext = databaseContext;
             _operationContext = operationContext;
@@ -23,16 +25,17 @@ namespace NxPlx.Core.Services
             var sessionConfig = configuration.GetSection("Session");
             _sessionLength = TimeSpan.FromDays(int.Parse(sessionConfig["LengthInDays"] ?? "20"));
         }
-        public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Login(string username, string password, string userAgent)
+
+        public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Handle(LoginAttemptEvent @event, CancellationToken cancellationToken = default)
         {
-            var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
-            if (user != null && PasswordUtils.Verify(password, user.PasswordHash))
+            var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == @event.Username);
+            if (user != null && PasswordUtils.Verify(@event.Password, user.PasswordHash))
             {
                 var token = TokenGenerator.Generate();
                 var expiry = DateTime.UtcNow.Add(_sessionLength);
                 var session = new Session
                 {
-                    UserAgent = userAgent,
+                    UserAgent = @event.UserAgent,
                     IsAdmin = user.Admin,
                     UserId = user.Id,
                 };
@@ -42,11 +45,6 @@ namespace NxPlx.Core.Services
             }
 
             return default;
-        }
-
-        public async Task Logout()
-        {
-            await _sessionService.RemoveSession(_operationContext.Session.UserId, _operationContext.SessionId);
         }
     }
 }

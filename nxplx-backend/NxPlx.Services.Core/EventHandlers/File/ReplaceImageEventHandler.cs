@@ -1,39 +1,43 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
+using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.Infrastructure.Database;
 
-namespace NxPlx.Core.Services
+namespace NxPlx.Core.Services.EventHandlers.File
 {
-    public class EditDetailsService
+    public class ReplaceImageEventHandler : IEventHandler<ReplaceImageEvent, bool>
     {
         private readonly DatabaseContext _context;
         private readonly TempFileService _tempFileService;
         private readonly ImageCreationService _imageCreationService;
         private readonly ICacheClearer _cacheClearer;
 
-        public EditDetailsService(DatabaseContext context, TempFileService tempFileService, ImageCreationService imageCreationService, ICacheClearer cacheClearer)
+        public ReplaceImageEventHandler(DatabaseContext context, TempFileService tempFileService, ImageCreationService imageCreationService, ICacheClearer cacheClearer)
         {
             _context = context;
             _tempFileService = tempFileService;
             _imageCreationService = imageCreationService;
             _cacheClearer = cacheClearer;
         }
-        public async Task<bool> SetImage(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
+
+        public async Task<bool> Handle(ReplaceImageEvent @event, CancellationToken cancellationToken = default)
         {
-            var task = detailsType switch
+            var task = @event.DetailsType switch
             {
-                DetailsType.Series => SetSeriesImage(detailsId, imageType, imageExtension, imageStream),
-                DetailsType.Season => SetSeasonImage(detailsId, imageType, imageExtension, imageStream),
-                DetailsType.Film => SetFilmImage(detailsId, imageType, imageExtension, imageStream),
-                DetailsType.Collection => SetCollectionImage(detailsId, imageType, imageExtension, imageStream),
+                DetailsType.Series => SetSeriesImage(@event.DetailsId, @event.ImageType, @event.ImageExtension, @event.ImageStream),
+                DetailsType.Season => SetSeasonImage(@event.DetailsId, @event.ImageType, @event.ImageExtension, @event.ImageStream),
+                DetailsType.Film => SetFilmImage(@event.DetailsId, @event.ImageType, @event.ImageExtension, @event.ImageStream),
+                DetailsType.Collection => SetCollectionImage(@event.DetailsId, @event.ImageType, @event.ImageExtension, @event.ImageStream),
                 _ => throw new ArgumentOutOfRangeException()
             };
             var success = await task;
             if (!success) return false;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(CancellationToken.None);
             await _cacheClearer.Clear("OVERVIEW");
             return true;
         }
@@ -106,7 +110,7 @@ namespace NxPlx.Core.Services
         private async Task<string> SaveTempImage(string imageExtension, Stream imageStream)
         {
             var tempFile = _tempFileService.GetFilename("image_upload", imageExtension);
-            await using (var outputStream = File.OpenWrite(tempFile))
+            await using (var outputStream = System.IO.File.OpenWrite(tempFile))
                 await imageStream.CopyToAsync(outputStream);
             return tempFile;
         }

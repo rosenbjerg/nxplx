@@ -2,9 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Core;
 using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -13,11 +14,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public UserController(UserService userService)
+        public UserController(IEventDispatcher eventDispatcher)
         {
-            _userService = userService;
+            _eventDispatcher = eventDispatcher;
         }
         
         [HttpPost("changepassword")]
@@ -26,16 +27,16 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             [FromForm, Required]string password1,
             [FromForm, Required]string password2)
         {
-            var success = await _userService.ChangeUserPassword(oldPassword, password1, password2);
+            var success = await _eventDispatcher.Dispatch(new UpdateUserPasswordEvent(oldPassword, password1, password2));
             if (success) return Ok();
             return BadRequest();
         }
         
         [HttpGet("")]
-        public async Task<ActionResult<UserDto?>> Get() => await _userService.GetCurrentUser();
+        public async Task<ActionResult<UserDto?>> Get() => await _eventDispatcher.Dispatch(new CurrentUserLookupEvent());
         
         [HttpPut("")]
-        public Task Update([FromForm, EmailAddress] string? email) => _userService.UpdateUser(email);
+        public Task Update([FromForm, EmailAddress] string? email) => _eventDispatcher.Dispatch(new UpdateUserDetailsEvent(email));
         
         [HttpPost("")]
         [RequiresAdminPermissions]
@@ -48,15 +49,15 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             [FromForm]List<int>? libraryIds)
         {
             if (password1 != password2) return BadRequest();
-            return await _userService.CreateUser(username, email, privileges == "admin", libraryIds, password1);
+            return await _eventDispatcher.Dispatch(new CreateUserEvent(username, email, privileges == "admin", libraryIds, password1));
         }
 
         [HttpDelete("")]
         [RequiresAdminPermissions]
-        public async Task Remove([FromBody, Required] string username) => await _userService.RemoveUser(username);
-        
+        public async Task Remove([FromBody, Required] string username) => await _eventDispatcher.Dispatch(new RemoveUserEvent(username));
+
         [HttpGet("list")]
         [RequiresAdminPermissions]
-        public async Task<IEnumerable<UserDto>> List() => await _userService.ListUsers();
+        public async Task<IEnumerable<UserDto>> List() => await _eventDispatcher.Dispatch(new ListUsersEvent());
     }
 }

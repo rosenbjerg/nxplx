@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
+using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -14,11 +15,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class EditDetailsController : ControllerBase
     {
-        private readonly EditDetailsService _editDetailsService;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public EditDetailsController(EditDetailsService editDetailsService)
+        public EditDetailsController(IEventDispatcher eventDispatcher)
         {
-            _editDetailsService = editDetailsService;
+            _eventDispatcher = eventDispatcher;
         }
 
         [HttpPost("image")]
@@ -30,7 +31,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         {
             var imageExtension = Path.GetExtension(image.FileName);
             await using var imageStream = image.OpenReadStream();
-            var ok = await _editDetailsService.SetImage(detailsType, detailsId, imageType, imageExtension, imageStream);
+            var ok = await _eventDispatcher.Dispatch(new ReplaceImageEvent(detailsType, detailsId, imageType, imageExtension, imageStream));
             if (!ok)
                 return BadRequest();
             return Ok();

@@ -1,4 +1,4 @@
-﻿namespace NxPlx.Application.Core
+﻿namespace NxPlx.Application.Models
 {
     public enum ImageType
     {

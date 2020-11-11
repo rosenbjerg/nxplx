@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Models.Events;
 
-namespace NxPlx.Core.Services.EventHandlers
+namespace NxPlx.Core.Services.EventHandlers.File
 {
     public class FileTokenRequestHandler : IEventHandler<FileTokenRequestEvent, string>
     {

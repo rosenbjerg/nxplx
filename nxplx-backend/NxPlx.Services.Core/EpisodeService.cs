@@ -32,7 +32,7 @@ namespace NxPlx.Core.Services
                 .Where(ef => ef.Id == id)
                 .FirstOrDefaultAsync();
             var dto = _dtoMapper.Map<EpisodeFile, InfoDto>(episodeFile);
-            dto!.FileToken = await _eventDispatcher.Dispatch<FileTokenRequestEvent, string>(new FileTokenRequestEvent(episodeFile.Path));
+            dto!.FileToken = await _eventDispatcher.Dispatch(new FileTokenRequestEvent(episodeFile.Path));
             return dto;
         }
 
