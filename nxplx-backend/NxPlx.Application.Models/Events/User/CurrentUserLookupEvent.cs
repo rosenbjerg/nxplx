@@ -1,6 +1,6 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.User
 {
-    public class CurrentUserLookupEvent : IEvent<UserDto>
+    public class CurrentUserLookupQuery : IQuery<UserDto>
     {
         
     }

@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.Library
 {
-    public class RemoveLibraryEvent : IEvent<bool>
+    public class RemoveLibraryCommand : ICommand<bool>
     {
-        public RemoveLibraryEvent(int libraryId)
+        public RemoveLibraryCommand(int libraryId)
         {
             LibraryId = libraryId;
         }

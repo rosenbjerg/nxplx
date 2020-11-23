@@ -1,6 +1,6 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.Authentication
 {
-    public class AdminCheckEvent : IEvent<bool>
+    public class AdminCheckQuery : IQuery<bool>
     {
     }
 }

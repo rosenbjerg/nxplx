@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Models.Events.Library
 {
-    public class GetLibraryAccessEvent : IEvent<List<int>>
+    public class LibraryAccessQuery : IQuery<List<int>>
     {
-        public GetLibraryAccessEvent(int userId)
+        public LibraryAccessQuery(int userId)
         {
             UserId = userId;
         }

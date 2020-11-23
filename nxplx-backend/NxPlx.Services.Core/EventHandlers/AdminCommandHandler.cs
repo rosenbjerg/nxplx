@@ -9,7 +9,7 @@ using NxPlx.Core.Services.Commands;
 
 namespace NxPlx.Core.Services.EventHandlers
 {
-    public class AdminCommandHandler : IEventHandler<AdminCommandInvocationEvent, string?>, IEventHandler<AdminCommandListRequestEvent, string[]>
+    public class AdminCommandHandler : IEventHandler<AdminCommandInvocationCommand, string?>, IEventHandler<AdminCommandListRequestQuery, string[]>
     {
         private static readonly Dictionary<string, Func<IServiceProvider, CommandBase>> Commands = new List<Type>
         {
@@ -26,15 +26,15 @@ namespace NxPlx.Core.Services.EventHandlers
             _logger = logger;
         }
 
-        public async Task<string?> Handle(AdminCommandInvocationEvent @event, CancellationToken cancellationToken = default)
+        public async Task<string?> Handle(AdminCommandInvocationCommand command, CancellationToken cancellationToken = default)
         {
-            if (!Commands.TryGetValue(@event.CommandName, out var commandResolver)) return null;
-            var command = commandResolver(_serviceProvider);
-            _logger.LogInformation("Invoking {AdminCommandName} with arguments {Arguments}", @event.CommandName, @event.Arguments);
-            return await command.Execute(@event.Arguments);
+            if (!Commands.TryGetValue(command.CommandName, out var commandResolver)) return null;
+            var cmd = commandResolver(_serviceProvider);
+            _logger.LogInformation("Invoking {AdminCommandName} with arguments {Arguments}", command.CommandName, command.Arguments);
+            return await cmd.Execute(command.Arguments);
         }
 
-        public Task<string[]> Handle(AdminCommandListRequestEvent @event, CancellationToken cancellationToken = default)
+        public Task<string[]> Handle(AdminCommandListRequestQuery query, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(Commands.Keys.ToArray());
         }

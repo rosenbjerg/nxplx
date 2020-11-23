@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events;
+using NxPlx.Application.Models.Events.Library;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -15,30 +15,30 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class LibraryController : ControllerBase
     {
-        private readonly UserContextService _userContextService;
         private readonly IEventDispatcher _eventDispatcher;
+        private readonly OperationContext _operationContext;
 
-        public LibraryController(UserContextService userContextService, IEventDispatcher eventDispatcher)
+        public LibraryController(IEventDispatcher eventDispatcher, OperationContext operationContext)
         {
-            _userContextService = userContextService;
             _eventDispatcher = eventDispatcher;
+            _operationContext = operationContext;
         }
         
         [HttpGet("browse")]
         [RequiresAdminPermissions]
         public async Task<List<string>> Browse([FromQuery, Required]string cwd) 
-            => await _eventDispatcher.Dispatch(new ListDirectoryEntriesEvent(cwd));
+            => await _eventDispatcher.Dispatch(new ListDirectoryEntriesQuery(cwd));
 
         [HttpPost("")]
         [RequiresAdminPermissions]
         public Task<AdminLibraryDto> Create([FromForm, Required]string name, [FromForm, Required]string path, [FromForm, Required]string language, [FromForm, Required]string kind)
-            => _eventDispatcher.Dispatch(new CreateLibraryEvent(name, path, language, kind));
+            => _eventDispatcher.Dispatch(new CreateLibraryCommand(name, path, language, kind));
 
         [HttpDelete("")]
         [RequiresAdminPermissions]
         public async Task<IActionResult> Remove([FromBody, Required]int libraryId)
         {
-            if (await _eventDispatcher.Dispatch(new RemoveLibraryEvent(libraryId)))
+            if (await _eventDispatcher.Dispatch(new RemoveLibraryCommand(libraryId)))
                 return Ok();
             return BadRequest();
         }
@@ -46,17 +46,16 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("list")]
         public async Task<IEnumerable<LibraryDto>> List()
         {
-            var currentUser = await _userContextService.GetUser();
-            if (currentUser.Admin)
-                return await _eventDispatcher.Dispatch(new ListAdminLibrariesEvent());
-            return await _eventDispatcher.Dispatch(new ListLibrariesEvent());
+            if (_operationContext.Session.IsAdmin)
+                return await _eventDispatcher.Dispatch(new ListAdminLibrariesQuery());
+            return await _eventDispatcher.Dispatch(new ListLibrariesQuery());
         }
         
         [HttpGet("permissions")]
         [RequiresAdminPermissions]
         public async Task<ActionResult<List<int>>> GetLibraryAccess([FromQuery, Required]int userId)
         {
-            var libraryAccess = await _eventDispatcher.Dispatch(new GetLibraryAccessEvent(userId));
+            var libraryAccess = await _eventDispatcher.Dispatch(new LibraryAccessQuery(userId));
             if (libraryAccess == null) return BadRequest();
             return Ok(libraryAccess);
         }
@@ -65,7 +64,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [RequiresAdminPermissions]
         public async Task<IActionResult> SetLibraryAccess([FromForm, Required]int userId, [FromForm, Required]List<int> libraries)
         {
-            var success = await _eventDispatcher.Dispatch(new SetLibraryAccessEvent(userId, libraries));
+            var success = await _eventDispatcher.Dispatch(new SetLibraryAccessCommand(userId, libraries));
             if (!success) return BadRequest();
             return Ok();
         }

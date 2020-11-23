@@ -1,8 +1,6 @@
-﻿using System.Threading.Tasks;
-
-namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.Authentication
 {
-    public class LogoutEvent : IEvent<bool>
+    public class LogoutCommand : ICommand<bool>
     {
     }
 }

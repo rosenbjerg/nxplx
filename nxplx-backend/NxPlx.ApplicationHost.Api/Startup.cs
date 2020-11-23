@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -27,14 +25,12 @@ using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
 using NxPlx.Core.Services.EventHandlers;
-using NxPlx.Core.Services.EventHandlers.File;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
-using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -53,6 +49,7 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<FolderOptions>(services);
             AddOptions<HostingOptions>(services);
             AddOptions<LoggingOptions>(services);
+            AddOptions<NxPlx.Application.Core.Options.SessionOptions>(services);
 
             services.AddSpaStaticFiles(options => options.RootPath = "public");
             services.AddHangfireServer(options =>
@@ -86,21 +83,12 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton(typeof(ICacheClearer), typeof(RedisCacheClearer));
             services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
             services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
-            services.AddSingleton(typeof(SessionService));
             
             services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
             services.AddScoped(typeof(IIndexer), typeof(IndexingService));
             services.AddScoped(typeof(TempFileService));
-            services.AddScoped(typeof(ImageCreationService));
             services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
             services.AddScoped(typeof(OperationContext), _ => new OperationContext());
-            services.AddScoped(typeof(EpisodeService));
-            services.AddScoped(typeof(NextEpisodeService));
-            services.AddScoped(typeof(UserContextService));
-            services.AddScoped(typeof(ProgressService));
-            services.AddScoped(typeof(SessionService));
-            services.AddScoped(typeof(SubtitleService));
-            services.AddScoped(typeof(OverviewService));
 
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.Scan(scan => scan

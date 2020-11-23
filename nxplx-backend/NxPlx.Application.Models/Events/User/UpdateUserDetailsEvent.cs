@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.User
 {
-    public class UpdateUserDetailsEvent : IEvent<bool>
+    public class UpdateUserDetailsCommand : ICommand<bool>
     {
-        public UpdateUserDetailsEvent(string? email)
+        public UpdateUserDetailsCommand(string? email)
         {
             Email = email;
         }

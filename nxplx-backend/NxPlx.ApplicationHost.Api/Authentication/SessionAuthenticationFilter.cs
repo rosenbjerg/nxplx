@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NxPlx.Application.Core;
+using NxPlx.Application.Models.Events.Sessions;
 using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Authentication
@@ -10,13 +11,13 @@ namespace NxPlx.ApplicationHost.Api.Authentication
     {
         private readonly OperationContext _operationContext;
         private readonly IHttpSessionService _httpSessionService;
-        private readonly SessionService _sessionService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public SessionAuthenticationFilter(OperationContext operationContext, IHttpSessionService httpSessionService, SessionService sessionService)
+        public SessionAuthenticationFilter(OperationContext operationContext, IHttpSessionService httpSessionService, IEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
             _httpSessionService = httpSessionService;
-            _sessionService = sessionService;
+            _dispatcher = dispatcher;
         }
         
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
@@ -24,7 +25,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
             var sessionToken = _httpSessionService.ExtractSessionToken(context.HttpContext.Request);
             if (!string.IsNullOrEmpty(sessionToken))
             {
-                var session = await _sessionService.FindSession(sessionToken, context.HttpContext.RequestAborted);
+                var session = await _dispatcher.Dispatch(new SessionQuery(sessionToken));
                 if (session != null)
                 {
                     _operationContext.Session = session;

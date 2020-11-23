@@ -1,8 +1,8 @@
 ﻿namespace NxPlx.Application.Models.Events
 {
-    public class AdminCommandInvocationEvent : IEvent<string?>
+    public class AdminCommandInvocationCommand : ICommand<string?>
     {
-        public AdminCommandInvocationEvent(string commandName, string[] arguments)
+        public AdminCommandInvocationCommand(string commandName, string[] arguments)
         {
             CommandName = commandName;
             Arguments = arguments;

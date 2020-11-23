@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.User
 {
-    public class UpdateUserPasswordEvent : IEvent<bool>
+    public class UpdateUserPasswordCommand : ICommand<bool>
     {
-        public UpdateUserPasswordEvent(string oldPassword, string newPassword1, string newPassword2)
+        public UpdateUserPasswordCommand(string oldPassword, string newPassword1, string newPassword2)
         {
             OldPassword = oldPassword;
             NewPassword1 = newPassword1;

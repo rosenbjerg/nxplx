@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Models.Events.Authentication;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Core.Services;
 
@@ -25,7 +25,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public async Task<ActionResult> Login([FromForm, Required] string username, [FromForm, Required] string password,
             [FromHeader(Name = "User-Agent"), Required] string userAgent)
         {
-            var session = await _eventDispatcher.Dispatch(new LoginAttemptEvent(username, password, userAgent));
+            var session = await _eventDispatcher.Dispatch(new LoginAttemptQuery(username, password, userAgent));
             if (session == default) return BadRequest("Invalid credentials");
             _sessionService.AttachSessionToken(HttpContext.Response, session.Token, session.Expiry);
             return Ok(session.IsAdmin);
@@ -35,7 +35,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [SessionAuthentication]
         public async Task<ActionResult> Logout()
         {
-            await _eventDispatcher.Dispatch(new LogoutEvent());
+            await _eventDispatcher.Dispatch(new LogoutCommand());
             _sessionService.AttachSessionToken(HttpContext.Response, null);
             return Ok();
         }
@@ -43,6 +43,6 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("verify")]
         [SessionAuthentication]
         public async Task<bool> Verify() 
-            => await _eventDispatcher.Dispatch(new AdminCheckEvent());
+            => await _eventDispatcher.Dispatch(new AdminCheckQuery());
     }
 }

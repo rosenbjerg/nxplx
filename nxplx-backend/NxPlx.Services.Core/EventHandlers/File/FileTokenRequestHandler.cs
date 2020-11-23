@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Models.Events.File;
 
 namespace NxPlx.Core.Services.EventHandlers.File
 {
-    public class FileTokenRequestHandler : IEventHandler<FileTokenRequestEvent, string>
+    public class FileTokenRequestHandler : IEventHandler<RequestFileTokenCommand, string>
     {
         private const string StreamPrefix = "stream";
         private readonly IDistributedCache _distributedCache;
@@ -16,10 +16,10 @@ namespace NxPlx.Core.Services.EventHandlers.File
             _distributedCache = distributedCache;
         }
         
-        public async Task<string> Handle(FileTokenRequestEvent @event, CancellationToken cancellationToken = default)
+        public async Task<string> Handle(RequestFileTokenCommand command, CancellationToken cancellationToken = default)
         {
             var token = TokenGenerator.Generate();
-            await _distributedCache.SetStringAsync($"{StreamPrefix}:{token}", @event.FilePath, new DistributedCacheEntryOptions
+            await _distributedCache.SetStringAsync($"{StreamPrefix}:{token}", command.FilePath, new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromMinutes(35)
             }, cancellationToken);

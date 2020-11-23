@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.File
 {
-    public class FileTokenLookupEvent : IEvent<string?>
+    public class FileTokenLookupQuery : IQuery<string?>
     {
-        public FileTokenLookupEvent(string token)
+        public FileTokenLookupQuery(string token)
         {
             Token = token;
         }

@@ -31,7 +31,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         {
             var imageExtension = Path.GetExtension(image.FileName);
             await using var imageStream = image.OpenReadStream();
-            var ok = await _eventDispatcher.Dispatch(new ReplaceImageEvent(detailsType, detailsId, imageType, imageExtension, imageStream));
+            var ok = await _eventDispatcher.Dispatch(new ReplaceImageCommand(detailsType, detailsId, imageType, imageExtension, imageStream));
             if (!ok)
                 return BadRequest();
             return Ok();

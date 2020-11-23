@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Models.Events.Library
 {
-    public class ListAdminLibrariesEvent : IEvent<List<AdminLibraryDto>>
+    public class ListAdminLibrariesQuery : IQuery<List<AdminLibraryDto>>
     {
     }
 }

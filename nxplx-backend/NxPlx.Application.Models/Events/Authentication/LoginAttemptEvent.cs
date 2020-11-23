@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Models.Events.Authentication
 {
-    public class LoginAttemptEvent : IEvent<(string Token, DateTime Expiry, bool IsAdmin)>
+    public class LoginAttemptQuery : ICommand<(string Token, DateTime Expiry, bool IsAdmin)>
     {
-        public LoginAttemptEvent(string username, string password, string userAgent)
+        public LoginAttemptQuery(string username, string password, string userAgent)
         {
             Username = username;
             Password = password;

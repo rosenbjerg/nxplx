@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Models.Events.Library
 {
-    public class ListLibrariesEvent : IEvent<List<LibraryDto>>
+    public class ListLibrariesQuery : IQuery<List<LibraryDto>>
     {
     }
 }

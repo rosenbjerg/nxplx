@@ -2,9 +2,9 @@
 
 namespace NxPlx.Application.Models.Events
 {
-    public class ReplaceImageEvent : IEvent<bool>
+    public class ReplaceImageCommand : ICommand<bool>
     {
-        public ReplaceImageEvent(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
+        public ReplaceImageCommand(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
         {
             DetailsType = detailsType;
             DetailsId = detailsId;

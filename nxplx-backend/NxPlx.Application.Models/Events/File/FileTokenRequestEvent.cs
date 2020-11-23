@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.File
 {
-    public class FileTokenRequestEvent : IEvent<string>
+    public class RequestFileTokenCommand : ICommand<string>
     {
-        public FileTokenRequestEvent(string filePath)
+        public RequestFileTokenCommand(string filePath)
         {
             FilePath = filePath;
         }

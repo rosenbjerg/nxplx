@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Models.Events.File;
 
 namespace NxPlx.Core.Services.EventHandlers.File
 {
-    public class FileTokenLookupHandler : IEventHandler<FileTokenLookupEvent, string?>
+    public class FileTokenLookupHandler : IEventHandler<FileTokenLookupQuery, string?>
     {
         private const string StreamPrefix = "stream";
         private readonly IDistributedCache _distributedCache;
@@ -14,9 +14,9 @@ namespace NxPlx.Core.Services.EventHandlers.File
         {
             _distributedCache = distributedCache;
         }
-        public Task<string?> Handle(FileTokenLookupEvent @event, CancellationToken cancellationToken = default)
+        public Task<string?> Handle(FileTokenLookupQuery query, CancellationToken cancellationToken = default)
         {
-            return _distributedCache.GetStringAsync($"{StreamPrefix}:{@event.Token}", cancellationToken);
+            return _distributedCache.GetStringAsync($"{StreamPrefix}:{query.Token}", cancellationToken);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events
+﻿namespace NxPlx.Application.Models.Events.Library
 {
-    public class CreateLibraryEvent : IEvent<AdminLibraryDto>
+    public class CreateLibraryCommand : ICommand<AdminLibraryDto>
     {
-        public CreateLibraryEvent(string name, string path, string language, string kind)
+        public CreateLibraryCommand(string name, string path, string language, string kind)
         {
             Name = name;
             Path = path;

@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Models.Events.Film;
+using NxPlx.Application.Models.Events.User;
 using NxPlx.ApplicationHost.Api.Authentication;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
@@ -27,16 +28,16 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             [FromForm, Required]string password1,
             [FromForm, Required]string password2)
         {
-            var success = await _eventDispatcher.Dispatch(new UpdateUserPasswordEvent(oldPassword, password1, password2));
+            var success = await _eventDispatcher.Dispatch(new UpdateUserPasswordCommand(oldPassword, password1, password2));
             if (success) return Ok();
             return BadRequest();
         }
         
         [HttpGet("")]
-        public async Task<ActionResult<UserDto?>> Get() => await _eventDispatcher.Dispatch(new CurrentUserLookupEvent());
+        public async Task<ActionResult<UserDto?>> Get() => await _eventDispatcher.Dispatch(new CurrentUserLookupQuery());
         
         [HttpPut("")]
-        public Task Update([FromForm, EmailAddress] string? email) => _eventDispatcher.Dispatch(new UpdateUserDetailsEvent(email));
+        public Task Update([FromForm, EmailAddress] string? email) => _eventDispatcher.Dispatch(new UpdateUserDetailsCommand(email));
         
         [HttpPost("")]
         [RequiresAdminPermissions]
@@ -49,15 +50,15 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             [FromForm]List<int>? libraryIds)
         {
             if (password1 != password2) return BadRequest();
-            return await _eventDispatcher.Dispatch(new CreateUserEvent(username, email, privileges == "admin", libraryIds, password1));
+            return await _eventDispatcher.Dispatch(new CreateUserCommand(username, email, privileges == "admin", libraryIds, password1));
         }
 
         [HttpDelete("")]
         [RequiresAdminPermissions]
-        public async Task Remove([FromBody, Required] string username) => await _eventDispatcher.Dispatch(new RemoveUserEvent(username));
+        public async Task Remove([FromBody, Required] string username) => await _eventDispatcher.Dispatch(new RemoveUserCommand(username));
 
         [HttpGet("list")]
         [RequiresAdminPermissions]
-        public async Task<IEnumerable<UserDto>> List() => await _eventDispatcher.Dispatch(new ListUsersEvent());
+        public async Task<IEnumerable<UserDto>> List() => await _eventDispatcher.Dispatch(new ListUsersQuery());
     }
 }
