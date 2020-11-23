@@ -2,9 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Core;
 using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events.Series;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
@@ -14,29 +15,27 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class ProgressController : ControllerBase
     {
-        private readonly ProgressService _progressService;
-        private readonly UserContextService _userContextService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public ProgressController(ProgressService progressService, UserContextService userContextService)
+        public ProgressController(IEventDispatcher dispatcher)
         {
-            _progressService = progressService;
-            _userContextService = userContextService;
+            _dispatcher = dispatcher;
         }
-        
+
         [HttpGet("continue")]
-        public async Task<IEnumerable<ContinueWatchingDto>> Continue()
-            => await _progressService.GetUserContinueWatchingList(await _userContextService.GetUser());
+        public Task<IEnumerable<ContinueWatchingDto>> Continue()
+            => _dispatcher.Dispatch(new ContinueWatchingQuery());
 
         [HttpGet("season/{seriesId}/{seasonNumber}")]
-        public async Task<List<WatchingProgressDto>> GetEpisodeProgress([FromRoute, Required]int seriesId, [FromRoute, Required]int seasonNumber)
-            => await _progressService.GetEpisodeProgress(await _userContextService.GetUser(), seriesId, seasonNumber);
+        public Task<List<WatchingProgressDto>> GetEpisodeProgress([FromRoute, Required]int seriesId, [FromRoute, Required]int seasonNumber)
+            => _dispatcher.Dispatch(new EpisodeProgressQuery(seriesId, seasonNumber));
 
         [HttpGet("{kind}/{fileId}")]
-        public async Task<double> GetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
-            => await _progressService.GetUserWatchingProgress(await _userContextService.GetUser(), kind, fileId);
+        public Task<double> GetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
+            => _dispatcher.Dispatch(new WatchingProgressQuery(kind, fileId));
 
         [HttpPut("{kind}/{fileId}")]
-        public async Task SetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromQuery, Required]double time)
-            => await _progressService.SetUserWatchingProgress(await _userContextService.GetUser(), kind, fileId, time);
+        public Task SetProgressByFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromQuery, Required]double time)
+            => _dispatcher.Dispatch(new SetWatchingProgressCommand(kind, fileId, time));
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models.Events.File;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -10,11 +10,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [ApiController]
     public class StreamController : ControllerBase
     {
-        private readonly StreamingService _streamingService;
+        private readonly IEventDispatcher _eventDispatcher;
 
-        public StreamController(StreamingService streamingService)
+        public StreamController(IEventDispatcher eventDispatcher)
         {
-            _streamingService = streamingService;
+            _eventDispatcher = eventDispatcher;
         }
 
         [HttpGet("{token}.mp4")]
@@ -22,7 +22,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
         private async Task<IActionResult> SendFile(string token, string mime)
         {
-            var path = await _streamingService.GetFilePath(token);
+            var path = await _eventDispatcher.Dispatch(new FileTokenLookupQuery(token));
             if (path == null) return NotFound();
             return PhysicalFile(path, mime, true);
         }

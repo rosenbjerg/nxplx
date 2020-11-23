@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
@@ -12,8 +13,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
@@ -26,13 +25,13 @@ using NxPlx.Application.Mapping;
 using NxPlx.ApplicationHost.Api.Logging;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
+using NxPlx.Core.Services.EventHandlers;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
-using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -51,6 +50,7 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<FolderOptions>(services);
             AddOptions<HostingOptions>(services);
             AddOptions<LoggingOptions>(services);
+            AddOptions<NxPlx.Application.Core.Options.SessionOptions>(services);
 
             services.AddSpaStaticFiles(options => options.RootPath = "public");
             services.AddHangfireServer(options =>
@@ -78,42 +78,32 @@ namespace NxPlx.ApplicationHost.Api
                 options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
                     .UseLazyLoadingProxies());
             
-            services.AddSingleton(typeof(ConnectionHub));
-            services.AddSingleton(typeof(IHttpSessionService), typeof(CookieSessionService));
-            services.AddSingleton(typeof(IDatabaseMapper), typeof(DatabaseMapper));
-            services.AddSingleton(typeof(ICacheClearer), typeof(RedisCacheClearer));
-            services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
-            services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
-            services.AddSingleton(typeof(AdminCommandService));
-            services.AddSingleton(typeof(SessionService));
-            services.AddSingleton(typeof(StreamingService));
-            
-            services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
-            services.AddScoped(typeof(IIndexer), typeof(IndexingService));
-            services.AddScoped(typeof(TempFileService));
-            services.AddScoped(typeof(ImageCreationService));
-            services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
-            services.AddScoped(typeof(OperationContext), _ => new OperationContext());
-            services.AddScoped(typeof(AuthenticationService));
-            services.AddScoped(typeof(EpisodeService));
-            services.AddScoped(typeof(FilmService));
-            services.AddScoped(typeof(LibraryService));
-            services.AddScoped(typeof(NextEpisodeService));
-            services.AddScoped(typeof(UserContextService));
-            services.AddScoped(typeof(ProgressService));
-            services.AddScoped(typeof(SessionService));
-            services.AddScoped(typeof(SubtitleService));
-            services.AddScoped(typeof(OverviewService));
-            services.AddScoped(typeof(UserService));
-            services.AddScoped(typeof(EditDetailsService));
-            
-            Register(typeof(CommandBase), services.AddScoped!);
-        }
+            services.AddHttpContextAccessor();
 
-        private static void Register(Type type, Func<Type, IServiceCollection> register)
-        {
-            var types = type.Assembly.ExportedTypes.Where(t => !t.IsAbstract && type.IsAssignableFrom(t)).ToList();
-            foreach (var t in types) register(t);
+            services.AddSingleton<ConnectionHub>();
+            services.AddSingleton<IHttpSessionService, CookieSessionService>();
+            services.AddSingleton<IDatabaseMapper, DatabaseMapper>();
+            services.AddSingleton<ICacheClearer, RedisCacheClearer>();
+            services.AddSingleton<IDtoMapper, DtoMapper>();
+            services.AddSingleton<IDetailsApi, TMDbApi>();
+
+            services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
+            services.AddScoped<IIndexer, IndexingService>();
+            services.AddScoped<ConnectionAccepter, WebsocketConnectionAccepter>();
+            services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
+            services.AddScoped<OperationContext>();
+            services.AddScoped<TempFileService>();
+
+            services.AddScoped<IEventDispatcher, EventDispatcher>();
+            services.Scan(scan => scan
+                .FromAssemblyOf<IEventHandler>()
+                    .AddClasses(classes => classes.AssignableTo<IEventHandler>())
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
+                    .AddClasses(classes => classes.AssignableTo<CommandBase>())
+                        .AsSelf()
+                        .WithScopedLifetime()
+            );
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)

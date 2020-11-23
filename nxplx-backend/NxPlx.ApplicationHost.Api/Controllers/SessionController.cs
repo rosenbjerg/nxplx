@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events.Sessions;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -13,24 +13,22 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class SessionController : ControllerBase
     {
-        private readonly OperationContext _operationContext;
-        private readonly SessionService _sessionService;
-        private readonly UserContextService _userContextService;
+        private readonly IOperationContext _operationContext;
+        private readonly IEventDispatcher _dispatcher;
 
-        public SessionController(OperationContext operationContext, SessionService sessionService, UserContextService userContextService)
+        public SessionController(IOperationContext operationContext, IEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
-            _sessionService = sessionService;
-            _userContextService = userContextService;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet("")]
         public Task<SessionDto[]> GetSessions()
-            => _sessionService.FindSessions(_operationContext.Session.UserId);
+            => _dispatcher.Dispatch(new SessionsQuery(_operationContext.Session.UserId));
 
         [HttpGet("{userId}")]
         [RequiresAdminPermissions]
         public Task<SessionDto[]> GetUserSessions([FromRoute, Required]int userId)
-            => _sessionService.FindSessions(userId);
+            => _dispatcher.Dispatch(new SessionsQuery(userId));
     }
 }

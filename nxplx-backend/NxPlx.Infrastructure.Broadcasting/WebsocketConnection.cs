@@ -14,7 +14,7 @@ namespace NxPlx.Infrastructure.Broadcasting
         private readonly HttpContext _httpContext;
         private WebSocket? _websocket;
 
-        public WebsocketConnection(HttpContext httpContext, OperationContext operationContext) : base(operationContext)
+        public WebsocketConnection(HttpContext httpContext, IOperationContext operationContext) : base(operationContext)
         {
             _httpContext = httpContext;
         }

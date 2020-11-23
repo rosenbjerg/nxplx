@@ -16,15 +16,15 @@ namespace NxPlx.Infrastructure.Database
 {
     public class DatabaseContext : DbContext
     {
-        private readonly OperationContext _operationContext;
-        public DatabaseContext(DbContextOptions<DatabaseContext> options, OperationContext operationContext)
+        private readonly IOperationContext _operationContext;
+        public DatabaseContext(DbContextOptions<DatabaseContext> options, IOperationContext IOperationContext)
             : base(options)
         {
-            _operationContext = operationContext;
+            _operationContext = IOperationContext;
         }
         // public DatabaseContext()
         // {
-        //     _operationContext = new OperationContext();
+        //     _operationContext = new IOperationContext();
         // }
         //
         // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
