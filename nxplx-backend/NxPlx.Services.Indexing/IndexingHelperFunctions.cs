@@ -36,6 +36,7 @@ namespace NxPlx.Services.Index
 
         private static List<T> GetUnique<T, TKey>(this IEnumerable<T> entities, Func<T, TKey> keySelector)
             where T : class
+            where TKey : notnull
         {
             var unique = new Dictionary<TKey, T>();
             foreach (var entity in entities)

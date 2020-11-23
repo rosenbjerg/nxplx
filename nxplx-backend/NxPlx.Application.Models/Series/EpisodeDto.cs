@@ -9,6 +9,6 @@ namespace NxPlx.Application.Models.Series
         public string Name { get; set; } = null!;
         public string StillPath { get; set; } = null!;
         public int FileId { get; set; }
-        public string StillBlurHash { get; set; }
+        public string StillBlurHash { get; set; } = null!;
     }
 }

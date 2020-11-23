@@ -15,9 +15,15 @@ name: "CodeQL"
 on:
   push:
     branches: [ master ]
+    paths:
+    - 'nxplx-backend/**'
+    - 'nxplx-frontend/**'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
+    paths:
+    - 'nxplx-backend/**'
+    - 'nxplx-frontend/**'
   schedule:
     - cron: '32 5 * * 2'
 

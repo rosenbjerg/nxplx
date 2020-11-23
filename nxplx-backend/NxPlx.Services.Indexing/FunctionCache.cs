@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 namespace NxPlx.Services.Index
 {
     class FunctionCache<TArg1, TResult>
+        where TArg1 : notnull
     {
         private readonly Func<TArg1, Task<TResult>> _function;
         private readonly Dictionary<TArg1, TResult> _dictionary = new Dictionary<TArg1, TResult>();

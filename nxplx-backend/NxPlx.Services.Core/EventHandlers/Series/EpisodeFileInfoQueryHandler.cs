@@ -11,7 +11,7 @@ using NxPlx.Models.File;
 
 namespace NxPlx.Core.Services.EventHandlers.Series
 {
-    public class EpisodeFileInfoQueryHandler : IEventHandler<EpisodeFileInfoQuery, InfoDto>
+    public class EpisodeFileInfoQueryHandler : IEventHandler<EpisodeFileInfoQuery, InfoDto?>
     {
         private readonly DatabaseContext _context;
         private readonly IDtoMapper _dtoMapper;

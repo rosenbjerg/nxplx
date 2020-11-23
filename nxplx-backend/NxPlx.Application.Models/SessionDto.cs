@@ -2,7 +2,7 @@
 {
     public class SessionDto
     {
-        public string Token { get; set; }
-        public string UserAgent { get; set; }
+        public string Token { get; set; } = null!;
+        public string UserAgent { get; set; } = null!;
     }
 }

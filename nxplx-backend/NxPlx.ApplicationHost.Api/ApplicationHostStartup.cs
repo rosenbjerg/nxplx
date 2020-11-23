@@ -40,7 +40,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddOptions<TOptions>()
                 .Bind(Configuration.GetSection(typeof(TOptions).Name.Replace("Options", string.Empty)))
                 .ValidateDataAnnotations();
-            services.AddSingleton(typeof(TOptions), provider => provider.GetService<IOptions<TOptions>>().Value);
+            services.AddSingleton(typeof(TOptions), provider => provider.GetRequiredService<IOptions<TOptions>>().Value);
         }
 
         public abstract void ConfigureServices(IServiceCollection services);

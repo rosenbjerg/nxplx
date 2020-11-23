@@ -2,7 +2,7 @@
 
 namespace NxPlx.Application.Models.Events.Library
 {
-    public class LibraryAccessQuery : IQuery<List<int>>
+    public class LibraryAccessQuery : IQuery<List<int>?>
     {
         public LibraryAccessQuery(int userId)
         {

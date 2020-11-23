@@ -4,13 +4,13 @@ WORKDIR /project
 RUN git clone https://github.com/rosenbjerg/NxPlx.git
 
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS backendBuilder
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
 RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-musl-x64 -o build
 
 
-FROM node:13-alpine3.10 AS frontendBuilder
+FROM node:13-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-amd64 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
