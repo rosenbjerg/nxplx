@@ -10,10 +10,10 @@ namespace NxPlx.Core.Services.EventHandlers
     public class CurrentUserQueryHandler : IEventHandler<CurrentUserQuery, Models.User>
     {
         private readonly DatabaseContext _databaseContext;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
         private Models.User? _user;
 
-        public CurrentUserQueryHandler(DatabaseContext databaseContext, OperationContext operationContext)
+        public CurrentUserQueryHandler(DatabaseContext databaseContext, IOperationContext operationContext)
         {
             _databaseContext = databaseContext;
             _operationContext = operationContext;

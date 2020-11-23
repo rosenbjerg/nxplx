@@ -16,12 +16,12 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class LibraryController : ControllerBase
     {
         private readonly IEventDispatcher _eventDispatcher;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
 
-        public LibraryController(IEventDispatcher eventDispatcher, OperationContext operationContext)
+        public LibraryController(IEventDispatcher eventDispatcher, IOperationContext IOperationContext)
         {
             _eventDispatcher = eventDispatcher;
-            _operationContext = operationContext;
+            _operationContext = IOperationContext;
         }
         
         [HttpGet("browse")]

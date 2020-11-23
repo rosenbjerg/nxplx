@@ -11,12 +11,12 @@ namespace NxPlx.Core.Services.EventHandlers.Series
     public class SetSubtitleLanguagePreferenceCommandHandler : IEventHandler<SetSubtitleLanguagePreferenceCommand>
     {
         private readonly DatabaseContext _context;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
 
-        public SetSubtitleLanguagePreferenceCommandHandler(DatabaseContext context, OperationContext operationContext)
+        public SetSubtitleLanguagePreferenceCommandHandler(DatabaseContext context, IOperationContext IOperationContext)
         {
             _context = context;
-            _operationContext = operationContext;
+            _operationContext = IOperationContext;
         }
         
         public async Task Handle(SetSubtitleLanguagePreferenceCommand @event, CancellationToken cancellationToken = default)

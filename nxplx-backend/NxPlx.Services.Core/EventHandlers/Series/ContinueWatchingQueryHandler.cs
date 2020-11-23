@@ -15,10 +15,10 @@ namespace NxPlx.Core.Services.EventHandlers.Series
     public class ContinueWatchingQueryHandler : IEventHandler<ContinueWatchingQuery, IEnumerable<ContinueWatchingDto>>
     {
         private readonly DatabaseContext _context;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
         private readonly IDtoMapper _dtoMapper;
 
-        public ContinueWatchingQueryHandler(DatabaseContext context, OperationContext operationContext, IDtoMapper dtoMapper)
+        public ContinueWatchingQueryHandler(DatabaseContext context, IOperationContext operationContext, IDtoMapper dtoMapper)
         {
             _context = context;
             _operationContext = operationContext;

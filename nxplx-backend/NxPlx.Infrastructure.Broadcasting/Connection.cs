@@ -6,12 +6,12 @@ namespace NxPlx.Infrastructure.Broadcasting
 {
     public abstract class Connection
     {
-        protected Connection(OperationContext operationContext)
+        protected Connection(IOperationContext operationContext)
         {
             OperationContext = operationContext;
         }
         
-        public OperationContext OperationContext { get; }
+        public IOperationContext OperationContext { get; }
 
         public abstract Task SendMessage(Message message);
 

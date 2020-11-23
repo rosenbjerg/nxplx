@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Threading;
 using NxPlx.Models;
 
 namespace NxPlx.Application.Core
 {
-    public class OperationContext
+    public class OperationContext : IOperationContext
     {
+        public CancellationToken OperationCancelled { get; set; }
         public Guid CorrelationId { get; } = Guid.NewGuid();
         public Session Session { get; set; } = null!;
         public string SessionId { get; set; } = null!;

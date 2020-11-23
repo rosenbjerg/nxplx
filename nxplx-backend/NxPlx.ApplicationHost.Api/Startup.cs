@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
@@ -77,18 +78,21 @@ namespace NxPlx.ApplicationHost.Api
                 options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
                     .UseLazyLoadingProxies());
             
-            services.AddSingleton(typeof(ConnectionHub));
-            services.AddSingleton(typeof(IHttpSessionService), typeof(CookieSessionService));
-            services.AddSingleton(typeof(IDatabaseMapper), typeof(DatabaseMapper));
-            services.AddSingleton(typeof(ICacheClearer), typeof(RedisCacheClearer));
-            services.AddSingleton(typeof(IDtoMapper), typeof(DtoMapper));
-            services.AddSingleton(typeof(IDetailsApi), typeof(TMDbApi));
-            
-            services.AddScoped(typeof(ILogEventEnricher), typeof(CommonEventEnricher));
-            services.AddScoped(typeof(IIndexer), typeof(IndexingService));
-            services.AddScoped(typeof(TempFileService));
-            services.AddScoped(typeof(ConnectionAccepter), typeof(WebsocketConnectionAccepter));
-            services.AddScoped(typeof(OperationContext), _ => new OperationContext());
+            services.AddHttpContextAccessor();
+
+            services.AddSingleton<ConnectionHub>();
+            services.AddSingleton<IHttpSessionService, CookieSessionService>();
+            services.AddSingleton<IDatabaseMapper, DatabaseMapper>();
+            services.AddSingleton<ICacheClearer, RedisCacheClearer>();
+            services.AddSingleton<IDtoMapper, DtoMapper>();
+            services.AddSingleton<IDetailsApi, TMDbApi>();
+
+            services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
+            services.AddScoped<IIndexer, IndexingService>();
+            services.AddScoped<ConnectionAccepter, WebsocketConnectionAccepter>();
+            services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
+            services.AddScoped<OperationContext>();
+            services.AddScoped<TempFileService>();
 
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.Scan(scan => scan

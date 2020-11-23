@@ -14,12 +14,12 @@ namespace NxPlx.Core.Services.EventHandlers.Series
     public class EpisodeProgressQueryHandler : IEventHandler<EpisodeProgressQuery, List<WatchingProgressDto>>
     {
         private readonly DatabaseContext _context;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
 
-        public EpisodeProgressQueryHandler(DatabaseContext context, OperationContext operationContext)
+        public EpisodeProgressQueryHandler(DatabaseContext context, IOperationContext IOperationContext)
         {
             _context = context;
-            _operationContext = operationContext;
+            _operationContext = IOperationContext;
         }
 
         public async Task<List<WatchingProgressDto>> Handle(EpisodeProgressQuery @event, CancellationToken cancellationToken = default)

@@ -12,12 +12,12 @@ namespace NxPlx.Core.Services.EventHandlers.Series
     public class SetWatchingProgressCommandHandler : IEventHandler<SetWatchingProgressCommand>
     {
         private readonly DatabaseContext _context;
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
 
-        public SetWatchingProgressCommandHandler(DatabaseContext context, OperationContext operationContext)
+        public SetWatchingProgressCommandHandler(DatabaseContext context, IOperationContext IOperationContext)
         {
             _context = context;
-            _operationContext = operationContext;
+            _operationContext = IOperationContext;
         }
 
         public async Task Handle(SetWatchingProgressCommand @event, CancellationToken cancellationToken = default)

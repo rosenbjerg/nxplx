@@ -13,10 +13,10 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class SessionController : ControllerBase
     {
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
         private readonly IEventDispatcher _dispatcher;
 
-        public SessionController(OperationContext operationContext, IEventDispatcher dispatcher)
+        public SessionController(IOperationContext operationContext, IEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
             _dispatcher = dispatcher;
