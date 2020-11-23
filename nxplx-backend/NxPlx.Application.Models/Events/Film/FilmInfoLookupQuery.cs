@@ -1,6 +1,6 @@
 ﻿namespace NxPlx.Application.Models.Events.Film
 {
-    public class FilmInfoLookupQuery : IQuery<InfoDto>
+    public class FilmInfoLookupQuery : IQuery<InfoDto?>
     {
         public FilmInfoLookupQuery(int fileId)
         {

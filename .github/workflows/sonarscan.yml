@@ -1,11 +1,16 @@
 on:
-  # Trigger analysis when pushing in master or pull requests, and when creating
-  # a pull request. 
   push:
     branches:
       - master
+    paths:
+    - 'nxplx-backend/**'
+    - 'nxplx-frontend/**'
   pull_request:
-      types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]
+    paths:
+    - 'nxplx-backend/**'
+    - 'nxplx-frontend/**'
+
 name: Sonar scan
 jobs:
   sonarcloud:

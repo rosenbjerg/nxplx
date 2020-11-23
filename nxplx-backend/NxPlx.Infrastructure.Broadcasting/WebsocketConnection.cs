@@ -54,7 +54,8 @@ namespace NxPlx.Infrastructure.Broadcasting
                         try
                         {
                             var parsed = JsonSerializer.Deserialize<Message>(buffer);
-                            OnMessageReceived(parsed);
+                            if (parsed != null)
+                                OnMessageReceived(parsed);
                         }
                         catch (JsonException) { }
                     }

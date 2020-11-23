@@ -8,7 +8,7 @@ using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Core.Services.EventHandlers.Library
 {
-    public class LibraryAccessQueryHandler : IEventHandler<LibraryAccessQuery, List<int>>
+    public class LibraryAccessQueryHandler : IEventHandler<LibraryAccessQuery, List<int>?>
     {
         private readonly DatabaseContext _context;
 

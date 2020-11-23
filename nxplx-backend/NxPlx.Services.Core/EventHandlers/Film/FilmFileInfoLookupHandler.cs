@@ -10,7 +10,7 @@ using NxPlx.Models.File;
 
 namespace NxPlx.Core.Services.EventHandlers.Film
 {
-    public class FilmFileInfoLookupHandler : IEventHandler<FilmInfoLookupQuery, InfoDto>
+    public class FilmFileInfoLookupHandler : IEventHandler<FilmInfoLookupQuery, InfoDto?>
     {
         private readonly DatabaseContext _databaseContext;
         private readonly IDtoMapper _dtoMapper;
@@ -23,11 +23,12 @@ namespace NxPlx.Core.Services.EventHandlers.Film
             _eventDispatcher = eventDispatcher;
         }
         
-        public async Task<InfoDto> Handle(FilmInfoLookupQuery query, CancellationToken cancellationToken = default)
+        public async Task<InfoDto?> Handle(FilmInfoLookupQuery query, CancellationToken cancellationToken = default)
         {
             var filmFile = await _databaseContext.FilmFiles.FirstOrDefaultAsync(ff => ff.Id == query.FileId, cancellationToken);
             var dto = _dtoMapper.Map<FilmFile, InfoDto>(filmFile);
-            dto!.FileToken = await _eventDispatcher.Dispatch(new RequestFileTokenCommand(filmFile.Path));
+            if (dto != null)
+                dto.FileToken = await _eventDispatcher.Dispatch(new RequestFileTokenCommand(filmFile.Path));
             return dto;
         }
     }

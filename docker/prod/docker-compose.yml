@@ -1,23 +1,23 @@
-﻿﻿version: '3.1'
+﻿version: '3.1'
 services:
 
   nxplx-database:
-    image: postgres:12-alpine
+    image: postgres:13-alpine
     volumes:
       - /srv/nxplx/database:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
+      POSTGRES_PASSWORD: notdev
 
   nxplx-cache:
-    image: redis:5.0.6-alpine
-    command: redis-server --requirepass 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
+    image: redis:6-alpine
+    command: redis-server --requirepass notdev
 
   nxplx-webapi:
     image: mrosenbjerg/nxplx-webapi
     environment:
-      REDIS_PASSWORD: 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
-      POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
-      NXPLX_PROBE_TOKEN: 45nv8239457w34589vngb7839b7v3452v903458457eg
+      REDIS_PASSWORD: notdev
+      POSTGRES_PASSWORD: notdev
+      NXPLX_PROBE_TOKEN: notdev
     volumes:
       - /srv/nxplx/webapi:/app/data
       - /mymedia:/media:ro

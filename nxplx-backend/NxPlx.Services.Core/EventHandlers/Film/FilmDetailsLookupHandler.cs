@@ -10,7 +10,7 @@ using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Core.Services.EventHandlers.Film
 {
-    public class FilmDetailsLookupHandler : IEventHandler<FilmDetailsLookupQuery, FilmDto>
+    public class FilmDetailsLookupHandler : IEventHandler<FilmDetailsLookupQuery, FilmDto?>
     {
         private readonly DatabaseContext _databaseContext;
         private readonly IMapper _mapper;

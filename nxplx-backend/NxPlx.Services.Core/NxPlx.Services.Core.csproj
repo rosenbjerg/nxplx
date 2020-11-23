@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <LangVersion>8</LangVersion>
+        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
         <RootNamespace>NxPlx.Core.Services</RootNamespace>
     </PropertyGroup>
@@ -16,14 +16,14 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper" Version="10.1.1" />
-      <PackageReference Include="BCrypt.Net-Next" Version="4.0.0" />
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
       <PackageReference Include="Blurhash.System.Drawing.Common" Version="1.0.0" />
-      <PackageReference Include="FFMpegCore" Version="3.0.0" />
+      <PackageReference Include="FFMpegCore" Version="3.1.0" />
       <PackageReference Include="Instances" Version="1.6.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
-      <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
+      <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
     </ItemGroup>
 
 </Project>
