@@ -5,7 +5,7 @@ namespace NxPlx.Application.Core
 {
     public interface IEventDispatcher
     {
-        Task Dispatch(IEvent<Task> @event);
+        Task Dispatch(ICommand @event);
         Task<TResult> Dispatch<TResult>(IEvent<TResult> @event);
     }
 }

@@ -74,8 +74,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
-                    .UseLazyLoadingProxies());
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
             
             services.AddHttpContextAccessor();
 
@@ -114,7 +113,7 @@ namespace NxPlx.ApplicationHost.Api
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseMiddleware<LoggingInterceptorMiddleware>();
+            app.UseMiddleware<LoggingEnrichingMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
             app.UseMiddleware<PerformanceInterceptorMiddleware>();
             app.UseForwardedHeaders();

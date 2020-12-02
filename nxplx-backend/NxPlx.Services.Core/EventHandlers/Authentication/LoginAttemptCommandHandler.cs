@@ -12,7 +12,7 @@ using NxPlx.Models;
 
 namespace NxPlx.Core.Services.EventHandlers.Authentication
 {
-    public class LoginAttemptCommandHandler : IEventHandler<LoginAttemptQuery, (string Token, DateTime Expiry, bool IsAdmin)>
+    public class LoginAttemptCommandHandler : IEventHandler<LoginAttemptCommand, (string Token, DateTime Expiry, bool IsAdmin)>
     {
         private readonly DatabaseContext _databaseContext;
         private readonly OperationContext _operationContext;
@@ -30,16 +30,16 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
             _sessionLength = TimeSpan.FromDays(int.Parse(sessionConfig["LengthInDays"] ?? "20"));
         }
 
-        public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Handle(LoginAttemptQuery query, CancellationToken cancellationToken = default)
+        public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Handle(LoginAttemptCommand command, CancellationToken cancellationToken = default)
         {
-            var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == query.Username, cancellationToken);
-            if (user != null && PasswordUtils.Verify(query.Password, user.PasswordHash))
+            var user = await _databaseContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == command.Username, cancellationToken);
+            if (user != null && PasswordUtils.Verify(command.Password, user.PasswordHash))
             {
                 var token = TokenGenerator.Generate();
                 var expiry = DateTime.UtcNow.Add(_sessionLength);
                 var session = new Session
                 {
-                    UserAgent = query.UserAgent,
+                    UserAgent = command.UserAgent,
                     IsAdmin = user.Admin,
                     UserId = user.Id,
                 };

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using NxPlx.Models.Database;
+
 namespace NxPlx.Models.Details.Series
 {
     public class Network : EntityBase, ILogoImageOwner
@@ -6,5 +9,6 @@ namespace NxPlx.Models.Details.Series
         public string LogoPath { get; set; }
         public string LogoBlurHash { get; set; }
         public string OriginCountry { get; set; }
+        public List<DbSeriesDetails> AiredSeries { get; set; }
     }
 }

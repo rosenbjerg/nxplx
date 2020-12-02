@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-amd64 AS runtime
+FROM --platform=linux/amd64 alpine:3 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
@@ -30,4 +30,4 @@ COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
 ENV NXPLX_BUILD=$build
 EXPOSE 5353
-ENTRYPOINT ["dotnet", "NxPlx.ApplicationHost.Api.dll"]
+ENTRYPOINT ["NxPlx.ApplicationHost.Api"]

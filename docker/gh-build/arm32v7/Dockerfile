@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7 AS runtime
+FROM --platform=linux/arm/v7 alpine:3 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"

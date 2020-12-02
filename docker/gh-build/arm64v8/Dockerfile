@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:5.0-alpine-arm64v8 AS runtime
+FROM --platform=linux/arm64 alpine:3 AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"

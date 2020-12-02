@@ -5,11 +5,11 @@ using Serilog.Core;
 
 namespace NxPlx.ApplicationHost.Api.Logging
 {
-    public class LoggingInterceptorMiddleware
+    public class LoggingEnrichingMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public LoggingInterceptorMiddleware(RequestDelegate next)
+        public LoggingEnrichingMiddleware(RequestDelegate next)
         {
             this._next = next;
         }

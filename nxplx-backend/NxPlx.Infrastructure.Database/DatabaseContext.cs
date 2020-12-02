@@ -58,16 +58,22 @@ namespace NxPlx.Infrastructure.Database
 
 
             modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Seasons).WithOne().OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.ProductionCompanies).WithMany(pc => pc.ProducedSeries);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Genres).WithMany(g => g.SeriesInGenre);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Networks).WithMany(g => g.AiredSeries);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.CreatedBy).WithMany(g => g.CreatedSeries);
+            
             modelBuilder.Entity<SeasonDetails>().HasMany(s => s.Episodes).WithOne().OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<DbFilmDetails>().HasOne(fd => fd.BelongsInCollection).WithMany(mc => mc.Movies).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.Genres).WithMany(g => g.FilmInGenre);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCompanies).WithMany(g => g.ProducedFilm);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCountries).WithMany(g => g.FilmedOnLocation);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.SpokenLanguages).WithMany(g => g.SpokenInFilm);
 
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
             modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);
-            
-            ConfigureFilmDetailsJoinEntities(modelBuilder);
 
-            ConfigureSeriesDetailsJoinEntities(modelBuilder);
-            
             modelBuilder.Entity<SubtitlePreference>(builder =>
             {
                 builder.HasKey(sp => new { sp.UserId, sp.FileId, sp.MediaType });
@@ -102,63 +108,6 @@ namespace NxPlx.Infrastructure.Database
                 modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
                 modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
             }
-        }
-
-        private static void ConfigureSeriesDetailsJoinEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Genre>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, ProductionCompany>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-                
-            });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Creator>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-            modelBuilder.Entity<JoinEntity<DbSeriesDetails, Network>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-        }
-
-        private static void ConfigureFilmDetailsJoinEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, Genre>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCompany>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, ProductionCountry, string>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
-            modelBuilder.Entity<JoinEntity<DbFilmDetails, SpokenLanguage, string>>(builder =>
-            {
-                builder.HasKey(e => new { e.Entity1Id, e.Entity2Id });
-                builder.HasOne(o => o.Entity1).WithMany().HasForeignKey(o => o.Entity1Id).OnDelete(DeleteBehavior.Cascade);
-                builder.HasOne(o => o.Entity2).WithMany().HasForeignKey(o => o.Entity2Id).OnDelete(DeleteBehavior.Cascade);
-            });
         }
 
         private static void ConfigureFilmFileEntity(ModelBuilder modelBuilder)
