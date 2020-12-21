@@ -9,8 +9,6 @@ using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Models;
 using NxPlx.Models.Database;
-using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
 using NxPlx.Models.File;
 using NxPlx.Infrastructure.Database;
 using Z.EntityFramework.Plus;
@@ -20,20 +18,17 @@ namespace NxPlx.Services.Index
     public class IndexingService : IIndexer
     {
         private readonly IDetailsApi _detailsApi;
-        private readonly IDatabaseMapper _databaseMapper;
         private readonly ILogger<IndexingService> _logger;
         private readonly DatabaseContext _context;
         private readonly ICacheClearer _cacheClearer;
 
         public IndexingService(
             IDetailsApi detailsApi,
-            IDatabaseMapper databaseMapper,
             ILogger<IndexingService> logger,
             DatabaseContext context,
             ICacheClearer cacheClearer)
         {
             _detailsApi = detailsApi;
-            _databaseMapper = databaseMapper;
             _logger = logger;
             _context = context;
             _cacheClearer = cacheClearer;
@@ -110,34 +105,25 @@ namespace NxPlx.Services.Index
             var currentFilePaths = new HashSet<string>(await _context.FilmFiles.Where(f => f.PartOfLibraryId == libraryId).Select(f => f.Path).ToListAsync());
             var newFiles = FileIndexer.FindFiles(library.Path, "*", "mp4").Where(filePath => !currentFilePaths.Contains(filePath));
             var newFilm = FileIndexer.IndexFilmFiles(newFiles, libraryId).ToList();
-
-            var details = await FindFilmDetails(newFilm, library);
+            var details = await FindFilmDetails(newFilm, library)!;
             if (!details.Any()) return;
             
-            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
-            var productionCountries = await details.Where(d => d.ProductionCountries != null).SelectMany(d => d.ProductionCountries).GetUniqueNew(pc => pc.Iso3166_1, _context);
-            var spokenLanguages = await details.Where(d => d.SpokenLanguages != null).SelectMany(d => d.SpokenLanguages).GetUniqueNew(sl => sl.Iso639_1, _context);
-            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew(_context);
-            var movieCollections = await details.Where(d => d.BelongsToCollection != null).Select(d => d.BelongsToCollection).GetUniqueNew(_context);
-            
-            _context.AddRange(genres);
-            _context.AddRange(productionCountries);
-            _context.AddRange(spokenLanguages);
-            _context.AddRange(productionCompanies);
-            _context.AddRange(movieCollections);
+            await DeduplicateEntities(details, d => d.Genres);
+            await DeduplicateEntities(details, d => d.ProductionCountries, pc => pc.Iso3166_1);
+            await DeduplicateEntities(details, d => d.SpokenLanguages, sl => sl.Iso639_1);
+            var newProductionCompanyIds = await DeduplicateEntities(details, d => d.ProductionCompanies);
+            var newMovieCollectionIds = await DeduplicateMovieCollections(details);
+
             _context.FilmFiles.AddRange(newFilm);
-            var databaseDetails = _databaseMapper.Map<FilmDetails, DbFilmDetails>(details).ToList();
-            var newDetails = await databaseDetails.GetUniqueNew(_context);
-            await _context.AddRangeAsync(newDetails);
             await _context.SaveChangesAsync();
             await _cacheClearer.Clear("OVERVIEW");
             
             foreach (var detail in details)
                 BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
-            foreach (var movieCollection in movieCollections)
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessMovieCollection(movieCollection.Id));
-            if (productionCompanies.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(productionCompanies.Select(n => n.Id).ToArray()));
+            foreach (var movieCollectionId in newMovieCollectionIds)
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessMovieCollection(movieCollectionId));
+            if (newProductionCompanyIds.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
             foreach (var filmFile in newFilm)
                 BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseFilmFile(filmFile.Id, libraryId));
         }
@@ -149,33 +135,124 @@ namespace NxPlx.Services.Index
             var currentEpisodePaths = new HashSet<string>(await _context.EpisodeFiles.Where(e => e.PartOfLibraryId == libraryId).Select(e => e.Path).ToListAsync());
             var newFiles = FileIndexer.FindFiles(library.Path, "*", "mp4").Where(filePath => !currentEpisodePaths.Contains(filePath));
             var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library).ToList();
-            var details = await FetchSeasons(newEpisodes, library);
+            var details = await FindSeriesDetails(newEpisodes, library);
+            if (!details.Any()) return;
 
-            var genres = await details.Where(d => d.Genres != null).SelectMany(d => d.Genres).GetUniqueNew(_context);
-            var networks = await details.Where(d => d.Networks != null).SelectMany(d => d.Networks).GetUniqueNew(_context);
-            var creators = await details.Where(d => d.CreatedBy != null).SelectMany(d => d.CreatedBy).GetUniqueNew(_context);
-            var productionCompanies = await details.Where(d => d.ProductionCompanies != null).SelectMany(d => d.ProductionCompanies).GetUniqueNew(_context);
-            
-            _context.AddRange(genres);
-            _context.AddRange(networks);
-            _context.AddRange(creators);
-            _context.AddRange(productionCompanies);
+            await DeduplicateEntities(details, d => d.Genres);
+            await DeduplicateEntities(details, d => d.CreatedBy);
+            var newProductionCompanyIds = await DeduplicateEntities(details, d => d.ProductionCompanies);
+            var newNetworkIds = await DeduplicateEntities(details, d => d.Networks);
+
+            await DeduplicateSeriesMetadata(details);
+
             _context.AddRange(newEpisodes);
-            var databaseDetails = _databaseMapper.Map<SeriesDetails, DbSeriesDetails>(details).ToList();
-            await AddOrUpdateSeries(databaseDetails);
             await _context.SaveChangesAsync();
             await _cacheClearer.Clear("OVERVIEW");
             
             foreach (var detail in details)
                 BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
-            if (networks.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessNetworks(networks.Select(n => n.Id).ToArray()));
-            if (productionCompanies.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(productionCompanies.Select(n => n.Id).ToArray()));
+            if (newNetworkIds.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessNetworks(newNetworkIds));
+            if (newProductionCompanyIds.Any())
+                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
             foreach (var episodes in newEpisodes.GroupBy(e => e.SeriesDetailsId))
                 BackgroundJob.Enqueue<IndexingService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), libraryId));
         }
-        
+
+        private async Task DeduplicateSeriesMetadata(List<DbSeriesDetails> details)
+        {
+            var newIds = details.Select(s => s.Id).ToList();
+            var existingSeries = await _context.SeriesDetails
+                .Include(s => s.Seasons)
+                .Where(s => newIds.Contains(s.Id)).ToDictionaryAsync(s => s.Id);
+            foreach (var detail in details)
+            {
+                if (existingSeries.TryGetValue(detail.Id, out var existing))
+                {
+                    existing.Popularity = detail.Popularity;
+                    existing.VoteAverage = detail.VoteAverage;
+                    existing.VoteCount = detail.VoteCount;
+                    existing.InProduction = detail.InProduction;
+                    existing.LastAirDate = detail.LastAirDate;
+
+                    MergeSeasonMetadata(detail, existing);
+                }
+                else
+                {
+                    existingSeries[detail.Id] = detail;
+                    _context.Add(detail);
+                }
+            }
+        }
+
+        private void MergeSeasonMetadata(DbSeriesDetails detail, DbSeriesDetails existing)
+        {
+            foreach (var season in detail.Seasons)
+            {
+                var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
+                if (existingSeason != null)
+                {
+                    existingSeason.Overview = season.Overview;
+                    var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id))
+                        .ToList();
+                    existingSeason.Episodes.AddRange(missingEpisodes);
+                    _context.AddRange(missingEpisodes);
+                }
+                else
+                {
+                    existing.Seasons.Add(season);
+                    _context.Add(season);
+                }
+            }
+        }
+
+        private async Task<List<int>> DeduplicateMovieCollections(List<DbFilmDetails> details)
+        {
+            var movieCollectionIds = details.Where(d => d.BelongsInCollectionId != null).Select(d => d.BelongsInCollectionId!.Value).Distinct().ToList();
+            var existing = await _context.MovieCollection.Where(mc => movieCollectionIds.Contains(mc.Id)).ToDictionaryAsync(mc => mc.Id);
+            foreach (var detail in details.Where(d => d.BelongsInCollection != null))
+            {
+                if (!existing.ContainsKey(detail.BelongsInCollectionId!.Value))
+                {
+                    existing[detail.BelongsInCollectionId.Value] = detail.BelongsInCollection;
+                    _context.Add(detail.BelongsInCollection);
+                }
+                else
+                {
+                    detail.BelongsInCollection = existing[detail.BelongsInCollectionId!.Value];
+                }
+            }
+
+            return movieCollectionIds.Where(id => !existing.ContainsKey(id)).ToList();
+        }
+        private Task<List<int>> DeduplicateEntities<TDetails, TEntity>(List<TDetails> details, Func<TDetails, List<TEntity>> entitySelector)
+            where TEntity : EntityBase
+        {
+            return DeduplicateEntities(details, entitySelector, e => e.Id);
+        }
+        private async Task<List<TKey>> DeduplicateEntities<TDetails, TEntity, TKey>(List<TDetails> details, Func<TDetails, List<TEntity>> entitySelector, Func<TEntity, TKey> idSelector)
+            where TEntity : class
+        {
+            var ids = details.SelectMany(d => entitySelector(d).Select(idSelector)).Distinct().ToList();
+            var existing = await _context.Set<TEntity>().Where(entity => ids.Contains(idSelector(entity))).ToDictionaryAsync(idSelector);
+            foreach (var detail in details)
+            {
+                var attachedEntities = entitySelector(detail);
+                foreach (var entity in attachedEntities.Where(entity => !existing.ContainsKey(idSelector(entity))))
+                {
+                    existing[idSelector(entity)] = entity;
+                    _context.Add(entity);
+                }
+
+                var deduplicated = attachedEntities.Select(entity => existing[idSelector(entity)]).ToList();
+                attachedEntities.Clear();
+                attachedEntities.AddRange(deduplicated);
+            }
+
+            return ids.Where(id => !existing.ContainsKey(id)).ToList();
+        }
+
+
         [Queue(JobQueueNames.FileIndexing)]
         public async Task RemoveDeletedMovies(int libraryId)
         {
@@ -208,46 +285,6 @@ namespace NxPlx.Services.Index
             }
         }
 
-        private async Task AddOrUpdateSeries(List<DbSeriesDetails> seriesDetails)
-        {
-            var seriesIds = seriesDetails.Select(sd => sd.Id).ToList();
-            var existingSeriesDetails = await _context.SeriesDetails
-                .Where(sd => seriesIds.Contains(sd.Id))
-                .ToDictionaryAsync(sd => sd.Id);
-            
-            foreach (var seriesDetail in seriesDetails)
-            {
-                if (existingSeriesDetails.TryGetValue(seriesDetail.Id, out var existing))
-                {
-                    existing.Popularity = seriesDetail.Popularity;
-                    existing.VoteAverage = seriesDetail.VoteAverage;
-                    existing.VoteCount = seriesDetail.VoteCount;
-                    existing.InProduction = seriesDetail.InProduction;
-                    existing.LastAirDate = seriesDetail.LastAirDate;
-                    
-                    foreach (var season in seriesDetail.Seasons)
-                    {
-                        var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
-                        if (existingSeason != null)
-                        {
-                            var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id)).ToList();
-                            existingSeason.Episodes.AddRange(missingEpisodes);
-                            _context.AddRange(missingEpisodes);
-                        }
-                        else
-                        {
-                            existing.Seasons.Add(season);
-                            _context.Add(season);
-                        }
-                    }
-                }
-                else
-                {
-                    _context.Add(seriesDetail);
-                }
-            }
-        }
-        
         private static async Task<MediaDetails> AnalyseMedia(string path)
         {
             var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
@@ -278,11 +315,11 @@ namespace NxPlx.Services.Index
             _context.SubtitlePreferences.RemoveRange(progress);
         }
 
-        private Task<FilmDetails> FetchFilmDetails(int id, string language) => _detailsApi.FetchMovieDetails(id, language);
-        private async Task<List<FilmDetails>> FindFilmDetails(IEnumerable<FilmFile> newFilm, Library library)
+        private Task<DbFilmDetails> FetchFilmDetails(int id, string language) => _detailsApi.FetchMovieDetails(id, language);
+        private async Task<List<DbFilmDetails>> FindFilmDetails(IEnumerable<FilmFile> newFilm, Library library)
         {
-            var allDetails = new Dictionary<int, FilmDetails>();
-            var functionCache = new FunctionCache<int, string, FilmDetails>(FetchFilmDetails);
+            var allDetails = new Dictionary<int, DbFilmDetails>();
+            var functionCache = new FunctionCache<int, string, DbFilmDetails>(FetchFilmDetails);
             
             foreach (var filmFile in newFilm)
             {
@@ -326,10 +363,10 @@ namespace NxPlx.Services.Index
             }
         }
 
-        private async Task<List<SeriesDetails>> FetchSeasons(List<EpisodeFile> newEpisodes, Library library)
+        private async Task<List<DbSeriesDetails>> FindSeriesDetails(List<EpisodeFile> newEpisodes, Library library)
         {
             await FindSeriesDetails(newEpisodes);
-            var details = new List<SeriesDetails>();
+            var details = new List<DbSeriesDetails>();
             var newSeries = newEpisodes.ToLookup(e => e.SeriesDetailsId);
             
             foreach (var series in newSeries)

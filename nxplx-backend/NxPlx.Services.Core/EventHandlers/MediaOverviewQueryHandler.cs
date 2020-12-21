@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
@@ -31,7 +32,7 @@ namespace NxPlx.Core.Services.EventHandlers
 
         protected override async Task<(string CacheKey, CacheResultGenerator<MediaOverviewQuery, IEnumerable<OverviewElementDto>> cacheGenerator)> Prepare(MediaOverviewQuery @event, CancellationToken cancellationToken = default)
         {
-            var currentUser = await _dispatcher.Dispatch<Models.User>(new CurrentUserQuery());
+            var currentUser = await _dispatcher.Dispatch(new CurrentUserQuery());
             var libs = currentUser.LibraryAccessIds;
             if (currentUser.Admin) libs = await _context.Libraries.Select(l => l.Id).ToListAsync(cancellationToken);
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
@@ -47,7 +48,7 @@ namespace NxPlx.Core.Services.EventHandlers
 
             var seriesDetails = await _context.SeriesDetails
                 .Where(sd => seriesDetailIds.Contains(sd.Id))
-                .Project<DbSeriesDetails, OverviewElementDto>(_dtoMapper)
+                .ProjectTo<OverviewElementDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
             
             var filmDetails = await _context.FilmFiles

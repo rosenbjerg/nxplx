@@ -4,14 +4,13 @@ using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
 using NxPlx.Integrations.TMDb.Models.TvSeason;
+using NxPlx.Models.Database;
 using NxPlx.Models.Details;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
-using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
 using MovieCollection = NxPlx.Models.Details.Film.MovieCollection;
 using Network = NxPlx.Models.Details.Series.Network;
 using ProductionCountry = NxPlx.Models.Details.Film.ProductionCountry;
-using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 using SpokenLanguage = NxPlx.Models.Details.Film.SpokenLanguage;
 
 namespace NxPlx.Integrations.TMDb
@@ -20,7 +19,7 @@ namespace NxPlx.Integrations.TMDb
     {
         public TMDbMapper()
         {
-            SetMapping<TvDetails, SeriesDetails>(tvDetails => new SeriesDetails
+            SetMapping<TvDetails, DbSeriesDetails>(tvDetails => new DbSeriesDetails
             {
                 Id = tvDetails.Id,
                 BackdropPath = TrimStart(tvDetails.backdrop_path, '/'),
@@ -44,7 +43,7 @@ namespace NxPlx.Integrations.TMDb
                 ProductionCompanies = Map<Models.ProductionCompany, ProductionCompany>(tvDetails.production_companies).ToList()
             });
             
-            SetMapping<MovieDetails, FilmDetails>(movieDetails => new FilmDetails
+            SetMapping<MovieDetails, DbFilmDetails>(movieDetails => new DbFilmDetails
             {
                 Id = movieDetails.Id,
                 BackdropPath = TrimStart(movieDetails.backdrop_path, '/'),
@@ -68,7 +67,7 @@ namespace NxPlx.Integrations.TMDb
                 ProductionCompanies = Map<Models.ProductionCompany, ProductionCompany>(movieDetails.production_companies).ToList(),
                 ProductionCountries = Map<Models.Movie.ProductionCountry, ProductionCountry>(movieDetails.production_countries).ToList(),
                 SpokenLanguages = Map<Models.Movie.SpokenLanguage, SpokenLanguage>(movieDetails.spoken_languages).ToList(),
-                BelongsToCollection = Map<Models.Movie.MovieCollection, MovieCollection>(movieDetails.belongs_to_collection),
+                BelongsInCollection = Map<Models.Movie.MovieCollection, MovieCollection>(movieDetails.belongs_to_collection),
             });
             
             SetMapping<Models.Genre, Genre>(genre => new Genre

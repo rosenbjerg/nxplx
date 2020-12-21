@@ -29,8 +29,8 @@ namespace NxPlx.Application.Mapping
             CreateMap<DbSeriesDetails, OverviewElementDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(_ => "series"))
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dst => dst.Year, opt => opt.MapFrom(src => src.FirstAirDate == null ? 9999 : src.FirstAirDate.Value.Year))
-                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Genres.Distinct()));
+                .ForMember(dst => dst.Year, opt => opt.MapFrom(src => src.FirstAirDate.HasValue ? src.FirstAirDate.Value.Year : 9999))
+                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Id)));
             
             CreateMap<DbFilmDetails, OverviewElementDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(_ => "film"))

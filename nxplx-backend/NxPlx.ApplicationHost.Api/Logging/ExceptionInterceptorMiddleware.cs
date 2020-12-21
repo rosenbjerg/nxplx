@@ -20,6 +20,7 @@ namespace NxPlx.ApplicationHost.Api.Logging
             {
                 await _next(context);
             }
+            catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
             catch (Exception e)
             {

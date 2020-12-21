@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using NxPlx.Models.Details.Film;
+using NxPlx.Models.Database;
 using NxPlx.Models.Details.Search;
 using NxPlx.Models.Details.Series;
 
@@ -76,8 +76,8 @@ namespace NxPlx.Application.Core
         
         public abstract Task<FilmResult[]> SearchMovies(string title, int year);
         public abstract Task<SeriesResult[]> SearchTvShows(string name);
-        public abstract Task<FilmDetails> FetchMovieDetails(int seriesId, string language);
-        public abstract Task<SeriesDetails> FetchTvDetails(int seriesId, string language, int[] seasons);
+        public abstract Task<DbFilmDetails> FetchMovieDetails(int seriesId, string language);
+        public abstract Task<DbSeriesDetails> FetchTvDetails(int seriesId, string language, int[] seasons);
         public abstract Task<SeasonDetails> FetchTvSeasonDetails(int seriesId, int seasonNo, string language);
         public abstract Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath);
     }

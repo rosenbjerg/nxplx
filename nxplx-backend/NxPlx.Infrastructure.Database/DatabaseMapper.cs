@@ -1,9 +1,6 @@
 using System.Linq;
 using NxPlx.Application.Core;
 using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
 using FilmDetails = NxPlx.Models.Details.Film.FilmDetails;
 using SeriesDetails = NxPlx.Models.Details.Series.SeriesDetails;
 

@@ -24,7 +24,7 @@ namespace NxPlx.Core.Services.EventHandlers
         {
             var (cacheKey, generator) = await Prepare(@event, cancellationToken);
             var cached = await _distributedCache.GetObjectAsync<TResult>(cacheKey, cancellationToken);
-            if (cached != null) return cached;
+            // if (cached != null) return cached;
             
             var generated = await generator(@event, cancellationToken);
             await _distributedCache.SetObjectAsync(cacheKey, generated, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(3) }, CancellationToken.None);
