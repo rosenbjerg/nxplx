@@ -6767,9 +6767,9 @@ preact-router@^3.2.1:
   integrity sha512-KEN2VN1DxUlTwzW5IFkF13YIA2OdQ2OvgJTkQREF+AA2NrHRLaGbB68EjS4IeZOa1shvQ1FvEm3bSLta4sXBhg==
 
 preact@^10.4.7:
-  version "10.4.7"
-  resolved "https://registry.yarnpkg.com/preact/-/preact-10.4.7.tgz#5a530d34b4ba45f38234be8b1b3fe910098a165f"
-  integrity sha512-DtnnPbOm7oxW7Sxf5Co+KSIOxo7bGm0vLfJN/wGey7G2sAGKnGP5+bFyE2YIgutMISQl6xFVTsOd6l/Au88VVw==
+  version "10.5.8"
+  resolved "https://registry.yarnpkg.com/preact/-/preact-10.5.8.tgz#96e71e2caadf60b5ff901f0e4772a46ba0756336"
+  integrity sha512-8d0FfBX3O0ay34i15mTckXicSsvaQLemPUByXTyfQUxDeFqZhbtnftVZMNqX3zEJLHcy1bqRu9t+V4GqJtG1TQ==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
