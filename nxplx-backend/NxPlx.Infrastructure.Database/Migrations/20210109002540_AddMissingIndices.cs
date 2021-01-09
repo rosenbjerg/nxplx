@@ -6,10 +6,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_FilmFiles_FilmDetails_FilmId",
-                table: "FilmFiles");
-
             migrationBuilder.DropPrimaryKey(
                 name: "PK_DbSeriesDetailsProductionCompany",
                 table: "DbSeriesDetailsProductionCompany");
@@ -25,16 +21,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_DbSeriesDetailsNetwork_NetworksId",
                 table: "DbSeriesDetailsNetwork");
-
-            migrationBuilder.RenameColumn(
-                name: "FilmId",
-                table: "FilmFiles",
-                newName: "FilmDetailsId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_FilmFiles_FilmId",
-                table: "FilmFiles",
-                newName: "IX_FilmFiles_FilmDetailsId");
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_DbSeriesDetailsProductionCompany",
@@ -55,22 +41,10 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 name: "IX_DbSeriesDetailsNetwork_SeriesId",
                 table: "DbSeriesDetailsNetwork",
                 column: "SeriesId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_FilmFiles_FilmDetails_FilmDetailsId",
-                table: "FilmFiles",
-                column: "FilmDetailsId",
-                principalTable: "FilmDetails",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_FilmFiles_FilmDetails_FilmDetailsId",
-                table: "FilmFiles");
-
             migrationBuilder.DropPrimaryKey(
                 name: "PK_DbSeriesDetailsProductionCompany",
                 table: "DbSeriesDetailsProductionCompany");
@@ -86,16 +60,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_DbSeriesDetailsNetwork_SeriesId",
                 table: "DbSeriesDetailsNetwork");
-
-            migrationBuilder.RenameColumn(
-                name: "FilmDetailsId",
-                table: "FilmFiles",
-                newName: "FilmId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_FilmFiles_FilmDetailsId",
-                table: "FilmFiles",
-                newName: "IX_FilmFiles_FilmId");
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_DbSeriesDetailsProductionCompany",
@@ -116,14 +80,6 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 name: "IX_DbSeriesDetailsNetwork_NetworksId",
                 table: "DbSeriesDetailsNetwork",
                 column: "NetworksId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_FilmFiles_FilmDetails_FilmId",
-                table: "FilmFiles",
-                column: "FilmId",
-                principalTable: "FilmDetails",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
         }
     }
 }
