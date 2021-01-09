@@ -58,18 +58,18 @@ namespace NxPlx.Infrastructure.Database
 
 
             modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Seasons).WithOne().OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.ProductionCompanies).WithMany(pc => pc.ProducedSeries);
-            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Genres).WithMany(g => g.SeriesInGenre);
-            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Networks).WithMany(g => g.AiredSeries);
-            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.CreatedBy).WithMany(g => g.CreatedSeries);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.ProductionCompanies).WithMany(pc => pc.Series);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Genres).WithMany(g => g.Series);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.Networks).WithMany(g => g.Series);
+            modelBuilder.Entity<DbSeriesDetails>().HasMany(s => s.CreatedBy).WithMany(g => g.Series);
             
             modelBuilder.Entity<SeasonDetails>().HasMany(s => s.Episodes).WithOne().OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<DbFilmDetails>().HasOne(fd => fd.BelongsInCollection).WithMany(mc => mc.Movies).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.Genres).WithMany(g => g.FilmInGenre);
-            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCompanies).WithMany(g => g.ProducedFilm);
-            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCountries).WithMany(g => g.FilmedOnLocation);
-            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.SpokenLanguages).WithMany(g => g.SpokenInFilm);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.Genres).WithMany(g => g.Film);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCompanies).WithMany(g => g.Film);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.ProductionCountries).WithMany(g => g.Film);
+            modelBuilder.Entity<DbFilmDetails>().HasMany(fd => fd.SpokenLanguages).WithMany(g => g.Film);
 
             modelBuilder.Entity<ProductionCountry>().HasKey(pc => pc.Iso3166_1);
             modelBuilder.Entity<SpokenLanguage>().HasKey(sl => sl.Iso639_1);

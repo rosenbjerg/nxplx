@@ -18,13 +18,11 @@ namespace NxPlx.Core.Services
             _operationContext = operationContext;
         }
 
-        public async Task Dispatch(ICommand @event)
+        public async Task Dispatch<TCommand>(TCommand @event)
+            where TCommand : ICommand
         {
-            var handlerType = typeof(IEventHandler<>).MakeGenericType(@event.GetType());
-            var handler = _serviceProvider.GetRequiredService(handlerType);
-            var handlerMethod = handlerType.GetMethod(nameof(IEventHandler<ICommand>.Handle));
-            var resultTask = (Task)handlerMethod!.Invoke(handler, new object?[] { @event, _operationContext.OperationCancelled })!;
-            await resultTask;
+            var handler = _serviceProvider.GetRequiredService<IEventHandler<TCommand>>();
+            await handler.Handle(@event, _operationContext.OperationCancelled);
         }
 
         public async Task<TResult> Dispatch<TResult>(IEvent<TResult> @event)

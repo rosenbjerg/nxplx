@@ -35,13 +35,12 @@ namespace NxPlx.Application.Mapping
             CreateMap<DbFilmDetails, OverviewElementDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(_ => "film"))
                 .ForMember(dst => dst.Year, opt => opt.MapFrom(src => src.ReleaseDate == null ? 9999 : src.ReleaseDate.Value.Year))
-                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Genres));
-            
+                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.Id)));
             
             CreateMap<MovieCollection, OverviewElementDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(_ => "collection"))
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Movies.SelectMany(f => f.Genres).Distinct().ToList()))
+                .ForMember(dst => dst.Genres, opt => opt.MapFrom(src => src.Movies.SelectMany(f => f.Genres.Select(g => g.Id)).Distinct().ToList()))
                 .ForMember(dst => dst.Year, opt => opt.MapFrom(src => src.Movies.Min(f => f.ReleaseDate == null ? 9999 : f.ReleaseDate.Value.Year)));
 
             CreateMap<FilmFile, FilmDto>()

@@ -21,7 +21,7 @@ namespace NxPlx.Core.Services.EventHandlers.File
             var token = TokenGenerator.Generate();
             await _distributedCache.SetStringAsync($"{StreamPrefix}:{token}", command.FilePath, new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(35)
+                SlidingExpiration = TimeSpan.FromMinutes(2)
             }, cancellationToken);
             return token;
         }

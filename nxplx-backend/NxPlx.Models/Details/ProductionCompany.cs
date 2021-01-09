@@ -10,7 +10,7 @@ namespace NxPlx.Models.Details
         public string Name { get; set; }
         public string OriginCountry { get; set; }
 
-        public List<DbSeriesDetails> ProducedSeries { get; set; }
-        public List<DbFilmDetails> ProducedFilm { get; set; }
+        public List<DbSeriesDetails> Series { get; set; }
+        public List<DbFilmDetails> Film { get; set; }
     }
 }

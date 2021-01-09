@@ -6,7 +6,7 @@ namespace NxPlx.Models.Details
     public class Genre : EntityBase
     {
         public string Name { get; set; }
-        public List<DbSeriesDetails> SeriesInGenre { get; set; }
-        public List<DbFilmDetails> FilmInGenre { get; set; }
+        public List<DbSeriesDetails> Series { get; set; }
+        public List<DbFilmDetails> Film { get; set; }
     }
 }

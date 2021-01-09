@@ -7,6 +7,6 @@ namespace NxPlx.Models.Details.Film
     {
         public string Iso639_1 { get; set; }
         public string Name { get; set; }
-        public List<DbFilmDetails> SpokenInFilm { get; set; }
+        public List<DbFilmDetails> Film { get; set; }
     }
 }

@@ -7,7 +7,7 @@ namespace NxPlx.Core.Services
 {
     public class TempFileService : IDisposable
     {
-        private readonly List<string> _tempFiles = new List<string>();
+        private readonly List<string> _tempFiles = new();
         private readonly string _tempFileFolder;
 
         public TempFileService(FolderOptions folderOptions)

@@ -15,8 +15,8 @@ namespace NxPlx.Application.Core
     }
     public abstract class MapperBase : IMapper
     {
-        private readonly Dictionary<(Type, Type), object> _expressions = new Dictionary<(Type, Type), object>();
-        private readonly Dictionary<(Type, Type), object> _compiledCache = new Dictionary<(Type, Type), object>();
+        private readonly Dictionary<(Type, Type), object> _expressions = new();
+        private readonly Dictionary<(Type, Type), object> _compiledCache = new();
 
         public void SetMapping<TFrom, TTo>(Expression<Func<TFrom, TTo>> mapping)
             where TTo : class

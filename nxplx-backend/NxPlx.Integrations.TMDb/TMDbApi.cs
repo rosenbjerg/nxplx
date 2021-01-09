@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
+using NxPlx.Integrations.TMDb.Models;
 using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
@@ -75,6 +76,7 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
+            if (tmdbObj == null) return new FilmResult[0];
             return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
         }
         
@@ -85,10 +87,26 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
-
+            if (tmdbObj == null) return new SeriesResult[0];
             var mapped = _mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
             
             return mapped;
+        }
+
+        public override async Task<NxPlx.Models.Details.Genre[]> FetchMovieGenres(string language)
+        {
+            var url = $"{BaseUrl}/genre/movie/list?language={language}";
+            var content = await Fetch(url);
+            var genreList = JsonConvert.DeserializeObject<GenreList>(content);
+            return _mapper.Map<Genre, NxPlx.Models.Details.Genre>(genreList.Genres).ToArray();
+        }
+
+        public override async Task<NxPlx.Models.Details.Genre[]> FetchTvGenres(string language)
+        {
+            var url = $"{BaseUrl}/genre/tv/list?language={language}";
+            var content = await Fetch(url);
+            var genreList = JsonConvert.DeserializeObject<GenreList>(content);
+            return _mapper.Map<Genre, NxPlx.Models.Details.Genre>(genreList.Genres).ToArray();
         }
 
         public override async Task<DbFilmDetails> FetchMovieDetails(int seriesId, string language)

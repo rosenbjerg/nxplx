@@ -9,8 +9,8 @@ namespace NxPlx.Infrastructure.Broadcasting
 {
     public class ConnectionHub
     {
-        private readonly ConcurrentDictionary<int, UserConnections> _connectionTable = new ConcurrentDictionary<int, UserConnections>();
-        private readonly object _tableLock = new object();
+        private readonly ConcurrentDictionary<int, UserConnections> _connectionTable = new();
+        private readonly object _tableLock = new();
         
         public void Add(Connection connection)
         {
@@ -77,8 +77,8 @@ namespace NxPlx.Infrastructure.Broadcasting
             {
                 Admin = isAdminUser;
             }
-            internal readonly object Sync = new object();
-            internal readonly List<Connection> Connections = new List<Connection>();
+            internal readonly object Sync = new();
+            internal readonly List<Connection> Connections = new();
             internal bool Admin;
         }
     }

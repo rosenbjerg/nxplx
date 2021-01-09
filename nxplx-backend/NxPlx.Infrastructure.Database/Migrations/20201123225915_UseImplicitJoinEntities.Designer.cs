@@ -26,25 +26,25 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CreatedSeriesId")
+                    b.Property<int>("SeriesId")
                         .HasColumnType("integer");
 
-                    b.HasKey("CreatedById", "CreatedSeriesId");
+                    b.HasKey("CreatedById", "SeriesId");
 
-                    b.HasIndex("CreatedSeriesId");
+                    b.HasIndex("SeriesId");
 
                     b.ToTable("CreatorDbSeriesDetails");
                 });
 
             modelBuilder.Entity("DbFilmDetailsGenre", b =>
                 {
-                    b.Property<int>("FilmInGenreId")
+                    b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<int>("GenresId")
                         .HasColumnType("integer");
 
-                    b.HasKey("FilmInGenreId", "GenresId");
+                    b.HasKey("FilmId", "GenresId");
 
                     b.HasIndex("GenresId");
 
@@ -53,13 +53,13 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("DbFilmDetailsProductionCompany", b =>
                 {
-                    b.Property<int>("ProducedFilmId")
+                    b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductionCompaniesId")
                         .HasColumnType("integer");
 
-                    b.HasKey("ProducedFilmId", "ProductionCompaniesId");
+                    b.HasKey("FilmId", "ProductionCompaniesId");
 
                     b.HasIndex("ProductionCompaniesId");
 
@@ -68,13 +68,13 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("DbFilmDetailsProductionCountry", b =>
                 {
-                    b.Property<int>("FilmedOnLocationId")
+                    b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ProductionCountriesIso3166_1")
                         .HasColumnType("text");
 
-                    b.HasKey("FilmedOnLocationId", "ProductionCountriesIso3166_1");
+                    b.HasKey("FilmId", "ProductionCountriesIso3166_1");
 
                     b.HasIndex("ProductionCountriesIso3166_1");
 
@@ -83,13 +83,13 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("DbFilmDetailsSpokenLanguage", b =>
                 {
-                    b.Property<int>("SpokenInFilmId")
+                    b.Property<int>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<string>("SpokenLanguagesIso639_1")
                         .HasColumnType("text");
 
-                    b.HasKey("SpokenInFilmId", "SpokenLanguagesIso639_1");
+                    b.HasKey("FilmId", "SpokenLanguagesIso639_1");
 
                     b.HasIndex("SpokenLanguagesIso639_1");
 
@@ -101,25 +101,25 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<int>("GenresId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SeriesInGenreId")
+                    b.Property<int>("SeriesId")
                         .HasColumnType("integer");
 
-                    b.HasKey("GenresId", "SeriesInGenreId");
+                    b.HasKey("GenresId", "SeriesId");
 
-                    b.HasIndex("SeriesInGenreId");
+                    b.HasIndex("SeriesId");
 
                     b.ToTable("DbSeriesDetailsGenre");
                 });
 
             modelBuilder.Entity("DbSeriesDetailsNetwork", b =>
                 {
-                    b.Property<int>("AiredSeriesId")
+                    b.Property<int>("SeriesId")
                         .HasColumnType("integer");
 
                     b.Property<int>("NetworksId")
                         .HasColumnType("integer");
 
-                    b.HasKey("AiredSeriesId", "NetworksId");
+                    b.HasKey("SeriesId", "NetworksId");
 
                     b.HasIndex("NetworksId");
 
@@ -128,13 +128,13 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
             modelBuilder.Entity("DbSeriesDetailsProductionCompany", b =>
                 {
-                    b.Property<int>("ProducedSeriesId")
+                    b.Property<int>("SeriesId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductionCompaniesId")
                         .HasColumnType("integer");
 
-                    b.HasKey("ProducedSeriesId", "ProductionCompaniesId");
+                    b.HasKey("SeriesId", "ProductionCompaniesId");
 
                     b.HasIndex("ProductionCompaniesId");
 
@@ -660,7 +660,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                     b.Property<long>("FileSizeBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("FilmDetailsId")
+                    b.Property<int?>("FilmId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("LastWrite")
@@ -686,7 +686,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FilmDetailsId");
+                    b.HasIndex("FilmId");
 
                     b.HasIndex("PartOfLibraryId");
 
@@ -880,7 +880,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany()
-                        .HasForeignKey("CreatedSeriesId")
+                        .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -889,7 +889,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany()
-                        .HasForeignKey("FilmInGenreId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -904,7 +904,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany()
-                        .HasForeignKey("ProducedFilmId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -919,7 +919,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany()
-                        .HasForeignKey("FilmedOnLocationId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -934,7 +934,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", null)
                         .WithMany()
-                        .HasForeignKey("SpokenInFilmId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -955,7 +955,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
 
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany()
-                        .HasForeignKey("SeriesInGenreId")
+                        .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -964,7 +964,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany()
-                        .HasForeignKey("AiredSeriesId")
+                        .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -979,7 +979,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbSeriesDetails", null)
                         .WithMany()
-                        .HasForeignKey("ProducedSeriesId")
+                        .HasForeignKey("SeriesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1092,7 +1092,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     b.HasOne("NxPlx.Models.Database.DbFilmDetails", "FilmDetails")
                         .WithMany()
-                        .HasForeignKey("FilmDetailsId")
+                        .HasForeignKey("FilmId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("NxPlx.Models.Library", "PartOfLibrary")

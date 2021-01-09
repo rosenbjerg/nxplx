@@ -9,6 +9,6 @@ namespace NxPlx.Models.Details.Series
         public string LogoPath { get; set; }
         public string LogoBlurHash { get; set; }
         public string OriginCountry { get; set; }
-        public List<DbSeriesDetails> AiredSeries { get; set; }
+        public List<DbSeriesDetails> Series { get; set; }
     }
 }

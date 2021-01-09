@@ -11,11 +11,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     CreatedById = table.Column<int>(type: "integer", nullable: false),
-                    CreatedSeriesId = table.Column<int>(type: "integer", nullable: false)
+                    SeriesId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CreatorDbSeriesDetails", x => new { x.CreatedById, x.CreatedSeriesId });
+                    table.PrimaryKey("PK_CreatorDbSeriesDetails", x => new { x.CreatedById, x.SeriesId });
                     table.ForeignKey(
                         name: "FK_CreatorDbSeriesDetails_Creator_CreatedById",
                         column: x => x.CreatedById,
@@ -23,28 +23,28 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CreatorDbSeriesDetails_SeriesDetails_CreatedSeriesId",
-                        column: x => x.CreatedSeriesId,
+                        name: "FK_CreatorDbSeriesDetails_SeriesDetails_SeriesId",
+                        column: x => x.SeriesId,
                         principalTable: "SeriesDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"CreatorDbSeriesDetails\" (\"CreatedById\", \"CreatedSeriesId\") SELECT \"Entity2Id\", \"Entity1Id\" FROM \"JoinEntity<DbSeriesDetails, Creator>\"");
+            migrationBuilder.Sql("INSERT INTO \"CreatorDbSeriesDetails\" (\"CreatedById\", \"SeriesId\") SELECT \"Entity2Id\", \"Entity1Id\" FROM \"JoinEntity<DbSeriesDetails, Creator>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbSeriesDetails, Creator>");
 
             migrationBuilder.CreateTable(
                 name: "DbFilmDetailsGenre",
                 columns: table => new
                 {
-                    FilmDetailsId = table.Column<int>(type: "integer", nullable: false),
+                    FilmId = table.Column<int>(type: "integer", nullable: false),
                     GenresId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbFilmDetailsGenre", x => new { x.FilmDetailsId, x.GenresId });
+                    table.PrimaryKey("PK_DbFilmDetailsGenre", x => new { x.FilmId, x.GenresId });
                     table.ForeignKey(
                         name: "FK_DbFilmDetailsGenre_FilmDetails_FilmId",
-                        column: x => x.FilmDetailsId,
+                        column: x => x.FilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -55,22 +55,22 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsGenre\" (\"FilmDetailsId\", \"GenresId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, Genre>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsGenre\" (\"FilmId\", \"GenresId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, Genre>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbFilmDetails, Genre>");
 
             migrationBuilder.CreateTable(
                 name: "DbFilmDetailsProductionCompany",
                 columns: table => new
                 {
-                    ProducedFilmId = table.Column<int>(type: "integer", nullable: false),
+                    FilmId = table.Column<int>(type: "integer", nullable: false),
                     ProductionCompaniesId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbFilmDetailsProductionCompany", x => new { x.ProducedFilmId, x.ProductionCompaniesId });
+                    table.PrimaryKey("PK_DbFilmDetailsProductionCompany", x => new { x.FilmId, x.ProductionCompaniesId });
                     table.ForeignKey(
-                        name: "FK_DbFilmDetailsProductionCompany_FilmDetails_ProducedFilmId",
-                        column: x => x.ProducedFilmId,
+                        name: "FK_DbFilmDetailsProductionCompany_FilmDetails_FilmId",
+                        column: x => x.FilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -81,22 +81,22 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsProductionCompany\" (\"ProducedFilmId\", \"ProductionCompaniesId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"public\".\"JoinEntity<DbFilmDetails, ProductionCompany>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsProductionCompany\" (\"FilmId\", \"ProductionCompaniesId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"public\".\"JoinEntity<DbFilmDetails, ProductionCompany>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbFilmDetails, ProductionCompany>");
 
             migrationBuilder.CreateTable(
                 name: "DbFilmDetailsProductionCountry",
                 columns: table => new
                 {
-                    FilmedOnLocationId = table.Column<int>(type: "integer", nullable: false),
+                    FilmId = table.Column<int>(type: "integer", nullable: false),
                     ProductionCountriesIso3166_1 = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbFilmDetailsProductionCountry", x => new { x.FilmedOnLocationId, x.ProductionCountriesIso3166_1 });
+                    table.PrimaryKey("PK_DbFilmDetailsProductionCountry", x => new { x.FilmId, x.ProductionCountriesIso3166_1 });
                     table.ForeignKey(
                         name: "FK_DbFilmDetailsProductionCountry_FilmDetails_FilmedOnLocation~",
-                        column: x => x.FilmedOnLocationId,
+                        column: x => x.FilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -107,22 +107,22 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Iso3166_1",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsProductionCountry\" (\"FilmedOnLocationId\", \"ProductionCountriesIso3166_1\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, ProductionCountry, string>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsProductionCountry\" (\"FilmId\", \"ProductionCountriesIso3166_1\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, ProductionCountry, string>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbFilmDetails, ProductionCountry, string>");
 
             migrationBuilder.CreateTable(
                 name: "DbFilmDetailsSpokenLanguage",
                 columns: table => new
                 {
-                    SpokenInFilmId = table.Column<int>(type: "integer", nullable: false),
+                    FilmId = table.Column<int>(type: "integer", nullable: false),
                     SpokenLanguagesIso639_1 = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbFilmDetailsSpokenLanguage", x => new { x.SpokenInFilmId, x.SpokenLanguagesIso639_1 });
+                    table.PrimaryKey("PK_DbFilmDetailsSpokenLanguage", x => new { x.FilmId, x.SpokenLanguagesIso639_1 });
                     table.ForeignKey(
-                        name: "FK_DbFilmDetailsSpokenLanguage_FilmDetails_SpokenInFilmId",
-                        column: x => x.SpokenInFilmId,
+                        name: "FK_DbFilmDetailsSpokenLanguage_FilmDetails_FilmId",
+                        column: x => x.FilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -133,7 +133,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Iso639_1",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsSpokenLanguage\" (\"SpokenInFilmId\", \"SpokenLanguagesIso639_1\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, SpokenLanguage, string>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbFilmDetailsSpokenLanguage\" (\"FilmId\", \"SpokenLanguagesIso639_1\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbFilmDetails, SpokenLanguage, string>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbFilmDetails, SpokenLanguage, string>");
 
             migrationBuilder.CreateTable(
@@ -141,11 +141,11 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 columns: table => new
                 {
                     GenresId = table.Column<int>(type: "integer", nullable: false),
-                    SeriesInGenreId = table.Column<int>(type: "integer", nullable: false)
+                    SeriesId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbSeriesDetailsGenre", x => new { x.GenresId, x.SeriesInGenreId });
+                    table.PrimaryKey("PK_DbSeriesDetailsGenre", x => new { x.GenresId, x.SeriesId });
                     table.ForeignKey(
                         name: "FK_DbSeriesDetailsGenre_Genre_GenresId",
                         column: x => x.GenresId,
@@ -153,25 +153,25 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DbSeriesDetailsGenre_SeriesDetails_SeriesInGenreId",
-                        column: x => x.SeriesInGenreId,
+                        name: "FK_DbSeriesDetailsGenre_SeriesDetails_SeriesId",
+                        column: x => x.SeriesId,
                         principalTable: "SeriesDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsGenre\" (\"GenresId\", \"SeriesInGenreId\") SELECT \"Entity2Id\", \"Entity1Id\" FROM \"JoinEntity<DbSeriesDetails, Genre>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsGenre\" (\"GenresId\", \"SeriesId\") SELECT \"Entity2Id\", \"Entity1Id\" FROM \"JoinEntity<DbSeriesDetails, Genre>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbSeriesDetails, Genre>");
 
             migrationBuilder.CreateTable(
                 name: "DbSeriesDetailsNetwork",
                 columns: table => new
                 {
-                    AiredSeriesId = table.Column<int>(type: "integer", nullable: false),
+                    SeriesId = table.Column<int>(type: "integer", nullable: false),
                     NetworksId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbSeriesDetailsNetwork", x => new { x.AiredSeriesId, x.NetworksId });
+                    table.PrimaryKey("PK_DbSeriesDetailsNetwork", x => new { x.SeriesId, x.NetworksId });
                     table.ForeignKey(
                         name: "FK_DbSeriesDetailsNetwork_Network_NetworksId",
                         column: x => x.NetworksId,
@@ -179,25 +179,25 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DbSeriesDetailsNetwork_SeriesDetails_AiredSeriesId",
-                        column: x => x.AiredSeriesId,
+                        name: "FK_DbSeriesDetailsNetwork_SeriesDetails_SeriesId",
+                        column: x => x.SeriesId,
                         principalTable: "SeriesDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsNetwork\" (\"AiredSeriesId\", \"NetworksId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbSeriesDetails, Network>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsNetwork\" (\"SeriesId\", \"NetworksId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbSeriesDetails, Network>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbSeriesDetails, Network>");
 
             migrationBuilder.CreateTable(
                 name: "DbSeriesDetailsProductionCompany",
                 columns: table => new
                 {
-                    ProducedSeriesId = table.Column<int>(type: "integer", nullable: false),
+                    SeriesId = table.Column<int>(type: "integer", nullable: false),
                     ProductionCompaniesId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbSeriesDetailsProductionCompany", x => new { x.ProducedSeriesId, x.ProductionCompaniesId });
+                    table.PrimaryKey("PK_DbSeriesDetailsProductionCompany", x => new { x.SeriesId, x.ProductionCompaniesId });
                     table.ForeignKey(
                         name: "FK_DbSeriesDetailsProductionCompany_ProductionCompany_Producti~",
                         column: x => x.ProductionCompaniesId,
@@ -206,18 +206,18 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DbSeriesDetailsProductionCompany_SeriesDetails_ProducedSeri~",
-                        column: x => x.ProducedSeriesId,
+                        column: x => x.SeriesId,
                         principalTable: "SeriesDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsProductionCompany\" (\"ProducedSeriesId\", \"ProductionCompaniesId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbSeriesDetails, ProductionCompany>\"");
+            migrationBuilder.Sql("INSERT INTO \"DbSeriesDetailsProductionCompany\" (\"SeriesId\", \"ProductionCompaniesId\") SELECT \"Entity1Id\", \"Entity2Id\" FROM \"JoinEntity<DbSeriesDetails, ProductionCompany>\"");
             migrationBuilder.DropTable(name: "JoinEntity<DbSeriesDetails, ProductionCompany>");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CreatorDbSeriesDetails_CreatedSeriesId",
+                name: "IX_CreatorDbSeriesDetails_SeriesId",
                 table: "CreatorDbSeriesDetails",
-                column: "CreatedSeriesId");
+                column: "SeriesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DbFilmDetailsGenre_GenresId",
@@ -240,9 +240,9 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 column: "SpokenLanguagesIso639_1");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DbSeriesDetailsGenre_SeriesInGenreId",
+                name: "IX_DbSeriesDetailsGenre_SeriesId",
                 table: "DbSeriesDetailsGenre",
-                column: "SeriesInGenreId");
+                column: "SeriesId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DbSeriesDetailsNetwork_NetworksId",
@@ -263,14 +263,14 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     Entity1Id = table.Column<int>(type: "integer", nullable: false),
                     Entity2Id = table.Column<int>(type: "integer", nullable: false),
-                    DbFilmDetailsId = table.Column<int>(type: "integer", nullable: true)
+                    DbFilmId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, Genre>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
-                        name: "FK_JoinEntity<DbFilmDetails, Genre>_FilmDetails_DbFilmDetailsId",
-                        column: x => x.DbFilmDetailsId,
+                        name: "FK_JoinEntity<DbFilmDetails, Genre>_FilmDetails_DbFilmId",
+                        column: x => x.DbFilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -294,14 +294,14 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     Entity1Id = table.Column<int>(type: "integer", nullable: false),
                     Entity2Id = table.Column<int>(type: "integer", nullable: false),
-                    DbFilmDetailsId = table.Column<int>(type: "integer", nullable: true)
+                    DbFilmId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_JoinEntity<DbFilmDetails, ProductionCompany>", x => new { x.Entity1Id, x.Entity2Id });
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, ProductionCompany>_FilmDetails_Db~",
-                        column: x => x.DbFilmDetailsId,
+                        column: x => x.DbFilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -325,7 +325,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     Entity1Id = table.Column<int>(type: "integer", nullable: false),
                     Entity2Id = table.Column<string>(type: "text", nullable: false),
-                    DbFilmDetailsId = table.Column<int>(type: "integer", nullable: true)
+                    DbFilmId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -338,7 +338,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, ProductionCountry, string>_FilmDe~",
-                        column: x => x.DbFilmDetailsId,
+                        column: x => x.DbFilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -356,7 +356,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 {
                     Entity1Id = table.Column<int>(type: "integer", nullable: false),
                     Entity2Id = table.Column<string>(type: "text", nullable: false),
-                    DbFilmDetailsId = table.Column<int>(type: "integer", nullable: true)
+                    DbFilmId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -369,7 +369,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_JoinEntity<DbFilmDetails, SpokenLanguage, string>_FilmDetai~",
-                        column: x => x.DbFilmDetailsId,
+                        column: x => x.DbFilmId,
                         principalTable: "FilmDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -506,14 +506,14 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 });
             
             
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Creator>\" (\"Entity2Id\", \"Entity1Id\") SELECT \"CreatedById\", \"CreatedSeriesId\" FROM \"CreatorDbSeriesDetails\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, Genre>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmDetailsId\", \"GenresId\" FROM \"DbFilmDetailsGenre\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, ProductionCompany>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"ProducedFilmId\", \"ProductionCompaniesId\" FROM \"DbFilmDetailsProductionCompany\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, ProductionCountry, string>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmedOnLocationId\", \"ProductionCountriesIso3166_1\" FROM \"DbFilmDetailsProductionCountry\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, SpokenLanguage, string>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"SpokenInFilmId\", \"SpokenLanguagesIso639_1\" FROM \"DbFilmDetailsSpokenLanguage\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Genre>\" (\"Entity2Id\", \"Entity1Id\") SELECT \"GenresId\", \"SeriesInGenreId\" FROM \"DbSeriesDetailsGenre\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Network>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"AiredSeriesId\", \"NetworksId\" FROM \"DbSeriesDetailsNetwork\"");
-            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, ProductionCompany>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"ProducedSeriesId\", \"ProductionCompaniesId\" FROM \"DbSeriesDetailsProductionCompany\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Creator>\" (\"Entity2Id\", \"Entity1Id\") SELECT \"CreatedById\", \"SeriesId\" FROM \"CreatorDbSeriesDetails\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, Genre>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmId\", \"GenresId\" FROM \"DbFilmDetailsGenre\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, ProductionCompany>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmId\", \"ProductionCompaniesId\" FROM \"DbFilmDetailsProductionCompany\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, ProductionCountry, string>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmId\", \"ProductionCountriesIso3166_1\" FROM \"DbFilmDetailsProductionCountry\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbFilmDetails, SpokenLanguage, string>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"FilmId\", \"SpokenLanguagesIso639_1\" FROM \"DbFilmDetailsSpokenLanguage\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Genre>\" (\"Entity2Id\", \"Entity1Id\") SELECT \"GenresId\", \"SeriesId\" FROM \"DbSeriesDetailsGenre\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, Network>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"SeriesId\", \"NetworksId\" FROM \"DbSeriesDetailsNetwork\"");
+            migrationBuilder.Sql("INSERT INTO \"JoinEntity<DbSeriesDetails, ProductionCompany>\" (\"Entity1Id\", \"Entity2Id\") SELECT \"SeriesId\", \"ProductionCompaniesId\" FROM \"DbSeriesDetailsProductionCompany\"");
             
             migrationBuilder.DropTable(
                 name: "CreatorDbSeriesDetails");
@@ -540,9 +540,9 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 name: "DbSeriesDetailsProductionCompany");
 
             migrationBuilder.CreateIndex(
-                name: "IX_JoinEntity<DbFilmDetails, Genre>_DbFilmDetailsId",
+                name: "IX_JoinEntity<DbFilmDetails, Genre>_DbFilmId",
                 table: "JoinEntity<DbFilmDetails, Genre>",
-                column: "DbFilmDetailsId");
+                column: "DbFilmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, Genre>_Entity2Id",
@@ -550,9 +550,9 @@ namespace NxPlx.Infrastructure.Database.Migrations
                 column: "Entity2Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmDetailsId",
+                name: "IX_JoinEntity<DbFilmDetails, ProductionCompany>_DbFilmId",
                 table: "JoinEntity<DbFilmDetails, ProductionCompany>",
-                column: "DbFilmDetailsId");
+                column: "DbFilmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, ProductionCompany>_Entity2Id",
@@ -562,7 +562,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, ProductionCountry, string>_DbFilm~",
                 table: "JoinEntity<DbFilmDetails, ProductionCountry, string>",
-                column: "DbFilmDetailsId");
+                column: "DbFilmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, ProductionCountry, string>_Entity~",
@@ -572,7 +572,7 @@ namespace NxPlx.Infrastructure.Database.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, SpokenLanguage, string>_DbFilmDet~",
                 table: "JoinEntity<DbFilmDetails, SpokenLanguage, string>",
-                column: "DbFilmDetailsId");
+                column: "DbFilmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinEntity<DbFilmDetails, SpokenLanguage, string>_Entity2Id",

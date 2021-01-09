@@ -31,6 +31,7 @@ using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -91,6 +92,10 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             services.AddScoped<OperationContext>();
             services.AddScoped<TempFileService>();
+            services.AddScoped<LibraryCleanupService>();
+            services.AddScoped<LibraryMetadataService>();
+            services.AddScoped<LibraryDeduplicationService>();
+            services.AddScoped<FileAnalysisService>();
 
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.Scan(scan => scan
@@ -104,10 +109,10 @@ namespace NxPlx.ApplicationHost.Api
             );
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IMapper mapper)
         {
 #if DEBUG
-            // mapper.ConfigurationProvider.AssertConfigurationIsValid();
+            mapper.ConfigurationProvider.AssertConfigurationIsValid();
 #endif
             
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
@@ -150,8 +155,8 @@ namespace NxPlx.ApplicationHost.Api
             }
         }
         
-        private static readonly Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
-        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new FileExtensionContentTypeProvider(); 
+        private static readonly Regex HashRegex = new("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new(); 
         private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
         {
             var path = context.Request.Path.ToString().TrimStart('/');
