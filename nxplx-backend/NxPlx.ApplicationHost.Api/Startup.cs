@@ -69,7 +69,7 @@ namespace NxPlx.ApplicationHost.Api
             
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
             
-            services.AddAutoMapper(typeof(AssemblyMarker));
+            services.AddAutoMapper(typeof(MappingAssemblyMarker));
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
@@ -109,12 +109,8 @@ namespace NxPlx.ApplicationHost.Api
             );
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IMapper mapper)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
-#if DEBUG
-            mapper.ConfigurationProvider.AssertConfigurationIsValid();
-#endif
-            
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
