@@ -18,12 +18,12 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM --platform=linux/arm64 jrottenberg/ffmpeg:4.3-alpine AS runtime
+FROM --platform=linux/arm64 alpine AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apk add --update --no-cache imagemagick
+RUN apk add --update --no-cache ffmpeg imagemagick
 RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
