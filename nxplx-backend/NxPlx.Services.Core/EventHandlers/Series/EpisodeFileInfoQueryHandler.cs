@@ -33,7 +33,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
                 .Where(ef => ef.Id == @event.Id)
                 .FirstOrDefaultAsync(cancellationToken);
             var dto = _dtoMapper.Map<EpisodeFile, InfoDto>(episodeFile);
-            dto!.FileToken = await _dispatcher.Dispatch(new RequestFileTokenCommand(episodeFile.Path));
+            dto!.FilePath = await _dispatcher.Dispatch(new StreamUrlQuery(StreamKind.Episode, episodeFile.Id));
             return dto;
         }
     }

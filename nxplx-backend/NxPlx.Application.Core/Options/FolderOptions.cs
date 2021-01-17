@@ -9,9 +9,4 @@ namespace NxPlx.Application.Core.Options
 
         public string? TempFiles { get; set; }
     }
-
-    public class SessionOptions : INxplxOptions
-    {
-        public int? LengthInDays { get; set; }
-    }
 }

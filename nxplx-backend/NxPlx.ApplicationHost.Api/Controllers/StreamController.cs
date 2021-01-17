@@ -2,7 +2,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Core;
+using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.Application.Models.Events.File;
+using NxPlx.ApplicationHost.Api.Authentication;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -17,14 +20,14 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             _eventDispatcher = eventDispatcher;
         }
 
-        [HttpGet("{token}.mp4")]
-        public Task<IActionResult> StreamFile([FromRoute, Required] string token) => SendFile(token, "video/mp4");
-
-        private async Task<IActionResult> SendFile(string token, string mime)
+        [RouteSessionAuthentication]
+        [HttpGet("{streamKind}/{token}/{id}")]
+        public async Task<IActionResult> StreamFile([FromRoute, Required]StreamKind streamKind, [FromRoute, Required]string token, [FromRoute, Required]long id)
         {
-            var path = await _eventDispatcher.Dispatch(new FileTokenLookupQuery(token));
+            using var scope = await _eventDispatcher.Dispatch(new SubOperationScopeCommand());
+            var path = await _eventDispatcher.Dispatch(new FilePathLookupQuery(streamKind, id), scope.ServiceProvider);
             if (path == null) return NotFound();
-            return PhysicalFile(path, mime, true);
+            return PhysicalFile(path, "video/mp4", "media.mp4", true);
         }
     }
 }

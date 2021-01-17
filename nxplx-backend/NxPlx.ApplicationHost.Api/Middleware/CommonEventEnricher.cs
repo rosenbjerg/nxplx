@@ -2,7 +2,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace NxPlx.ApplicationHost.Api.Logging
+namespace NxPlx.ApplicationHost.Api.Middleware
 {
     public class CommonEventEnricher : ILogEventEnricher
     {
@@ -10,7 +10,7 @@ namespace NxPlx.ApplicationHost.Api.Logging
 
         public CommonEventEnricher(IOperationContext IOperationContext)
         {
-            this._operationContext = IOperationContext;
+            _operationContext = IOperationContext;
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)

@@ -77,6 +77,14 @@ namespace NxPlx.Application.Mapping
                 .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"));
 
+            CreateMap<FilmFile, InfoDto>()
+                .IncludeMembers(f => f.FilmDetails)
+                .ForMember(dto => dto.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)))
+                .ForMember(dto => dto.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
+                .ForMember(dto => dto.FilePath, opt => opt.Ignore());
+
+            CreateMap<DbFilmDetails, InfoDto>();
+
             CreateMap<SubtitleFile, SubtitleFileDto>();
             CreateMap<Genre, GenreDto>();
             CreateMap<ProductionCompany, ProductionCompanyDto>();

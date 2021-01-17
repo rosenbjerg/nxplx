@@ -9,11 +9,11 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
 {
     public class LogoutCommandHandler : IEventHandler<LogoutCommand, bool>
     {
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
         private readonly IEventDispatcher _dispatcher;
         private readonly ILogger<LogoutCommandHandler> _logger;
 
-        public LogoutCommandHandler(OperationContext operationContext, IEventDispatcher dispatcher, ILogger<LogoutCommandHandler> logger)
+        public LogoutCommandHandler(IOperationContext operationContext, IEventDispatcher dispatcher, ILogger<LogoutCommandHandler> logger)
         {
             _operationContext = operationContext;
             _dispatcher = dispatcher;

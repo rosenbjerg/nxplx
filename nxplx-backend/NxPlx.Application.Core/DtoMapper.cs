@@ -120,17 +120,6 @@ namespace NxPlx.Application.Core
                 BelongsToCollectionId = filmFilm.FilmDetails.BelongsInCollectionId
             });
             
-            SetMapping<FilmFile, InfoDto>(filmFile => new InfoDto
-            {
-                Id = filmFile.FilmDetails.Id,
-                Duration = filmFile.MediaDetails.Duration,
-                BackdropPath = filmFile.FilmDetails.BackdropPath,
-                BackdropBlurHash = filmFile.FilmDetails.BackdropBlurHash,
-                PosterPath = filmFile.FilmDetails.PosterPath,
-                PosterBlurHash = filmFile.FilmDetails.PosterBlurHash,
-                Title = filmFile.FilmDetails.Title,
-                Subtitles = filmFile.Subtitles.Select(s => s.Language)
-            });
             SetMapping<EpisodeFile, EpisodeFileDto>(episodeFile => new EpisodeFileDto
             {
                 Id = episodeFile.Id,
@@ -140,7 +129,7 @@ namespace NxPlx.Application.Core
             });
             SetMapping<EpisodeFile, InfoDto>(episodeFile => new InfoDto
             {
-                Id = episodeFile.SeriesDetails.Id,
+                Id = episodeFile.Id,
                 Duration = episodeFile.MediaDetails.Duration,
                 BackdropPath = episodeFile.SeriesDetails.BackdropPath,
                 BackdropBlurHash = episodeFile.SeriesDetails.BackdropBlurHash,

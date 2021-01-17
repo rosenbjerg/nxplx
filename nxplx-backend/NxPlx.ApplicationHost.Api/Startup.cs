@@ -21,7 +21,7 @@ using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.Application.Mapping;
-using NxPlx.ApplicationHost.Api.Logging;
+using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
 using NxPlx.Core.Services.EventHandlers;
@@ -81,6 +81,7 @@ namespace NxPlx.ApplicationHost.Api
 
             services.AddSingleton<ConnectionHub>();
             services.AddSingleton<IHttpSessionService, CookieSessionService>();
+            services.AddSingleton<IRouteSessionTokenExtractor, RouteSessionTokenExtractor>();
             services.AddSingleton<IDatabaseMapper, DatabaseMapper>();
             services.AddSingleton<ICacheClearer, RedisCacheClearer>();
             services.AddSingleton<IDtoMapper, DtoMapper>();
@@ -114,6 +115,7 @@ namespace NxPlx.ApplicationHost.Api
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
+            app.UseMiddleware<OperationContextMiddleware>();
             app.UseMiddleware<LoggingEnrichingMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
             app.UseMiddleware<PerformanceInterceptorMiddleware>();

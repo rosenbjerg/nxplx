@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,20 +16,11 @@ namespace NxPlx.Infrastructure.Database
     public class DatabaseContext : DbContext
     {
         private readonly IOperationContext _operationContext;
-        public DatabaseContext(DbContextOptions<DatabaseContext> options, IOperationContext IOperationContext)
+        public DatabaseContext(DbContextOptions<DatabaseContext> options, IOperationContext operationContext)
             : base(options)
         {
-            _operationContext = IOperationContext;
+            _operationContext = operationContext;
         }
-        // public DatabaseContext()
-        // {
-        //     _operationContext = new IOperationContext();
-        // }
-        //
-        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        // {
-        //     base.OnConfiguring(optionsBuilder.UseNpgsql("Host=localhost;Database=nxplx_db;Username=postgres;Password=dev"));
-        // }
 
         public DbSet<FilmFile> FilmFiles { get; set; } = null!;
         public DbSet<DbFilmDetails> FilmDetails { get; set; } = null!;
@@ -160,23 +150,15 @@ namespace NxPlx.Infrastructure.Database
 
             return base.SaveChangesAsync(cancellationToken);
         }
-    }
 
-    public static class DbUtils
-    {
-        public static async Task AddOrUpdate<TEntity>(this DbContext context, IList<TEntity> entities)
-            where TEntity : EntityBase
+        public override void Dispose()
         {
-            var set = context.Set<TEntity>();
-            var ids = entities.Where(e => e.Id != default).Select(e => e.Id).ToList();
-            var existing = await set.Where(e => ids.Contains(e.Id)).ToDictionaryAsync(e => e.Id);
-            foreach (var entity in entities)
-            {
-                if (existing.TryGetValue(entity.Id, out var existingEntity))
-                    context.Entry(existingEntity).CurrentValues.SetValues(entity);
-                else
-                    set.Add(entity);
-            }
+            base.Dispose();
+        }
+
+        public override ValueTask DisposeAsync()
+        {
+            return base.DisposeAsync();
         }
     }
 }

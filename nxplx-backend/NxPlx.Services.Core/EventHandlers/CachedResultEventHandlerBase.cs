@@ -7,8 +7,6 @@ using NxPlx.Application.Models.Events;
 
 namespace NxPlx.Core.Services.EventHandlers
 {
-    public delegate Task<TResult> CacheResultGenerator<in TEvent, TResult>(TEvent @event, CancellationToken cancellation);
-    
     public abstract class CachedResultEventHandlerBase<TEvent, TResult> : IEventHandler<TEvent, TResult>
         where TEvent : IEvent<TResult>
         where TResult : class
