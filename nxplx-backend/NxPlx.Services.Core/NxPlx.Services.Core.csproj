@@ -22,7 +22,7 @@
       <PackageReference Include="Instances" Version="1.6.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
       <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
     </ItemGroup>
 
