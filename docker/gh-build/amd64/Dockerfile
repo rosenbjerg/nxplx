@@ -18,7 +18,7 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM --platform=linux/amd64 jrottenberg/ffmpeg:4.1-alpine AS runtime
+FROM --platform=linux/amd64 jrottenberg/ffmpeg:4.3-alpine AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
