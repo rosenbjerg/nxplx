@@ -3,7 +3,6 @@ name: Docker build
 on:
   pull_request:
     branches:
-      - master
       - release
 
 jobs:
