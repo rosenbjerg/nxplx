@@ -78,12 +78,13 @@ namespace NxPlx.Application.Mapping
                 .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"));
 
             CreateMap<FilmFile, InfoDto>()
-                .IncludeMembers(f => f.FilmDetails)
+                .ForMember(dto => dto.PosterPath, opt => opt.MapFrom(src => src.FilmDetails.PosterPath))
+                .ForMember(dto => dto.PosterBlurHash, opt => opt.MapFrom(src => src.FilmDetails.PosterBlurHash))
+                .ForMember(dto => dto.BackdropPath, opt => opt.MapFrom(src => src.FilmDetails.BackdropPath))
+                .ForMember(dto => dto.BackdropBlurHash, opt => opt.MapFrom(src => src.FilmDetails.BackdropBlurHash))
                 .ForMember(dto => dto.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)))
                 .ForMember(dto => dto.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
                 .ForMember(dto => dto.FilePath, opt => opt.Ignore());
-
-            CreateMap<DbFilmDetails, InfoDto>();
 
             CreateMap<SubtitleFile, SubtitleFileDto>();
             CreateMap<Genre, GenreDto>();
