@@ -8,11 +8,11 @@ namespace NxPlx.Core.Services.EventHandlers
     {
     }
     public interface IEventHandler<in TEvent> : IEventHandler 
-        where TEvent : ICommand
+        where TEvent : ICommand<Task>
     {
         Task Handle(TEvent @event, CancellationToken cancellationToken = default);
     }
-    public interface IEventHandler<in TEvent, TResult> : IEventHandler 
+    public interface IEventHandler<in TEvent, TResult> : IEventHandler
         where TEvent : IEvent<TResult>
     {
         Task<TResult> Handle(TEvent @event, CancellationToken cancellationToken = default);

@@ -1,6 +1,6 @@
 ﻿namespace NxPlx.Application.Mapping
 {
-    public class AssemblyMarker
+    public class MappingAssemblyMarker
     {
     }
 }

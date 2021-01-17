@@ -25,7 +25,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public async Task<ActionResult> Login([FromForm, Required] string username, [FromForm, Required] string password,
             [FromHeader(Name = "User-Agent"), Required] string userAgent)
         {
-            var session = await _eventDispatcher.Dispatch(new LoginAttemptQuery(username, password, userAgent));
+            var session = await _eventDispatcher.Dispatch(new LoginAttemptCommand(username, password, userAgent));
             if (session == default) return BadRequest("Invalid credentials");
             _sessionService.AttachSessionToken(HttpContext.Response, session.Token, session.Expiry);
             return Ok(session.IsAdmin);
@@ -36,7 +36,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public async Task<ActionResult> Logout()
         {
             await _eventDispatcher.Dispatch(new LogoutCommand());
-            _sessionService.AttachSessionToken(HttpContext.Response, null);
+            _sessionService.AttachSessionToken(HttpContext.Response);
             return Ok();
         }
         

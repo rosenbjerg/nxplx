@@ -1,8 +1,9 @@
-name: Docker build
+name: CD - Publish docker images
 
 on:
   pull_request:
-    branches: release
+    branches:
+      - release
 
 jobs:
   buildx:

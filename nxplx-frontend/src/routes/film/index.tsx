@@ -58,9 +58,9 @@ export default class Home extends Component<Props, State> {
                                 {title: 'Run time', value: formatRunTime(details.runtime)},
                                 {title: 'Rating', value: `${details.voteAverage}/10 from ${details.voteCount} votes`},
                                 {title: 'Genres', value: details.genres.map(g => g.name).join(", ")},
-                                {title: 'Original languages', value: details.spokenLanguages.map(sl => `${sl.name} (${sl.iso639_1})`).join(", ")},
+                                {title: 'Original languages', value: details.spokenLanguages.map(sl => `${sl.name} (${sl.iso6391})`).join(", ")},
                                 {title: 'Production companies', value: details.productionCompanies.map(pc => pc.name).join(", ")},
-                                {title: 'Production countries', value: details.productionCountries.map(pc => pc.name).join(", ")},
+                                {title: 'Production countries', value: details.productionCountries.map(pc => `${pc.name} (${pc.iso31661})`).join(", ")},
                                 {title: 'Subtitles', value: <Subtitles kind="film" file_id={details.fid.toString()} />}
                             ].map(formatInfoPair)
                         }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace NxPlx.ApplicationHost.Api.Logging
+namespace NxPlx.ApplicationHost.Api.Middleware
 {
     public class PerformanceInterceptorMiddleware
     {

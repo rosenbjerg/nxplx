@@ -25,10 +25,10 @@ namespace NxPlx.Application.Core
                 VoteAverage = seriesDetails.VoteAverage,
                 VoteCount = seriesDetails.VoteCount,
                 Name = seriesDetails.Name,
-                Networks = Map<Network, NetworkDto>(seriesDetails.Networks.Select(g => g.Entity2)).ToList(),
-                Genres = Map<Genre, GenreDto>(seriesDetails.Genres.Select(g => g.Entity2)).ToList(),
-                CreatedBy = Map<Creator, CreatorDto>(seriesDetails.CreatedBy.Select(cb => cb.Entity2)).ToList(),
-                ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies.Select(pc => pc.Entity2)).ToList(),
+                Networks = Map<Network, NetworkDto>(seriesDetails.Networks).ToList(),
+                Genres = Map<Genre, GenreDto>(seriesDetails.Genres).ToList(),
+                CreatedBy = Map<Creator, CreatorDto>(seriesDetails.CreatedBy).ToList(),
+                ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(seriesDetails.ProductionCompanies).ToList(),
                 Overview = seriesDetails.Overview
             });
             SetMapping<SeasonDetails, SeasonDto>(seasonDetails => new SeasonDto
@@ -47,7 +47,7 @@ namespace NxPlx.Application.Core
                 PosterPath = seriesDetails.PosterPath,
                 PosterBlurHash = seriesDetails.PosterBlurHash,
                 Title = seriesDetails.Name,
-                Genres = seriesDetails.Genres.Select(g => g.Entity2Id).Distinct().ToList(),
+                Genres = seriesDetails.Genres.Select(g => g.Id).Distinct().ToList(),
                 Year = seriesDetails.FirstAirDate == null ? 9999 : seriesDetails.FirstAirDate.Value.Year
             });
             SetMapping<DbFilmDetails, OverviewElementDto>(filmDetails => new OverviewElementDto
@@ -57,7 +57,7 @@ namespace NxPlx.Application.Core
                 PosterPath = filmDetails.PosterPath,
                 PosterBlurHash = filmDetails.PosterBlurHash,
                 Title = filmDetails.Title,
-                Genres = filmDetails.Genres.Select(g => g.Entity2Id).ToList(),
+                Genres = filmDetails.Genres.Select(g => g.Id).ToList(),
                 Year = filmDetails.ReleaseDate == null ? 9999 : filmDetails.ReleaseDate.Value.Year
             });
             SetMapping<MovieCollection, OverviewElementDto>(movieCollection => new OverviewElementDto
@@ -67,7 +67,7 @@ namespace NxPlx.Application.Core
                 PosterPath = movieCollection.PosterPath,
                 PosterBlurHash = movieCollection.PosterBlurHash,
                 Title = movieCollection.Name,
-                Genres = movieCollection.Movies.SelectMany(f => f.Genres).Select(g => g.Entity2Id).Distinct().ToList(),
+                Genres = movieCollection.Movies.SelectMany(f => f.Genres).Select(g => g.Id).Distinct().ToList(),
                 Year = movieCollection.Movies.Min(f => f.ReleaseDate == null ? 9999 : f.ReleaseDate.Value.Year)
             });
             SetMapping<(WatchingProgress wp, EpisodeFile ef), ContinueWatchingDto>(pair => new ContinueWatchingDto
@@ -102,7 +102,7 @@ namespace NxPlx.Application.Core
                 PosterBlurHash = filmFilm.FilmDetails.PosterBlurHash,
                 Title = filmFilm.FilmDetails.Title,
                 Budget = filmFilm.FilmDetails.Budget,
-                Genres = Map<Genre, GenreDto>(filmFilm.FilmDetails.Genres.Select(e => e.Entity2)).ToList(),
+                Genres = Map<Genre, GenreDto>(filmFilm.FilmDetails.Genres).ToList(),
                 Overview = filmFilm.FilmDetails.Overview,
                 Popularity = filmFilm.FilmDetails.Popularity,
                 Revenue = filmFilm.FilmDetails.Revenue,
@@ -111,26 +111,15 @@ namespace NxPlx.Application.Core
                 ImdbId = filmFilm.FilmDetails.ImdbId,
                 OriginalLanguage = filmFilm.FilmDetails.OriginalLanguage,
                 OriginalTitle = filmFilm.FilmDetails.OriginalTitle,
-                ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(filmFilm.FilmDetails.ProductionCompanies.Select(e => e.Entity2)).ToList(),
-                ProductionCountries = Map<ProductionCountry, ProductionCountryDto>(filmFilm.FilmDetails.ProductionCountries.Select(e => e.Entity2)).ToList(),
+                ProductionCompanies = Map<ProductionCompany, ProductionCompanyDto>(filmFilm.FilmDetails.ProductionCompanies).ToList(),
+                ProductionCountries = Map<ProductionCountry, ProductionCountryDto>(filmFilm.FilmDetails.ProductionCountries).ToList(),
                 ReleaseDate = filmFilm.FilmDetails.ReleaseDate,
-                SpokenLanguages = Map<SpokenLanguage, SpokenLanguageDto>(filmFilm.FilmDetails.SpokenLanguages.Select(e => e.Entity2)).ToList(),
+                SpokenLanguages = Map<SpokenLanguage, SpokenLanguageDto>(filmFilm.FilmDetails.SpokenLanguages).ToList(),
                 VoteAverage = filmFilm.FilmDetails.VoteAverage,
                 VoteCount = filmFilm.FilmDetails.VoteCount,
                 BelongsToCollectionId = filmFilm.FilmDetails.BelongsInCollectionId
             });
             
-            SetMapping<FilmFile, InfoDto>(filmFile => new InfoDto
-            {
-                Id = filmFile.FilmDetails.Id,
-                Duration = filmFile.MediaDetails.Duration,
-                BackdropPath = filmFile.FilmDetails.BackdropPath,
-                BackdropBlurHash = filmFile.FilmDetails.BackdropBlurHash,
-                PosterPath = filmFile.FilmDetails.PosterPath,
-                PosterBlurHash = filmFile.FilmDetails.PosterBlurHash,
-                Title = filmFile.FilmDetails.Title,
-                Subtitles = filmFile.Subtitles.Select(s => s.Language)
-            });
             SetMapping<EpisodeFile, EpisodeFileDto>(episodeFile => new EpisodeFileDto
             {
                 Id = episodeFile.Id,
@@ -140,7 +129,7 @@ namespace NxPlx.Application.Core
             });
             SetMapping<EpisodeFile, InfoDto>(episodeFile => new InfoDto
             {
-                Id = episodeFile.SeriesDetails.Id,
+                Id = episodeFile.Id,
                 Duration = episodeFile.MediaDetails.Duration,
                 BackdropPath = episodeFile.SeriesDetails.BackdropPath,
                 BackdropBlurHash = episodeFile.SeriesDetails.BackdropBlurHash,

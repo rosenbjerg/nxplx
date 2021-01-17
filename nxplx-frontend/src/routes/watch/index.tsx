@@ -47,7 +47,7 @@ export default class Watch extends Component<Props, State> {
                     events={this.videoEvents}
                     startTime={progress}
                     title={info.title}
-                    src={`/api/stream/${info.fileToken}.mp4`}
+                    src={`/api/stream/${info.filePath}`}
                     poster={imageUrl(this.state.info!.backdropPath, 1280)}
                     playNext={this.tryPlayNext}
 

@@ -6,7 +6,7 @@ namespace NxPlx.Core.Services
     public class CookieSessionService : IHttpSessionService
     {
         private const string CookieName = "SessionToken";
-        private static readonly DateTimeOffset ExpiredDateTimeOffset = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        private static readonly DateTimeOffset ExpiredDateTimeOffset = new(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         public string? ExtractSessionToken(HttpRequest request)
         {

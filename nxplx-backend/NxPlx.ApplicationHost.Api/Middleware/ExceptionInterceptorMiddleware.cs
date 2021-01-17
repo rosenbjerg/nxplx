@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace NxPlx.ApplicationHost.Api.Logging
+namespace NxPlx.ApplicationHost.Api.Middleware
 {
     public class ExceptionInterceptorMiddleware
     {
@@ -20,6 +20,7 @@ namespace NxPlx.ApplicationHost.Api.Logging
             {
                 await _next(context);
             }
+            catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
             catch (Exception e)
             {

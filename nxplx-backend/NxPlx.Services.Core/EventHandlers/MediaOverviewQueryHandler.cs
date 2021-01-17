@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
@@ -31,7 +32,7 @@ namespace NxPlx.Core.Services.EventHandlers
 
         protected override async Task<(string CacheKey, CacheResultGenerator<MediaOverviewQuery, IEnumerable<OverviewElementDto>> cacheGenerator)> Prepare(MediaOverviewQuery @event, CancellationToken cancellationToken = default)
         {
-            var currentUser = await _dispatcher.Dispatch<Models.User>(new CurrentUserQuery());
+            var currentUser = await _dispatcher.Dispatch(new CurrentUserQuery());
             var libs = currentUser.LibraryAccessIds;
             if (currentUser.Admin) libs = await _context.Libraries.Select(l => l.Id).ToListAsync(cancellationToken);
             var overviewCacheKey = "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
@@ -44,15 +45,19 @@ namespace NxPlx.Core.Services.EventHandlers
                 .Where(ef => ef.SeriesDetailsId != null && libs.Contains(ef.PartOfLibraryId))
                 .Select(ef => ef.SeriesDetailsId).Distinct()
                 .ToListAsync(cancellationToken);
-
             var seriesDetails = await _context.SeriesDetails
                 .Where(sd => seriesDetailIds.Contains(sd.Id))
-                .Project<DbSeriesDetails, OverviewElementDto>(_dtoMapper)
+                .ProjectTo<OverviewElementDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
-            
-            var filmDetails = await _context.FilmFiles
+
+            var filmDetailsIds = await _context.FilmFiles
                 .Where(ff => ff.FilmDetailsId != null && libs.Contains(ff.PartOfLibraryId))
-                .Select(ff => ff.FilmDetails).Distinct()
+                .Select(ff => ff.FilmDetailsId)
+                .ToListAsync(cancellationToken);
+            var filmDetails = await _context.FilmDetails
+                .Where(fd => filmDetailsIds.Contains(fd.Id))
+                .Include(ff => ff.Genres)
+                .Include(ff => ff.BelongsInCollection)
                 .ToListAsync(cancellationToken);
             
             var collections = filmDetails
@@ -67,8 +72,8 @@ namespace NxPlx.Core.Services.EventHandlers
 
             var overview = new List<OverviewElementDto>(seriesDetails.Count + notInCollections.Count + collections.Count);
             overview.AddRange(seriesDetails);
-            overview.AddRange(_mapper.Map<List<DbFilmDetails>, IEnumerable<OverviewElementDto>>(notInCollections));
-            overview.AddRange(_mapper.Map<List<MovieCollection>, IEnumerable<OverviewElementDto>>(collections));
+            overview.AddRange(_mapper.Map<List<DbFilmDetails>, List<OverviewElementDto>>(notInCollections));
+            overview.AddRange(_mapper.Map<List<MovieCollection>, List<OverviewElementDto>>(collections));
 
             return overview.OrderBy(oe => oe.Title).ToList();
         }

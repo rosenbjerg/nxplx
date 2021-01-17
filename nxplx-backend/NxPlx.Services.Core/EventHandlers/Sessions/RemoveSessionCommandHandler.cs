@@ -19,7 +19,7 @@ namespace NxPlx.Core.Services.EventHandlers.Sessions
         public async Task Handle(RemoveSessionCommand command, CancellationToken cancellationToken = default)
         {
             var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{command.UserId}", cancellationToken);
-            await _distributedCache.RemoveAsync(command.Token, cancellationToken);
+            await _distributedCache.RemoveAsync($"{SessionPrefix}:{command.Token}", cancellationToken);
             
             if (sessions != null && sessions.Remove(command.Token))
                 await _distributedCache.SetObjectAsync($"{SessionPrefix}:{command.UserId}", sessions, cancellationToken: CancellationToken.None);

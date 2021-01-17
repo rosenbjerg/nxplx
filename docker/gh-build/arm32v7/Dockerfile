@@ -10,7 +10,7 @@ COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
 RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-arm -o build
 
 
-FROM node:13-alpine AS frontendBuilder
+FROM node:14-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
@@ -18,15 +18,16 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim-arm32v7 AS runtime
+FROM --platform=linux/arm/v7 jrottenberg/ffmpeg:4.1-alpine AS runtime
 ARG build
 LABEL maintainer="Malte Rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apt-get update && apt-get install -y ffmpeg imagemagick libgdiplus && apt-get autoremove && apt-get clean
+RUN apk add --update --no-cache imagemagick
+RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
 ENV NXPLX_BUILD=$build
 EXPOSE 5353
-ENTRYPOINT ["dotnet", "NxPlx.ApplicationHost.Api.dll"]
+ENTRYPOINT ["./NxPlx.ApplicationHost.Api"]

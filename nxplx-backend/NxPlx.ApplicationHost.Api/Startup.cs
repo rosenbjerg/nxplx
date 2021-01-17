@@ -21,7 +21,7 @@ using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.Application.Mapping;
-using NxPlx.ApplicationHost.Api.Logging;
+using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
 using NxPlx.Core.Services.EventHandlers;
@@ -31,6 +31,7 @@ using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -68,19 +69,19 @@ namespace NxPlx.ApplicationHost.Api
             
             var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
             
-            services.AddAutoMapper(typeof(AssemblyMarker));
+            services.AddAutoMapper(typeof(MappingAssemblyMarker));
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             ConfigureHangfire(GlobalConfiguration.Configuration);
             services.AddHangfire(ConfigureHangfire);
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
-                    .UseLazyLoadingProxies());
+                options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
             
             services.AddHttpContextAccessor();
 
             services.AddSingleton<ConnectionHub>();
             services.AddSingleton<IHttpSessionService, CookieSessionService>();
+            services.AddSingleton<IRouteSessionTokenExtractor, RouteSessionTokenExtractor>();
             services.AddSingleton<IDatabaseMapper, DatabaseMapper>();
             services.AddSingleton<ICacheClearer, RedisCacheClearer>();
             services.AddSingleton<IDtoMapper, DtoMapper>();
@@ -92,6 +93,10 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             services.AddScoped<OperationContext>();
             services.AddScoped<TempFileService>();
+            services.AddScoped<LibraryCleanupService>();
+            services.AddScoped<LibraryMetadataService>();
+            services.AddScoped<LibraryDeduplicationService>();
+            services.AddScoped<FileAnalysisService>();
 
             services.AddScoped<IEventDispatcher, EventDispatcher>();
             services.Scan(scan => scan
@@ -107,14 +112,11 @@ namespace NxPlx.ApplicationHost.Api
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
         {
-#if DEBUG
-            // mapper.ConfigurationProvider.AssertConfigurationIsValid();
-#endif
-            
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
             InitializeDatabase(databaseContext);
 
-            app.UseMiddleware<LoggingInterceptorMiddleware>();
+            app.UseMiddleware<OperationContextMiddleware>();
+            app.UseMiddleware<LoggingEnrichingMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
             app.UseMiddleware<PerformanceInterceptorMiddleware>();
             app.UseForwardedHeaders();
@@ -151,8 +153,8 @@ namespace NxPlx.ApplicationHost.Api
             }
         }
         
-        private static readonly Regex HashRegex = new Regex("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
-        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new FileExtensionContentTypeProvider(); 
+        private static readonly Regex HashRegex = new("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new(); 
         private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
         {
             var path = context.Request.Path.ToString().TrimStart('/');

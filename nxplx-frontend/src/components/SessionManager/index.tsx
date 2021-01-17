@@ -19,22 +19,30 @@ interface UserSession {
 }
 interface Session {
     id: string
-    browser: any
-    os: any
+    browser: Browser
+    os: Os
+}
+interface Browser {
+    name: string
+    version: string
+}
+interface Os {
+    name: string
+    version: string
 }
 
 export default class SessionManager extends Component<Props, State> {
 
     public componentDidMount(): void {
         const adminUserIdQuery = this.props.userId ? `/all?userId=${this.props.userId}` : "";
-        http.getJson<UserSession[]>(`/api/session${adminUserIdQuery}`).then(sessions => {
+        void http.getJson<UserSession[]>(`/api/session${adminUserIdQuery}`).then(sessions => {
             const parser = new UAParser();
             const parsed = sessions.map(session => {
                 parser.setUA(session.userAgent);
                 return {
                     id: session.id,
-                    browser: parser.getBrowser(),
-                    os: parser.getOS()
+                    browser: parser.getBrowser() as Browser,
+                    os: parser.getOS() as Os
                 };
             });
             this.setState({ sessions: parsed });
@@ -49,8 +57,8 @@ export default class SessionManager extends Component<Props, State> {
                     <tbody>
                     {sessions.map(session => (
                         <tr key={session.id}>
-                            <td title={translate('browser on device', `${session.browser.name} ${session.browser.version}`, `${session.os.name} ${session.os.version}`)}>
-                                {translate('browser on device', session.browser.name, session.os.name)}
+                            <td title={translate('browser on device', { browser: `${session.browser.name} ${session.browser.version}`, device: `${session.os.name} ${session.os.version}` })}>
+                                {translate('browser on device', { browser: session.browser.name, device: session.os.name })}
                             </td>
                             <td>
                                 <button title={translate('close this session')} onClick={this.closeSession(session)}

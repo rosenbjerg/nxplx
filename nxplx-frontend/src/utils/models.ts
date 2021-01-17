@@ -2,7 +2,7 @@
 type imagesize = 100|190|260|270|1280;
 export const imageUrl = (url:string, width:imagesize, fallbackUrl?:string) => {
     if (!url && !fallbackUrl) return `/assets/images/w${width}.jpg`;
-    return `/api/image/w${width}/${url || fallbackUrl}`;
+    return `/api/image/w${width}/${url ?? fallbackUrl}`;
 };
 
 export interface Genre {
@@ -16,11 +16,11 @@ export interface ProductionCompany {
     originCountry: string;
 }
 export interface ProductionCountry {
-    iso3166_1: string;
+    iso31661: string;
     name: string;
 }
 export interface SpokenLanguage {
-    iso639_1: string;
+    iso6391: string;
     name: string;
 }
 
@@ -94,7 +94,7 @@ export interface ContinueWatchingElement {
 
 export interface FileInfo {
     id:number
-    fileToken:string
+    filePath:string
     duration:number
     title:string
     posterPath:string

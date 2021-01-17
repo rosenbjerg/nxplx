@@ -30,9 +30,9 @@ namespace NxPlx.Services.Index
         
         [Queue(JobQueueNames.ImageProcessing)]
         [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessFilmDetails(int filmDetailsId)
+        public async Task ProcessFilmDetails(int filmId)
         {
-            var filmDetails = await _context.FilmDetails.FindAsync(filmDetailsId);
+            var filmDetails = await _context.FilmDetails.SingleAsync(fd => fd.Id == filmId);
 
             var poster = await ProcessPoster(filmDetails);
             var backdrop = await ProcessBackdrop(filmDetails);
@@ -45,7 +45,7 @@ namespace NxPlx.Services.Index
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessMovieCollection(int movieCollectionId)
         {
-            var movieCollection = await _context.MovieCollection.FindAsync(movieCollectionId);
+            var movieCollection = await _context.MovieCollection.SingleAsync(mc => mc.Id == movieCollectionId);
 
             var poster = await ProcessPoster(movieCollection);
             var backdrop = await ProcessBackdrop(movieCollection);
@@ -91,7 +91,7 @@ namespace NxPlx.Services.Index
         public async Task ProcessSeries(int seriesDetailsId)
         {
             var seriesDetails = await _context.SeriesDetails.Include(sd => sd.Seasons)
-                .FirstOrDefaultAsync(sd => sd.Id == seriesDetailsId);
+                .SingleAsync(sd => sd.Id == seriesDetailsId);
 
             await ProcessPoster(seriesDetails);
             await ProcessBackdrop(seriesDetails);

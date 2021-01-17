@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 using Serilog.Core;
 
-namespace NxPlx.ApplicationHost.Api.Logging
+namespace NxPlx.ApplicationHost.Api.Middleware
 {
-    public class LoggingInterceptorMiddleware
+    public class LoggingEnrichingMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public LoggingInterceptorMiddleware(RequestDelegate next)
+        public LoggingEnrichingMiddleware(RequestDelegate next)
         {
-            this._next = next;
+            _next = next;
         }
 
         public async Task Invoke(HttpContext context, ILogEventEnricher logEventEnricher)

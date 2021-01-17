@@ -5,18 +5,10 @@ using System.Linq.Expressions;
 
 namespace NxPlx.Application.Core
 {
-    public static class MappingExtensions
-    {
-        public static IQueryable<TTo> Project<TFrom, TTo>(this IQueryable<TFrom> queryable, IMapper mapper)
-        {
-            var projectionExpression = mapper.GetProjectionExpression<TFrom, TTo>();
-            return queryable.Select(projectionExpression);
-        }
-    }
     public abstract class MapperBase : IMapper
     {
-        private readonly Dictionary<(Type, Type), object> _expressions = new Dictionary<(Type, Type), object>();
-        private readonly Dictionary<(Type, Type), object> _compiledCache = new Dictionary<(Type, Type), object>();
+        private readonly Dictionary<(Type, Type), object> _expressions = new();
+        private readonly Dictionary<(Type, Type), object> _compiledCache = new();
 
         public void SetMapping<TFrom, TTo>(Expression<Func<TFrom, TTo>> mapping)
             where TTo : class

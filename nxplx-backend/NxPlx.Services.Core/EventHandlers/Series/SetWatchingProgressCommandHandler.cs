@@ -23,7 +23,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
         public async Task Handle(SetWatchingProgressCommand @event, CancellationToken cancellationToken = default)
         {
             var progress = await _context.WatchingProgresses
-                .FirstOrDefaultAsync(wp => wp.UserId == _operationContext.Session.UserId && wp.FileId == @event.FileId && wp.MediaType == @event.MediaType, cancellationToken);
+                .FirstOrDefaultAsync(wp => wp.UserId == _operationContext.Session.UserId && wp.FileId == @event.FileId && wp.MediaType == @event.MediaType, CancellationToken.None);
 
             if (progress == null)
             {

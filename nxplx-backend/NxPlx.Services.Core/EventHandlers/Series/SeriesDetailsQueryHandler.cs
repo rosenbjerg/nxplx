@@ -32,7 +32,9 @@ namespace NxPlx.Core.Services.EventHandlers.Series
 
             if (!episodes.Any()) return default;
 
-            var seriesDetails = await _context.SeriesDetails.SingleAsync(sd => sd.Id == @event.Id, cancellationToken);
+            var seriesDetails = await _context.SeriesDetails
+                .Include(sd => sd.Seasons).ThenInclude(s => s.Episodes)
+                .SingleAsync(sd => sd.Id == @event.Id, cancellationToken);
             return MergeEpisodes(seriesDetails, episodes);
         }
 

@@ -13,8 +13,8 @@ namespace NxPlx.Services.Index
             return filename.Substring(index + 1);
         }
 
-        private static readonly Regex CueIdRegex = new Regex(@"^\d+$", RegexOptions.Compiled);
-        private static readonly Regex TimeStringRegex = new Regex(@"(\d\d:\d\d:\d\d(?:[,.]\d\d\d)?) --> (\d\d:\d\d:\d\d(?:[,.]\d\d\d)?)", RegexOptions.Compiled);
+        private static readonly Regex CueIdRegex = new(@"^\d+$", RegexOptions.Compiled);
+        private static readonly Regex TimeStringRegex = new(@"(\d\d:\d\d:\d\d(?:[,.]\d\d\d)?) --> (\d\d:\d\d:\d\d(?:[,.]\d\d\d)?)", RegexOptions.Compiled);
         
         public static void Srt2Vtt(string srtFile, string outputFile, float offsetMs = 0)
         {

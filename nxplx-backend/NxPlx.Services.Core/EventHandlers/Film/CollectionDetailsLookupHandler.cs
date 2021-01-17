@@ -25,6 +25,8 @@ namespace NxPlx.Core.Services.EventHandlers.Film
         public async Task<MovieCollectionDto> Handle(CollectionDetailsLookupQuery query, CancellationToken cancellationToken = default)
         {
             var filmFiles = await _databaseContext.FilmFiles
+                .Include(ff => ff.FilmDetails).ThenInclude(fd => fd.Genres)
+                .Include(ff => ff.FilmDetails).ThenInclude(fd => fd.BelongsInCollection)
                 .Where(ff => ff.FilmDetails.BelongsInCollectionId == query.CollectionId)
                 .ToListAsync(cancellationToken);
 

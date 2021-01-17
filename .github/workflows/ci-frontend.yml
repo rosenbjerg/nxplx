@@ -1,0 +1,25 @@
+name: CI - Frontend
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+    - 'nxplx-frontend/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./nxplx-frontend
+    timeout-minutes: 10
+    steps:
+    - uses: actions/checkout@v1
+    
+    - name: Install dependencies
+      working-directory: ${{env.working-directory}}
+      run: yarn install --frozen-lockfile --no-progress --silent
+
+    - name: Build frontend
+      working-directory: ${{env.working-directory}}
+      run: yarn build

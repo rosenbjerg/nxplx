@@ -26,10 +26,14 @@ namespace NxPlx.Core.Services.EventHandlers.Series
         public async Task<InfoDto?> Handle(EpisodeFileInfoQuery @event, CancellationToken cancellationToken = default)
         {
             var episodeFile = await _context.EpisodeFiles
+                .Include(ef => ef.SeriesDetails)
+                .ThenInclude(sd => sd.Seasons)
+                .ThenInclude(sd => sd.Episodes)
+                .Include(ef => ef.Subtitles)
                 .Where(ef => ef.Id == @event.Id)
                 .FirstOrDefaultAsync(cancellationToken);
             var dto = _dtoMapper.Map<EpisodeFile, InfoDto>(episodeFile);
-            dto!.FileToken = await _dispatcher.Dispatch(new RequestFileTokenCommand(episodeFile.Path));
+            dto!.FilePath = await _dispatcher.Dispatch(new StreamUrlQuery(StreamKind.Episode, episodeFile.Id));
             return dto;
         }
     }
