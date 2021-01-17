@@ -10,7 +10,7 @@ COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
 RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-musl-x64 -o build
 
 
-FROM node:13-alpine AS frontendBuilder
+FROM node:14-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
@@ -30,4 +30,4 @@ COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
 ENV NXPLX_BUILD=$build
 EXPOSE 5353
-ENTRYPOINT ["NxPlx.ApplicationHost.Api"]
+ENTRYPOINT ["./NxPlx.ApplicationHost.Api"]
