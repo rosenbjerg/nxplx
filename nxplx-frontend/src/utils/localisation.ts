@@ -27,7 +27,7 @@ export function translate(key:string, parameters?: Record<string, string> | unde
     }
     if (parameters) {
         for (const key in parameters)
-            translation.replace(key, parameters[key]);
+            translation = translation.replace(key, parameters[key]);
     }
     return translation;
 }
