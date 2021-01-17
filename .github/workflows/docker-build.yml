@@ -1,4 +1,4 @@
-name: Docker build
+name: CD - Publish docker images
 
 on:
   pull_request:
