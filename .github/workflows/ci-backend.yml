@@ -1,18 +1,18 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches:
       - master
-      - release
+    paths:
+    - 'nxplx-backend/**'
 
 jobs:
   ci:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    env:
+      working-directory: ./nxplx-backend
+    timeout-minutes: 10
     steps:
     - name: Checkout
       uses: actions/checkout@v1
@@ -23,4 +23,4 @@ jobs:
         dotnet-version: '5.0.x'
 
     - name: Test with dotnet
-      run: dotnet test nxplx-backend/NxPlx.sln --logger GitHubActions
+      run: dotnet test NxPlx.sln --logger GitHubActions
