@@ -26,8 +26,8 @@ export function translate(key:string, parameters?: Record<string, string> | unde
         translation = dictionary.en[key] || `[${key}]`;
     }
     if (parameters) {
-        for (const key in parameters)
-            translation = translation.replace(key, parameters[key]);
+        for (const parameter in parameters)
+            translation = translation.replace(parameter, parameters[parameter]);
     }
     return translation;
 }
