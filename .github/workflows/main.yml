@@ -11,6 +11,7 @@ on:
 
 jobs:
   ci:
+    runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
     - name: Checkout
