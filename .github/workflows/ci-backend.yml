@@ -23,4 +23,5 @@ jobs:
         dotnet-version: '5.0.x'
 
     - name: Test with dotnet
+      working-directory: ${{env.working-directory}}
       run: dotnet test NxPlx.sln --logger GitHubActions
