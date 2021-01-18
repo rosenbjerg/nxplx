@@ -31,6 +31,6 @@ COPY --from=frontendBuilder /app/build ./public/
 ENV NXPLX_BUILD=$build
 EXPOSE 5353
 ENV TINI_VERSION v0.19.0
-RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static && chmod +x /tini
+RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-armhf && chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--"]
 CMD ["./NxPlx.ApplicationHost.Api"]
