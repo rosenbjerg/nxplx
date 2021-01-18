@@ -7,7 +7,7 @@ RUN git clone https://github.com/rosenbjerg/NxPlx.git
 FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
 WORKDIR /app
 COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
-RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-arm -o build
+RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-musl-arm -o build
 
 
 FROM node:14-alpine AS frontendBuilder
