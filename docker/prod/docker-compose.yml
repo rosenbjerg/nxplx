@@ -7,7 +7,7 @@ networks:
     external: false
 
 services:
-  nxplx-database:
+  nxplx-postgres:
     image: postgres:13-alpine
     networks: 
       - internal
@@ -16,7 +16,7 @@ services:
     environment:
       POSTGRES_PASSWORD: notdev
 
-  nxplx-cache:
+  nxplx-redis:
     image: redis:6-alpine
     networks:
       - internal
@@ -28,14 +28,14 @@ services:
       - internal
       - web
     environment:
-      REDIS_PASSWORD: notdev
-      POSTGRES_PASSWORD: notdev
-      NXPLX_PROBE_TOKEN: notdev
+      - NXPLX_ConnectionStrings__Redis=nxplx-redis,password=notdev,name=NxPlx
+      - NXPLX_ConnectionStrings__Pgsql=Host=nxplx-postgres;Database=nxplx_db;Username=postgres;Password=notdev
+      - NXPLX_ConnectionStrings__HangfirePgsql=Host=nxplx-postgres;Database=nxplx_job_db;Username=postgres;Password=notdev
     volumes:
       - /srv/nxplx/webapi:/app/data
       - /mymedia:/media:ro
     depends_on:
-      - nxplx-database
-      - nxplx-cache
+      - nxplx-postgres
+      - nxplx-redis
     ports:
       - "5353:5353"
