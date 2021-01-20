@@ -23,7 +23,7 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
         public async Task<bool> Handle(LogoutCommand command, CancellationToken cancellationToken = default)
         {
             await _dispatcher.Dispatch(new RemoveSessionCommand(_operationContext.Session.UserId, _operationContext.SessionId));
-            _logger.LogInformation("User {UserId} logged out", _operationContext.Session.UserId);
+            _logger.LogInformation("User logged out");
             return true;
         }
     }

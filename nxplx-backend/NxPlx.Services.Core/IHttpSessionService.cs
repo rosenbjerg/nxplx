@@ -5,7 +5,7 @@ namespace NxPlx.Core.Services
 {
     public interface IHttpSessionService
     {
-        string? ExtractSessionToken(HttpRequest request);
-        public void AttachSessionToken(HttpResponse response, string? sessionToken = null, DateTime? sessionExpiration = null);
+        string? ExtractSessionToken(HttpContext context);
+        public void AttachSessionToken(HttpContext context, string? sessionToken = null, DateTime? sessionExpiration = null);
     }
 }

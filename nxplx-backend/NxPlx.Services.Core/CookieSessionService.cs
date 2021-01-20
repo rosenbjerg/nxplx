@@ -1,23 +1,33 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using NxPlx.Application.Core.Options;
 
 namespace NxPlx.Core.Services
 {
     public class CookieSessionService : IHttpSessionService
     {
+        private readonly HostingOptions _hostingOptions;
         private const string CookieName = "SessionToken";
         private static readonly DateTimeOffset ExpiredDateTimeOffset = new(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
-        public string? ExtractSessionToken(HttpRequest request)
+        public CookieSessionService(HostingOptions hostingOptions)
         {
-            return request.Cookies.TryGetValue(CookieName, out var token) ? token : null;
+            _hostingOptions = hostingOptions;
+        }
+
+        public string? ExtractSessionToken(HttpContext context)
+        {
+            if (context.Request.Cookies.TryGetValue(CookieName, out var token))
+                return token;
+            return context.GetRouteValue("sessionToken")?.ToString();
         }
         
-        public void AttachSessionToken(HttpResponse response, string? sessionToken, DateTime? sessionExpiration)
+        public void AttachSessionToken(HttpContext context, string? sessionToken, DateTime? sessionExpiration)
         {
             var expiry = sessionToken != null && sessionExpiration != null ? sessionExpiration.Value : ExpiredDateTimeOffset;
             var (cookie, options) = BuildCookie(sessionToken, expiry);
-            response.Cookies.Append(CookieName, cookie, options);
+            context.Response.Cookies.Append(CookieName, cookie, options);
         }
 
         private (string, CookieOptions) BuildCookie(string? sessionToken, DateTimeOffset expiry)
@@ -25,10 +35,7 @@ namespace NxPlx.Core.Services
             return (sessionToken ?? "", new CookieOptions
             {
                 Path = "/",
-#if DEBUG
-#else
-                Secure = true,
-#endif
+                Secure = _hostingOptions.Secure,
                 HttpOnly = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict,

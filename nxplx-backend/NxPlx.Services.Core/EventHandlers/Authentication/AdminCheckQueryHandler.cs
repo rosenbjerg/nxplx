@@ -16,7 +16,7 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
 
         public Task<bool> Handle(AdminCheckQuery query, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(_operationContext.Session.IsAdmin);
+            return Task.FromResult(_operationContext.Session?.IsAdmin ?? false);
         }
     }
 }

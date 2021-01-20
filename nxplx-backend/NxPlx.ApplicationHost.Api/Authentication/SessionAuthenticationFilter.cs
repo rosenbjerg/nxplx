@@ -22,7 +22,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
         
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            var sessionToken = _httpSessionService.ExtractSessionToken(context.HttpContext.Request);
+            var sessionToken = _httpSessionService.ExtractSessionToken(context.HttpContext);
             if (!string.IsNullOrEmpty(sessionToken))
             {
                 var session = await _dispatcher.Dispatch(new SessionQuery(sessionToken));

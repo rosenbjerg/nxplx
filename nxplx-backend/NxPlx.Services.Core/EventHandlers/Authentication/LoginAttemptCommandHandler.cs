@@ -43,8 +43,8 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
                     IsAdmin = user.Admin,
                     UserId = user.Id,
                 };
-                await _dispatcher.Dispatch(new CreateSessionCommand(user.Id, token, session, _sessionLength));
-                _logger.LogInformation("User {UserId} logged in", session.UserId);
+                await _dispatcher.Dispatch(new CreateSessionCommand(session.UserId, token, session, _sessionLength));
+                _logger.LogInformation("User logged in");
                 _operationContext.Session = session;
                 return (token, expiry, user.Admin);
             }

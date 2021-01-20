@@ -4,8 +4,7 @@ namespace NxPlx.Application.Core.Options
 {
     public class ApiKeyOptions : INxplxOptions
     {
-        [Required]
-        public string ProbeKey { get; set; } = null!;
+        public string ProbeKey { get; set; } = "dev";
         [Required]
         public string TmdbKey { get; set; } = null!;
     }

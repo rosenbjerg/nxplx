@@ -9,7 +9,5 @@ namespace NxPlx.Application.Core.Options
 
         [Required]
         public bool Secure { get; set; } = true;
-        public bool ApiDocumentation { get; set; } = false;
-        public bool HangfireDashboard { get; set; } = false;
     }
 }

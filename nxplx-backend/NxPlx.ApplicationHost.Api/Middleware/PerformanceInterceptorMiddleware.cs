@@ -7,6 +7,9 @@ namespace NxPlx.ApplicationHost.Api.Middleware
 {
     public class PerformanceInterceptorMiddleware
     {
+        private static readonly Action<ILogger, string, double, Exception?> RequestServed = LoggerMessage.Define<string, double>(
+            LogLevel.Information, new EventId(),
+            "Request to {Path} took {ElapsedMs}ms");
         private readonly RequestDelegate _next;
 
         public PerformanceInterceptorMiddleware(RequestDelegate next)
@@ -19,7 +22,8 @@ namespace NxPlx.ApplicationHost.Api.Middleware
             var startTime = DateTime.UtcNow;
             await _next(context);
             var elapsedMs = DateTime.UtcNow.Subtract(startTime).TotalMilliseconds;
-            logger.LogInformation("Request to {Path} took {ElapsedMs}ms", context.Request.Path, elapsedMs);
+            RequestServed(logger, context.Request.Path, elapsedMs, null);
+            // logger.LogInformation("Request to {Path} took {ElapsedMs}ms", context.Request.Path, elapsedMs);
         }
     }
 }

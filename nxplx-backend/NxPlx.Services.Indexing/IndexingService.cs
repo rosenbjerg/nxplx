@@ -37,9 +37,9 @@ namespace NxPlx.Services.Index
                 .ToListAsync();
 
             if (libraries.Any(l => l.Kind == LibraryKind.Film))
-                BackgroundJob.Enqueue<IndexingService>(service => service.IndexFilmGenres("en-UK"));
+                BackgroundJob.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Film, "en-UK"));
             if (libraries.Any(l => l.Kind == LibraryKind.Series))
-                BackgroundJob.Enqueue<IndexingService>(service => service.IndexSeriesGenres("en-UK"));
+                BackgroundJob.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Series, "en-UK"));
             
             var previousJob = string.Empty;
             foreach (var library in libraries)
@@ -116,23 +116,21 @@ namespace NxPlx.Services.Index
                 BackgroundJob.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), libraryId));
         }
         
+        [DisableConcurrentExecution(5)]
         [Queue(JobQueueNames.GenreIndexing)]
-        public async Task IndexFilmGenres(string language)
+        public async Task IndexGenres(LibraryKind libraryKind, string language)
         {
-            var genres = await _metadataService.FetchFilmGenres(language);
-            var newGenreIds = genres.Select(g => g.Id).ToList();
+            var availableGenres = libraryKind switch
+            {
+                LibraryKind.Film => await _metadataService.FetchFilmGenres(language),
+                LibraryKind.Series => await _metadataService.FetchSeriesGenres(language),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            
+            await _metadataService.FetchFilmGenres(language);
+            var newGenreIds = availableGenres.Select(g => g.Id).ToList();
             var existingGenres = await _context.Genre.Where(g => newGenreIds.Contains(g.Id)).Select(g => g.Id).ToListAsync();
-            _context.AddRange(genres.Where(g => !existingGenres.Contains(g.Id)));
-            await _context.SaveChangesAsync();
-        }
-        
-        [Queue(JobQueueNames.GenreIndexing)]
-        public async Task IndexSeriesGenres(string language)
-        {
-            var genres = await _metadataService.FetchSeriesGenres(language);
-            var newGenreIds = genres.Select(g => g.Id).ToList();
-            var existingGenres = await _context.Genre.Where(g => newGenreIds.Contains(g.Id)).Select(g => g.Id).ToListAsync();
-            _context.AddRange(genres.Where(g => !existingGenres.Contains(g.Id)));
+            _context.AddRange(availableGenres.Where(g => !existingGenres.Contains(g.Id)));
             await _context.SaveChangesAsync();
         }
         

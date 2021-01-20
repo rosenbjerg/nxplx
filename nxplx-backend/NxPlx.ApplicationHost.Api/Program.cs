@@ -21,7 +21,7 @@ namespace NxPlx.ApplicationHost.Api
                 .ConfigureAppConfiguration((context, builder) => builder.AddEnvironmentVariables("NxPlx_"))
                 .ConfigureWebHostDefaults(webBuilder => webBuilder
                     .UseKestrel()
-                    .UseStartup<Startup>()
+                    .UseStartup<ApiStartup>()
                     .UseUrls(UseUrls))
                 .UseNxplxSerilog("Api");
     }

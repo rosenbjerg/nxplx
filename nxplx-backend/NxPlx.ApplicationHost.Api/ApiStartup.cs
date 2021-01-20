@@ -1,10 +1,10 @@
 using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -21,6 +21,7 @@ using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.Application.Mapping;
+using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
@@ -35,44 +36,45 @@ using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {
-    public class Startup : ApplicationHostStartup
+    public class ApiStartup : ApplicationHostStartup
     {
-        public Startup(IConfiguration configuration) : base(configuration) { }
-        
-        public override void ConfigureServices(IServiceCollection services)
+        public ApiStartup(IConfiguration configuration) : base(configuration) { }
+
+        public ServiceProvider ConfigureOptions(IServiceCollection services)
         {
-            services
-                .AddMvc()
-                .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
-            
             AddOptions<ApiKeyOptions>(services);
             AddOptions<ConnectionStrings>(services);
             AddOptions<FolderOptions>(services);
             AddOptions<HostingOptions>(services);
             AddOptions<LoggingOptions>(services);
+            AddOptions<JobDashboardOptions>(services);
+            AddOptions<ApiDocumentationOptions>(services);
             AddOptions<NxPlx.Application.Core.Options.SessionOptions>(services);
+            return services.BuildServiceProvider();
+        }
+        
+        public override void ConfigureServices(IServiceCollection services)
+        {
+            var optionsProvider = ConfigureOptions(services);
+            
+            services
+                .AddMvc()
+                .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
 
-            services.AddSpaStaticFiles(options => options.RootPath = "public");
-            services.AddHangfireServer(options =>
-            {
-                options.WorkerCount = Math.Max(Environment.ProcessorCount - 1, 2);
-                options.Queues = JobQueueNames.All;
-            });
+            services.AddJobProcessing(optionsProvider);
             
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 
-            var hostingSettings = Configuration.GetSection("Hosting").Get<HostingOptions>();
-            services.AddWebSockets(options => options.AllowedOrigins.Add(hostingSettings.Origin));
-            if (hostingSettings.ApiDocumentation) 
-                services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
             
-            
-            var connectionStrings = Configuration.GetSection("ConnectionStrings").Get<ConnectionStrings>();
+            var hostingOptions = optionsProvider.GetRequiredService<HostingOptions>();
+            services.AddWebSockets(options => options.AllowedOrigins.Add(hostingOptions.Origin));
+
+            services.AddApiDocumentation(optionsProvider);
             
             services.AddAutoMapper(typeof(MappingAssemblyMarker));
-            HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
-            ConfigureHangfire(GlobalConfiguration.Configuration);
-            services.AddHangfire(ConfigureHangfire);
+            
+            var connectionStrings = optionsProvider.GetRequiredService<ConnectionStrings>();
+            
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
@@ -92,6 +94,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped<ConnectionAccepter, WebsocketConnectionAccepter>();
             services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             services.AddScoped<OperationContext>();
+            
             services.AddScoped<TempFileService>();
             services.AddScoped<LibraryCleanupService>();
             services.AddScoped<LibraryMetadataService>();
@@ -110,9 +113,10 @@ namespace NxPlx.ApplicationHost.Api
             );
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IServiceProvider serviceProvider)
         {
             var hostingOptions = Configuration.GetSection("Hosting").Get<HostingOptions>();
+            var jobDashboardOptions = Configuration.GetSection("JobDashboard").Get<JobDashboardOptions>();
             InitializeDatabase(databaseContext);
 
             app.UseMiddleware<OperationContextMiddleware>();
@@ -121,21 +125,18 @@ namespace NxPlx.ApplicationHost.Api
             app.UseMiddleware<PerformanceInterceptorMiddleware>();
             app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
-            if (hostingOptions.HangfireDashboard) app.UseHangfireDashboard("/dashboard");
-            if (hostingOptions.ApiDocumentation)
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
-            }
             
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(Path.GetFullPath("public"))
-            });
+            app.ConfigureJobDashboard(serviceProvider);
+            // if (hostingOptions.ApiDocumentation)
+            // {
+            //     app.UseSwagger();
+            //     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "NxPlx API"));
+            // }
+            
             app.UseWebSockets();
             app.UseRouting();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
-            app.Use(FallbackMiddlewareHandler);
+            app.UseStaticFileHandler("public");
         }
 
         private static void InitializeDatabase(DatabaseContext databaseContext)
@@ -153,27 +154,46 @@ namespace NxPlx.ApplicationHost.Api
             }
         }
         
-        private static readonly Regex HashRegex = new("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
-        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new(); 
-        private static async Task FallbackMiddlewareHandler(HttpContext context, Func<Task> next)
+        
+    }
+
+    public static class ApiDocumentationExtensions
+    {
+        public static IServiceCollection AddApiDocumentation(this IServiceCollection serviceCollection, IServiceProvider serviceProvider)
         {
-            var path = context.Request.Path.ToString().TrimStart('/');
-            var file = Path.Combine("public", path);
-            var fileInfo = File.Exists(file)
-                ? new FileInfo(file)
-                : new FileInfo(Path.Combine("public", "index.html"));
-            if (!context.Response.HasStarted)
+            var apiDocumentationOptions = serviceProvider.GetRequiredService<ApiDocumentationOptions>();
+            if (apiDocumentationOptions.Enabled) 
+                serviceCollection.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
+            return serviceCollection;
+        }
+    }
+    public static class StaticFileExtensions
+    {
+        private static readonly Regex HashRegex = new("\\.[0-9a-f]{5}\\.", RegexOptions.Compiled); 
+        private static readonly FileExtensionContentTypeProvider FileExtensionContentTypeProvider = new();
+
+        public static IApplicationBuilder UseStaticFileHandler(this IApplicationBuilder applicationBuilder, string directory)
+        {
+            return applicationBuilder.Use(async (context, next) =>
             {
-                if (HashRegex.IsMatch(path))
-                    context.Response.Headers.Add("Cache-Control", "max-age=2592000");
+                var path = context.Request.Path.ToString().TrimStart('/');
+                var file = Path.Combine(directory, path);
+                var fileInfo = File.Exists(file)
+                    ? new FileInfo(file)
+                    : new FileInfo(Path.Combine(directory, "index.html"));
+                if (!context.Response.HasStarted)
+                {
+                    if (HashRegex.IsMatch(path))
+                        context.Response.Headers.Add("Cache-Control", "max-age=2592000");
                 
-                if(!FileExtensionContentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType))
-                    contentType = "application/octet-stream";
-                context.Response.ContentType = contentType;
-                context.Response.StatusCode = 200;
-            }
-            await context.Response.SendFileAsync(new PhysicalFileInfo(fileInfo));
-            await context.Response.CompleteAsync();
+                    if(!FileExtensionContentTypeProvider.TryGetContentType(fileInfo.Name, out var contentType))
+                        contentType = "application/octet-stream";
+                    context.Response.ContentType = contentType;
+                    context.Response.StatusCode = 200;
+                }
+                await context.Response.SendFileAsync(new PhysicalFileInfo(fileInfo));
+                await context.Response.CompleteAsync();
+            });
         }
     }
 }

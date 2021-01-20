@@ -27,9 +27,10 @@ namespace NxPlx.Core.Services.EventHandlers.Series
 
         public async Task<IEnumerable<ContinueWatchingDto>> Handle(ContinueWatchingQuery @event, CancellationToken cancellationToken = default)
         {
-            var progress = await _context.WatchingProgresses.AsNoTracking().Where(wp => wp.UserId == _operationContext.Session.UserId)
+            var progress = await _context.WatchingProgresses.AsNoTracking()
+                .Where(wp => wp.UserId == _operationContext.Session.UserId)
                 .OrderByDescending(wp => wp.LastWatched)
-                .Take(40).ToListAsync();
+                .Take(40).ToListAsync(cancellationToken);
 
             var episodes = progress.Where(wp => wp.MediaType == MediaFileType.Series).ToDictionary(wp => wp.FileId);
             var film = progress.Where(wp => wp.MediaType == MediaFileType.Film).ToDictionary(wp => wp.FileId);
@@ -39,11 +40,13 @@ namespace NxPlx.Core.Services.EventHandlers.Series
 
             var list = new List<ContinueWatchingDto>();
 
-            var watchedEpisodes = await _context.EpisodeFiles.Where(ef => episodesIds.Contains(ef.Id)).ToListAsync();
+            var watchedEpisodes = await _context.EpisodeFiles
+                .Include(ef => ef.SeriesDetails).ThenInclude(sd => sd.Seasons).ThenInclude(s => s.Episodes)
+                .Where(ef => episodesIds.Contains(ef.Id)).ToListAsync(cancellationToken);
             var relevantEpisodes = watchedEpisodes.Select(ef => (wp: episodes[ef.Id], ef)).Where(ef => NotFinished(ef));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, EpisodeFile), ContinueWatchingDto>(relevantEpisodes));
 
-            var watchedFilm = await _context.FilmFiles.AsNoTracking().Include(ff => ff.FilmDetails).Where(ff => filmIds.Contains(ff.Id)).ToListAsync();
+            var watchedFilm = await _context.FilmFiles.AsNoTracking().Include(ff => ff.FilmDetails).Where(ff => filmIds.Contains(ff.Id)).ToListAsync(cancellationToken);
             var relevantFilm = watchedFilm.Select(ff => (wp: film[ff.Id], ff)).Where(ff => NotFinished(ff));
             list.AddRange(_dtoMapper.Map<(WatchingProgress, FilmFile), ContinueWatchingDto>(relevantFilm));
 

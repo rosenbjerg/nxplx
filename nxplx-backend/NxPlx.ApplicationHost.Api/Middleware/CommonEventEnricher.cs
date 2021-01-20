@@ -8,15 +8,16 @@ namespace NxPlx.ApplicationHost.Api.Middleware
     {
         private readonly IOperationContext _operationContext;
 
-        public CommonEventEnricher(IOperationContext IOperationContext)
+        public CommonEventEnricher(IOperationContext operationContext)
         {
-            _operationContext = IOperationContext;
+            _operationContext = operationContext;
         }
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.SessionId), _operationContext.SessionId));
-            logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.Session.UserId), _operationContext.Session));
+            if (_operationContext.Session != null)
+                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.Session.UserId), _operationContext.Session.UserId));
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.CorrelationId), _operationContext.CorrelationId.ToString()));
         }
     }

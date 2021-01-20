@@ -27,7 +27,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         {
             var session = await _eventDispatcher.Dispatch(new LoginAttemptCommand(username, password, userAgent));
             if (session == default) return BadRequest("Invalid credentials");
-            _sessionService.AttachSessionToken(HttpContext.Response, session.Token, session.Expiry);
+            _sessionService.AttachSessionToken(HttpContext, session.Token, session.Expiry);
             return Ok(session.IsAdmin);
         }
         
@@ -36,7 +36,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public async Task<ActionResult> Logout()
         {
             await _eventDispatcher.Dispatch(new LogoutCommand());
-            _sessionService.AttachSessionToken(HttpContext.Response);
+            _sessionService.AttachSessionToken(HttpContext);
             return Ok();
         }
         
