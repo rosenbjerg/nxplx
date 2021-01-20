@@ -8,7 +8,6 @@ using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events.File;
 using NxPlx.Application.Models.Events.Film;
 using NxPlx.Infrastructure.Database;
-using NxPlx.Models.File;
 using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services.EventHandlers.Film

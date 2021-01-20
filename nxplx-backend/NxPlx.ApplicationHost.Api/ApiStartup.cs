@@ -1,9 +1,7 @@
 using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,14 +12,12 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.Application.Mapping;
-using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Core.Services;
 using NxPlx.Core.Services.Commands;
@@ -32,7 +28,6 @@ using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Services.Index;
 using Serilog.Core;
-using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.ApplicationHost.Api
 {

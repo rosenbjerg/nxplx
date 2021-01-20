@@ -1,6 +1,4 @@
-﻿using NxPlx.Models.File;
-
-namespace NxPlx.Application.Models.Events.File
+﻿namespace NxPlx.Application.Models.Events.File
 {
     public class StreamUrlQuery : ICommand<string>
     {
