@@ -9,9 +9,9 @@ namespace NxPlx.Core.Services.EventHandlers.Authentication
     {
         private readonly IOperationContext _operationContext;
 
-        public AdminCheckQueryHandler(IOperationContext IOperationContext)
+        public AdminCheckQueryHandler(IOperationContext operationContext)
         {
-            _operationContext = IOperationContext;
+            _operationContext = operationContext;
         }
 
         public Task<bool> Handle(AdminCheckQuery query, CancellationToken cancellationToken = default)

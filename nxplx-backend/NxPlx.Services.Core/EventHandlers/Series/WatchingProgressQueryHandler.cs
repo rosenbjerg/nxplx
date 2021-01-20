@@ -13,10 +13,10 @@ namespace NxPlx.Core.Services.EventHandlers.Series
         private readonly DatabaseContext _context;
         private readonly IOperationContext _operationContext;
 
-        public WatchingProgressQueryHandler(DatabaseContext context, IOperationContext IOperationContext)
+        public WatchingProgressQueryHandler(DatabaseContext context, IOperationContext operationContext)
         {
             _context = context;
-            _operationContext = IOperationContext;
+            _operationContext = operationContext;
         }
         
         public Task<double> Handle(WatchingProgressQuery @event, CancellationToken cancellationToken = default)

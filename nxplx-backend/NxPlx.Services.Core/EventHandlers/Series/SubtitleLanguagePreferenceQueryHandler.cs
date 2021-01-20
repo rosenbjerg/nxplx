@@ -13,10 +13,10 @@ namespace NxPlx.Core.Services.EventHandlers.Series
         private readonly DatabaseContext _context;
         private readonly IOperationContext _operationContext;
 
-        public SubtitleLanguagePreferenceQueryHandler(DatabaseContext context, IOperationContext IOperationContext)
+        public SubtitleLanguagePreferenceQueryHandler(DatabaseContext context, IOperationContext operationContext)
         {
             _context = context;
-            _operationContext = IOperationContext;
+            _operationContext = operationContext;
         }
         public async Task<string> Handle(SubtitleLanguagePreferenceQuery @event, CancellationToken cancellationToken = default)
         {
