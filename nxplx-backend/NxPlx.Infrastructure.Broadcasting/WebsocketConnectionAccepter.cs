@@ -6,9 +6,9 @@ namespace NxPlx.Infrastructure.Broadcasting
 {
     public class WebsocketConnectionAccepter : ConnectionAccepter
     {
-        private readonly OperationContext _operationContext;
+        private readonly IOperationContext _operationContext;
 
-        public WebsocketConnectionAccepter(OperationContext operationContext, ConnectionHub connectionHub) : base(connectionHub)
+        public WebsocketConnectionAccepter(IOperationContext operationContext, ConnectionHub connectionHub) : base(connectionHub)
         {
             _operationContext = operationContext;
         }

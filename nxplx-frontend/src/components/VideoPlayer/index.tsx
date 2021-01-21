@@ -3,7 +3,7 @@ import { Events } from "../../utils/events";
 import Store from "../../utils/storage";
 import * as style from "./style.css";
 import IconButton from "../IconButton";
-import { useCallback, useEffect } from "preact/hooks";
+import { useCallback } from "preact/hooks";
 
 interface TextTrack {
     displayName: string
@@ -34,13 +34,13 @@ interface State {
     focused: boolean
 }
 
-let volume = Store.local.getFloatEntry("player_volume") || 1.0;
-let muted = Store.local.getBooleanEntry("player_muted");
-let autoplay = Store.local.getBooleanEntry("player_autoplay");
+let volume: number = Store.local.getFloatEntry("player_volume") || 1.0;
+let muted: boolean = Store.local.getBooleanEntry("player_muted");
+let autoplay: boolean = Store.local.getBooleanEntry("player_autoplay");
 
-const setVolume = vl => Store.local.setEntry("player_volume", volume = vl);
-const setAutoplay = ap => Store.local.setEntry("player_autoplay", autoplay = ap);
-const setMuted = mu => Store.local.setEntry("player_muted", muted = mu);
+const setVolume = (vl: number) => Store.local.setEntry("player_volume", volume = vl);
+const setAutoplay = (ap: boolean) => Store.local.setEntry("player_autoplay", autoplay = ap);
+const setMuted = (mu: boolean) => Store.local.setEntry("player_muted", muted = mu);
 
 // declare const cast;
 // declare const chrome;
@@ -63,7 +63,7 @@ interface FancyProps {
     innerStyle?: string
     outerStyle?: string
 
-    onSeek: (number) => any
+    onSeek: (number) => void
 }
 
 const FancyTrack = ({ primaryPct, secondaryPct = 0, innerStyle, outerStyle, onSeek }: FancyProps) => {
@@ -79,8 +79,8 @@ const FancyTrack = ({ primaryPct, secondaryPct = 0, innerStyle, outerStyle, onSe
 const isTouchscreen = () => 'ontouchstart' in window || 'onmsgesturechange' in window;
 
 export default class VideoPlayer extends Component<Props, State> {
-    private video?: HTMLVideoElement;
-    private videoContainer?: HTMLElement;
+    private video?: HTMLVideoElement | null;
+    private videoContainer?: HTMLDivElement | null;
     private videoClickTimer: any;
     private isHandlingKey: boolean = false;
     private isTouch: boolean = false;
@@ -88,30 +88,16 @@ export default class VideoPlayer extends Component<Props, State> {
     private lastFocus: number = 0;
 
     componentDidMount(): void {
-        if (this.video !== undefined) {
+        if (this.video) {
             this.video.volume = volume;
             this.isTouch = isTouchscreen();
             this.setState({ volume, muted });
         }
-        // cast.framework.CastContext.getInstance().setOptions({
-        //     receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-        //     autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
-        // });
-        // const player = new cast.framework.RemotePlayer();
-        // const playerController = new cast.framework.RemotePlayerController(player);
-        // console.log(player, playerController);
-        // const mediaInfo = new chrome.cast.media.MediaInfo(this.props.src, "video/mp4");
-        // mediaInfo.tracks = [];
-        // const request = new chrome.cast.media.LoadRequest(mediaInfo);
-        // console.log(mediaInfo, request);
-        // console.log(cast.framework.CastContext.getInstance());
-        // chrome.cast.requestSession((e) => {
-        //     console.log('session', e);
-        // });
+
     }
 
     render({ poster, src, startTime, subtitles, title, playNext, duration, isSeries }: Props, { fullscreen, playing, volume, muted, currentTime, buffered, focused }: State) {
-        useEffect(() => this.videoContainer?.focus());
+        setTimeout(() => this.videoContainer?.focus(), 0);
         const volumeIcon = !muted ? (volume > 0.50 ? 'volume_up' : (volume > 0.10 ? 'volume_down' : 'volume_mute')) : 'volume_off';
         return (
             <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}`}>
@@ -132,7 +118,7 @@ export default class VideoPlayer extends Component<Props, State> {
                     <span style="margin-right: 10px; float: right;">
                         {subtitles && subtitles.length > 0 && (
                             <select class="noborder">
-                                {subtitles.map(track => (<option value={track.language}>{track.displayName}</option>))}
+                                {subtitles.map(track => (<option key={track.language} value={track.language}>{track.displayName}</option>))}
                             </select>
                         )}
                         {fullscreen
@@ -158,14 +144,14 @@ export default class VideoPlayer extends Component<Props, State> {
                        onEnded={this.onEnded}>
                     <source src={`${src}#t=${startTime}`} type="video/mp4"/>
                     {subtitles && subtitles.map(track => (
-                        <track default={track.default} src={track.path} kind="captions" srcLang={track.language} label={track.displayName}/>
+                        <track key={track.path} default={track.default} src={track.path} kind="captions" srcLang={track.language} label={track.displayName}/>
                     ))}
                 </video>
             </div>
         );
     }
 
-    private onKeyPress = async (ev) => {
+    private onKeyPress = async (ev:KeyboardEvent) => {
         if (ev.defaultPrevented || this.isHandlingKey) return;
         // console.log(ev.key);
         this.isHandlingKey = true;
@@ -206,7 +192,7 @@ export default class VideoPlayer extends Component<Props, State> {
         if (!this.video) return;
         this.video.currentTime += seconds;
     }
-    private setVolume = (volume) => {
+    private setVolume = (volume: number) => {
         if (!this.video) return;
         setVolume(volume);
         this.video.volume = volume;
@@ -232,11 +218,11 @@ export default class VideoPlayer extends Component<Props, State> {
     }
     private exitFullscreen = () => {
         if (!document.fullscreenElement) return;
-        document.exitFullscreen().then(() => this.setState({ fullscreen: false }));
+        void document.exitFullscreen().then(() => this.setState({ fullscreen: false }));
     }
     private enterFullscreen = () => {
         if (!this.videoContainer) return;
-        this.videoContainer.requestFullscreen().then(() => this.setState({ fullscreen: true }));
+        void this.videoContainer.requestFullscreen().then(() => this.setState({ fullscreen: true }));
     }
     private clickOnVideo = () => {
         const shouldPlay = !this.isTouch || (this.isTouch && this.state.focused);
@@ -248,7 +234,7 @@ export default class VideoPlayer extends Component<Props, State> {
         else {
             this.videoClickTimer = setTimeout(() => {
                 this.videoClickTimer = null;
-                if (shouldPlay) this.playPause();
+                if (shouldPlay) void this.playPause();
             }, 200);
         }
     }
@@ -296,15 +282,18 @@ export default class VideoPlayer extends Component<Props, State> {
         this.setState({ playing: false });
     };
 
-    private bindVideo = ref => this.video = ref;
-    private bindVideoContainer = ref => {
+    private bindVideo = (ref: HTMLVideoElement | null) => {
+        if (ref !== null)
+            ref.onerror = (e) => console.log(e);
+        this.video = ref;
+    };
+    private bindVideoContainer = (ref: HTMLDivElement | null) => {
         if (ref === this.videoContainer) return;
-        if (ref) {
+        if (ref !== null) {
             ref.onmousemove = this.onFocused;
             ref.onmousedown = this.onFocused;
-            ref.onfocusin = this.onFocused;
+            ref.onfocus = this.onFocused;
             ref.onmouseover = this.onFocused;
-            ref.onhover = this.onFocused;
         }
         this.videoContainer = ref;
     }

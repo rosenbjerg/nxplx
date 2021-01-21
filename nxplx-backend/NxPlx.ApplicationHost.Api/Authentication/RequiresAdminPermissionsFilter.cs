@@ -9,7 +9,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var operationContext = context.HttpContext.RequestServices.GetService<OperationContext>();
+            var operationContext = context.HttpContext.RequestServices.GetRequiredService<IOperationContext>();
             if (!operationContext.Session.IsAdmin)
             {
                 context.Result = new UnauthorizedResult();

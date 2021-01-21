@@ -77,7 +77,7 @@ export default class UserPermissions extends Component<Props, State> {
 
         return (
             <div class={style.container}>
-                <h3>{translate('libraries username has access to', props.user.username)}</h3>
+                <h3>{translate('libraries username has access to', { username: props.user.username })}</h3>
                 {permissions.map((up, i) => (
                     <div key={up.library.id}>
                         <Checkbox checked={up.hasPermission} onInput={linkState(this, `permissions.${i}.hasPermission`)}/>

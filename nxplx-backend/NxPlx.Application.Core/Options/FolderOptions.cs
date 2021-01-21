@@ -7,6 +7,6 @@ namespace NxPlx.Application.Core.Options
         [Required]
         public string Images { get; set; } = null!;
 
-        public string TempFiles { get; set; }
+        public string? TempFiles { get; set; }
     }
 }

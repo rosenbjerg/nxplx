@@ -8,7 +8,6 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class BuildController : ControllerBase
     {
-
         [HttpGet("")]
         public OkObjectResult Build()
             => Ok("dev");

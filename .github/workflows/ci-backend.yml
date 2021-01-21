@@ -1,0 +1,27 @@
+name: CI - Backend
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+    - 'nxplx-backend/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    env:
+      working-directory: ./nxplx-backend
+    timeout-minutes: 10
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+
+    - name: Prepare .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Test with dotnet
+      working-directory: ${{env.working-directory}}
+      run: dotnet test NxPlx.sln --logger GitHubActions

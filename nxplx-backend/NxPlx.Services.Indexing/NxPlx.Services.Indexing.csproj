@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>NxPlx.Services.Index</RootNamespace>
-        <LangVersion>8</LangVersion>
+        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -15,8 +15,8 @@
 
     <ItemGroup>
       <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
-      <PackageReference Include="Hangfire.Core" Version="1.7.17" />
-      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="3.0.68" />
+      <PackageReference Include="Hangfire.Core" Version="1.7.19" />
+      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.13" />
     </ItemGroup>
 
 </Project>

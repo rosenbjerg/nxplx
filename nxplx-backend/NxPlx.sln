@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Broadc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDb", "NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj", "{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing.Tests", "NxPlx.Services.Indexing.Tests\NxPlx.Services.Indexing.Tests.csproj", "{7474A643-73D2-4333-84DB-DDABB7318856}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Core", "NxPlx.Services.Core\NxPlx.Services.Core.csproj", "{2F945733-6917-4CF8-8228-F7356198C37E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.ApplicationHost.Api", "NxPlx.ApplicationHost.Api\NxPlx.ApplicationHost.Api.csproj", "{31583ED4-5CFA-44A3-B810-7EAE7F954F02}"
@@ -21,6 +19,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Core", "NxPlx.Application.Core\NxPlx.Application.Core.csproj", "{E4C53733-D53F-4B39-BEF9-A5D96714F4DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Mapping", "NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj", "{CF4DA1CD-A303-49C4-9DE2-446856334A74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Test.UnitTests", "NxPlx.Test.UnitTests\NxPlx.Test.UnitTests.csproj", "{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,10 +52,6 @@ Global
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7474A643-73D2-4333-84DB-DDABB7318856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7474A643-73D2-4333-84DB-DDABB7318856}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7474A643-73D2-4333-84DB-DDABB7318856}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7474A643-73D2-4333-84DB-DDABB7318856}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,5 +68,9 @@ Global
 		{CF4DA1CD-A303-49C4-9DE2-446856334A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF4DA1CD-A303-49C4-9DE2-446856334A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF4DA1CD-A303-49C4-9DE2-446856334A74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

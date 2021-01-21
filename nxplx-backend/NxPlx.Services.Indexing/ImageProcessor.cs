@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
+using NxPlx.Application.Models.Events.Images;
 using NxPlx.Core.Services;
 using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
@@ -17,21 +18,21 @@ namespace NxPlx.Services.Index
         private readonly DatabaseContext _context;
         private readonly IDetailsApi _detailsApi;
         private readonly TempFileService _tempFileService;
-        private readonly ImageCreationService _imageCreationService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, ImageCreationService imageCreationService)
+        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IEventDispatcher dispatcher)
         {
             _context = context;
             _detailsApi = detailsApi;
             _tempFileService = tempFileService;
-            _imageCreationService = imageCreationService;
+            _dispatcher = dispatcher;
         }
         
         [Queue(JobQueueNames.ImageProcessing)]
         [AutomaticRetry(Attempts = 0)]
-        public async Task ProcessFilmDetails(int filmDetailsId)
+        public async Task ProcessFilmDetails(int filmId)
         {
-            var filmDetails = await _context.FilmDetails.FindAsync(filmDetailsId);
+            var filmDetails = await _context.FilmDetails.SingleAsync(fd => fd.Id == filmId);
 
             var poster = await ProcessPoster(filmDetails);
             var backdrop = await ProcessBackdrop(filmDetails);
@@ -44,7 +45,7 @@ namespace NxPlx.Services.Index
         [AutomaticRetry(Attempts = 0)]
         public async Task ProcessMovieCollection(int movieCollectionId)
         {
-            var movieCollection = await _context.MovieCollection.FindAsync(movieCollectionId);
+            var movieCollection = await _context.MovieCollection.SingleAsync(mc => mc.Id == movieCollectionId);
 
             var poster = await ProcessPoster(movieCollection);
             var backdrop = await ProcessBackdrop(movieCollection);
@@ -90,7 +91,7 @@ namespace NxPlx.Services.Index
         public async Task ProcessSeries(int seriesDetailsId)
         {
             var seriesDetails = await _context.SeriesDetails.Include(sd => sd.Seasons)
-                .FirstOrDefaultAsync(sd => sd.Id == seriesDetailsId);
+                .SingleAsync(sd => sd.Id == seriesDetailsId);
 
             await ProcessPoster(seriesDetails);
             await ProcessBackdrop(seriesDetails);
@@ -121,8 +122,8 @@ namespace NxPlx.Services.Index
                 if (!paths.TryGetValue(episodeDetails.EpisodeNumber, out var path))
                     continue;
 
-                var snapshotTempPath = await _imageCreationService.CreateSnapshot(path, 0.2);
-                await _imageCreationService.SetStill(episodeDetails, snapshotTempPath, $"{Guid.NewGuid()}.jpg");
+                var snapshotTempPath = await _dispatcher.Dispatch(new CreateSnapshotCommand(path, 0.2, 260, 200));
+                await _dispatcher.Dispatch(new SetImageCommand<IStillImageOwner>(episodeDetails, snapshotTempPath, $"{Guid.NewGuid()}.jpg"));
             }
 
             await _context.SaveChangesAsync();
@@ -136,7 +137,7 @@ namespace NxPlx.Services.Index
             var downloaded = await _detailsApi.DownloadImage(342, imageOwner.PosterPath, tempFile);
             if (!downloaded)
                 return false;
-            await _imageCreationService.SetPoster(imageOwner, tempFile, imageOwner.PosterPath);
+            await _dispatcher.Dispatch(new SetImageCommand<IPosterImageOwner>(imageOwner, tempFile, $"{Guid.NewGuid()}.jpg"));
             return true;
         }
 
@@ -148,7 +149,7 @@ namespace NxPlx.Services.Index
             var downloaded = await _detailsApi.DownloadImage(1280, imageOwner.BackdropPath, tempFile);
             if (!downloaded)
                 return false;
-            await _imageCreationService.SetBackdrop(imageOwner, tempFile, imageOwner.BackdropPath);
+            await _dispatcher.Dispatch(new SetImageCommand<IBackdropImageOwner>(imageOwner, tempFile, $"{Guid.NewGuid()}.jpg"));
             await _context.SaveChangesAsync();
             return true;
         }
@@ -160,7 +161,7 @@ namespace NxPlx.Services.Index
             var downloaded = await _detailsApi.DownloadImage(154, imageOwner.LogoPath, tempFile);
             if (!downloaded)
                 return false;
-            await _imageCreationService.SetLogo(imageOwner, tempFile, imageOwner.LogoPath);
+            await _dispatcher.Dispatch(new SetImageCommand<ILogoImageOwner>(imageOwner, tempFile, $"{Guid.NewGuid()}.jpg"));
             await _context.SaveChangesAsync();
             return true;
         }

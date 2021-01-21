@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +15,7 @@ namespace NxPlx.ApplicationHost.Api
         public static IHostBuilder UseNxplxSerilog(this IHostBuilder hostBuilder, string serviceName)
         {
             return hostBuilder
-                .ConfigureServices((context, collection) => collection.AddLogging(builder => builder.ClearProviders()))
+                .ConfigureServices((_, collection) => collection.AddLogging(builder => builder.ClearProviders()))
                 .UseSerilog(ConfigureSerilog(serviceName));
         }
 
@@ -25,20 +24,20 @@ namespace NxPlx.ApplicationHost.Api
             return (hostingContext, loggerConfiguration) =>
             {
                 var logSettings = hostingContext.Configuration.GetSection("Logging").Get<LoggingOptions>();
-                var logDirectory = logSettings.Directory;
-                loggerConfiguration
+                var enrichedConfiguration = loggerConfiguration
                     .Filter.ByExcluding(Matching.FromSource("Microsoft"))
                     .Filter.ByExcluding(Matching.FromSource("Hangfire"))
+                    .Destructure.ToMaximumDepth(3)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProperty("Service", serviceName);
+                    
 #if DEBUG
-                    .Enrich.FromLogContext().WriteTo.Async(x => x.Console())
+                enrichedConfiguration.WriteTo.Async(x => x.Console(logSettings.LogLevel));
+#else
+                enrichedConfiguration.WriteTo.Async(x => x.Console(new JsonFormatter(), logSettings.LogLevel));
 #endif
-                    .Enrich.FromLogContext().WriteTo.Async(x => x.File(
-                        new JsonFormatter(),
-                        Path.Combine(logDirectory, $"{serviceName}-{Environment.MachineName}-.log"),
-                        logSettings.LogLevel,
-                        rollingInterval: RollingInterval.Day,
-                        fileSizeLimitBytes: 50000000,
-                        retainedFileCountLimit: 90));
+                if (!string.IsNullOrEmpty(logSettings.Seq))
+                    enrichedConfiguration.WriteTo.Seq(logSettings.Seq);
             };
         }
     }

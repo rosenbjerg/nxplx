@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 namespace NxPlx.Services.Index
 {
     class FunctionCache<TArg1, TResult>
+        where TArg1 : notnull
     {
         private readonly Func<TArg1, Task<TResult>> _function;
-        private readonly Dictionary<TArg1, TResult> _dictionary = new Dictionary<TArg1, TResult>();
+        private readonly Dictionary<TArg1, TResult> _dictionary = new();
 
         public FunctionCache(Func<TArg1, Task<TResult>> function)
         {
@@ -28,7 +29,7 @@ namespace NxPlx.Services.Index
     class FunctionCache<TArg1, TArg2, TResult>
     {
         private readonly Func<TArg1, TArg2, Task<TResult>> _function;
-        private readonly Dictionary<(TArg1, TArg2), TResult> _dictionary = new Dictionary<(TArg1, TArg2), TResult>();
+        private readonly Dictionary<(TArg1, TArg2), TResult> _dictionary = new();
 
         public FunctionCache(Func<TArg1, TArg2, Task<TResult>> function)
         {

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,9 +43,9 @@ namespace NxPlx.Services.Index
             return extensions.SelectMany(ext => Directory.EnumerateFiles(folder, $"{pattern}.{ext}", SearchOption.AllDirectories));
         }
         
-        private static readonly Regex SeriesRegex = new Regex("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
-        private static readonly Regex FilmRegex = new Regex("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
-        private static readonly Regex WhitespaceRegex = new Regex("[\\s\\.-]+", RegexOptions.Compiled);
+        private static readonly Regex SeriesRegex = new("^(?<name>.+?)??[ -]*([Ss](?<season>\\d{1,3}))? ?[Ee](?<episode>\\d{1,3})", RegexOptions.Compiled);
+        private static readonly Regex FilmRegex = new("^(?<title>.+)?\\(?(?<year>\\d{4})\\)??[ .]?", RegexOptions.Compiled);
+        private static readonly Regex WhitespaceRegex = new("[\\s\\.-]+", RegexOptions.Compiled);
 
         private static readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
         

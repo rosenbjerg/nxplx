@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Core;
 using NxPlx.Application.Models;
+using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -12,19 +13,19 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class OverviewController : ControllerBase
     {
-        private readonly OverviewService _overviewService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public OverviewController(OverviewService overviewService)
+        public OverviewController(IEventDispatcher dispatcher)
         {
-            _overviewService = overviewService;
+            _dispatcher = dispatcher;
         }
 
         [HttpGet("")]
         public Task<IEnumerable<OverviewElementDto>> GetOverview()
-            => _overviewService.GetOverview();
+            => _dispatcher.Dispatch(new MediaOverviewQuery());
 
         [HttpGet("genres")]
         public Task<IEnumerable<GenreDto>> GetGenres()
-            => _overviewService.GetGenresOverview();
+            => _dispatcher.Dispatch(new GenreOverviewQuery());
     }
 }

@@ -1,28 +1,41 @@
-﻿﻿version: '3.1'
-services:
+﻿version: '3.1'
 
-  nxplx-database:
-    image: postgres:12-alpine
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
+services:
+  nxplx-postgres:
+    image: postgres:13-alpine
+    networks: 
+      - internal
     volumes:
       - /srv/nxplx/database:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
+      POSTGRES_PASSWORD: notdev
 
-  nxplx-cache:
-    image: redis:5.0.6-alpine
-    command: redis-server --requirepass 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
+  nxplx-redis:
+    image: redis:6-alpine
+    networks:
+      - internal
+    command: redis-server --requirepass notdev
 
   nxplx-webapi:
     image: mrosenbjerg/nxplx-webapi
+    networks:
+      - internal
+      - web
     environment:
-      REDIS_PASSWORD: 4f9o87b6hw498f6w4g5764ohlaglafv94ab68lbvoa9487b
-      POSTGRES_PASSWORD: o8e4v7wjnt39w82380947n5v209
-      NXPLX_PROBE_TOKEN: 45nv8239457w34589vngb7839b7v3452v903458457eg
+      - NXPLX_ConnectionStrings__Redis=nxplx-redis,password=notdev,name=NxPlx
+      - NXPLX_ConnectionStrings__Pgsql=Host=nxplx-postgres;Database=nxplx_db;Username=postgres;Password=notdev
+      - NXPLX_ConnectionStrings__HangfirePgsql=Host=nxplx-postgres;Database=nxplx_job_db;Username=postgres;Password=notdev
     volumes:
       - /srv/nxplx/webapi:/app/data
       - /mymedia:/media:ro
     depends_on:
-      - nxplx-database
-      - nxplx-cache
+      - nxplx-postgres
+      - nxplx-redis
     ports:
       - "5353:5353"

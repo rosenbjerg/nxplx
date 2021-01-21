@@ -2,8 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Core;
+using NxPlx.Application.Models.Events.Series;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
 using NxPlx.Models;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
@@ -13,29 +14,29 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class SubtitleController : ControllerBase
     {
-        private readonly SubtitleService _subtitleService;
+        private readonly IEventDispatcher _dispatcher;
 
-        public SubtitleController(SubtitleService subtitleService)
+        public SubtitleController(IEventDispatcher dispatcher)
         {
-            _subtitleService = subtitleService;
+            _dispatcher = dispatcher;
         }
         
         [HttpGet("languages/{kind}/{fileId}")]
-        public Task<IEnumerable<string>> LanguagesForFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
-            => _subtitleService.FindSubtitleLanguages(kind, fileId);
+        public Task<List<string>> LanguagesForFileId([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
+            => _dispatcher.Dispatch(new AvailableSubtitleLanguageQuery(kind, fileId));
 
         [HttpGet("preference/{kind}/{fileId}")]
         public Task<string> GetLanguagePreference([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId)
-            => _subtitleService.GetLanguagePreference(kind, fileId);
+            => _dispatcher.Dispatch(new SubtitleLanguagePreferenceQuery(kind, fileId));
 
         [HttpPut("preference/{kind}/{fileId}")]
         public Task SetLanguagePreference([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromBody, Required]string preference)
-            => _subtitleService.SetLanguagePreference(kind, fileId, preference);
+            => _dispatcher.Dispatch(new SetSubtitleLanguagePreferenceCommand(kind, fileId, preference));
         
         [HttpGet("file/{kind}/{fileId}/{language}")]
         public async Task<ActionResult<PhysicalFileResult>> Get([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromRoute, Required]string language)
         {
-            var subtitlePath = await _subtitleService.GetSubtitlePath(kind, fileId, language);
+            var subtitlePath = await _dispatcher.Dispatch(new SubtitlePathQuery(kind, fileId, language));
             if (!string.IsNullOrEmpty(subtitlePath))
                 return PhysicalFile(subtitlePath, "text/vtt");
             return NotFound();
