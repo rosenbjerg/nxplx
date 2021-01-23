@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events;
 using NxPlx.Application.Models.Events.Series;
 using NxPlx.Infrastructure.Database;
-using NxPlx.Models.File;
+using IMapper = AutoMapper.IMapper;
 
 namespace NxPlx.Core.Services.EventHandlers.Series
 {
@@ -16,26 +17,24 @@ namespace NxPlx.Core.Services.EventHandlers.Series
     {
         private readonly DatabaseContext _context;
         private readonly IEventDispatcher _dispatcher;
-        private readonly IDtoMapper _dtoMapper;
+        private readonly IMapper _mapper;
 
-        public NextEpisodeQueryHandler(DatabaseContext context, IEventDispatcher dispatcher, IDtoMapper dtoMapper)
+        public NextEpisodeQueryHandler(DatabaseContext context, IEventDispatcher dispatcher, IMapper mapper)
         {
             _context = context;
             _dispatcher = dispatcher;
-            _dtoMapper = dtoMapper;
+            _mapper = mapper;
         }
         
         public async Task<NextEpisodeDto?> Handle(NextEpisodeQuery @event, CancellationToken cancellationToken = default)
         {
-            var next = @event.Mode.ToLower() switch
+            return @event.Mode.ToLower() switch
             {
                 "leastrecent" => await LongestSinceLastWatch(@event.SeriesId, @event.SeasonNo, @event.EpisodeNo),
                 "random" => await Random(@event.SeriesId, @event.SeasonNo, @event.EpisodeNo, true),
                 "random_in_season" => await Random(@event.SeriesId, @event.SeasonNo, @event.EpisodeNo, false),
                 _ => await Default(@event.SeriesId, @event.SeasonNo, @event.EpisodeNo)
             };
-
-            return _dtoMapper.Map<EpisodeFile, NextEpisodeDto>(next);
         }
 
         public async Task<NextEpisodeDto?> Handle(NextEpisodeByFileIdQuery @event, CancellationToken cancellationToken = default)
@@ -46,7 +45,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
             return await Handle(newEvent, cancellationToken);
         }
         
-        private async Task<EpisodeFile> Random(int seriesId, int? seasonNo, int? episodeNo, bool allSeasons)
+        private async Task<NextEpisodeDto> Random(int seriesId, int? seasonNo, int? episodeNo, bool allSeasons)
         {
             var available = await _context.EpisodeFiles.Where(ef => 
                     ef.SeriesDetailsId == seriesId
@@ -55,10 +54,13 @@ namespace NxPlx.Core.Services.EventHandlers.Series
                 .Select(ef => ef.Id)
                 .ToListAsync();
             var selectedIndex = new Random().Next(0, available.Count - 1);
-            return await _context.EpisodeFiles.SingleAsync(ef => ef.Id == selectedIndex);
+            return await _context.EpisodeFiles
+                .Where(ef => ef.Id == available[selectedIndex])
+                .ProjectTo<NextEpisodeDto>(_mapper.ConfigurationProvider)
+                .SingleAsync();
         }
 
-        private async Task<EpisodeFile?> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
+        private async Task<NextEpisodeDto> LongestSinceLastWatch(int seriesId, int? seasonNo, int? episodeNo)
         {
             var available = await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
@@ -68,7 +70,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
                 .ToListAsync();
             var availableIds = available.Select(ef => ef.Id).ToList();
 
-            var currentUser = await _dispatcher.Dispatch<Models.User>(new CurrentUserQuery());
+            var currentUser = await _dispatcher.Dispatch(new CurrentUserQuery());
             var progress = await _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == currentUser.Id && availableIds.Contains(wp.FileId))
                 .ToDictionaryAsync(wp => wp.FileId);
@@ -81,10 +83,13 @@ namespace NxPlx.Core.Services.EventHandlers.Series
                 .Select(pair => pair.ef)
                 .First();
 
-            return await _context.EpisodeFiles.SingleAsync(ef => ef.Id == selected.Id);
+            return await _context.EpisodeFiles
+                .Where(ef => ef.Id == selected.Id)
+                .ProjectTo<NextEpisodeDto>(_mapper.ConfigurationProvider)
+                .SingleAsync();
         }
 
-        private async Task<EpisodeFile> Default(int seriesId, int? seasonNo, int? episodeNo)
+        private async Task<NextEpisodeDto> Default(int seriesId, int? seasonNo, int? episodeNo)
         {
             return await _context.EpisodeFiles.Where(ef =>
                     ef.SeriesDetailsId == seriesId &&
@@ -92,7 +97,8 @@ namespace NxPlx.Core.Services.EventHandlers.Series
                      ef.SeasonNumber == seasonNo && (episodeNo == null || ef.EpisodeNumber > episodeNo)))
                 .OrderBy(episode => episode.SeasonNumber)
                 .ThenBy(episode => episode.EpisodeNumber)
-                .FirstOrDefaultAsync();
+                .ProjectTo<NextEpisodeDto>(_mapper.ConfigurationProvider)
+                .FirstAsync();
         }
     }
 }
