@@ -29,27 +29,39 @@ jobs:
       -
         name: Build AMD64 image
         run: |
-          NXPLX_BUILD=`printf '%(%y.%m.%d)T-alpha' -1` && docker build \
+          NXPLX_BUILD=`printf '%(%y.%m.%d)T' -1` && \
+          docker build \
             --build-arg "build=$NXPLX_BUILD" \
-            --output "type=image,push=false" \
+            --build-arg BASE=amd64/alpine \
+            --build-arg DOTNET_RID=linux-musl-x64 \
+            --build-arg TINI_BUILD=tini-static \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
-            ./docker/gh-build/amd64
+            -f docker/gh-build/Dockerfile \
+            .
       -
         name: Build ARM64v8 image
         run: |
-          NXPLX_BUILD=`printf '%(%y.%m.%d)T-alpha' -1` && docker build \
+          NXPLX_BUILD=`printf '%(%y.%m.%d)T' -1` && \
+          docker build \
             --build-arg "build=$NXPLX_BUILD" \
-            --output "type=image,push=false" \
+            --build-arg BASE=arm64v8/alpine \
+            --build-arg DOTNET_RID=linux-musl-arm64 \
+            --build-arg TINI_BUILD=tini-static-arm64 \
             --tag mrosenbjerg/nxplx-webapi:arm64v8 \
-            ./docker/gh-build/arm64v8
+            -f docker/gh-build/Dockerfile \
+            .
       -
         name: Build ARM32v7 image
         run: |
-          NXPLX_BUILD=`printf '%(%y.%m.%d)T-alpha' -1` && docker build \
+          NXPLX_BUILD=`printf '%(%y.%m.%d)T' -1` && \
+          docker build \
             --build-arg "build=$NXPLX_BUILD" \
-            --output "type=image,push=false" \
-            --tag mrosenbjerg/nxplx-webapi:arm32v7 \
-            ./docker/gh-build/arm32v7
+            --build-arg BASE=arm32v7/alpine \
+            --build-arg DOTNET_RID=linux-musl-arm \
+            --build-arg TINI_BUILD=tini-static-armhf \
+            --tag mrosenbjerg/nxplx-webapi:arm64v8 \
+            -f docker/gh-build/Dockerfile \
+            .
       -
         name: Push new images
         run: |

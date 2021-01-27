@@ -1,32 +1,29 @@
-﻿FROM alpine AS gitCloner
-RUN apk --update --no-cache --quiet add git openssh
-WORKDIR /project
-RUN git clone https://github.com/rosenbjerg/NxPlx.git
-
-
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
+﻿FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
 WORKDIR /app
-COPY --from=gitCloner /project/NxPlx/nxplx-backend/ ./
-RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r linux-musl-x64 -o build
+COPY ./nxplx-backend/ ./
+ARG DOTNET_RID
+RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r $DOTNET_RID -o build
 
 
 FROM node:14-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
-COPY --from=gitCloner /project/NxPlx/nxplx-frontend/ ./
+COPY ./nxplx-frontend/ ./
 RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-FROM amd64/alpine AS runtime
+ARG BASE
+FROM $BASE AS runtime
 ARG build
-LABEL maintainer="Malte Rosenbjerg"
+LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
 RUN apk add --update --no-cache ffmpeg imagemagick icu-libs
 RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-ENV TINI_VERSION v0.19.0
-RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static && chmod +x /tini
+ARG TINI_VERSION=v0.19.0
+ARG TINI_BUILD
+RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BUILD} && chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--"]
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -37,4 +34,4 @@ ENV NXPLX_BUILD=$build
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
-CMD ["./NxPlx.ApplicationHost.Api"]
+CMD ["./NxPlx   .ApplicationHost.Api"]

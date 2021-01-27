@@ -25,12 +25,16 @@ LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
 RUN apk add --update --no-cache ffmpeg imagemagick icu-libs
 RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-WORKDIR /app
-COPY --from=backendBuilder /app/build ./
-COPY --from=frontendBuilder /app/build ./public/
-ENV NXPLX_BUILD=$build
-EXPOSE 5353
 ENV TINI_VERSION v0.19.0
 RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-static-arm64 && chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--"]
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+EXPOSE 5353
+ENV NXPLX_BUILD=$build
+WORKDIR /app
+COPY --from=backendBuilder /app/build ./
+COPY --from=frontendBuilder /app/build ./public/
 CMD ["./NxPlx.ApplicationHost.Api"]
