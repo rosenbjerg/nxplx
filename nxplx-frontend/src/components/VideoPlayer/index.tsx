@@ -16,6 +16,7 @@ interface Props {
     events: Events
     title: string
     poster: string
+    backdrop: string
     src: string
     subtitles: TextTrack[]
     startTime: number
@@ -94,13 +95,38 @@ export default class VideoPlayer extends Component<Props, State> {
             this.setState({ volume, muted });
         }
 
+        document.addEventListener('fullscreenchange', this.updateFullscreenState);
+        this.updateMediaSession();
+    }
+    componentWillUnmount() {
+        document.removeEventListener('fullscreenchange', this.updateFullscreenState);
+        if (window.navigator.mediaSession) window.navigator.mediaSession.setActionHandler("nexttrack", null);
     }
 
-    render({ poster, src, startTime, subtitles, title, playNext, duration, isSeries }: Props, { fullscreen, playing, volume, muted, currentTime, buffered, focused }: State) {
+    private updateFullscreenState = () => {
+        this.setState({ fullscreen: !!document.fullscreenElement });
+    }
+    private updateMediaSession() {
+        if (window.navigator.mediaSession) {
+            const absolutePosterUrl = `${window.location.protocol}//${window.location.host}${this.props.poster}`;
+            window.navigator.mediaSession.metadata = new MediaMetadata({
+                title: this.props.title,
+                artist: "NxPlx",
+                artwork: [
+                    { src: absolutePosterUrl, sizes: "192x270", type: "image/jpg" }
+                ]
+            });
+            window.navigator.mediaSession.setActionHandler("nexttrack", () => {
+                if (this.props.isSeries) this.props.playNext();
+            });
+        }
+    }
+
+    render({ backdrop, src, startTime, subtitles, title, playNext, duration, isSeries }: Props, { fullscreen, playing, volume, muted, currentTime, buffered, focused }: State) {
         setTimeout(() => this.videoContainer?.focus(), 0);
         const volumeIcon = !muted ? (volume > 0.50 ? 'volume_up' : (volume > 0.10 ? 'volume_down' : 'volume_mute')) : 'volume_off';
         return (
-            <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}`}>
+            <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
                 <span class={`${style.title} ${style.topControls}`}>{title}</span>
                 <div class={style.bottomControls}>
                     <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px; margin-bottom: 2px"}/>
@@ -135,7 +161,7 @@ export default class VideoPlayer extends Component<Props, State> {
                        class={style.video}
                        muted={muted}
                        autoPlay={autoplay}
-                       poster={poster}
+                       poster={backdrop}
                        controls={false}
                        onTimeUpdate={this.onTimeChange}
                        onVolumeChange={this.onVolumeChange}

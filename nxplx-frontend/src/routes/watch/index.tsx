@@ -31,7 +31,7 @@ interface State {
 
 export default class Watch extends Component<Props, State> {
     private videoEvents = CreateEventBroker();
-    private previousUnload?: any;
+    private previousUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
     private playerTime = 0;
     private suggestNext = true;
     private openSnackbar: Snackbar|null = null;
@@ -48,7 +48,8 @@ export default class Watch extends Component<Props, State> {
                     startTime={progress}
                     title={info.title}
                     src={`/api/stream/${info.filePath}`}
-                    poster={imageUrl(this.state.info!.backdropPath, 1280)}
+                    poster={imageUrl(this.state.info!.posterPath, 190)}
+                    backdrop={imageUrl(this.state.info!.backdropPath, 1280)}
                     playNext={this.tryPlayNext}
 
                     subtitles={info.subtitles.map(lang => ({
@@ -62,13 +63,13 @@ export default class Watch extends Component<Props, State> {
     }
 
     public componentWillUnmount(): void {
-        this.saveProgress();
+        this.saveProgress(false);
         window.onbeforeunload = this.previousUnload;
     }
 
     public componentDidMount(): void {
         this.previousUnload = window.onbeforeunload;
-        window.onbeforeunload = this.saveProgress;
+        window.onbeforeunload = () => this.saveProgress(false);
 
         this.videoEvents.subscribe<{ state: PlayerStates, time: number }>("state_changed", ({ time, state }) => {
             this.playerTime = time;
@@ -104,9 +105,9 @@ export default class Watch extends Component<Props, State> {
     }
 
     private tryPlayNext = () => {
-        http.getJson<NextEpisode>(`/api/series/file/${this.props.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
-            this.saveProgress();
-            if (this.openSnackbar) this.openSnackbar.destroy();
+        void http.getJson<NextEpisode>(`/api/series/file/${this.props.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
+            this.saveProgress(true);
+            if (this.openSnackbar) void this.openSnackbar.destroy();
             this.suggestNext = true;
             this.playerTime = 0;
             route(`/watch/${this.props.kind}/${next.fid}`);
@@ -116,7 +117,7 @@ export default class Watch extends Component<Props, State> {
     private load = () => {
         const { kind, fid } = this.props;
         this.suggestNext = kind === 'series';
-        Promise.all([
+        void Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
             http.get(`/api/subtitle/preference/${kind}/${fid}`).then(res => res.text()),
             http.getJson<number>(`/api/progress/${kind}/${fid}`)
@@ -127,10 +128,12 @@ export default class Watch extends Component<Props, State> {
         });
     };
 
-    private saveProgress = () => {
+    private saveProgress = (skipToEnd:boolean) => {
         if (this.state.info) {
-            if (this.playerTime > 5) {
-                http.put(`/api/progress/${this.props.kind}/${this.props.fid}?time=${this.playerTime}`);
+            if (skipToEnd) {
+                void http.put(`/api/progress/${this.props.kind}/${this.props.fid}?time=${this.state.info.duration * 0.98}`);
+            } else if (this.playerTime > 5) {
+                void http.put(`/api/progress/${this.props.kind}/${this.props.fid}?time=${this.playerTime}`);
             }
         }
     };
