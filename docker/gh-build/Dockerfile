@@ -14,7 +14,7 @@ RUN yarn build
 
 
 ARG BASE
-FROM $BASE AS runtime
+FROM ${BASE} AS runtime
 ARG build
 LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
