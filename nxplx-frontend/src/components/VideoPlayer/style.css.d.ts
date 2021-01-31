@@ -6,6 +6,7 @@ declare namespace StyleCssNamespace {
         focused: string;
         hover: string;
         loaded: string;
+        playing: string;
         range: string;
         title: string;
         topControls: string;
