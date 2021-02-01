@@ -34,7 +34,7 @@ jobs:
             --build-arg "build=$NXPLX_BUILD" \
             --build-arg BASE_IMAGE=amd64/alpine \
             --build-arg DOTNET_RID=linux-musl-x64 \
-            --build-arg TINI_BUILD=tini-static \
+            --build-arg TINI_BUILD=tini-static-amd64 \
             --tag mrosenbjerg/nxplx-webapi:amd64 \
             -f docker/gh-build/Dockerfile \
             .
