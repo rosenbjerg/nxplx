@@ -2,7 +2,6 @@
 
 namespace NxPlx.Application.Models.Events.Sessions
 {
-
     public class SessionQuery : IQuery<Session?>
     {
         public SessionQuery(string token)
