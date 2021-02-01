@@ -59,7 +59,7 @@ jobs:
             --build-arg BASE_IMAGE=arm32v7/alpine \
             --build-arg DOTNET_RID=linux-musl-arm \
             --build-arg TINI_BUILD=tini-static-armhf \
-            --tag mrosenbjerg/nxplx-webapi:arm64v8 \
+            --tag mrosenbjerg/nxplx-webapi:arm32v7 \
             -f docker/gh-build/Dockerfile \
             .
       -
