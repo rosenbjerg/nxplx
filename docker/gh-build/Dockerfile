@@ -12,9 +12,8 @@ COPY ./nxplx-frontend/ ./
 RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
-
 ARG BASE_IMAGE
-FROM $BASE_IMAGE AS runtime
+FROM $BASE_IMAGE
 ARG build
 LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
