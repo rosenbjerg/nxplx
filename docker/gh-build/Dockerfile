@@ -13,8 +13,8 @@ RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
 
-ARG BASE
-FROM ${BASE} AS runtime
+ARG BASE_IMAGE
+FROM $BASE_IMAGE AS runtime
 ARG build
 LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
