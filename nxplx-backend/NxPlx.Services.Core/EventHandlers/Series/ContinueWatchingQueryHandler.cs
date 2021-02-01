@@ -30,7 +30,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
             var progress = await _context.WatchingProgresses.AsNoTracking()
                 .Where(wp => wp.UserId == _operationContext.Session.UserId)
                 .OrderByDescending(wp => wp.LastWatched)
-                .Take(40).ToListAsync(cancellationToken);
+                .Take(25).ToListAsync(cancellationToken);
 
             var episodes = progress.Where(wp => wp.MediaType == MediaFileType.Series).ToDictionary(wp => wp.FileId);
             var film = progress.Where(wp => wp.MediaType == MediaFileType.Film).ToDictionary(wp => wp.FileId);
@@ -55,7 +55,7 @@ namespace NxPlx.Core.Services.EventHandlers.Series
 
         private static bool NotFinished((WatchingProgress wp, MediaFileBase fb) pair)
         {
-            return (pair.wp.Time / pair.fb.MediaDetails.Duration) < 0.96;
+            return (pair.wp.Time / pair.fb.MediaDetails.Duration) < 0.95;
         }
     }
 }
