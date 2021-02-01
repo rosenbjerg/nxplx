@@ -1,8 +1,14 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
+﻿ARG build
+ARG BASE_IMAGE
+ARG TINI_VERSION=v0.19.0
+ARG TINI_BUILD
+
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
 WORKDIR /app
 COPY ./nxplx-backend/ ./
 ARG DOTNET_RID
 RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r $DOTNET_RID -o build
+
 
 
 FROM node:14-alpine AS frontendBuilder
@@ -12,16 +18,14 @@ COPY ./nxplx-frontend/ ./
 RUN yarn install --frozen-lockfile --no-progress --silent
 RUN yarn build
 
-ARG BASE_IMAGE
-FROM $BASE_IMAGE
-ARG build
+
+
+FROM $BASE_IMAGE AS runtime
 LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
 RUN apk add --update --no-cache ffmpeg imagemagick icu-libs
 RUN apk add --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
-ARG TINI_VERSION=v0.19.0
-ARG TINI_BUILD
 RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BUILD} && chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--"]
 
