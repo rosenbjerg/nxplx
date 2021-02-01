@@ -37,4 +37,4 @@ ENV NXPLX_BUILD=$build
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
-CMD ["./NxPlx   .ApplicationHost.Api"]
+CMD ["./NxPlx.ApplicationHost.Api"]
