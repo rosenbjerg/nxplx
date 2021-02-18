@@ -3,10 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -15,9 +15,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class EditDetailsController : ControllerBase
     {
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly IApplicationEventDispatcher _eventDispatcher;
 
-        public EditDetailsController(IEventDispatcher eventDispatcher)
+        public EditDetailsController(IApplicationEventDispatcher eventDispatcher)
         {
             _eventDispatcher = eventDispatcher;
         }

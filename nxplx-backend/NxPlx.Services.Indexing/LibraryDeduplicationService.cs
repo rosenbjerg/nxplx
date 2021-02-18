@@ -5,8 +5,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Infrastructure.Database;
-using NxPlx.Models;
-using NxPlx.Models.Database;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.Database;
 
 namespace NxPlx.Services.Index
 {

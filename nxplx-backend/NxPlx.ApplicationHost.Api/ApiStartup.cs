@@ -15,17 +15,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.Application.Mapping;
+using NxPlx.Application.Services;
+using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
-using NxPlx.Core.Services;
-using NxPlx.Core.Services.Commands;
-using NxPlx.Core.Services.EventHandlers;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Services;
+using NxPlx.Domain.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
-using NxPlx.Models;
 using NxPlx.Infrastructure.Database;
+using NxPlx.Infrastructure.Events;
+using NxPlx.Infrastructure.Events.Handling;
 using NxPlx.Services.Index;
 using Serilog.Core;
 
@@ -53,7 +57,10 @@ namespace NxPlx.ApplicationHost.Api
             var optionsProvider = ConfigureOptions(services);
             
             services
-                .AddMvc()
+                .AddMvc(options =>
+                {
+                    options.Filters.Add<Send404WhenNull>();
+                })
                 .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
 
             services.AddJobProcessing(optionsProvider);
@@ -66,7 +73,7 @@ namespace NxPlx.ApplicationHost.Api
 
             services.AddApiDocumentation(optionsProvider);
             
-            services.AddAutoMapper(typeof(MappingAssemblyMarker));
+            services.AddAutoMapper(typeof(DtoProfile), typeof(TMDbProfile));
             
             var connectionStrings = optionsProvider.GetRequiredService<ConnectionStrings>();
             
@@ -79,9 +86,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton<ConnectionHub>();
             services.AddSingleton<IHttpSessionService, CookieSessionService>();
             services.AddSingleton<IRouteSessionTokenExtractor, RouteSessionTokenExtractor>();
-            services.AddSingleton<IDatabaseMapper, DatabaseMapper>();
             services.AddSingleton<ICacheClearer, RedisCacheClearer>();
-            services.AddSingleton<IDtoMapper, DtoMapper>();
             services.AddSingleton<IDetailsApi, TMDbApi>();
 
             services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
@@ -89,6 +94,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped<ConnectionAccepter, WebsocketConnectionAccepter>();
             services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             services.AddScoped<OperationContext>();
+            services.AddScoped<ReadOnlyDatabaseContext>();
             
             services.AddScoped<TempFileService>();
             services.AddScoped<LibraryCleanupService>();
@@ -96,7 +102,11 @@ namespace NxPlx.ApplicationHost.Api
             services.AddScoped<LibraryDeduplicationService>();
             services.AddScoped<FileAnalysisService>();
 
-            services.AddScoped<IEventDispatcher, EventDispatcher>();
+            services
+                .AddEventHandlingFramework()
+                .AddApplicationEventHandlers(typeof(Application.Services.AssemblyMarker))
+                .AddDomainEventHandlers(typeof(Domain.Services.AssemblyMarker));
+            
             services.Scan(scan => scan
                 .FromAssemblyOf<IEventHandler>()
                     .AddClasses(classes => classes.AssignableTo<IEventHandler>())
@@ -118,6 +128,7 @@ namespace NxPlx.ApplicationHost.Api
             app.UseMiddleware<LoggingEnrichingMiddleware>();
             app.UseMiddleware<ExceptionInterceptorMiddleware>();
             app.UseMiddleware<PerformanceInterceptorMiddleware>();
+            app.UseMiddleware<AuthenticationMiddleware>();
             app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             

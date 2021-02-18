@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Models;
+using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Services.Index
@@ -14,8 +14,10 @@ namespace NxPlx.Services.Index
         internal static Task<List<T>> GetUniqueNew<T>(this IEnumerable<T> entities, DatabaseContext databaseContext)
             where T : EntityBase
             => GetUniqueNew(entities, e => e.Id, databaseContext);
+
         internal static async Task<List<T>> GetUniqueNew<T, TKey>(this IEnumerable<T> entities, Expression<Func<T, TKey>> keySelector, DatabaseContext databaseContext)
             where T : class
+            where TKey : notnull
         {
             var keySelectorFunc = keySelector.Compile();
             var unique = GetUnique(entities, keySelectorFunc);
@@ -35,7 +37,7 @@ namespace NxPlx.Services.Index
         }
 
         private static List<T> GetUnique<T, TKey>(this IEnumerable<T> entities, Func<T, TKey> keySelector)
-            where T : class
+            where T : notnull
             where TKey : notnull
         {
             var unique = new Dictionary<TKey, T>();

@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
@@ -31,10 +30,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Services\NxPlx.Application.Services.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Services\NxPlx.Domain.Services.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Broadcasting\NxPlx.Infrastructure.Broadcasting.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
       <ProjectReference Include="..\NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj" />
-      <ProjectReference Include="..\NxPlx.Services.Core\NxPlx.Services.Core.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
     </ItemGroup>
 

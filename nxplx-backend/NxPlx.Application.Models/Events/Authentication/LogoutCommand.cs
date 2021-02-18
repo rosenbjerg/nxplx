@@ -1,6 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events.Authentication
+﻿using NxPlx.Infrastructure.Events.Events;
+
+namespace NxPlx.Application.Models.Events.Authentication
 {
-    public class LogoutCommand : ICommand<bool>
+    public class LogoutCommand : IApplicationEvent<bool>
     {
     }
 }

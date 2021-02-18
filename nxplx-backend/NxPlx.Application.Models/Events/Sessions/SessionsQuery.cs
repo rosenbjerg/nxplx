@@ -1,6 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events.Sessions
+﻿using NxPlx.Infrastructure.Events.Events;
+
+namespace NxPlx.Application.Models.Events.Sessions
 {
-    public class SessionsQuery : IQuery<SessionDto[]>
+    public class SessionsQuery : IDomainQuery<SessionDto[]>
     {
         public SessionsQuery(int userId)
         {

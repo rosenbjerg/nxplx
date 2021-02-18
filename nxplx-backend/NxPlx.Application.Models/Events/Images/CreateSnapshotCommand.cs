@@ -1,6 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events.Images
+﻿using NxPlx.Infrastructure.Events.Events;
+
+namespace NxPlx.Application.Models.Events.Images
 {
-    public class CreateSnapshotCommand : ICommand<string>
+    public class CreateSnapshotCommand : IApplicationCommand<string>
     {
         public CreateSnapshotCommand(string inputVideoFilePath, double seekPercentage, int width, int height)
         {

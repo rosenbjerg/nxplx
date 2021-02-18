@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NxPlx.Models;
-using NxPlx.Models.File;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Services.Index
 {

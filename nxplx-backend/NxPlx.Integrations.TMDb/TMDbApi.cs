@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -12,9 +13,9 @@ using NxPlx.Integrations.TMDb.Models.Movie;
 using NxPlx.Integrations.TMDb.Models.Search;
 using NxPlx.Integrations.TMDb.Models.Tv;
 using NxPlx.Integrations.TMDb.Models.TvSeason;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details.Search;
-using NxPlx.Models.Details.Series;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details.Search;
+using NxPlx.Domain.Models.Details.Series;
 using TokenBucket;
 
 namespace NxPlx.Integrations.TMDb
@@ -23,16 +24,16 @@ namespace NxPlx.Integrations.TMDb
     {
         private const string BaseUrl = "https://api.themoviedb.org/3";
         private const string CachePrefix = "TmdbCache";
-        private readonly TMDbMapper _mapper;
+        private readonly IMapper _mapper;
         
         public TMDbApi(
-            FolderOptions folderSettings,
             ApiKeyOptions apiKeySettings,
             IDistributedCache cachingService,
+            IMapper mapper,
             ILogger<TMDbApi> logger) 
-            : base(folderSettings.Images, cachingService, logger)
+            : base(cachingService, logger)
         {
-            _mapper = new TMDbMapper();
+            _mapper = mapper;
             Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKeySettings.TmdbKey}");
         }
 
@@ -76,8 +77,8 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<MovieResult>>(content);
-            if (tmdbObj == null) return new FilmResult[0];
-            return _mapper.Map<SearchResult<MovieResult>, FilmResult[]>(tmdbObj);
+            if (tmdbObj == null) return Array.Empty<FilmResult>();
+            return tmdbObj.results.Take(10).Select(res => _mapper.Map<MovieResult, FilmResult>(res)).ToArray();
         }
         
         public override async Task<SeriesResult[]> SearchTvShows(string name)
@@ -87,26 +88,24 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<SearchResult<TvShowResult>>(content);
-            if (tmdbObj == null) return new SeriesResult[0];
-            var mapped = _mapper.Map<SearchResult<TvShowResult>, SeriesResult[]>(tmdbObj);
-            
-            return mapped;
+            if (tmdbObj == null) return Array.Empty<SeriesResult>();
+            return tmdbObj.results.Take(10).Select(res => _mapper.Map<TvShowResult, SeriesResult>(res)).ToArray();
         }
 
-        public override async Task<NxPlx.Models.Details.Genre[]> FetchMovieGenres(string language)
+        public override async Task<Domain.Models.Details.Genre[]> FetchMovieGenres(string language)
         {
             var url = $"{BaseUrl}/genre/movie/list?language={language}";
             var content = await Fetch(url);
             var genreList = JsonConvert.DeserializeObject<GenreList>(content);
-            return _mapper.Map<Genre, NxPlx.Models.Details.Genre>(genreList.Genres).ToArray();
+            return genreList.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
         }
 
-        public override async Task<NxPlx.Models.Details.Genre[]> FetchTvGenres(string language)
+        public override async Task<Domain.Models.Details.Genre[]> FetchTvGenres(string language)
         {
             var url = $"{BaseUrl}/genre/tv/list?language={language}";
             var content = await Fetch(url);
             var genreList = JsonConvert.DeserializeObject<GenreList>(content);
-            return _mapper.Map<Genre, NxPlx.Models.Details.Genre>(genreList.Genres).ToArray();
+            return genreList.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
         }
 
         public override async Task<DbFilmDetails> FetchMovieDetails(int seriesId, string language)

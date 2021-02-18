@@ -1,8 +1,10 @@
-﻿using NxPlx.Models;
+﻿using System.Threading.Tasks;
+using NxPlx.Infrastructure.Events.Events;
+using NxPlx.Domain.Models;
 
 namespace NxPlx.Application.Models.Events.Images
 {
-    public class SetImageCommand<TImageOwner> : ICommand
+    public class SetImageCommand<TImageOwner> : IApplicationCommand<Task>
         where TImageOwner : IImageOwner
     {
         public SetImageCommand(TImageOwner imageOwner, string inputFilepath, string outputFilename)

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models.Events.Sessions;
-using NxPlx.Core.Services;
+using NxPlx.Application.Services;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Authentication
 {
@@ -11,9 +12,9 @@ namespace NxPlx.ApplicationHost.Api.Authentication
     {
         private readonly OperationContext _operationContext;
         private readonly IRouteSessionTokenExtractor _routeSessionTokenExtractor;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public RouteSessionAuthenticationFilter(OperationContext operationContext, IRouteSessionTokenExtractor routeSessionTokenExtractor, IEventDispatcher dispatcher)
+        public RouteSessionAuthenticationFilter(OperationContext operationContext, IRouteSessionTokenExtractor routeSessionTokenExtractor, IApplicationEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
             _routeSessionTokenExtractor = routeSessionTokenExtractor;

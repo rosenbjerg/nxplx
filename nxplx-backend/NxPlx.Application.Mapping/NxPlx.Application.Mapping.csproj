@@ -10,7 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
     </ItemGroup>
 
 </Project>

@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,7 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
-      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,9 +1,10 @@
-﻿using NxPlx.Models;
+﻿using NxPlx.Infrastructure.Events.Events;
+using NxPlx.Domain.Models;
 
 namespace NxPlx.Application.Models.Events.Sessions
 {
 
-    public class SessionQuery : IQuery<Session?>
+    public class SessionQuery : IDomainQuery<Session?>
     {
         public SessionQuery(string token)
         {

@@ -2,13 +2,14 @@
 using AutoMapper;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Film;
+using NxPlx.Application.Models.Jobs;
 using NxPlx.Application.Models.Series;
-using NxPlx.Models;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
-using NxPlx.Models.File;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details;
+using NxPlx.Domain.Models.Details.Film;
+using NxPlx.Domain.Models.Details.Series;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Application.Mapping
 {
@@ -75,7 +76,16 @@ namespace NxPlx.Application.Mapping
 
             CreateMap<EpisodeFile, NextEpisodeDto>()
                 .ForMember(dst => dst.Fid, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2}"));
+                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2} - {src.SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == src.SeasonNumber).Episodes.FirstOrDefault(e => e.EpisodeNumber == src.EpisodeNumber).Name}"));
+            
+            CreateMap<EpisodeFile, InfoDto>()
+                .ForMember(dst => dst.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
+                .ForMember(dst => dst.BackdropPath, opt => opt.MapFrom(src => src.SeriesDetails.BackdropPath))
+                .ForMember(dst => dst.BackdropBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.BackdropBlurHash))
+                .ForMember(dst => dst.PosterPath, opt => opt.MapFrom(src => src.SeriesDetails.PosterPath))
+                .ForMember(dst => dst.PosterBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.PosterBlurHash))
+                .ForMember(dst => dst.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(sub => sub.Language)))
+                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2} - {src.SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == src.SeasonNumber).Episodes.FirstOrDefault(e => e.EpisodeNumber == src.EpisodeNumber).Name}"));
 
             CreateMap<FilmFile, InfoDto>()
                 .ForMember(dto => dto.PosterPath, opt => opt.MapFrom(src => src.FilmDetails.PosterPath))

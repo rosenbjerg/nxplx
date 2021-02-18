@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Models;
+using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Services.Index

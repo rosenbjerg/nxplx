@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Services.EventHandlers;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Domain.Events;
+using NxPlx.Domain.Events.Library;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -13,19 +17,27 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class OverviewController : ControllerBase
     {
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public OverviewController(IEventDispatcher dispatcher)
+        public OverviewController(IApplicationEventDispatcher dispatcher)
         {
             _dispatcher = dispatcher;
         }
 
         [HttpGet("")]
         public Task<IEnumerable<OverviewElementDto>> GetOverview()
-            => _dispatcher.Dispatch(new MediaOverviewQuery());
+        {
+            Func<MediaOverviewQuery, Task<string>> cacheKeyGenerator = async _ =>
+            {
+                var libs = await _dispatcher.Dispatch(new CurrentUserLibraryAccessQuery());
+                return "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
+            };
+            var @event = new CachedEventCommand<MediaOverviewQuery, IEnumerable<OverviewElementDto>>(cacheKeyGenerator, new MediaOverviewQuery());
+            return _dispatcher.Dispatch(@event);
+        }
 
         [HttpGet("genres")]
         public Task<IEnumerable<GenreDto>> GetGenres()
-            => _dispatcher.Dispatch(new GenreOverviewQuery());
+            => _dispatcher.Dispatch(new CachedEventCommand<GenreOverviewQuery, IEnumerable<GenreDto>>("OVERVIEW:GENRES", new GenreOverviewQuery()));
     }
 }

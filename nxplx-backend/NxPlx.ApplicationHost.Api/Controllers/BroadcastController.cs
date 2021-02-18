@@ -38,7 +38,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
 
         [HttpGet("online")]
-        [RequiresAdminPermissions]
+        [AdminOnly]
         public Task<List<string>> ListOnline()
         {
             var ids = _connectionHub.ConnectedIds();

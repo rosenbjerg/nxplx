@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events.Film;
 using NxPlx.Application.Models.Film;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Domain.Events.Film;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -14,16 +14,16 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class FilmController : ControllerBase
     {
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly IApplicationEventDispatcher _eventDispatcher;
 
-        public FilmController(IEventDispatcher eventDispatcher)
+        public FilmController(IApplicationEventDispatcher eventDispatcher)
         {
             _eventDispatcher = eventDispatcher;
         }
 
         [HttpGet("{fileId}/info")]
         [Send404WhenNull]
-        public Task<InfoDto?> FileInfo([FromRoute, Required] int fileId) 
+        public Task<InfoDto> FileInfo([FromRoute, Required] int fileId) 
             => _eventDispatcher.Dispatch(new FilmInfoLookupQuery(fileId));
 
         [HttpGet("{filmId}/details")]

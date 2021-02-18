@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using NxPlx.Application.Core;
+using NxPlx.Abstractions;
 
 namespace NxPlx.Infrastructure.Broadcasting
 {

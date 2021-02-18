@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 
 namespace NxPlx.Infrastructure.Broadcasting

@@ -1,6 +1,5 @@
 ﻿using System;
 using Hangfire;
-using Hangfire.Dashboard.BasicAuthorization;
 using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;

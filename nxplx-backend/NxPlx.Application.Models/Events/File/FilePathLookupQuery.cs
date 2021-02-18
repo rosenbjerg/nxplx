@@ -1,6 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events.File
+﻿using NxPlx.Infrastructure.Events.Events;
+
+namespace NxPlx.Application.Models.Events.File
 {
-    public class FilePathLookupQuery : IQuery<string?>
+    public class FilePathLookupQuery : IDomainQuery<string?>
     {
         public FilePathLookupQuery(StreamKind streamKind, long id)
         {

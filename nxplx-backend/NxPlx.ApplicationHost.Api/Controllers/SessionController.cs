@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
+using NxPlx.Abstractions;
 using NxPlx.Application.Models;
 using NxPlx.Application.Models.Events.Sessions;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -14,9 +15,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class SessionController : ControllerBase
     {
         private readonly IOperationContext _operationContext;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public SessionController(IOperationContext operationContext, IEventDispatcher dispatcher)
+        public SessionController(IOperationContext operationContext, IApplicationEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
             _dispatcher = dispatcher;
@@ -27,7 +28,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             => _dispatcher.Dispatch(new SessionsQuery(_operationContext.Session.UserId));
 
         [HttpGet("{userId}")]
-        [RequiresAdminPermissions]
+        [AdminOnly]
         public Task<SessionDto[]> GetUserSessions([FromRoute, Required]int userId)
             => _dispatcher.Dispatch(new SessionsQuery(userId));
     }

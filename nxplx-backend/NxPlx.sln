@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Database", "NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj", "{EEDF876C-DDE3-48C2-8B05-9EB312705ED8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Models", "NxPlx.Models\NxPlx.Models.csproj", "{92CA0DD6-FC93-4263-8CE1-C9201B6F86BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Models", "NxPlx.Domain.Models\NxPlx.Domain.Models.csproj", "{92CA0DD6-FC93-4263-8CE1-C9201B6F86BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Indexing", "NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj", "{E056F05E-69B2-4B52-BCFD-074AC70B589D}"
 EndProject
@@ -12,8 +12,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Broadc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.TMDb", "NxPlx.Integrations.TMDb\NxPlx.Integrations.TMDb.csproj", "{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Services.Core", "NxPlx.Services.Core\NxPlx.Services.Core.csproj", "{2F945733-6917-4CF8-8228-F7356198C37E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.ApplicationHost.Api", "NxPlx.ApplicationHost.Api\NxPlx.ApplicationHost.Api.csproj", "{31583ED4-5CFA-44A3-B810-7EAE7F954F02}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Core", "NxPlx.Application.Core\NxPlx.Application.Core.csproj", "{E4C53733-D53F-4B39-BEF9-A5D96714F4DA}"
@@ -21,6 +19,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Mapping", "NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj", "{CF4DA1CD-A303-49C4-9DE2-446856334A74}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Test.UnitTests", "NxPlx.Test.UnitTests\NxPlx.Test.UnitTests.csproj", "{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Infrastructure.Events", "NxPlx.Infrastructure.Events\NxPlx.Infrastructure.Events.csproj", "{4D9A1B9F-3F2E-4B41-AFED-97BAB0D5D00C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Abstractions", "NxPlx.Abstractions\NxPlx.Abstractions.csproj", "{77AB0D7E-978D-4838-AEE3-A86D412970B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Services", "NxPlx.Application.Services\NxPlx.Application.Services.csproj", "{B77B17C5-9C49-41D4-A7BB-C6FDCF9CD6FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Services", "NxPlx.Domain.Services\NxPlx.Domain.Services.csproj", "{0C4C5235-8D07-4638-9F08-53896D3C7430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Events", "NxPlx.Domain.Events\NxPlx.Domain.Events.csproj", "{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,10 +60,6 @@ Global
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C66555F7-87AD-4EAF-9EF4-84331EF01F8C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F945733-6917-4CF8-8228-F7356198C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F945733-6917-4CF8-8228-F7356198C37E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{31583ED4-5CFA-44A3-B810-7EAE7F954F02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{31583ED4-5CFA-44A3-B810-7EAE7F954F02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31583ED4-5CFA-44A3-B810-7EAE7F954F02}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -72,5 +76,25 @@ Global
 		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E31F3DB5-4A6A-4D24-8518-44CABCDD709E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D9A1B9F-3F2E-4B41-AFED-97BAB0D5D00C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D9A1B9F-3F2E-4B41-AFED-97BAB0D5D00C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D9A1B9F-3F2E-4B41-AFED-97BAB0D5D00C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D9A1B9F-3F2E-4B41-AFED-97BAB0D5D00C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77AB0D7E-978D-4838-AEE3-A86D412970B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77AB0D7E-978D-4838-AEE3-A86D412970B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77AB0D7E-978D-4838-AEE3-A86D412970B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77AB0D7E-978D-4838-AEE3-A86D412970B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B77B17C5-9C49-41D4-A7BB-C6FDCF9CD6FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B77B17C5-9C49-41D4-A7BB-C6FDCF9CD6FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B77B17C5-9C49-41D4-A7BB-C6FDCF9CD6FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B77B17C5-9C49-41D4-A7BB-C6FDCF9CD6FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C4C5235-8D07-4638-9F08-53896D3C7430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C4C5235-8D07-4638-9F08-53896D3C7430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C4C5235-8D07-4638-9F08-53896D3C7430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C4C5235-8D07-4638-9F08-53896D3C7430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

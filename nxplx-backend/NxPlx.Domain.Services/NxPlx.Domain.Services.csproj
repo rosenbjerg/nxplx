@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Domain.Events\NxPlx.Domain.Events.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Events\NxPlx.Infrastructure.Events.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper" Version="10.1.1" />
+      <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
+    </ItemGroup>
+
+</Project>

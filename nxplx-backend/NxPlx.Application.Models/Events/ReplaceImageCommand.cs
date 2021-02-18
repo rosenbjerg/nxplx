@@ -1,8 +1,9 @@
 ﻿using System.IO;
+using NxPlx.Infrastructure.Events.Events;
 
 namespace NxPlx.Application.Models.Events
 {
-    public class ReplaceImageCommand : ICommand<bool>
+    public class ReplaceImageCommand : IApplicationCommand<bool>
     {
         public ReplaceImageCommand(DetailsType detailsType, int detailsId, ImageType imageType, string imageExtension, Stream imageStream)
         {

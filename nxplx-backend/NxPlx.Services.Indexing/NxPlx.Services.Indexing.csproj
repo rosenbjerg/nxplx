@@ -1,22 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>NxPlx.Services.Index</RootNamespace>
-        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Application.Services\NxPlx.Application.Services.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
-      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Services.Core\NxPlx.Services.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
       <PackageReference Include="Hangfire.Core" Version="1.7.19" />
-      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.15" />
     </ItemGroup>
 
 </Project>

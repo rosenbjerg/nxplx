@@ -1,4 +1,4 @@
-﻿namespace NxPlx.Application.Models
+﻿namespace NxPlx.Application.Models.Jobs
 {
     public class JobQueueDto<TJobDto>
         where TJobDto : JobDto

@@ -1,9 +1,11 @@
 ﻿using System;
-using NxPlx.Models;
+using System.Threading.Tasks;
+using NxPlx.Infrastructure.Events.Events;
+using NxPlx.Domain.Models;
 
 namespace NxPlx.Application.Models.Events.Sessions
 {
-    public class CreateSessionCommand : ICommand
+    public class CreateSessionCommand : IApplicationCommand<Task>
     {
         public CreateSessionCommand(int userId, string token, Session session, TimeSpan validity)
         {

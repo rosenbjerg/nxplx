@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 
 namespace NxPlx.Infrastructure.Broadcasting

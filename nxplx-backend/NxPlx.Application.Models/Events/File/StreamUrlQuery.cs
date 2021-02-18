@@ -1,6 +1,8 @@
-﻿namespace NxPlx.Application.Models.Events.File
+﻿using NxPlx.Infrastructure.Events.Events;
+
+namespace NxPlx.Application.Models.Events.File
 {
-    public class StreamUrlQuery : ICommand<string>
+    public class StreamUrlQuery : IDomainQuery<string>
     {
         public StreamKind StreamKind { get; }
         public long MediaFileId { get; }
