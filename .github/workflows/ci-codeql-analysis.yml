@@ -43,6 +43,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      
+    - name: Cancel outdated workflow-runs
+      uses: fkirc/skip-duplicate-actions@master
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

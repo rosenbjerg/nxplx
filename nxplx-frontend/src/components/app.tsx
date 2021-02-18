@@ -36,7 +36,6 @@ function MakeLazy(importer: () => Promise<{ default: any }>): FunctionalComponen
 }
 
 const Admin = MakeLazy(() => import("../routes/admin"));
-const Jobs = MakeLazy(() => import("../routes/jobs"));
 const Profile = MakeLazy(() => import("../routes/profile"));
 const Watch = MakeLazy(() => import("../routes/watch"));
 
@@ -54,7 +53,6 @@ export default class App extends Component {
                         <Route path="/series/:id" component={Series}/>
                         <Route path="/series/:id/:season" component={Season}/>
                         <Route path="/admin" component={Admin}/>
-                        <Route path="/jobs" component={Jobs}/>
                         <Route path="/profile" component={Profile}/>
                         <Route path="/watch/:kind/:fid" component={Watch}/>
                     </Router>
@@ -64,8 +62,8 @@ export default class App extends Component {
     }
 
     public componentDidMount() {
-        setLocale(Store.local.getEntry("locale", "en"));
-        this.checkLoggedIn();
+        void setLocale(Store.local.getEntry("locale", "en"));
+        void this.checkLoggedIn();
         store.subscribe(state => {
             if (!state.build && state.isLoggedIn) {
                 this.loadBuild();
@@ -75,7 +73,7 @@ export default class App extends Component {
     }
 
     private loadBuild() {
-        http.get("/api/build")
+        void http.get("/api/build")
             .then(response => response.text())
             .then(text => store.setState({ build: text }));
     }
@@ -83,7 +81,7 @@ export default class App extends Component {
     private checkLoggedIn = async () => {
         const response = await http.get("/api/authentication/verify");
         if (response.ok) {
-            const isAdmin = await response.json();
+            const isAdmin: boolean = await response.json();
             store.setState({ isLoggedIn: true, isAdmin });
             if (location.pathname === "/login") {
                 route("/", true);
