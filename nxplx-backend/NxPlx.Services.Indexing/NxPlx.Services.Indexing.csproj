@@ -16,7 +16,7 @@
     <ItemGroup>
       <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
       <PackageReference Include="Hangfire.Core" Version="1.7.19" />
-      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.15" />
+      <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="5.1.28" />
     </ItemGroup>
 
 </Project>
