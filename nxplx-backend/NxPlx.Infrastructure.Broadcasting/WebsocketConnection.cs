@@ -13,11 +13,13 @@ namespace NxPlx.Infrastructure.Broadcasting
     public class WebsocketConnection : Connection
     {
         private readonly HttpContext _httpContext;
+        private readonly IOperationContext _operationContext;
         private WebSocket? _websocket;
 
         public WebsocketConnection(HttpContext httpContext, IOperationContext operationContext) : base(operationContext)
         {
             _httpContext = httpContext;
+            _operationContext = operationContext;
         }
 
         public override Task SendMessage(Message message)
@@ -36,7 +38,7 @@ namespace NxPlx.Infrastructure.Broadcasting
                 _websocket = await _httpContext.WebSockets.AcceptWebSocketAsync();
             
                 var buffer = ArrayPool<byte>.Shared.Rent(4096);
-                while (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open)
+                while (!_operationContext.OperationCancelled.IsCancellationRequested && (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open))
                 {
                     WebSocketReceiveResult message;
                     try

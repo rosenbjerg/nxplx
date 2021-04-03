@@ -1,15 +1,15 @@
 
-function getEntry(store: any, key:string, defaultValue:any = '') {
+function getEntry<T>(store:Storage, key:string, defaultValue:T | string = ''): string | T {
     const stored = store.getItem(key);
     return (stored !== null) ? stored : defaultValue;
 }
-function setEntry(store: any, key:string, value:any) {
+function setEntry(store:Storage, key:string, value:any) {
     store.setItem(key, value);
 }
 
 function makeStore(store: Storage) {
     return {
-        getEntry(key:string, defaultValue:any = '') {
+        getEntry<T>(key:string, defaultValue:T | string = '') {
             return getEntry(store, key, defaultValue);
         },
         getBooleanEntry(key:string) {

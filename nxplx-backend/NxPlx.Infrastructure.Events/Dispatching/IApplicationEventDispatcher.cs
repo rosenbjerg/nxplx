@@ -11,4 +11,11 @@ namespace NxPlx.Infrastructure.Events.Dispatching
 
         public Task<TResult> Dispatch<TResult>(IEvent<TResult> @event, IServiceProvider? serviceProvider = null);
     }
+    public interface ICachingEventDispatcher
+    {
+        public Task Dispatch<TCommand>(TCommand @event, IServiceProvider? serviceProvider = null)
+            where TCommand : IEvent<Task>;
+
+        public Task<TResult> Dispatch<TResult>(IEvent<TResult> @event, IServiceProvider? serviceProvider = null);
+    }
 }

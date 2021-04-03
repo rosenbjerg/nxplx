@@ -1,4 +1,4 @@
-.subtitles {
+.select {
     font-size: 16pt;
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
     color: #e0e0e0;
@@ -9,7 +9,7 @@
     overflow: hidden;
     margin-left: -5px;
 }
-.subtitles option {
+.select option {
     background: rgba(0, 0, 0, 0.7);
     overflow: hidden;
 }

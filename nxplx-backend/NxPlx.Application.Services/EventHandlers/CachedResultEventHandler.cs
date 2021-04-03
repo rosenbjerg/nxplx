@@ -25,7 +25,7 @@ namespace NxPlx.Application.Services.EventHandlers
         public Func<TEvent, Task<string>> CacheKeyGenerator { get; }
         public TEvent Event { get; }
     }
-    public class CachedEventHandler<TEvent, TResult> : IApplicationEventHandler<CachedEventCommand<TEvent, TResult>, TResult>
+    public class CachedEventHandler<TResult> : IApplicationEventHandler<CachedEventCommand<IEvent<TResult>, TResult>, TResult>
         where TResult : class, new()
     {
         private readonly IDistributedCache _distributedCache;

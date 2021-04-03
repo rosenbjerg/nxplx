@@ -103,10 +103,7 @@ namespace NxPlx.ApplicationHost.Api
                 .AddDomainEventHandlers(typeof(Domain.Services.AssemblyMarker));
             
             services.Scan(scan => scan
-                .FromAssemblyOf<IEventHandler>()
-                    .AddClasses(classes => classes.AssignableTo<IEventHandler>())
-                        .AsImplementedInterfaces()
-                        .WithScopedLifetime()
+                .FromAssemblyOf<CommandBase>()
                     .AddClasses(classes => classes.AssignableTo<CommandBase>())
                         .AsSelf()
                         .WithScopedLifetime()
