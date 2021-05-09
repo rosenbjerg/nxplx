@@ -1,57 +1,13 @@
 version: 2
 updates:
+
 - package-ecosystem: nuget
   directory: "/nxplx-backend"
   schedule:
     interval: daily
     time: "04:00"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: Z.EntityFramework.Plus.EFCore
-    versions:
-    - 5.1.16
-    - 5.1.17
-    - 5.1.19
-    - 5.1.23
-    - 5.1.24
-    - 5.1.25
-    - 5.1.26
-    - 5.1.27
-    - 5.1.28
-    - 5.1.29
-    - 5.1.30
-    - 5.1.31
-  - dependency-name: Swashbuckle.AspNetCore
-    versions:
-    - 6.0.2
-    - 6.0.4
-    - 6.0.5
-    - 6.0.7
-    - 6.1.0
-    - 6.1.1
-    - 6.1.2
-  - dependency-name: Microsoft.EntityFrameworkCore.Design
-    versions:
-    - 5.0.3
-    - 5.0.4
-  - dependency-name: Microsoft.AspNetCore.SpaServices.Extensions
-    versions:
-    - 5.0.3
-    - 5.0.4
-  - dependency-name: Microsoft.EntityFrameworkCore.InMemory
-    versions:
-    - 5.0.3
-    - 5.0.4
-  - dependency-name: FFMpegCore
-    versions:
-    - 3.4.0
-    - 4.0.0
-  - dependency-name: System.Drawing.Common
-    versions:
-    - 5.0.1
-  - dependency-name: NUnit
-    versions:
-    - 3.13.1
+  
 - package-ecosystem: npm
   directory: "/nxplx-frontend"
   schedule:
@@ -59,32 +15,3 @@ updates:
     time: "04:00"
   open-pull-requests-limit: 10
   versioning-strategy: lockfile-only
-  ignore:
-  - dependency-name: eslint
-    versions:
-    - 7.19.0
-    - 7.20.0
-    - 7.21.0
-    - 7.22.0
-    - 7.23.0
-    - 7.24.0
-  - dependency-name: ua-parser-js
-    versions:
-    - 0.7.24
-    - 0.7.25
-    - 0.7.26
-    - 0.7.27
-  - dependency-name: preact-render-to-string
-    versions:
-    - 5.1.13
-    - 5.1.14
-    - 5.1.15
-    - 5.1.16
-    - 5.1.17
-    - 5.1.18
-  - dependency-name: eslint-plugin-react
-    versions:
-    - 7.23.1
-  - dependency-name: typescript
-    versions:
-    - 3.9.8
