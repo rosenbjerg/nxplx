@@ -85,7 +85,8 @@ namespace NxPlx.Application.Mapping
                 .ForMember(dst => dst.PosterPath, opt => opt.MapFrom(src => src.SeriesDetails.PosterPath))
                 .ForMember(dst => dst.PosterBlurHash, opt => opt.MapFrom(src => src.SeriesDetails.PosterBlurHash))
                 .ForMember(dst => dst.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(sub => sub.Language)))
-                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2} - {src.SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == src.SeasonNumber).Episodes.FirstOrDefault(e => e.EpisodeNumber == src.EpisodeNumber).Name}"));
+                .ForMember(dst => dst.Title, opt => opt.MapFrom(src => $"{src.SeriesDetails.Name} - S{src.SeasonNumber:D2}E{src.EpisodeNumber:D2} - {src.SeriesDetails.Seasons.FirstOrDefault(s => s.SeasonNumber == src.SeasonNumber).Episodes.FirstOrDefault(e => e.EpisodeNumber == src.EpisodeNumber).Name}"))
+                .ForMember(dto => dto.FilePath, opt => opt.Ignore());
 
             CreateMap<FilmFile, InfoDto>()
                 .ForMember(dto => dto.PosterPath, opt => opt.MapFrom(src => src.FilmDetails.PosterPath))
