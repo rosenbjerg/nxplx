@@ -9,7 +9,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [Route("api/indexing")]
     [ApiController]
     [SessionAuthentication]
-    [RequiresAdminPermissions]
+    [AdminOnly]
     public class IndexingController : ControllerBase
     {
         private readonly IIndexer _indexer;

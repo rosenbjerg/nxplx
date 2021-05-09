@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Images;
-using NxPlx.Core.Services;
-using NxPlx.Models;
+using NxPlx.Application.Events.Images;
+using NxPlx.Application.Services;
+using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Database;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.Services.Index
 {
@@ -18,9 +19,9 @@ namespace NxPlx.Services.Index
         private readonly DatabaseContext _context;
         private readonly IDetailsApi _detailsApi;
         private readonly TempFileService _tempFileService;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IEventDispatcher dispatcher)
+        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IApplicationEventDispatcher dispatcher)
         {
             _context = context;
             _detailsApi = detailsApi;

@@ -1,14 +1,15 @@
 using System.Threading.Tasks;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Series;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details;
+using NxPlx.Domain.Models.Details.Series;
+using NxPlx.Domain.Models.Details.Search;
 
 namespace NxPlx.Application.Core
 {
     public interface IDetailsApi
     {
-        Task<NxPlx.Models.Details.Search.FilmResult[]> SearchMovies(string title, int year);
-        Task<NxPlx.Models.Details.Search.SeriesResult[]> SearchTvShows(string name);
+        Task<FilmResult[]> SearchMovies(string title, int year);
+        Task<SeriesResult[]> SearchTvShows(string name);
 
         Task<Genre[]> FetchMovieGenres(string language);
         Task<Genre[]> FetchTvGenres(string language);

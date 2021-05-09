@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Sessions;
-using NxPlx.Core.Services;
+using NxPlx.Application.Services;
+using NxPlx.Domain.Events.Sessions;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Authentication
 {
@@ -11,9 +12,9 @@ namespace NxPlx.ApplicationHost.Api.Authentication
     {
         private readonly OperationContext _operationContext;
         private readonly IHttpSessionService _httpSessionService;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public SessionAuthenticationFilter(OperationContext operationContext, IHttpSessionService httpSessionService, IEventDispatcher dispatcher)
+        public SessionAuthenticationFilter(OperationContext operationContext, IHttpSessionService httpSessionService, IApplicationEventDispatcher dispatcher)
         {
             _operationContext = operationContext;
             _httpSessionService = httpSessionService;

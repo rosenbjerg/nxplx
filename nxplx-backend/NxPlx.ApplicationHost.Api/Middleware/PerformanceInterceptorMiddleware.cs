@@ -23,7 +23,6 @@ namespace NxPlx.ApplicationHost.Api.Middleware
             await _next(context);
             var elapsedMs = DateTime.UtcNow.Subtract(startTime).TotalMilliseconds;
             RequestServed(logger, context.Request.Path, elapsedMs, null);
-            // logger.LogInformation("Request to {Path} took {ElapsedMs}ms", context.Request.Path, elapsedMs);
         }
     }
 }

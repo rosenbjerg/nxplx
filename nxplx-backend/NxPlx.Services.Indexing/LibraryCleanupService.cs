@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Infrastructure.Database;
-using Z.EntityFramework.Plus;
 
 namespace NxPlx.Services.Index
 {
@@ -32,10 +31,11 @@ namespace NxPlx.Services.Index
             {
                 await RemoveWatchingProgress(deletedIds);
                 await RemoveSubtitlePreferences(deletedIds);
-                var deleted = await _databaseContext.FilmFiles.Where(f => deletedIds.Contains(f.Id)).DeleteAsync();
+                var toDelete = await _databaseContext.FilmFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
+                _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
                 await _cacheClearer.Clear("OVERVIEW");
-                _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
+                _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }
         
@@ -48,10 +48,11 @@ namespace NxPlx.Services.Index
             {
                 await RemoveWatchingProgress(deletedIds);
                 await RemoveSubtitlePreferences(deletedIds);
-                var deleted = await _databaseContext.EpisodeFiles.Where(f => deletedIds.Contains(f.Id)).DeleteAsync();
+                var toDelete = await _databaseContext.EpisodeFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
+                _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
                 await _cacheClearer.Clear("OVERVIEW");
-                _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", deleted, libraryId);
+                _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }
         

@@ -1,6 +1,6 @@
 import {Component, h} from "preact";
 import http from "../../utils/http";
-import * as style from "./style.css";
+import Select from "../Select";
 
 interface Props { kind:'film'|'series', file_id:string }
 
@@ -30,8 +30,7 @@ export function formatSubtitleName(name:string) : string {
 export default class SubtitleSelector extends Component<Props, State> {
 
     public componentDidMount(): void {
-        http.get(`/api/subtitle/languages/${this.props.kind}/${this.props.file_id}`)
-            .then(response => response.json())
+        http.getJson<string[]>(`/api/subtitle/languages/${this.props.kind}/${this.props.file_id}`)
             .then(langs => this.setState({languages: langs}));
 
         http.get(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`)
@@ -44,17 +43,17 @@ export default class SubtitleSelector extends Component<Props, State> {
             return "None"
         }
         return (
-            <select value={state.selected} class={style.subtitles} name="Subtitles" onInput={this.setSubtitle}>
-                <option value="none">none</option>
-                {state.languages.map(lang => (<option value={lang}>{formatSubtitleName(lang)}</option>))}
-            </select>
+            <Select
+                selected={state.selected}
+                name="Subtitles"
+                onInput={this.setSubtitle}
+                defaultOption={{ value: "none", displayValue: "None" }}
+                options={state.languages.map(lang => ({ value: lang, displayValue: formatSubtitleName(lang) }))}
+            />
         );
     }
 
-    private setSubtitle = (event:Event) => {
-        // @ts-ignore
-        const lang = event.target.value;
-        if (!lang) { return; }
-        http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, lang);
+    private setSubtitle = (selected: string) => {
+        void http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, selected);
     }
 }
