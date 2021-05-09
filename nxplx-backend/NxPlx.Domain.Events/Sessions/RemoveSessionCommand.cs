@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Sessions
+namespace NxPlx.Domain.Events.Sessions
 {
     public class RemoveSessionCommand : IDomainCommand<Task>
     {

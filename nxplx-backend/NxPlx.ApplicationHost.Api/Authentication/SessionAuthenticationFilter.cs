@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Sessions;
 using NxPlx.Application.Services;
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Authentication

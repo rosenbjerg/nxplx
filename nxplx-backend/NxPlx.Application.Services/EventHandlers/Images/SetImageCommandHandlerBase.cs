@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using BlurHashSharp.Drawing;
 using Instances;
 using NxPlx.Application.Core.Options;
-using NxPlx.Application.Models.Events.Images;
+using NxPlx.Application.Events.Images;
 using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Events.Handling;
 

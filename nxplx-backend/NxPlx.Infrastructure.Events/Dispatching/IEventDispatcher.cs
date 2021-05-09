@@ -8,6 +8,8 @@ namespace NxPlx.Infrastructure.Events.Dispatching
     {
         Task Dispatch<TCommand>(TCommand @event, IServiceProvider? serviceProvider = null)
             where TCommand : IEvent<Task>;
+        
         Task<TResult> Dispatch<TResult>(IEvent<TResult> @event, IServiceProvider? serviceProvider = null);
+        
     }
 }

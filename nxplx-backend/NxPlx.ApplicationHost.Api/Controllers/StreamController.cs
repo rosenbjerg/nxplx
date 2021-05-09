@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Events;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events;
-using NxPlx.Application.Models.Events.File;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Domain.Events.File;
+using NxPlx.Domain.Models.File;
 using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers

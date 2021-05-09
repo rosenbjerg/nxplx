@@ -1,6 +1,7 @@
-﻿using NxPlx.Infrastructure.Events.Events;
+﻿using NxPlx.Application.Models;
+using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Sessions
+namespace NxPlx.Domain.Events.Sessions
 {
     public class SessionsQuery : IDomainQuery<SessionDto[]>
     {

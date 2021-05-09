@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using NxPlx.Infrastructure.Events.Events;
 using NxPlx.Domain.Models;
+using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Images
+namespace NxPlx.Application.Events.Images
 {
     public class SetImageCommand<TImageOwner> : IApplicationCommand<Task>
         where TImageOwner : IImageOwner

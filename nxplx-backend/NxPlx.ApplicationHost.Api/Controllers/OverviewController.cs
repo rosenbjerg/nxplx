@@ -9,6 +9,7 @@ using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Domain.Events;
 using NxPlx.Domain.Events.Library;
 using NxPlx.Infrastructure.Events.Dispatching;
+using NxPlx.Infrastructure.Events.Events;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -18,10 +19,14 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class OverviewController : ControllerBase
     {
         private readonly IApplicationEventDispatcher _dispatcher;
+        private readonly CachingApplicationEventDispatcher _cachingApplicationEventDispatcher;
 
-        public OverviewController(IApplicationEventDispatcher dispatcher)
+        public OverviewController(
+            IApplicationEventDispatcher dispatcher,
+            CachingApplicationEventDispatcher cachingApplicationEventDispatcher)
         {
             _dispatcher = dispatcher;
+            _cachingApplicationEventDispatcher = cachingApplicationEventDispatcher;
         }
 
         [HttpGet("")]
@@ -30,14 +35,14 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             Func<MediaOverviewQuery, Task<string>> cacheKeyGenerator = async _ =>
             {
                 var libs = await _dispatcher.Dispatch(new CurrentUserLibraryAccessQuery());
-                return "OVERVIEW:" + string.Join(',', libs.OrderBy(i => i));
+                return "overview:" + string.Join(',', libs.OrderBy(i => i));
             };
-            var @event = new CachedEventCommand<MediaOverviewQuery, IEnumerable<OverviewElementDto>>(cacheKeyGenerator, new MediaOverviewQuery());
-            return _dispatcher.Dispatch(@event);
+            return _cachingApplicationEventDispatcher.Dispatch<MediaOverviewQuery, IEnumerable<OverviewElementDto>>(new MediaOverviewQuery(), cacheKeyGenerator, TimeSpan.FromDays(3));
         }
 
         [HttpGet("genres")]
         public Task<IEnumerable<GenreDto>> GetGenres()
-            => _dispatcher.Dispatch(new CachedEventCommand<GenreOverviewQuery, IEnumerable<GenreDto>>("OVERVIEW:GENRES", new GenreOverviewQuery()));
+            => _cachingApplicationEventDispatcher.Dispatch<GenreOverviewQuery, IEnumerable<GenreDto>>(
+                new GenreOverviewQuery(), "overview:genres", TimeSpan.FromDays(3));
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Hangfire.Dashboard;
 using Microsoft.Extensions.DependencyInjection;
-using NxPlx.Application.Models.Events.Sessions;
 using NxPlx.Application.Services;
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Authentication

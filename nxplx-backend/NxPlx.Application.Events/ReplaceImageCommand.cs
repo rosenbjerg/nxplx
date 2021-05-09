@@ -1,7 +1,8 @@
 ﻿using System.IO;
+using NxPlx.Application.Models;
 using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Events
 {
     public class ReplaceImageCommand : IApplicationCommand<bool>
     {

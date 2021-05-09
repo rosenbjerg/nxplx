@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Services", "Nx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Events", "NxPlx.Domain.Events\NxPlx.Domain.Events.csproj", "{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Events", "NxPlx.Application.Events\NxPlx.Application.Events.csproj", "{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,5 +98,9 @@ Global
 		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53D0BBDA-E14E-47C6-AA4E-114A806D6E57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

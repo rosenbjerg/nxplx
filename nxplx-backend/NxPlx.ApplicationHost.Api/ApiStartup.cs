@@ -17,6 +17,7 @@ using NxPlx.Application.Mapping;
 using NxPlx.Application.Services;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;
 using NxPlx.Domain.Services;
 using NxPlx.Domain.Services.Commands;

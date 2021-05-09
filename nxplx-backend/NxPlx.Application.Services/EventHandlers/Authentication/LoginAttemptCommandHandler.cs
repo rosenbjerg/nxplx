@@ -5,8 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Authentication;
-using NxPlx.Application.Models.Events.Sessions;
+using NxPlx.Application.Events.Authentication;
+
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;
 using NxPlx.Domain.Services;
 using NxPlx.Infrastructure.Database;

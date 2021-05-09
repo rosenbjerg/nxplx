@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Images;
+using NxPlx.Application.Events.Images;
 using NxPlx.Application.Services;
 using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Database;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events.File;
+using NxPlx.Domain.Events.File;
 using NxPlx.Domain.Events.Series;
 using NxPlx.Domain.Models.File;
 using NxPlx.Infrastructure.Database;

@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FFMpegCore;
-using NxPlx.Application.Models.Events.Images;
+using NxPlx.Application.Events.Images;
 using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Application.Services.EventHandlers.Images

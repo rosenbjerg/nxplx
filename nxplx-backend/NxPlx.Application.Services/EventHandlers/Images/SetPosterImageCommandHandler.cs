@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using NxPlx.Application.Core.Options;
-using NxPlx.Application.Models.Events.Images;
+using NxPlx.Application.Events.Images;
 using NxPlx.Domain.Models;
 
 namespace NxPlx.Application.Services.EventHandlers.Images

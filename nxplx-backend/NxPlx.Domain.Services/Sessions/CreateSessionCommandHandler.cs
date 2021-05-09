@@ -3,12 +3,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Sessions;
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Application.Services.EventHandlers.Sessions
 {
-    public class CreateSessionCommandHandler : IApplicationEventHandler<CreateSessionCommand>
+    public class CreateSessionCommandHandler : IDomainEventHandler<CreateSessionCommand>
     {
         private const string SessionPrefix = "session";
         private readonly IDistributedCache _distributedCache;

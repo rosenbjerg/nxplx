@@ -6,12 +6,12 @@ namespace NxPlx.Infrastructure.Events.Handling
     public interface IDomainEventHandler
     {
     }
-    public interface IDomainEventHandler<TEvent, TResult> : IEventHandler<TEvent, TResult>, IDomainEventHandler
+    public interface IDomainEventHandler<in TEvent, TResult> : IEventHandler<TEvent, TResult>, IDomainEventHandler
         where TEvent : IDomainEvent<TResult>
     {
     }
 
-    public interface IDomainEventHandler<TEvent> : IEventHandler<TEvent>, IDomainEventHandler
+    public interface IDomainEventHandler<in TEvent> : IEventHandler<TEvent>, IDomainEventHandler
         where TEvent : IDomainEvent<Task>
     {
     }

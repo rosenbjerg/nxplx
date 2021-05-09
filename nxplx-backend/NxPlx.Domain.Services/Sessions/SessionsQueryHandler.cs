@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events.Sessions;
+using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Events.Dispatching;
 using NxPlx.Infrastructure.Events.Handling;

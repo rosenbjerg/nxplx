@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events
+namespace NxPlx.Application.Events
 {
     public class ListDirectoryEntriesQuery : IApplicationQuery<List<string>>
     {

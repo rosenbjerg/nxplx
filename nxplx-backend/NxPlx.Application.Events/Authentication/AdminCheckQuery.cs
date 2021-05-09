@@ -1,6 +1,6 @@
 ﻿using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Authentication
+namespace NxPlx.Application.Events.Authentication
 {
     public class AdminCheckQuery : IApplicationQuery<bool>
     {

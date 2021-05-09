@@ -20,6 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Events\NxPlx.Application.Events.csproj" />
       <ProjectReference Include="..\NxPlx.Domain.Services\NxPlx.Domain.Services.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
     </ItemGroup>

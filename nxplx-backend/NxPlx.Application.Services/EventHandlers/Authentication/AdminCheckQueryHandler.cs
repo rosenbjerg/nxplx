@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
-using NxPlx.Application.Models.Events.Authentication;
+using NxPlx.Application.Events.Authentication;
 using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Application.Services.EventHandlers.Authentication

@@ -1,6 +1,6 @@
 ﻿using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Images
+namespace NxPlx.Application.Events.Images
 {
     public class CreateSnapshotCommand : IApplicationCommand<string>
     {

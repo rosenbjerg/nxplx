@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Models.Events.Authentication;
+using NxPlx.Application.Events.Authentication;
 using NxPlx.Application.Services;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Infrastructure.Events.Dispatching;

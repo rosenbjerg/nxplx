@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using NxPlx.Application.Models.Events;
+using NxPlx.Application.Events;
 using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Application.Services.EventHandlers

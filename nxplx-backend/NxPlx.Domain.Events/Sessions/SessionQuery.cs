@@ -1,7 +1,7 @@
-﻿using NxPlx.Infrastructure.Events.Events;
-using NxPlx.Domain.Models;
+﻿using NxPlx.Domain.Models;
+using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Application.Models.Events.Sessions
+namespace NxPlx.Domain.Events.Sessions
 {
 
     public class SessionQuery : IDomainQuery<Session?>

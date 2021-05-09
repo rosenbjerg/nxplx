@@ -7,7 +7,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Infrastructure.Events\NxPlx.Infrastructure.Events.csproj" />
     </ItemGroup>
 
     <ItemGroup>
