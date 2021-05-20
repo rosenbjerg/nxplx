@@ -43,6 +43,7 @@ namespace NxPlx.Services.Index
             var newIds = details.Select(s => s.Id).ToList();
             var existingSeries = await _databaseContext.SeriesDetails
                 .Include(s => s.Seasons)
+                .ThenInclude(s => s.Episodes)
                 .Where(s => newIds.Contains(s.Id)).ToDictionaryAsync(s => s.Id);
             foreach (var detail in details)
             {
