@@ -50,7 +50,7 @@ namespace NxPlx.Services.Index
             var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
             return new MediaDetails
             {
-                Duration = (float)analysis.Duration.TotalSeconds,
+                Duration = (float)analysis!.Duration.TotalSeconds,
                 AudioBitrate = analysis.PrimaryAudioStream.BitRate,
                 AudioCodec = analysis.PrimaryAudioStream.CodecName,
                 AudioChannelLayout = analysis.PrimaryAudioStream.ChannelLayout,
