@@ -51,11 +51,11 @@ namespace NxPlx.Services.Index
             return new MediaDetails
             {
                 Duration = (float)analysis!.Duration.TotalSeconds,
-                AudioBitrate = analysis.PrimaryAudioStream.BitRate,
+                AudioBitrate = analysis.PrimaryAudioStream!.BitRate,
                 AudioCodec = analysis.PrimaryAudioStream.CodecName,
                 AudioChannelLayout = analysis.PrimaryAudioStream.ChannelLayout,
                 AudioStreamIndex = analysis.PrimaryAudioStream.Index,
-                VideoBitrate = analysis.PrimaryVideoStream.BitRate,
+                VideoBitrate = analysis.PrimaryVideoStream!.BitRate,
                 VideoCodec = analysis.PrimaryVideoStream.CodecName,
                 VideoHeight = analysis.PrimaryVideoStream.Height,
                 VideoWidth = analysis.PrimaryVideoStream.Width,

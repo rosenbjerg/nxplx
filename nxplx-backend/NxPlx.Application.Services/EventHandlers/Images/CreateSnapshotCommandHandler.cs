@@ -20,7 +20,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
         {
             var tempFile = _tempFileService.GetFilename("generated", ".png");
             var analysis = await FFProbe.AnalyseAsync(@event.InputVideoFilePath);
-            await FFMpeg.SnapshotAsync(analysis!, tempFile, new Size(@event.Width, @event.Height), analysis!.Duration * @event.SeekPercentage);
+            await FFMpeg.SnapshotAsync(@event.InputVideoFilePath, tempFile, new Size(@event.Width, @event.Height), analysis!.Duration * @event.SeekPercentage);
             return tempFile;
         }
     }
