@@ -10,23 +10,26 @@ using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.Services.Index
 {
-    public class IndexingService : IIndexer
+    public class IndexingService : IIndexingService
     {
         private readonly DatabaseContext _context;
         private readonly ICacheClearer _cacheClearer;
         private readonly LibraryDeduplicationService _deduplicationService;
         private readonly LibraryMetadataService _metadataService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
 
         public IndexingService(
             DatabaseContext context,
             ICacheClearer cacheClearer,
             LibraryDeduplicationService deduplicationService,
-            LibraryMetadataService metadataService)
+            LibraryMetadataService metadataService,
+            IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
             _cacheClearer = cacheClearer;
             _deduplicationService = deduplicationService;
             _metadataService = metadataService;
+            _backgroundJobClient = backgroundJobClient;
         }
 
         public async Task IndexLibraries(int[] libraryIds)
@@ -37,9 +40,9 @@ namespace NxPlx.Services.Index
                 .ToListAsync();
 
             if (libraries.Any(l => l.Kind == LibraryKind.Film))
-                BackgroundJob.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Film, "en-UK"));
+                _backgroundJobClient.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Film, "en-UK"));
             if (libraries.Any(l => l.Kind == LibraryKind.Series))
-                BackgroundJob.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Series, "en-UK"));
+                _backgroundJobClient.Enqueue<IndexingService>(service => service.IndexGenres(LibraryKind.Series, "en-UK"));
             
             var previousJob = string.Empty;
             foreach (var library in libraries)
@@ -76,13 +79,13 @@ namespace NxPlx.Services.Index
             await _cacheClearer.Clear("OVERVIEW");
             
             foreach (var detail in details)
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
             foreach (var movieCollectionId in newMovieCollectionIds)
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessMovieCollection(movieCollectionId));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessMovieCollection(movieCollectionId));
             if (newProductionCompanyIds.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
             foreach (var filmFile in newFilm)
-                BackgroundJob.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFile.Id, libraryId));
+                _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFile.Id, libraryId));
         }
 
         [Queue(JobQueueNames.FileIndexing)]
@@ -107,13 +110,13 @@ namespace NxPlx.Services.Index
             await _cacheClearer.Clear("OVERVIEW");
             
             foreach (var detail in details)
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
             if (newNetworkIds.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessNetworks(newNetworkIds));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessNetworks(newNetworkIds));
             if (newProductionCompanyIds.Any())
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
             foreach (var episodes in newEpisodes.GroupBy(e => e.SeriesDetailsId))
-                BackgroundJob.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), libraryId));
+                _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), libraryId));
         }
         
         [DisableConcurrentExecution(5)]
@@ -137,17 +140,17 @@ namespace NxPlx.Services.Index
         private string IndexMovieLibrary(int libraryId, string previousJob = "")
         {
             var deleteJobId = !string.IsNullOrEmpty(previousJob)
-                ? BackgroundJob.ContinueJobWith<LibraryCleanupService>(previousJob, service => service.RemoveDeletedMovies(libraryId))
-                : BackgroundJob.Enqueue<LibraryCleanupService>(service => service.RemoveDeletedMovies(libraryId));
-            return BackgroundJob.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewMovies(libraryId));
+                ? _backgroundJobClient.ContinueJobWith<LibraryCleanupService>(previousJob, service => service.RemoveDeletedMovies(libraryId))
+                : _backgroundJobClient.Enqueue<LibraryCleanupService>(service => service.RemoveDeletedMovies(libraryId));
+            return _backgroundJobClient.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewMovies(libraryId));
         }
         
         private string IndexSeriesLibrary(int libraryId, string previousJob = "")
         {
             var deleteJobId = !string.IsNullOrEmpty(previousJob)
-                ? BackgroundJob.ContinueJobWith<LibraryCleanupService>(previousJob, service => service.RemoveDeletedEpisodes(libraryId))
-                : BackgroundJob.Enqueue<LibraryCleanupService>(service => service.RemoveDeletedEpisodes(libraryId));
-            return BackgroundJob.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewEpisodes(libraryId));
+                ? _backgroundJobClient.ContinueJobWith<LibraryCleanupService>(previousJob, service => service.RemoveDeletedEpisodes(libraryId))
+                : _backgroundJobClient.Enqueue<LibraryCleanupService>(service => service.RemoveDeletedEpisodes(libraryId));
+            return _backgroundJobClient.ContinueJobWith<IndexingService>(deleteJobId, service => service.IndexNewEpisodes(libraryId));
         }
     }
 }

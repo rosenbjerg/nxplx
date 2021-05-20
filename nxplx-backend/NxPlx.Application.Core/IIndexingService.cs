@@ -2,7 +2,7 @@
 
 namespace NxPlx.Application.Core
 {
-    public interface IIndexer
+    public interface IIndexingService
     {
         Task IndexLibraries(int[] libraries);
     }

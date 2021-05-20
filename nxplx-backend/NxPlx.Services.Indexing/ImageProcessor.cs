@@ -19,13 +19,15 @@ namespace NxPlx.Services.Index
         private readonly DatabaseContext _context;
         private readonly IDetailsApi _detailsApi;
         private readonly TempFileService _tempFileService;
+        private readonly IBackgroundJobClient _backgroundJobClient;
         private readonly IApplicationEventDispatcher _dispatcher;
 
-        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IApplicationEventDispatcher dispatcher)
+        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IBackgroundJobClient backgroundJobClient, IApplicationEventDispatcher dispatcher)
         {
             _context = context;
             _detailsApi = detailsApi;
             _tempFileService = tempFileService;
+            _backgroundJobClient = backgroundJobClient;
             _dispatcher = dispatcher;
         }
         
@@ -100,7 +102,7 @@ namespace NxPlx.Services.Index
             foreach (var season in seriesDetails.Seasons)
             {
                 await ProcessPoster(season);
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.GenerateEpisodeStills(seriesDetailsId, season.Id));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.GenerateEpisodeStills(seriesDetailsId, season.Id));
             }
             await _context.SaveChangesAsync();
         }
