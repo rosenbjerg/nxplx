@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="10.1.1" />
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
+        <PackageReference Include="BlurHashSharp.Drawing" Version="1.2.0" />
+        <PackageReference Include="FFMpegCore" Version="3.4.0" />
+        <PackageReference Include="Instances" Version="1.6.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.5" />
+        <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
+      <ProjectReference Include="..\NxPlx.Application.Events\NxPlx.Application.Events.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Services\NxPlx.Domain.Services.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
+    </ItemGroup>
+
+</Project>

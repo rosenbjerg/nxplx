@@ -16,44 +16,10 @@
     color: var(--faded-text);
 }
 
-.search {
-    padding-left: 5px;
-    width: 100%;
-    font-size: 20px;
-    line-height: 28px;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    transition: border-color 1100ms;
-    background: none;
-    color: var(--focused-text);
-    margin-right: 1px;
-}
-.search::placeholder {
-    color: var(--faded-text);
-    opacity: 1;
-    transition: color 250ms;
-}
-.search:focus {
-    transition: border-color 200ms, box-shadow 200ms;
-    box-shadow: 0 0 5px 0 var(--hover-border-color);
-    border-color: var(--hover-border-color);
-    outline: none;
-}
-.search:focus::placeholder {
-    color: #bdbdbd;
-    transition: color 250ms;
-}
+
 .scan {
     width: 30px;
     padding: 0;
     color: var(--faded-text);
 }
-.top {
-    display: flex;
-}
-.continueWatchingContainer {
-    overflow-y: hidden;
-    white-space: nowrap;
-    margin-bottom: 6px;
-    padding-top: 4px;
-}
+

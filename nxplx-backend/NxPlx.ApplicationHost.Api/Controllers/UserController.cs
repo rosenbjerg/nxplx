@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events.Film;
-using NxPlx.Application.Models.Events.User;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Domain.Events.Film;
+using NxPlx.Domain.Events.User;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -15,9 +15,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class UserController : ControllerBase
     {
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly IApplicationEventDispatcher _eventDispatcher;
 
-        public UserController(IEventDispatcher eventDispatcher)
+        public UserController(IApplicationEventDispatcher eventDispatcher)
         {
             _eventDispatcher = eventDispatcher;
         }
@@ -40,7 +40,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         public Task Update([FromForm, EmailAddress] string? email) => _eventDispatcher.Dispatch(new UpdateUserDetailsCommand(email));
         
         [HttpPost("")]
-        [RequiresAdminPermissions]
+        [AdminOnly]
         public async Task<ActionResult<UserDto>> Create(
             [FromForm, Required, MinLength(4), MaxLength(40)]string username,
             [FromForm, EmailAddress]string? email,
@@ -54,11 +54,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         }
 
         [HttpDelete("")]
-        [RequiresAdminPermissions]
+        [AdminOnly]
         public async Task Remove([FromBody, Required] string username) => await _eventDispatcher.Dispatch(new RemoveUserCommand(username));
 
         [HttpGet("list")]
-        [RequiresAdminPermissions]
+        [AdminOnly]
         public async Task<IEnumerable<UserDto>> List() => await _eventDispatcher.Dispatch(new ListUsersQuery());
     }
 }

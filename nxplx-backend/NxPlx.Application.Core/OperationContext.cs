@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
-using NxPlx.Models;
+using NxPlx.Abstractions;
+using NxPlx.Domain.Models;
 
 namespace NxPlx.Application.Core
 {

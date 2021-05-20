@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Authentication;
+using NxPlx.Application.Events.Authentication;
+using NxPlx.Application.Services;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Core.Services;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -13,9 +13,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IHttpSessionService _sessionService;
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly IApplicationEventDispatcher _eventDispatcher;
 
-        public AuthenticationController(IHttpSessionService sessionService, IEventDispatcher eventDispatcher)
+        public AuthenticationController(IHttpSessionService sessionService, IApplicationEventDispatcher eventDispatcher)
         {
             _sessionService = sessionService;
             _eventDispatcher = eventDispatcher;

@@ -5,12 +5,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
-      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
     </ItemGroup>
 
 </Project>

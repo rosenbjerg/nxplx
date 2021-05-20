@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events.Images;
-using NxPlx.Core.Services;
-using NxPlx.Models;
+using NxPlx.Application.Events.Images;
+using NxPlx.Application.Services;
+using NxPlx.Domain.Models;
 using NxPlx.Infrastructure.Database;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.Services.Index
 {
@@ -18,13 +19,15 @@ namespace NxPlx.Services.Index
         private readonly DatabaseContext _context;
         private readonly IDetailsApi _detailsApi;
         private readonly TempFileService _tempFileService;
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IEventDispatcher dispatcher)
+        public ImageProcessor(DatabaseContext context, IDetailsApi detailsApi, TempFileService tempFileService, IBackgroundJobClient backgroundJobClient, IApplicationEventDispatcher dispatcher)
         {
             _context = context;
             _detailsApi = detailsApi;
             _tempFileService = tempFileService;
+            _backgroundJobClient = backgroundJobClient;
             _dispatcher = dispatcher;
         }
         
@@ -99,7 +102,7 @@ namespace NxPlx.Services.Index
             foreach (var season in seriesDetails.Seasons)
             {
                 await ProcessPoster(season);
-                BackgroundJob.Enqueue<ImageProcessor>(service => service.GenerateEpisodeStills(seriesDetailsId, season.Id));
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.GenerateEpisodeStills(seriesDetailsId, season.Id));
             }
             await _context.SaveChangesAsync();
         }

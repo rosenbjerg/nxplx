@@ -1,9 +1,15 @@
 name: CI - Frontend
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+    - 'nxplx-frontend/**'
   pull_request:
     branches:
       - master
+      - release
     paths:
     - 'nxplx-frontend/**'
 
@@ -14,7 +20,11 @@ jobs:
       working-directory: ./nxplx-frontend
     timeout-minutes: 10
     steps:
-    - uses: actions/checkout@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+    - name: Cancel outdated workflow-runs
+      uses: fkirc/skip-duplicate-actions@master
     
     - name: Install dependencies
       working-directory: ${{env.working-directory}}

@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NxPlx.Models;
-using NxPlx.Models.File;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Services.Index
 {
@@ -49,7 +49,7 @@ namespace NxPlx.Services.Index
 
         private static readonly string[] StopWords = { "(", ")", "1080", "1440", "2160", "4096", "4320", "8192" };
         
-        public static IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath, Library library)
+        public static IEnumerable<EpisodeFile> IndexEpisodeFiles(IEnumerable<string> filesPath, int libraryId)
         {
             return filesPath
                 .Where(mp4 => SeriesRegex.IsMatch(Path.GetFileNameWithoutExtension(mp4)))
@@ -67,7 +67,7 @@ namespace NxPlx.Services.Index
                     SeasonNumber = seasonGroup.Success ? int.Parse(seasonGroup.Value) : 1,
                     EpisodeNumber = episodeGroup.Success ? int.Parse(episodeGroup.Value) : 0,
                     Path = episodePath,
-                    PartOfLibraryId = library.Id
+                    PartOfLibraryId = libraryId
                 };
             });
         }

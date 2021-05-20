@@ -1,0 +1,17 @@
+version: 2
+updates:
+
+- package-ecosystem: nuget
+  directory: "/nxplx-backend"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  
+- package-ecosystem: npm
+  directory: "/nxplx-frontend"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  versioning-strategy: lockfile-only

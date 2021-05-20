@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Threading.Tasks;
 using NxPlx.Application.Core;
-using NxPlx.Models;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.File;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Services.Index
 {
@@ -68,7 +68,7 @@ namespace NxPlx.Services.Index
         private Task<DbFilmDetails> FetchFilmDetails(int id, string language) => _detailsApi.FetchMovieDetails(id, language);
         private async Task EnrichWithSeriesDetailsId(List<EpisodeFile> newEpisodes)
         {
-            var functionCache = new FunctionCache<string, Models.Details.Search.SeriesResult[]>(_detailsApi.SearchTvShows);
+            var functionCache = new FunctionCache<string, Domain.Models.Details.Search.SeriesResult[]>(_detailsApi.SearchTvShows);
             
             foreach (var episodeFile in newEpisodes)
             {

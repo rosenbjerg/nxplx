@@ -2,11 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
 using NxPlx.Application.Models;
-using NxPlx.Application.Models.Events.Series;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Models;
+using NxPlx.Domain.Events.Series;
+using NxPlx.Domain.Models;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -15,9 +15,9 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [SessionAuthentication]
     public class ProgressController : ControllerBase
     {
-        private readonly IEventDispatcher _dispatcher;
+        private readonly IApplicationEventDispatcher _dispatcher;
 
-        public ProgressController(IEventDispatcher dispatcher)
+        public ProgressController(IApplicationEventDispatcher dispatcher)
         {
             _dispatcher = dispatcher;
         }

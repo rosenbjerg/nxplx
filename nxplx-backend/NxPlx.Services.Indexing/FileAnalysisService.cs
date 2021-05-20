@@ -5,7 +5,7 @@ using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
 using NxPlx.Infrastructure.Database;
-using NxPlx.Models.File;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Services.Index
 {
@@ -50,7 +50,7 @@ namespace NxPlx.Services.Index
             var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
             return new MediaDetails
             {
-                Duration = (float)analysis.Duration.TotalSeconds,
+                Duration = (float)analysis!.Duration.TotalSeconds,
                 AudioBitrate = analysis.PrimaryAudioStream.BitRate,
                 AudioCodec = analysis.PrimaryAudioStream.CodecName,
                 AudioChannelLayout = analysis.PrimaryAudioStream.ChannelLayout,

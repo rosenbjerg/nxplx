@@ -1,21 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using NxPlx.Application.Core;
-using NxPlx.Application.Models.Events;
 using NxPlx.ApplicationHost.Api.Authentication;
+using NxPlx.Domain.Events;
+using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
     [Route("api/command")]
     [ApiController]
     [SessionAuthentication]
-    [RequiresAdminPermissions]
+    [AdminOnly]
     public class CommandController : ControllerBase
     {
-        private readonly IEventDispatcher _eventDispatcher;
+        private readonly IApplicationEventDispatcher _eventDispatcher;
 
-        public CommandController(IEventDispatcher eventDispatcher)
+        public CommandController(IApplicationEventDispatcher eventDispatcher)
         {
             _eventDispatcher = eventDispatcher;
         }

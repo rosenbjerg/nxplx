@@ -1,4 +1,4 @@
-﻿using NxPlx.Application.Core;
+﻿using NxPlx.Abstractions;
 using Serilog.Core;
 using Serilog.Events;
 

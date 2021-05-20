@@ -2,6 +2,6 @@
 {
     public class GenreList
     {
-        public Genre[] Genres { get; set; }
+        public Genre[] Genres { get; set; } = null!;
     }
 }

@@ -4,10 +4,11 @@ import { Component, h } from "preact";
 import Entry from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
-import { translate } from "../../utils/localisation";
-import { ContinueWatchingElement, imageUrl, OverviewElement } from "../../utils/models";
+import { imageUrl, OverviewElement } from "../../utils/models";
 import * as style from "./style.css";
 import PageTitle from "../../components/PageTitle/index.";
+import SearchBar from "../../components/SearchBar";
+import ContinueWatchingRow from "../../components/ContinueWatchingRow";
 
 
 interface Props {
@@ -15,7 +16,6 @@ interface Props {
 
 interface State {
     overview?: OverviewElement[];
-    progress?: ContinueWatchingElement[];
     search: string
 }
 
@@ -32,38 +32,17 @@ export default class Home extends Component<Props, State> {
     }
 
 
-    public render(_, { overview, search, progress }: State) {
+    public render(_, { overview, search }: State) {
         return (
             <div class={style.home}>
                 <PageTitle title="NxPlx"/>
-                <div class={style.top}>
-                    <input tabIndex={0} autofocus class={style.search} placeholder={translate("search here")}
-                           type="search" value={this.state.search} onInput={linkState(this, "search")}/>
-                </div>
+                <SearchBar value={this.state.search} onInput={linkState(this, "search")}/>
 
                 {overview === undefined ? (
                     <Loading fullscreen/>
                 ) : (
                     <div class={`${style.entryContainer} nx-scroll`}>
-                        {!search && progress && progress.length > 0 && (
-                            <span>
-                                <label>{translate("continue watching")}</label>
-                                <div class={`nx-scroll ${style.continueWatchingContainer}`}>
-                                    {progress.map(p => (
-                                        <Entry
-                                            key={p.kind[0] + p.fileId}
-                                            title={p.title}
-                                            href={`/watch/${p.kind}/${p.fileId}`}
-                                            image={imageUrl(p.posterPath, 190)}
-                                            imageBlurHash={p.posterBlurHash}
-                                            progress={p.progress}
-                                            blurhashWidth={20}
-                                            blurhashHeight={32}
-                                        />
-                                    ))}
-                                </div>
-                            </span>
-                        )}
+                        {!search && (<ContinueWatchingRow/>)}
                         {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
@@ -94,10 +73,6 @@ export default class Home extends Component<Props, State> {
         if (!this.state.overview) {
             http.getJson<OverviewElement[]>("/api/overview")
                 .then(overview => this.setState({ overview: orderBy(overview, ["title"], ["asc"]) }));
-        }
-        if (!this.state.progress) {
-            http.getJson<ContinueWatchingElement[]>("/api/progress/continue")
-                .then(progress => this.setState({ progress }));
         }
     };
 

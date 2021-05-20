@@ -3,13 +3,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using NxPlx.Application.Core;
-using NxPlx.Models;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Film;
-using NxPlx.Models.Details.Series;
-using NxPlx.Models.File;
+using NxPlx.Abstractions;
+using NxPlx.Domain.Models;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details;
+using NxPlx.Domain.Models.Details.Film;
+using NxPlx.Domain.Models.Details.Series;
+using NxPlx.Domain.Models.File;
 
 namespace NxPlx.Infrastructure.Database
 {

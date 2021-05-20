@@ -1,0 +1,6 @@
+.continueWatchingContainer {
+    overflow-y: hidden;
+    white-space: nowrap;
+    margin-bottom: 6px;
+    padding-top: 4px;
+}

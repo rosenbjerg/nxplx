@@ -4,10 +4,10 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using NxPlx.Models.Database;
-using NxPlx.Models.Details;
-using NxPlx.Models.Details.Search;
-using NxPlx.Models.Details.Series;
+using NxPlx.Domain.Models.Database;
+using NxPlx.Domain.Models.Details;
+using NxPlx.Domain.Models.Details.Search;
+using NxPlx.Domain.Models.Details.Series;
 
 namespace NxPlx.Application.Core
 {
@@ -15,9 +15,8 @@ namespace NxPlx.Application.Core
     {
         protected readonly IDistributedCache CachingService;
         protected readonly ILogger<IDetailsApi> Logger;
-        private readonly string _imageFolder;
         
-        protected static readonly HttpClient Client = new()
+        protected static readonly HttpClient Client = new HttpClient()
         {
             DefaultRequestHeaders =
             {
@@ -25,11 +24,10 @@ namespace NxPlx.Application.Core
             }
         };
 
-        protected DetailsApiBase(string imageFolder, IDistributedCache cachingService, ILogger<IDetailsApi> logger)
+        protected DetailsApiBase(IDistributedCache cachingService, ILogger<IDetailsApi> logger)
         {
             CachingService = cachingService;
             Logger = logger;
-            _imageFolder = imageFolder;
         }
         
         protected async Task<string?> FetchInternal(string cacheKey, string url)

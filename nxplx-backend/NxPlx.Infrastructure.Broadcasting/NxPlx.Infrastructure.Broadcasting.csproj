@@ -2,18 +2,18 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="RHttpServer" Version="5.2.1" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
-      <ProjectReference Include="..\NxPlx.Models\NxPlx.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
     </ItemGroup>
 
 </Project>

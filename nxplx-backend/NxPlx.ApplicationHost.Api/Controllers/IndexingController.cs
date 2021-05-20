@@ -9,20 +9,20 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     [Route("api/indexing")]
     [ApiController]
     [SessionAuthentication]
-    [RequiresAdminPermissions]
+    [AdminOnly]
     public class IndexingController : ControllerBase
     {
-        private readonly IIndexer _indexer;
+        private readonly IIndexingService _indexingService;
 
-        public IndexingController(IIndexer indexer)
+        public IndexingController(IIndexingService indexingService)
         {
-            _indexer = indexer;
+            _indexingService = indexingService;
         }
         
         [HttpPost("")]
         public async Task<IActionResult> Index([FromBody, Required]int[] libraryIds)
         {
-            await _indexer.IndexLibraries(libraryIds);
+            await _indexingService.IndexLibraries(libraryIds);
             return Ok();
         }
     }

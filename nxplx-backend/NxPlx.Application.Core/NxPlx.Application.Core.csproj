@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\NxPlx.Abstractions\NxPlx.Abstractions.csproj" />
       <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
     </ItemGroup>
 
@@ -15,7 +15,7 @@
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
       <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-      <PackageReference Include="System.Text.Json" Version="5.0.1" />
+      <PackageReference Include="System.Text.Json" Version="5.0.2" />
     </ItemGroup>
 
 </Project>
