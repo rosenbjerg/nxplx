@@ -1,6 +1,11 @@
 name: CI - Backend
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+    - 'nxplx-backend/**'
   pull_request:
     branches:
       - master
