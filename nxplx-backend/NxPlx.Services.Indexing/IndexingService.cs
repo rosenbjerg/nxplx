@@ -91,7 +91,7 @@ namespace NxPlx.Services.Index
             var library = await _context.Libraries.SingleAsync(l => l.Id == libraryId);
             var currentEpisodePaths = new HashSet<string>(await _context.EpisodeFiles.Where(e => e.PartOfLibraryId == libraryId).Select(e => e.Path).ToListAsync());
             var newFiles = FileIndexer.FindFiles(library.Path, "*", "mp4").Where(filePath => !currentEpisodePaths.Contains(filePath));
-            var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library).ToList();
+            var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library.Id).ToList();
             var details = await _metadataService.FindSeriesDetails(newEpisodes, library);
             if (!details.Any()) return;
 
