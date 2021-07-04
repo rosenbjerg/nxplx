@@ -45,21 +45,22 @@ namespace NxPlx.Services.Index
             }
             await _databaseContext.SaveChangesAsync();
         }
+        
         private static async Task<MediaDetails> AnalyseMedia(string path)
         {
             var analysis = await FFMpegCore.FFProbe.AnalyseAsync(path);
             return new MediaDetails
             {
                 Duration = (float)analysis!.Duration.TotalSeconds,
-                AudioBitrate = analysis.PrimaryAudioStream!.BitRate,
-                AudioCodec = analysis.PrimaryAudioStream.CodecName,
-                AudioChannelLayout = analysis.PrimaryAudioStream.ChannelLayout,
-                AudioStreamIndex = analysis.PrimaryAudioStream.Index,
+                AudioBitrate = analysis.PrimaryAudioStream?.BitRate ?? 0,
+                AudioCodec = analysis.PrimaryAudioStream?.CodecName ?? "-",
+                AudioChannelLayout = analysis.PrimaryAudioStream?.ChannelLayout ?? "-",
+                AudioStreamIndex = analysis.PrimaryAudioStream?.Index ?? -1,
                 VideoBitrate = analysis.PrimaryVideoStream!.BitRate,
                 VideoCodec = analysis.PrimaryVideoStream.CodecName,
                 VideoHeight = analysis.PrimaryVideoStream.Height,
                 VideoWidth = analysis.PrimaryVideoStream.Width,
-                VideoAspectRatio = $"{analysis.PrimaryVideoStream.DisplayAspectRatio.Width}x{analysis.PrimaryVideoStream.DisplayAspectRatio.Height}",
+                VideoAspectRatio = $"{analysis.PrimaryVideoStream.DisplayAspectRatio.Width}:{analysis.PrimaryVideoStream.DisplayAspectRatio.Height}",
                 VideoBitDepth = analysis.PrimaryVideoStream.BitsPerRawSample,
                 VideoFrameRate = (float)analysis.PrimaryVideoStream.FrameRate
             };

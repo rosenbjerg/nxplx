@@ -4,7 +4,7 @@ using NxPlx.Domain.Models.Details.Series;
 
 namespace NxPlx.Domain.Models.File
 {
-    public class EpisodeFile : MediaFileBase
+    public class EpisodeFile : MediaFileBase, ILibraryMember
     {
         public string Name { get; set; }
 
