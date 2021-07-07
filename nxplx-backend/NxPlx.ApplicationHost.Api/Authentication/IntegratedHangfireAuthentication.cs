@@ -1,4 +1,5 @@
-﻿using Hangfire.Dashboard;
+﻿using System.Threading.Tasks;
+using Hangfire.Dashboard;
 using Microsoft.Extensions.DependencyInjection;
 using NxPlx.Application.Services;
 using NxPlx.Domain.Events.Sessions;
@@ -6,9 +7,9 @@ using NxPlx.Infrastructure.Events.Dispatching;
 
 namespace NxPlx.ApplicationHost.Api.Authentication
 {
-    public class IntegratedHangfireAuthentication : IDashboardAuthorizationFilter
+    public class IntegratedHangfireAuthentication : IDashboardAsyncAuthorizationFilter
     {
-        public bool Authorize(DashboardContext context)
+        public async Task<bool> AuthorizeAsync(DashboardContext context)
         {
             var httpContext = context.GetHttpContext();
             var httpSessionService = httpContext.RequestServices.GetRequiredService<IHttpSessionService>();
@@ -16,7 +17,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
             var sessionToken = httpSessionService.ExtractSessionToken(httpContext);
             if (!string.IsNullOrEmpty(sessionToken))
             {
-                var session = dispatcher.Dispatch(new SessionQuery(sessionToken)).GetAwaiter().GetResult();
+                var session = await dispatcher.Dispatch(new SessionQuery(sessionToken));
                 return session != null;
             }
 
