@@ -41,11 +41,14 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
                         <Link href="/">
                             <i class="material-icons">home</i>
                         </Link>
-                        {isAdmin && (
+                        {isAdmin && [
                             <Link href="/admin">
                                 <i class="material-icons">supervisor_account</i>
+                            </Link>,
+                            <Link href="/dashboard">
+                                <i class="material-icons">assignment</i>
                             </Link>
-                        )}
+                        ]}
                         <Link href="/profile">
                             <i class="material-icons">account_circle</i>
                         </Link>

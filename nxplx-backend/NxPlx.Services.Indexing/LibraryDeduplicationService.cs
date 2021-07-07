@@ -13,6 +13,12 @@ namespace NxPlx.Services.Index
     public class LibraryDeduplicationService
     {
         private readonly DatabaseContext _databaseContext;
+        
+        public LibraryDeduplicationService(DatabaseContext databaseContext)
+        {
+            _databaseContext = databaseContext;
+        }
+        
         public async Task DeduplicateFilmMetadata(DbFilmDetails[] details)
         {
             var newIds = details.Select(s => s.Id).ToList();
@@ -64,30 +70,7 @@ namespace NxPlx.Services.Index
                 }
             }
         }
-        private void MergeSeasonMetadata(DbSeriesDetails detail, DbSeriesDetails existing)
-        {
-            foreach (var season in detail.Seasons)
-            {
-                var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
-                if (existingSeason != null)
-                {
-                    existingSeason.Overview = season.Overview;
-                    var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id))
-                        .ToList();
-                    existingSeason.Episodes.AddRange(missingEpisodes);
-                    _databaseContext.AddRange(missingEpisodes);
-                }
-                else
-                {
-                    existing.Seasons.Add(season);
-                    _databaseContext.Add(season);
-                }
-            }
-        }
-        public LibraryDeduplicationService(DatabaseContext databaseContext)
-        {
-            _databaseContext = databaseContext;
-        }
+        
         public async Task<int[]> DeduplicateMovieCollections(DbFilmDetails[] details)
         {
             var movieCollectionIds = details.Where(d => d.BelongsInCollection != null).Select(d => d.BelongsInCollection.Id).Distinct().ToList();
@@ -109,11 +92,13 @@ namespace NxPlx.Services.Index
 
             return newIds.ToArray();
         }
+        
         public Task<int[]> DeduplicateEntities<TDetails, TEntity>(TDetails[] details, Func<TDetails, List<TEntity>> entitySelector)
             where TEntity : EntityBase
         {
             return DeduplicateEntities(details, entitySelector, e => e.Id, ids => entity => ids.Contains(entity.Id));
         }
+        
         public async Task<TKey[]> DeduplicateEntities<TDetails, TEntity, TKey>(
             TDetails[] details, 
             Func<TDetails, List<TEntity>> entitySelector, 
@@ -133,13 +118,34 @@ namespace NxPlx.Services.Index
                     _databaseContext.Add(entity);
                     newIds.Add(idSelector(entity));
                 }
-
+                
                 var deduplicated = attachedEntities.Select(entity => existing[idSelector(entity)]).ToList();
                 attachedEntities.Clear();
                 attachedEntities.AddRange(deduplicated);
             }
 
             return newIds.ToArray();
+        }
+        
+        private void MergeSeasonMetadata(DbSeriesDetails detail, DbSeriesDetails existing)
+        {
+            foreach (var season in detail.Seasons)
+            {
+                var existingSeason = existing.Seasons.FirstOrDefault(s => s.SeasonNumber == season.SeasonNumber);
+                if (existingSeason != null)
+                {
+                    existingSeason.Overview = season.Overview;
+                    var missingEpisodes = season.Episodes.Where(e => existingSeason.Episodes.All(ee => e.Id != ee.Id))
+                        .ToList();
+                    existingSeason.Episodes.AddRange(missingEpisodes);
+                    _databaseContext.AddRange(missingEpisodes);
+                }
+                else
+                {
+                    existing.Seasons.Add(season);
+                    _databaseContext.Add(season);
+                }
+            }
         }
     }
 }

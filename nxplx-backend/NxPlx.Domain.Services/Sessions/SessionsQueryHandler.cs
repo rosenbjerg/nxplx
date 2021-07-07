@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace NxPlx.Domain.Services.Sessions
         {
             var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{@event.UserId}", cancellationToken);
             if (sessions == null)
-                return new SessionDto[0];
+                return Array.Empty<SessionDto>();
 
             var foundSessions = await Task.WhenAll(sessions.Select(async token => (token, session: await _eventDispatcher.Dispatch(new SessionQuery(token)))));
             return foundSessions.Where(s => s.session != null).Select(s => new SessionDto

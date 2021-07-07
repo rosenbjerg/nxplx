@@ -2,15 +2,17 @@
 
 services:
   nxplx-database:
-    image: postgres:13-alpine
+    image: bitnami/postgresql:13
     environment:
-      - POSTGRES_PASSWORD=dev
+      - POSTGRESQL_PASSWORD=dev
     ports:
       - "5432:5432"
       
   nxplx-cache:
-    image: redis:6-alpine
-    command: redis-server --requirepass dev
+    image: bitnami/redis:6.2
+    environment:
+      - REDIS_PASSWORD=dev
+      - REDIS_AOF_ENABLED=no
     ports:
       - "6379:6379"
 

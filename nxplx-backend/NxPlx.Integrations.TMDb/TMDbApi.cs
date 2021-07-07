@@ -70,7 +70,7 @@ namespace NxPlx.Integrations.TMDb
         {
             var encodedTitle = HttpUtility.UrlEncode(title);
             if (title == "" || encodedTitle == "")
-                return new FilmResult[0];
+                return Array.Empty<FilmResult>();
             
             var encodedYear = year < 2 ? "" : $"&year={year}";
             var url = $"{BaseUrl}/search/movie?query={encodedTitle}{encodedYear}";
