@@ -8,7 +8,7 @@ namespace NxPlx.ApplicationHost.Api.Middleware
     public class PerformanceInterceptorMiddleware
     {
         private static readonly Action<ILogger, string, double, Exception?> RequestServed = LoggerMessage.Define<string, double>(
-            LogLevel.Information, new EventId(),
+            LogLevel.Debug, new EventId(),
             "Request to {Path} took {ElapsedMs}ms");
         private readonly RequestDelegate _next;
 

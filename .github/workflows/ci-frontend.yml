@@ -1,9 +1,15 @@
 name: CI - Frontend
 
 on:
+  push:
+    branches:
+      - master
+    paths:
+    - 'nxplx-frontend/**'
   pull_request:
     branches:
       - master
+      - release
     paths:
     - 'nxplx-frontend/**'
 

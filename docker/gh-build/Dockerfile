@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
 WORKDIR /app
 COPY ./nxplx-backend/ ./
 ARG DOTNET_RID
-RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r $DOTNET_RID /p:PublishTrimmed=true -o build
+RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c Release -r $DOTNET_RID -o build
 
 
 
@@ -23,6 +23,9 @@ LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
 RUN apk add -q --update --no-cache ffmpeg imagemagick icu-libs
 RUN apk add -q --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+ARG TINI_VERSION=v0.19.0
+ARG TINI_BUILD
+RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BUILD} && chmod +x /tini
 
 RUN addgroup -S nxplx && adduser -S nxplx -G nxplx
 USER nxplx
@@ -34,9 +37,5 @@ WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/
 
-ARG TINI_VERSION=v0.19.0
-ARG TINI_BUILD
-RUN wget -O /tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/${TINI_BUILD} && chmod +x /tini
 ENTRYPOINT ["/tini", "-g", "--"]
-
 CMD ["./NxPlx.ApplicationHost.Api"]

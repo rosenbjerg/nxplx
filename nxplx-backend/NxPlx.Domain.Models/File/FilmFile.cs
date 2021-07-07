@@ -2,7 +2,7 @@ using NxPlx.Domain.Models.Database;
 
 namespace NxPlx.Domain.Models.File
 {
-    public class FilmFile : MediaFileBase
+    public class FilmFile : MediaFileBase, ILibraryMember
     {
         public string Title { get; set; }
 

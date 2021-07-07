@@ -86,7 +86,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton<IDetailsApi, TMDbApi>();
 
             services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
-            services.AddScoped<IIndexer, IndexingService>();
+            services.AddScoped<IIndexingService, IndexingService>();
             services.AddScoped<ConnectionAccepter, WebsocketConnectionAccepter>();
             services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             services.AddScoped<OperationContext>();

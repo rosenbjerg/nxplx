@@ -70,7 +70,7 @@ namespace NxPlx.Integrations.TMDb
         {
             var encodedTitle = HttpUtility.UrlEncode(title);
             if (title == "" || encodedTitle == "")
-                return new FilmResult[0];
+                return Array.Empty<FilmResult>();
             
             var encodedYear = year < 2 ? "" : $"&year={year}";
             var url = $"{BaseUrl}/search/movie?query={encodedTitle}{encodedYear}";
@@ -97,7 +97,7 @@ namespace NxPlx.Integrations.TMDb
             var url = $"{BaseUrl}/genre/movie/list?language={language}";
             var content = await Fetch(url);
             var genreList = JsonConvert.DeserializeObject<GenreList>(content);
-            return genreList.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
+            return genreList!.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
         }
 
         public override async Task<Domain.Models.Details.Genre[]> FetchTvGenres(string language)
@@ -105,7 +105,7 @@ namespace NxPlx.Integrations.TMDb
             var url = $"{BaseUrl}/genre/tv/list?language={language}";
             var content = await Fetch(url);
             var genreList = JsonConvert.DeserializeObject<GenreList>(content);
-            return genreList.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
+            return genreList!.Genres.Select(g => _mapper.Map<Genre, Domain.Models.Details.Genre>(g)).ToArray();
         }
 
         public override async Task<DbFilmDetails> FetchMovieDetails(int seriesId, string language)
@@ -115,7 +115,7 @@ namespace NxPlx.Integrations.TMDb
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<MovieDetails>(content);
             
-            return _mapper.Map<MovieDetails, DbFilmDetails>(tmdbObj);
+            return _mapper.Map<MovieDetails, DbFilmDetails>(tmdbObj!);
         }
         
         public override async Task<DbSeriesDetails> FetchTvDetails(int seriesId, string language, int[] seasons)
@@ -124,7 +124,7 @@ namespace NxPlx.Integrations.TMDb
             
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvDetails>(content);
-            var mapped = _mapper.Map<TvDetails, DbSeriesDetails>(tmdbObj);
+            var mapped = _mapper.Map<TvDetails, DbSeriesDetails>(tmdbObj!);
             var seasonDetailsTasks = mapped!.Seasons.Where(s => seasons.Contains(s.SeasonNumber)).Select(s => FetchTvSeasonDetails(seriesId, s.SeasonNumber, language));
             var seasonDetails = await Task.WhenAll(seasonDetailsTasks);
             mapped.Seasons = seasonDetails.ToList();
@@ -138,7 +138,7 @@ namespace NxPlx.Integrations.TMDb
 
             var content = await Fetch(url);
             var tmdbObj = JsonConvert.DeserializeObject<TvSeasonDetails>(content);
-            return _mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj);
+            return _mapper.Map<TvSeasonDetails, SeasonDetails>(tmdbObj!);
         }
         
         public override async Task<bool> DownloadImage(int width, string imageUrl, string outputFilePath)

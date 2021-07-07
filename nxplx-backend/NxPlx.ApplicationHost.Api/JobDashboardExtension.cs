@@ -23,7 +23,6 @@ namespace NxPlx.ApplicationHost.Api
             var connectionStrings = serviceProvider.GetRequiredService<ConnectionStrings>();
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             var hangfireConfiguration = ConfigureHangfire(connectionStrings);
-            hangfireConfiguration(GlobalConfiguration.Configuration);
             services.AddHangfire(hangfireConfiguration);
         }
         
@@ -34,7 +33,7 @@ namespace NxPlx.ApplicationHost.Api
             {
                 app.UseHangfireDashboard(dashboardUrl, new DashboardOptions
                 {
-                    Authorization = new[] { new IntegratedHangfireAuthentication() }
+                    AsyncAuthorization = new[] { new IntegratedHangfireAuthentication() }
                 });
             }
         }

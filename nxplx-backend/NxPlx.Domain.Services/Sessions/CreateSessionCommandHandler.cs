@@ -6,7 +6,7 @@ using NxPlx.Application.Core;
 using NxPlx.Domain.Events.Sessions;
 using NxPlx.Infrastructure.Events.Handling;
 
-namespace NxPlx.Application.Services.EventHandlers.Sessions
+namespace NxPlx.Domain.Services.Sessions
 {
     public class CreateSessionCommandHandler : IDomainEventHandler<CreateSessionCommand>
     {
