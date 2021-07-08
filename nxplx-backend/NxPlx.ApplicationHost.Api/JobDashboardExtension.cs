@@ -33,7 +33,7 @@ namespace NxPlx.ApplicationHost.Api
             {
                 app.UseHangfireDashboard(dashboardUrl, new DashboardOptions
                 {
-                    AsyncAuthorization = new[] { new IntegratedHangfireAuthentication() }
+                    Authorization = new[] { new IntegratedHangfireAuthentication() }
                 });
             }
         }
