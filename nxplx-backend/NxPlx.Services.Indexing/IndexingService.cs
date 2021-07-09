@@ -122,29 +122,31 @@ namespace NxPlx.Services.Index
             var newEpisodes = FileIndexer.IndexEpisodeFiles(newFiles, library.Id).ToList();
             var details = await _metadataService.FindSeriesDetails(newEpisodes, library);
             if (!details.Any())
-            {
-                await _deduplicationService.DeduplicateEntities(details, d => d.Genres);
-                await _deduplicationService.DeduplicateEntities(details, d => d.CreatedBy);
-                var newProductionCompanyIds =
-                    await _deduplicationService.DeduplicateEntities(details, d => d.ProductionCompanies);
-                var newNetworkIds = await _deduplicationService.DeduplicateEntities(details, d => d.Networks);
+                return;
+            
+            await _deduplicationService.DeduplicateEntities(details, d => d.Genres);
+            await _deduplicationService.DeduplicateEntities(details, d => d.CreatedBy);
+            var newProductionCompanyIds =
+                await _deduplicationService.DeduplicateEntities(details, d => d.ProductionCompanies);
+            var newNetworkIds = await _deduplicationService.DeduplicateEntities(details, d => d.Networks);
 
-                await _deduplicationService.DeduplicateSeriesMetadata(details);
+            await _deduplicationService.DeduplicateSeriesMetadata(details);
 
-                _context.AddRange(newEpisodes);
-                await _context.SaveChangesAsync();
-                await _cacheClearer.Clear("OVERVIEW");
+            _context.AddRange(newEpisodes);
+            await _context.SaveChangesAsync();
+            await _cacheClearer.Clear("OVERVIEW");
 
-                foreach (var detail in details)
-                    _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
-                if (newNetworkIds.Any())
-                    _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessNetworks(newNetworkIds));
-                if (newProductionCompanyIds.Any())
-                    _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessProductionCompanies(newProductionCompanyIds));
-                
-                foreach (var episodes in newEpisodes.GroupBy(e => e.SeriesDetailsId))
-                    _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), library.Id));
-            }
+            foreach (var detail in details)
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
+            if (newNetworkIds.Any())
+                _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessNetworks(newNetworkIds));
+            if (newProductionCompanyIds.Any())
+                _backgroundJobClient.Enqueue<ImageProcessor>(service =>
+                    service.ProcessProductionCompanies(newProductionCompanyIds));
+
+            foreach (var episodes in newEpisodes.GroupBy(e => e.SeriesDetailsId))
+                _backgroundJobClient.Enqueue<FileAnalysisService>(service =>
+                    service.AnalyseEpisodeFiles(episodes.Select(e => e.Id).ToArray(), library.Id));
         }
 
         [DisableConcurrentExecution(5)]
