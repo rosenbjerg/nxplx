@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using NxPlx.Application.Core;
+using NxPlx.Application.Services;
 using NxPlx.Domain.Models;
 using NxPlx.Domain.Models.File;
 using NxPlx.Infrastructure.Database;
@@ -68,8 +69,9 @@ namespace NxPlx.Services.Index
 
             await IndexNewMovies(newFiles, library);
 
-            foreach (var filmFileId in updatedFiles)
-                _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFileId, libraryId));
+            foreach (var filmFileIdBatch in updatedFiles.Batch(50))
+                foreach (var filmFileId in filmFileIdBatch)
+                    _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFileId, libraryId));
         }
 
         private async Task IndexNewMovies(string[] newFiles, Library library)
@@ -183,7 +185,7 @@ namespace NxPlx.Services.Index
                 else
                 {
                     var fileInfo = new FileInfo(filePath);
-                    if (found.FileSize != fileInfo.Length || fileInfo.LastWriteTimeUtc != found.LastWrite)
+                    if (found.FileSize != fileInfo.Length || Math.Abs(fileInfo.LastWriteTimeUtc.Ticks - found.LastWrite.Ticks) > 100)
                         updatedFiles.Add(found.Id);
                 }
             }
