@@ -25,8 +25,10 @@ namespace NxPlx.Services.Index
         [Queue(JobQueueNames.FileIndexing)]
         public async Task RemoveDeletedMovies(int libraryId)
         {
-            var currentFilePaths = await _databaseContext.FilmFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path }).ToListAsync();
-            var deletedIds = currentFilePaths.Where(file => !File.Exists(file.Path)).Select(file => file.Id).ToList();
+            var currentFilePaths = await _databaseContext.FilmFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path, e.FilmDetailsId }).ToListAsync();
+            var deletedIds = currentFilePaths
+                .Where(file => file.FilmDetailsId == null || !File.Exists(file.Path)).Select(file => file.Id)
+                .ToList();
             if (deletedIds.Any())
             {
                 await RemoveWatchingProgress(deletedIds);
@@ -42,8 +44,10 @@ namespace NxPlx.Services.Index
         [Queue(JobQueueNames.FileIndexing)]
         public async Task RemoveDeletedEpisodes(int libraryId)
         {
-            var currentFilePaths = await _databaseContext.EpisodeFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path }).ToListAsync();
-            var deletedIds = currentFilePaths.Where(file => !File.Exists(file.Path)).Select(file => file.Id).ToList();
+            var currentFilePaths = await _databaseContext.EpisodeFiles.Where(f => f.PartOfLibraryId == libraryId).Select(e => new { e.Id, e.Path, e.SeriesDetailsId }).ToListAsync();
+            var deletedIds = currentFilePaths
+                .Where(file => file.SeriesDetailsId == null || !File.Exists(file.Path)).Select(file => file.Id)
+                .ToList();
             if (deletedIds.Any())
             {
                 await RemoveWatchingProgress(deletedIds);
