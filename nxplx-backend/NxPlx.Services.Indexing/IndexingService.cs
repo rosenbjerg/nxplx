@@ -69,9 +69,8 @@ namespace NxPlx.Services.Index
 
             await IndexNewMovies(newFiles, library);
 
-            foreach (var filmFileIdBatch in updatedFiles.Batch(50))
-                foreach (var filmFileId in filmFileIdBatch)
-                    _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFileId, libraryId));
+            foreach (var filmFileId in updatedFiles)
+                _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseFilmFile(filmFileId, libraryId));
         }
 
         private async Task IndexNewMovies(string[] newFiles, Library library)
@@ -116,7 +115,8 @@ namespace NxPlx.Services.Index
             
             await IndexNewEpisodes(newFiles, library);
 
-            _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(updatedFiles, libraryId));
+            foreach (var episodeFileIds in updatedFiles.Batch(50))
+                _backgroundJobClient.Enqueue<FileAnalysisService>(service => service.AnalyseEpisodeFiles(episodeFileIds, libraryId));
         }
 
         private async Task IndexNewEpisodes(string[] newFiles, Library library)
