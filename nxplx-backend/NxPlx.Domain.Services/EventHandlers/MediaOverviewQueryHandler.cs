@@ -51,6 +51,7 @@ namespace NxPlx.Domain.Services.EventHandlers
                 .Select(ff => ff.FilmDetailsId)
                 .ToListAsync(cancellationToken);
             var filmDetails = await _context.FilmDetails
+                .AsNoTracking()
                 .Where(fd => filmDetailsIds.Contains(fd.Id))
                 .Include(ff => ff.Genres)
                 .Include(ff => ff.BelongsInCollection)

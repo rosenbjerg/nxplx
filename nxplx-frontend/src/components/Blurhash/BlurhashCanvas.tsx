@@ -32,7 +32,6 @@ export default class BlurhashCanvas extends Component<Props> {
 
     if (this.canvas) {
       const pixels = decode(hash, width, height, punch);
-
       const ctx = this.canvas.getContext('2d');
       const imageData = ctx!.createImageData(width, height);
       imageData.data.set(pixels);
@@ -43,6 +42,6 @@ export default class BlurhashCanvas extends Component<Props> {
   render() {
     const { hash, height, width, style, ...rest } = this.props;
 
-    return <canvas {...rest} style={style} height={height} width={width} ref={this.handleRef} />;
+    return (<canvas {...rest} style={style} height={height} width={width} ref={this.handleRef} />);
   }
 }

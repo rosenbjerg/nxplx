@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
@@ -31,7 +32,7 @@ namespace NxPlx.Services.Index
         }
         
         [Queue(JobQueueNames.FileAnalysis)]
-        public async Task AnalyseEpisodeFiles(int[] episodeFileIds, int libraryId)
+        public async Task AnalyseEpisodeFiles(IReadOnlyCollection<int> episodeFileIds, int libraryId)
         {
             var episodeFiles = await _databaseContext.EpisodeFiles.Where(e => episodeFileIds.Contains(e.Id)).ToListAsync();
             foreach (var episodeFile in episodeFiles)
