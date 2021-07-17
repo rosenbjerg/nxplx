@@ -1,13 +1,14 @@
 
-function getEntry<T>(store:Storage, key:string, defaultValue:T | string = ''): string | T {
+function getEntry<T>(store:Storage|undefined, key:string, defaultValue:T | string = ''): string | T {
+    if (store === undefined) return defaultValue;
     const stored = store.getItem(key);
     return (stored !== null) ? stored : defaultValue;
 }
-function setEntry(store:Storage, key:string, value:any) {
-    store.setItem(key, value);
+function setEntry(store:Storage|undefined, key:string, value:any) {
+    store?.setItem(key, value);
 }
 
-function makeStore(store: Storage) {
+function makeStore(store?: Storage) {
     return {
         getEntry<T>(key:string, defaultValue:T | string = '') {
             return getEntry(store, key, defaultValue);
@@ -29,10 +30,14 @@ function makeStore(store: Storage) {
 
 const Store = {
     get local() {
-        return makeStore(localStorage);
+        if (typeof window !== "undefined")
+            return makeStore(window.localStorage);
+        return makeStore(undefined);
     },
     get session() {
-        return makeStore(sessionStorage);
+        if (typeof window !== "undefined")
+            return makeStore(window.sessionStorage);
+        return makeStore(undefined);
     }
 };
 export default Store;

@@ -1,7 +1,6 @@
 import "@snackbar/core/dist/snackbar.min.css";
-import { Component, FunctionalComponent, h } from "preact";
+import { Component, h } from "preact";
 import { Route, route, Router } from "preact-router";
-import { lazy, Suspense } from "preact/compat";
 import createStore from "unistore";
 import { Provider } from "unistore/preact";
 import Collection from "../routes/collection";
@@ -10,11 +9,13 @@ import Home from "../routes/home";
 import Login from "../routes/login";
 import Season from "../routes/season";
 import Series from "../routes/series";
+import Admin from "../routes/admin";
+import Profile from "../routes/profile";
+import Watch from "../routes/watch";
 import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
 import Header from "./Header";
-import Loading from "./Loading";
 import Store from "../utils/storage";
 
 if ((module as any).hot) {
@@ -26,18 +27,6 @@ const store = createStore<NxPlxStore>({
     isAdmin: false,
     build: ""
 });
-
-function MakeLazy(importer: () => Promise<{ default: any }>): FunctionalComponent {
-    const LazyComponent = lazy(importer);
-    return (props) =>
-        <Suspense fallback={<Loading fullscreen/>}>
-            <LazyComponent {...props}/>
-        </Suspense>;
-}
-
-const Admin = MakeLazy(() => import("../routes/admin"));
-const Profile = MakeLazy(() => import("../routes/profile"));
-const Watch = MakeLazy(() => import("../routes/watch"));
 
 export default class App extends Component {
     public render() {

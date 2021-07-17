@@ -37,12 +37,12 @@ export default class Home extends Component<Props, State> {
             <div class={style.home}>
                 <PageTitle title="NxPlx"/>
                 <SearchBar value={this.state.search} onInput={linkState(this, "search")}/>
+                {!search && (<ContinueWatchingRow/>)}
 
                 {overview === undefined ? (
                     <Loading fullscreen/>
                 ) : (
                     <div class={`${style.entryContainer} nx-scroll`}>
-                        {!search && (<ContinueWatchingRow/>)}
                         {overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
