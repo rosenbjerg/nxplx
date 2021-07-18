@@ -5,7 +5,7 @@ import { connect } from "unistore/preact";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 const actions = (store:Store<NxPlxStore>) => (
     {

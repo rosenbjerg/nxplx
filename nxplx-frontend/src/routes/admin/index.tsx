@@ -5,7 +5,7 @@ import OnlineUsers from "../../components/OnlineUsers";
 import UserManagement from "../../components/UserManagement";
 import { translate } from "../../utils/localisation";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 const Admin = () => (
     <div class={style.profile}>

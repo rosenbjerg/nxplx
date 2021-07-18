@@ -10,7 +10,7 @@ import { LazyImage } from "../../components/Entry";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 
 interface Props {

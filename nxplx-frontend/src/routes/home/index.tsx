@@ -6,7 +6,7 @@ import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { imageUrl, OverviewElement } from "../../utils/models";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 import SearchBar from "../../components/SearchBar";
 import ContinueWatchingRow from "../../components/ContinueWatchingRow";
 

@@ -12,7 +12,7 @@ import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import { Link } from "preact-router";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 interface EpisodeProgress {
     fileId: number

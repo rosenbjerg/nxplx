@@ -10,7 +10,7 @@ import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 import { createSnackbar, Snackbar } from "@snackbar/core";
 import Store from "../../utils/storage";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 
 interface NextEpisode {

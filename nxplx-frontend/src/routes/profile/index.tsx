@@ -8,7 +8,7 @@ import { setLocale, translate } from "../../utils/localisation";
 import Store from "../../utils/storage";
 import { User } from "../../utils/models";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 interface Props {
 }

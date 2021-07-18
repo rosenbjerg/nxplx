@@ -8,7 +8,7 @@ import { FilmDetails, imageUrl } from "../../utils/models";
 import * as style from './style.css';
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 interface Props { id:string }
 

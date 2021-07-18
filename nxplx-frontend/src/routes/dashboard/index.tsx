@@ -1,6 +1,6 @@
 import { h } from "preact";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 const Dashboard = () => (
     <span>
