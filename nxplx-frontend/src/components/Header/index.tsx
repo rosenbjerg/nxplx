@@ -30,8 +30,8 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
     // @ts-ignore
     ({ isLoggedIn, isAdmin, build, logout }) => (
         <header class={style.header}>
-            <Link title={`NxPlx - v.${build}`} href={'/'}>
-                <img src="/assets/images/nxplx-logo.svg" alt="NxPlx"/>
+            <Link title={`nxplx - v.${build}`} href={'/'}>
+                <img src="/assets/images/nxplx-logo.svg" alt="nxplx"/>
             </Link>
             {isLoggedIn && (
                 <nav class={style.menu}>
@@ -45,9 +45,9 @@ const Header = connect(['isLoggedIn', 'isAdmin', 'build'], actions)(
                             <Link href="/admin">
                                 <i class="material-icons">supervisor_account</i>
                             </Link>,
-                            <a href="/dashboard">
+                            <Link href="/dashboard">
                                 <i class="material-icons">assignment</i>
-                            </a>
+                            </Link>
                         ]}
                         <Link href="/profile">
                             <i class="material-icons">account_circle</i>

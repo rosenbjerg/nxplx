@@ -10,7 +10,7 @@ import { LazyImage } from "../../components/Entry";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 
 interface Props {
@@ -43,7 +43,7 @@ export default class Series extends Component<Props, State> {
         return (
             <div class={style.bg} style={bg} data-bg={details.backdropPath}>
                 <div class={`nx-scroll ${style.content}`}>
-                    <PageTitle title={`${details.name} - NxPlx`}/>
+                    <PageTitle title={`${details.name} - nxplx`}/>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>
                             <button class="material-icons" style="border: none; padding: 0px 4px 0px 0px; font-size: 28pt" onClick={this.showPlayModeDiv}>play_arrow</button>

@@ -8,6 +8,7 @@ import { setLocale, translate } from "../../utils/localisation";
 import Store from "../../utils/storage";
 import { User } from "../../utils/models";
 import * as style from "./style.css";
+import PageTitle from "../../components/PageTitle";
 
 interface Props {
 }
@@ -28,6 +29,7 @@ export default class Profile extends Component<Props, State> {
         }
         return (
             <div class={style.profile}>
+                <PageTitle title='Profile - nxplx' />
                 <h1>{translate("account settings for")} {user.username}</h1>
 
                 <h3>{translate("your account details")}</h3>

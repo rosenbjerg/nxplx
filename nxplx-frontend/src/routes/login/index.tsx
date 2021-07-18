@@ -5,7 +5,7 @@ import { connect } from "unistore/preact";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 const actions = (store:Store<NxPlxStore>) => (
     {
@@ -32,8 +32,8 @@ const Login = connect([], actions)(
     // @ts-ignore
     ({ login }) => {
         return (<div class={style.login}>
-            <PageTitle title={`Login at NxPlx`} />
-            <h1>NxPlx</h1>
+            <PageTitle title='Login at nxplx' />
+            <h1>nxplx</h1>
             <form onSubmit={login}>
                 <div>
                     <input class="inline-edit" placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>

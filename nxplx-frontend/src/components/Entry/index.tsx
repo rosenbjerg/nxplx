@@ -3,7 +3,7 @@ import { Link } from "preact-router";
 import * as style from "./style.css";
 import { useState } from "preact/hooks";
 import { useInView } from "react-intersection-observer";
-import BlurhashCanvas from "../Blurhash/BlurhashCanvas";
+import BlurhashCanvas from "../Blurhash";
 
 interface Props2 {
     src: string;
@@ -19,7 +19,7 @@ export class LazyImage extends Component<Props2> {
     private loadStarted = false;
     private image = new Image();
     private intersectionOptions = {
-        threshold: 0.1
+        threshold: 0.0
     };
 
     componentDidMount() {
@@ -33,6 +33,10 @@ export class LazyImage extends Component<Props2> {
 
     render() {
         const [imageLoaded, setImageLoaded] = useState(false);
+
+        if (imageLoaded)
+            return (<img class={this.props.class} src={this.props.src} alt={this.props.alt} />);
+
         const [ref, inView, _] = useInView(this.intersectionOptions);
         if (inView && !this.loadStarted) {
             this.image.addEventListener("load", () => {
@@ -42,18 +46,16 @@ export class LazyImage extends Component<Props2> {
             this.loadStarted = true;
         }
 
-        return (<span ref={ref}>
-            {imageLoaded
-                ? (<img class={this.props.class} src={this.props.src} alt={this.props.alt} />)
-                : (<BlurhashCanvas
-                        hash={this.props.blurhash || "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
-                        width={this.props.blurhashWidth}
-                        height={this.props.blurhashHeight}
-                        class={this.props.class}
-                        punch={1}
-                    />
-                )}
-        </span>);
+        return (
+            <BlurhashCanvas
+                setRef={ref}
+                hash={this.props.blurhash || "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
+                width={this.props.blurhashWidth}
+                height={this.props.blurhashHeight}
+                class={this.props.class}
+                punch={1}
+            />
+        );
     }
 }
 

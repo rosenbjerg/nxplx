@@ -7,7 +7,7 @@ import { imageUrl, MovieCollection } from "../../utils/models";
 import * as style from "./style.css";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 interface Props {
     id: string
@@ -35,8 +35,8 @@ export default class Collection extends Component<Props, State> {
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdropPath}>
+                <PageTitle title={`${details.name} - nxplx`}/>
                 <div class={`nx-scroll ${style.content}`}>
-                    <PageTitle title={`${details.name} - NxPlx`}/>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                         <AdminOnly>

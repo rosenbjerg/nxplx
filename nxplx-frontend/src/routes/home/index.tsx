@@ -6,7 +6,7 @@ import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { imageUrl, OverviewElement } from "../../utils/models";
 import * as style from "./style.css";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 import SearchBar from "../../components/SearchBar";
 import ContinueWatchingRow from "../../components/ContinueWatchingRow";
 
@@ -35,15 +35,16 @@ export default class Home extends Component<Props, State> {
     public render(_, { overview, search }: State) {
         return (
             <div class={style.home}>
-                <PageTitle title="NxPlx"/>
+                <PageTitle title="Home - nxplx"/>
                 <SearchBar value={this.state.search} onInput={linkState(this, "search")}/>
 
-                {overview === undefined ? (
-                    <Loading fullscreen/>
-                ) : (
-                    <div class={`${style.entryContainer} nx-scroll`}>
-                        {!search && (<ContinueWatchingRow/>)}
-                        {overview
+                <div class={`${style.entryContainer} nx-scroll`}>
+                    {!search && (<ContinueWatchingRow/>)}
+
+                    {overview === undefined ? (
+                        <Loading fullscreen/>
+                    ) : (
+                        overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
                                     <Entry
@@ -56,9 +57,9 @@ export default class Home extends Component<Props, State> {
                                         blurhashHeight={32}
                                     />
                                 )
-                            )}
-                    </div>
-                )}
+                            )
+                    )}
+                </div>
             </div>
         );
     }

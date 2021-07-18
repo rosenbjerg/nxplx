@@ -12,7 +12,7 @@ import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import { Link } from "preact-router";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 interface EpisodeProgress {
     fileId: number
@@ -53,7 +53,7 @@ export default class Season extends Component<Props, State> {
         }
         return (
             <div class={style.bg} style={bg} data-bg={bgImg}>
-                <PageTitle title={`Season ${season.number} - ${series.name} - NxPlx`}/>
+                <PageTitle title={`Season ${season.number} - ${series.name} - nxplx`}/>
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>

@@ -10,7 +10,7 @@ import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
 import { createSnackbar, Snackbar } from "@snackbar/core";
 import Store from "../../utils/storage";
-import PageTitle from "../../components/PageTitle/index.";
+import PageTitle from "../../components/PageTitle";
 
 
 interface NextEpisode {
@@ -40,7 +40,7 @@ export default class Watch extends Component<Props, State> {
         if (!info) return (<Loading fullscreen/>);
         return (
             <div class={style.container}>
-                <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - NxPlx`}/>
+                <PageTitle title={`${this.state.playerState === "playing" ? "▶" : "❚❚"} ${info.title} - nxplx`}/>
                 <VideoPlayer
                     isSeries={kind === 'series'}
                     duration={info.duration}

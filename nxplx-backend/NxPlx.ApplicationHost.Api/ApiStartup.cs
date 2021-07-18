@@ -123,8 +123,8 @@ namespace NxPlx.ApplicationHost.Api
             app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             
-            app.UseJobDashboard("/dashboard", serviceProvider);
-            app.UseApiDocumentation("/swagger", serviceProvider);
+            app.UseJobDashboard("/api/dashboard", serviceProvider);
+            app.UseApiDocumentation("/api/swagger", serviceProvider);
             
             app.UseWebSockets();
             app.UseRouting();
