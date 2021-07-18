@@ -32,8 +32,8 @@ const Login = connect([], actions)(
     // @ts-ignore
     ({ login }) => {
         return (<div class={style.login}>
-            <PageTitle title={`Login at NxPlx`} />
-            <h1>NxPlx</h1>
+            <PageTitle title='Login at nxplx' />
+            <h1>nxplx</h1>
             <form onSubmit={login}>
                 <div>
                     <input class="inline-edit" placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>

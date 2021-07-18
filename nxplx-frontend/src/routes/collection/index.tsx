@@ -35,8 +35,8 @@ export default class Collection extends Component<Props, State> {
         }
         return (
             <div class={style.bg} style={bg} data-bg={details.backdropPath}>
+                <PageTitle title={`${details.name} - nxplx`}/>
                 <div class={`nx-scroll ${style.content}`}>
-                    <PageTitle title={`${details.name} - NxPlx`}/>
                     <div>
                         <h2 class={[style.title, style.marked].join(" ")}>{details.name}</h2>
                         <AdminOnly>

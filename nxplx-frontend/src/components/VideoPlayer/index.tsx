@@ -111,7 +111,7 @@ export default class VideoPlayer extends Component<Props, State> {
             const absolutePosterUrl = `${window.location.protocol}//${window.location.host}${this.props.poster}`;
             window.navigator.mediaSession.metadata = new MediaMetadata({
                 title: this.props.title,
-                artist: "NxPlx",
+                artist: "nxplx",
                 artwork: [
                     { src: absolutePosterUrl, sizes: "192x270", type: "image/jpg" }
                 ]

@@ -35,15 +35,16 @@ export default class Home extends Component<Props, State> {
     public render(_, { overview, search }: State) {
         return (
             <div class={style.home}>
-                <PageTitle title="NxPlx"/>
+                <PageTitle title="Home - nxplx"/>
                 <SearchBar value={this.state.search} onInput={linkState(this, "search")}/>
-                {!search && (<ContinueWatchingRow/>)}
 
-                {overview === undefined ? (
-                    <Loading fullscreen/>
-                ) : (
-                    <div class={`${style.entryContainer} nx-scroll`}>
-                        {overview
+                <div class={`${style.entryContainer} nx-scroll`}>
+                    {!search && (<ContinueWatchingRow/>)}
+
+                    {overview === undefined ? (
+                        <Loading fullscreen/>
+                    ) : (
+                        overview
                             .filter(this.entrySearch(search))
                             .map(entry => (
                                     <Entry
@@ -56,9 +57,9 @@ export default class Home extends Component<Props, State> {
                                         blurhashHeight={32}
                                     />
                                 )
-                            )}
-                    </div>
-                )}
+                            )
+                    )}
+                </div>
             </div>
         );
     }

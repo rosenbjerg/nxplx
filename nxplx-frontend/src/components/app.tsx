@@ -12,6 +12,7 @@ import Series from "../routes/series";
 import Admin from "../routes/admin";
 import Profile from "../routes/profile";
 import Watch from "../routes/watch";
+import Dashboard from "../routes/dashboard";
 import WebsocketMessenger from "../utils/connection";
 import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
@@ -43,6 +44,7 @@ export default class App extends Component {
                         <Route path="/series/:id/:season" component={Season}/>
                         <Route path="/admin" component={Admin}/>
                         <Route path="/profile" component={Profile}/>
+                        <Route path="/dashboard" component={Dashboard}/>
                         <Route path="/watch/:kind/:fid" component={Watch}/>
                     </Router>
                 </div>
