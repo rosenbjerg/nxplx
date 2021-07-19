@@ -72,16 +72,16 @@
     --mdc-theme-surface: var(--secondary-background-color);
 }
 
-html,
-body {
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
+*{
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
     background: var(--background-color);
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
-    font-weight: 400;
     color: #fafafa;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -115,13 +115,6 @@ body::-webkit-scrollbar-thumb {
     outline: 1px solid var(--secondary-background-color);
 }
 
-* {
-    box-sizing: border-box;
-}
-
-#app {
-    height: 100%;
-}
 
 button.material-icons,
 button.bordered {
