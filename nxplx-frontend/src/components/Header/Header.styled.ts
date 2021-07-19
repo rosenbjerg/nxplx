@@ -4,9 +4,12 @@ import { Link } from "preact-router";
 export const Wrapper = styled.header`
   background-color: ${props => props.theme.darkGray};
   display: flex;
+  top: 0;
+  left: 0;
   justify-content: space-between;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-
+  position: fixed;
+  width: 100%;
 `;
 
 export const Img = styled.img`

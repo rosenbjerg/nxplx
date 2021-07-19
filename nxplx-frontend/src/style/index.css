@@ -79,12 +79,14 @@
 }
 
 html,
-body {
-    background: var(--background-color);
+body,
+#app{
+    background: #1E1F22;
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
-    color: #fafafa;
+    color: white;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    height: 100%;
 }
 .nx-scroll {
     overflow-x: auto;
