@@ -42,7 +42,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             var success = await task;
             if (!success) return false;
             await _context.SaveChangesAsync(CancellationToken.None);
-            await _cacheClearer.Clear("OVERVIEW");
+            await _cacheClearer.Clear("overview");
             return true;
         }
 

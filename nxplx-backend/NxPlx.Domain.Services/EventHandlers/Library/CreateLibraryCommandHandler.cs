@@ -38,7 +38,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
             _context.Libraries.Add(lib);
             await _context.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Created library {Name} with {Path}", lib.Name, lib.Path);
-            await _cacheClearer.Clear("OVERVIEW");
+            await _cacheClearer.Clear("overview");
             
             return _mapper.Map<Domain.Models.Library, AdminLibraryDto>(lib)!;
         }

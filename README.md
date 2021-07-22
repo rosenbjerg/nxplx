@@ -3,8 +3,9 @@
 A home media vault designed for low-power devices such as Raspberry Pi 3/4, ODroid C2, ASUS TinkerBoard, and similar SBCs.
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/mrosenbjerg/nxplx-webapi)](https://hub.docker.com/r/mrosenbjerg/nxplx-webapi)
-[![DeepScan grade](https://deepscan.io/api/teams/7497/projects/9582/branches/126538/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=7497&pid=9582&bid=126538)
 [![GitHub](https://img.shields.io/github/license/rosenbjerg/NxPlx)](https://github.com/rosenbjerg/NxPlx/blob/master/LICENSE)
+[![DeepScan grade](https://deepscan.io/api/teams/7497/projects/9582/branches/126538/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=7497&pid=9582&bid=126538)
+[![CodeFactor](https://www.codefactor.io/repository/github/rosenbjerg/agentdeploy/badge/main)](https://www.codefactor.io/repository/github/rosenbjerg/nxplx/overview/master)
 
 NxPlx is designed with deployment using Docker in mind
 

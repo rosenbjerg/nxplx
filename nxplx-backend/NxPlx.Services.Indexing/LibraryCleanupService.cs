@@ -36,7 +36,7 @@ namespace NxPlx.Services.Index
                 var toDelete = await _databaseContext.FilmFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
                 _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
-                await _cacheClearer.Clear("OVERVIEW");
+                await _cacheClearer.Clear("overview");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }
@@ -55,7 +55,7 @@ namespace NxPlx.Services.Index
                 var toDelete = await _databaseContext.EpisodeFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
                 _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
-                await _cacheClearer.Clear("OVERVIEW");
+                await _cacheClearer.Clear("overview");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }

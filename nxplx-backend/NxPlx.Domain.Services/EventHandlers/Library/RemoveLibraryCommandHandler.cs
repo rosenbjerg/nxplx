@@ -24,18 +24,19 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
         }
         public async Task<bool> Handle(RemoveLibraryCommand command, CancellationToken cancellationToken = default)
         {
-            foreach (var user in await _context.Users.Where(u => u.LibraryAccessIds.Contains(command.LibraryId)).ToListAsync())
+            var library = await _context.Libraries.FirstOrDefaultAsync(l => l.Id == command.LibraryId, cancellationToken);
+            if (library == null) 
+                return false;
+            
+            foreach (var user in await _context.Users.ToListAsync(cancellationToken))
             {
                 user.LibraryAccessIds.Remove(command.LibraryId);
             }
             await _context.SaveChangesAsync(cancellationToken);
 
-            var library = await _context.Libraries.FirstOrDefaultAsync(l => l.Id == command.LibraryId, CancellationToken.None);
-            if (library == null) return false;
-
             _context.Libraries.Remove(library);
             await _context.SaveChangesAsync(CancellationToken.None);
-            await _cacheClearer.Clear("OVERVIEW");
+            await _cacheClearer.Clear("overview");
 
             _logger.LogInformation("Deleted library {Username}", library.Name);
             return true;

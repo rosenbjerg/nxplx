@@ -37,10 +37,8 @@ interface State {
 
 let volume: number = Store.local.getFloatEntry("player_volume") || 1.0;
 let muted: boolean = Store.local.getBooleanEntry("player_muted");
-let autoplay: boolean = Store.local.getBooleanEntry("player_autoplay");
 
 const setVolume = (vl: number) => Store.local.setEntry("player_volume", volume = vl);
-const setAutoplay = (ap: boolean) => Store.local.setEntry("player_autoplay", autoplay = ap);
 const setMuted = (mu: boolean) => Store.local.setEntry("player_muted", muted = mu);
 
 // declare const cast;
@@ -126,7 +124,7 @@ export default class VideoPlayer extends Component<Props, State> {
         setTimeout(() => this.videoContainer?.focus(), 0);
         const volumeIcon = !muted ? (volume > 0.50 ? 'volume_up' : (volume > 0.10 ? 'volume_down' : 'volume_mute')) : 'volume_off';
         return (
-            <div tabIndex={0} onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
+            <div tabIndex={0} autofocus onKeyDown={this.onKeyPress} ref={this.bindVideoContainer} class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
                 <span class={`${style.title} ${style.topControls}`}>{title}</span>
                 <div class={style.bottomControls}>
                     <FancyTrack onSeek={this.onSeek} primaryPct={(currentTime/duration) * 100} secondaryPct={(buffered/duration) * 100} outerStyle={"width: calc(100vw - 12px); margin-left: 6px; margin-right: 6px; margin-bottom: 2px"}/>
@@ -160,7 +158,7 @@ export default class VideoPlayer extends Component<Props, State> {
                        onClick={this.clickOnVideo}
                        class={style.video}
                        muted={muted}
-                       autoPlay={autoplay}
+                       autoPlay={true}
                        poster={backdrop}
                        controls={false}
                        onTimeUpdate={this.onTimeChange}
@@ -272,12 +270,10 @@ export default class VideoPlayer extends Component<Props, State> {
     }
     private playVideo = () => {
         if (!this.video) return;
-        setAutoplay(true);
         return this.video.play();
     }
     private pauseVideo = () => {
         if (!this.video) return;
-        setAutoplay(false);
         this.video.pause();
     }
     private onTimeChange = () => {
