@@ -35,7 +35,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
 
             _context.Libraries.Remove(library);
             await _context.SaveChangesAsync(CancellationToken.None);
-            await _cacheClearer.Clear("OVERVIEW");
+            await _cacheClearer.Clear("overview");
 
             _logger.LogInformation("Deleted library {Username}", library.Name);
             return true;

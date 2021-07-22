@@ -92,7 +92,7 @@ namespace NxPlx.Services.Index
 
                 _context.FilmFiles.AddRange(newFilm);
                 await _context.SaveChangesAsync();
-                await _cacheClearer.Clear("OVERVIEW");
+                await _cacheClearer.Clear("overview");
 
                 foreach (var detail in details)
                     _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
@@ -136,7 +136,7 @@ namespace NxPlx.Services.Index
 
             _context.AddRange(newEpisodes);
             await _context.SaveChangesAsync();
-            await _cacheClearer.Clear("OVERVIEW");
+            await _cacheClearer.Clear("overview");
 
             foreach (var detail in details)
                 _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
