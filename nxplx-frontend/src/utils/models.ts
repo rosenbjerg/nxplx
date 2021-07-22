@@ -1,5 +1,5 @@
 
-type imagesize = 100|190|260|270|1280;
+export type imagesize = 100|190|260|270|1280;
 export const imageUrl = (url:string, width:imagesize, fallbackUrl?:string) => {
     if (!url && !fallbackUrl) return `/assets/images/w${width}.jpg`;
     return `/api/image/w${width}/${url ?? fallbackUrl}`;

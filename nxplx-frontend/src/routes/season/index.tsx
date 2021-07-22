@@ -7,12 +7,13 @@ import { formatInfoPair } from "../../utils/common";
 import http from "../../utils/http";
 import { imageUrl, SeasonDetails, SeriesDetails } from "../../utils/models";
 import * as style from "./style.css";
-import { LazyImage } from "../../components/Entry";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import { Link } from "preact-router";
 import SelectPlaybackMode from "../../modals/SelectPlaybackMode";
 import PageTitle from "../../components/PageTitle";
+import { useBackgroundGradient } from "../../utils/hooks";
+import LazyImage from "../../components/LazyImage";
 
 interface EpisodeProgress {
     fileId: number
@@ -27,8 +28,6 @@ interface Props {
 interface State {
     series: SeriesDetails,
     season: SeasonDetails,
-    bg: string,
-    bgImg: string
     progress?: Map<number, number>
     showPlaybackModeSelector: boolean
 }
@@ -38,8 +37,7 @@ export default class Season extends Component<Props, State> {
         http.getJson<SeriesDetails>(`/api/series/${this.props.id}/${this.props.season}/detail`)
             .then(async seriesDetails => {
                 const seasonDetails: SeasonDetails = seriesDetails.seasons[0];
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(seriesDetails.backdropPath, 1280)}");`;
-                this.setState({ series: seriesDetails, season: seasonDetails, bg, bgImg: seriesDetails.backdropPath });
+                this.setState({ series: seriesDetails, season: seasonDetails });
 
                 const progressArray = await http.getJson<EpisodeProgress[]>(`/api/progress/season/${this.props.id}/${this.props.season}`);
                 const progress = toMap(progressArray, p => p.fileId, p => p.progress);
@@ -47,12 +45,13 @@ export default class Season extends Component<Props, State> {
             });
     }
 
-    public render(_, { series, season, bg, bgImg, progress, showPlaybackModeSelector }: State) {
+    public render(_, { series, season, progress, showPlaybackModeSelector }: State) {
         if (!series) {
             return (<Loading fullscreen/>);
         }
+        const gradient = useBackgroundGradient(series.backdropPath);
         return (
-            <div class={style.bg} style={bg} data-bg={bgImg}>
+            <div class={style.bg} style={gradient} data-bg={series.backdropPath}>
                 <PageTitle title={`Season ${season.number} - ${series.name} - nxplx`}/>
                 <div class={`nx-scroll ${style.content}`}>
                     <div>

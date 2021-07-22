@@ -8,7 +8,6 @@ import http from "../../utils/http";
 import { imageUrl } from "../../utils/models";
 import { FileInfo } from "../../utils/models";
 import * as style from "./style.css";
-import { createSnackbar, Snackbar } from "@snackbar/core";
 import Store from "../../utils/storage";
 import PageTitle from "../../components/PageTitle";
 
@@ -33,8 +32,6 @@ export default class Watch extends Component<Props, State> {
     private videoEvents = CreateEventBroker();
     private previousUnload: ((this: WindowEventHandlers, ev: BeforeUnloadEvent) => any) | null = null;
     private playerTime = 0;
-    private suggestNext = true;
-    private openSnackbar: Snackbar|null = null;
 
     public render({ fid, kind }: Props, { info, subtitleLanguage, progress }: State) {
         if (!info) return (<Loading fullscreen/>);
@@ -79,21 +76,6 @@ export default class Watch extends Component<Props, State> {
         });
         this.videoEvents.subscribe<{ time: number }>("time_changed", ({ time }) => {
             this.playerTime = time;
-            if (this.suggestNext && time > this.state.info!.duration - (40 + 2)) {
-                this.suggestNext = false;
-                this.openSnackbar = createSnackbar('Play next?', {
-                    actions: [
-                        {
-                            text: 'Yes',
-                            callback: this.tryPlayNext
-                        },
-                        {
-                            text: 'X',
-                            callback: (_, snackbar) => snackbar.destroy()
-                        }
-                    ]
-                })
-            }
         });
         this.load();
     }
@@ -107,8 +89,6 @@ export default class Watch extends Component<Props, State> {
     private tryPlayNext = () => {
         void http.getJson<NextEpisode>(`/api/series/file/${this.props.fid}/next?mode=${Store.session.getEntry('playback-mode', 'default')}`).then(next => {
             this.saveProgress(true);
-            if (this.openSnackbar) void this.openSnackbar.destroy();
-            this.suggestNext = true;
             this.playerTime = 0;
             route(`/watch/${this.props.kind}/${next.fid}`);
         });
@@ -116,7 +96,6 @@ export default class Watch extends Component<Props, State> {
 
     private load = () => {
         const { kind, fid } = this.props;
-        this.suggestNext = kind === 'series';
         void Promise.all([
             http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
             http.get(`/api/subtitle/preference/${kind}/${fid}`).then(res => res.text()),
@@ -138,3 +117,5 @@ export default class Watch extends Component<Props, State> {
         }
     };
 }
+
+

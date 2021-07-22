@@ -4,38 +4,32 @@ import Loading from '../../components/Loading';
 import Subtitles from '../../components/Subtitles';
 import { formatInfoPair, formatRunTime } from "../../utils/common";
 import http from '../../utils/http';
-import { FilmDetails, imageUrl } from "../../utils/models";
+import { FilmDetails } from "../../utils/models";
 import * as style from './style.css';
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import PageTitle from "../../components/PageTitle";
+import { useBackgroundGradient } from "../../utils/hooks";
 
 interface Props { id:string }
 
-interface State { details?:FilmDetails, bg:string }
+interface State { details?:FilmDetails }
 
-export default class Home extends Component<Props, State> {
 
-    public state = {
-        bg: '',
-        subtitle: 'none'
-    };
-
+export default class Film extends Component<Props, State> {
     public componentDidMount() : void {
         http.get(`/api/film/${this.props.id}/details`)
             .then(response => response.json())
-            .then(details => {
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
-                this.setState({ details, bg });
-        });
+            .then(details => this.setState({ details }));
     }
 
-    public render(_, { details, bg }:State) {
+    public render(_, { details }:State) {
         if (!details) {
             return (<Loading fullscreen/>);
         }
+        const gradient = useBackgroundGradient(details.backdropPath);
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdropPath}>
+            <div class={style.bg} style={gradient} data-bg={details.backdropPath}>
                 <PageTitle title={`${details.title} - nxplx`} />
                 <div class={`nx-scroll ${style.content}`}>
                     <div>
