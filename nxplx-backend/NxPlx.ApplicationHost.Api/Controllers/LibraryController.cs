@@ -28,8 +28,8 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         
         [HttpGet("browse")]
         [AdminOnly]
-        public async Task<List<string>> Browse([FromQuery, Required]string cwd) 
-            => await _eventDispatcher.Dispatch(new ListDirectoryEntriesQuery(cwd));
+        public async Task<DirectoryEntries> Browse([FromQuery]string? cwd) 
+            => await _eventDispatcher.Dispatch(new ListDirectoryEntriesQuery(cwd ?? string.Empty));
 
         [HttpPost("")]
         [AdminOnly]
