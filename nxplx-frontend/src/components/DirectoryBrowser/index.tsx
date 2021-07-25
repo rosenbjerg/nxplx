@@ -12,7 +12,6 @@ interface Directories {
     parent: string
     current: string
     directories: DirectoryEntry[]
-
 }
 
 interface Props {
@@ -20,7 +19,7 @@ interface Props {
 }
 interface State {
     cwd: string,
-    dirs: Directories|undefined,
+    dirs: Directories | null,
     loading: boolean
 }
 
@@ -28,13 +27,8 @@ const getDirs = cwd => http.getJson<Directories>(`/api/library/browse?cwd=${cwd}
 
 export default class DirectoryBrowser extends Component<Props, State> {
 
-    public state = {
-        cwd: '',
-        loading: false,
-        dirs: undefined
-    };
-
     private queued? : NodeJS.Timeout;
+    private inputRef: HTMLElement = null!;
 
     public componentDidMount(): void {
         this.setCwd('')
@@ -46,7 +40,10 @@ export default class DirectoryBrowser extends Component<Props, State> {
             this.setState({ loading: true });
             getDirs(cwd)
                 .then(dirs => this.setState({ cwd: cwd.replace(/\\/g, '/'), dirs }))
-                .finally(() => this.setState({ loading: false }));
+                .finally(() => {
+                    this.setState({ loading: false });
+                    setTimeout(() => this.inputRef.focus(), 0);
+                });
         }, wait ? 500 : 0);
     }
     public changeCwd = (ev) => {
@@ -58,7 +55,7 @@ export default class DirectoryBrowser extends Component<Props, State> {
             <div class={style.container}>
                 <div class="center-content">
                     <button type="button" disabled={cwd === '' || cwd === '/'} class="bordered" onClick={this.up}>..</button>
-                    <input autofocus disabled={loading} class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
+                    <input ref={this.setInputRef} disabled={loading} class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
                     <button type="button" disabled={cwd === '' || cwd === '/'} class="bordered" onClick={this.selectDirectory}>{translate('select')}</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
@@ -68,11 +65,12 @@ export default class DirectoryBrowser extends Component<Props, State> {
                 </ul>
             </div>);
     }
+    private setInputRef = ref => this.inputRef = ref;
     private selectDirectory = () => {
         this.props.onSelected(this.state.cwd);
     }
     private up = () => {
-        if (this.state.dirs)
+        if (this.state.dirs !== null)
             this.setCwd(this.state.dirs.parent);
     }
 
