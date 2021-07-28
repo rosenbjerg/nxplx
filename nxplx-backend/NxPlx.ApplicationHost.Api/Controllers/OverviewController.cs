@@ -19,11 +19,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class OverviewController : ControllerBase
     {
         private readonly IApplicationEventDispatcher _dispatcher;
-        private readonly CachingApplicationEventDispatcher _cachingApplicationEventDispatcher;
+        private readonly ICachingEventDispatcher _cachingApplicationEventDispatcher;
 
         public OverviewController(
             IApplicationEventDispatcher dispatcher,
-            CachingApplicationEventDispatcher cachingApplicationEventDispatcher)
+            ICachingEventDispatcher cachingApplicationEventDispatcher)
         {
             _dispatcher = dispatcher;
             _cachingApplicationEventDispatcher = cachingApplicationEventDispatcher;

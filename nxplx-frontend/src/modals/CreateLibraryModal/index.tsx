@@ -35,7 +35,7 @@ export default class CreateLibraryModal extends Component<Props, State> {
                     <input class="inline-edit fullwidth gapped" name="path" value={selectedDirectory} onChange={linkState(this, 'selectedDirectory')} placeholder={translate('path')} type="text" required/>
                     <button type="submit" class="material-icons bordered right">done</button>
                     <button type="button" class="bordered" onClick={() => this.setState({ showDirectories: !showDirectories })}>{translate(showDirectories ? 'hide directories' : 'show directories')}</button>
-                    {showDirectories && (<DirectoryBrowser onSelected={dir => this.setState({ selectedDirectory: dir })}/>)}
+                    {showDirectories && (<DirectoryBrowser onSelected={dir => this.setState({ selectedDirectory: dir, showDirectories: false })}/>)}
                 </form>
             </Modal>
         );

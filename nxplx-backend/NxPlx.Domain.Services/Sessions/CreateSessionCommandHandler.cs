@@ -19,6 +19,8 @@ namespace NxPlx.Domain.Services.Sessions
         }
         public async Task Handle(CreateSessionCommand command, CancellationToken cancellationToken = default)
         {
+            await _distributedCache.AddToList($"{SessionPrefix}:{command.UserId}", command.Token, command.Session, command.Validity, cancellationToken);
+            
             var sessions = await _distributedCache.GetObjectAsync<List<string>>($"{SessionPrefix}:{command.UserId}", cancellationToken);
             sessions ??= new List<string>();
             await _distributedCache.SetObjectAsync($"{SessionPrefix}:{command.Token}", command.Session, new DistributedCacheEntryOptions

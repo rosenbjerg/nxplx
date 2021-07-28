@@ -2,63 +2,88 @@ import { Component, h } from "preact";
 import http from "../../utils/http";
 import * as style from './style.css'
 import { translate } from "../../utils/localisation";
+import { useCallback } from "preact/hooks";
+
+interface DirectoryEntry {
+    name: string
+    path: string
+}
+interface Directories {
+    parent: string
+    current: string
+    directories: DirectoryEntry[]
+}
 
 interface Props {
     onSelected: (dir:string) => void;
 }
 interface State {
-    cwd:string,
-    dirs: string[],
+    cwd: string,
+    dirs: Directories | null,
     loading: boolean
 }
 
-const getDirs = cwd => http.getJson<string[]>(`/api/library/browse?cwd=${cwd}`);
+const getDirs = cwd => http.getJson<Directories>(`/api/library/browse?cwd=${cwd}`);
 
 export default class DirectoryBrowser extends Component<Props, State> {
 
-    public state = {
-        cwd: '',
-        dirs: [],
-        loading: false
-    };
+    private queued? : NodeJS.Timeout;
+    private inputRef: HTMLElement = null!;
 
     public componentDidMount(): void {
-        this.setCwd('/')
+        this.setCwd('')
     }
 
-    public setCwd(cwd:string){
-        this.setState({ loading: true });
-        getDirs(cwd)
-            .then(dirs => this.setState({ cwd: cwd.replace(/\\/g, '/'), dirs }))
-            .finally(() => this.setState({ loading: false }));
+    public setCwd = (cwd:string, wait?: boolean) => {
+        if (this.queued) clearTimeout(this.queued);
+        this.queued = setTimeout(() => {
+            this.setState({ loading: true });
+            getDirs(cwd)
+                .then(dirs => this.setState({ cwd: cwd.replace(/\\/g, '/'), dirs }))
+                .finally(() => {
+                    this.setState({ loading: false });
+                    setTimeout(() => this.inputRef.focus(), 0);
+                });
+        }, wait ? 500 : 0);
     }
     public changeCwd = (ev) => {
-        this.setCwd(ev.target.value || '/');
+        this.setCwd(ev.target.value || '', true);
     }
 
-    public render(_, {cwd, dirs}:State) {
+    public render(_, {cwd, dirs, loading}:State) {
         return (
             <div class={style.container}>
                 <div class="center-content">
-                    <button disabled={cwd === '/'} class="bordered" onClick={this.up}>..</button>
-                    <input class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
-                    <button disabled={cwd === '/'} class="bordered" onClick={this.selectDirectory}>{translate('select')}</button>
+                    <button type="button" disabled={cwd === '' || cwd === '/'} class="bordered" onClick={this.up}>..</button>
+                    <input ref={this.setInputRef} disabled={loading} class="inline-edit" type="text" value={cwd} onChange={this.changeCwd}/>
+                    <button type="button" disabled={cwd === '' || cwd === '/'} class="bordered" onClick={this.selectDirectory}>{translate('select')}</button>
                 </div>
                 <ul class={[style.directories, 'nx-scroll'].join(" ")}>
-                    {dirs.map(d => (
-                        <li onClick={() => this.setCwd(`${cwd === '/' ? '' : cwd}/${d}`)} key={d}>{d}</li>
+                    {dirs && dirs.directories.map(d => (
+                        <Directory key={d.name} dirName={d.name} path={d.path} onClick={this.setCwd}/>
                     ))}
                 </ul>
             </div>);
     }
+    private setInputRef = ref => this.inputRef = ref;
     private selectDirectory = () => {
         this.props.onSelected(this.state.cwd);
     }
     private up = () => {
-        const cwd = this.state.cwd;
-        const index = cwd.lastIndexOf('/');
-        const path = index === -1 ? cwd : cwd.substr(0, index);
-        this.setCwd(path || '/');
+        if (this.state.dirs !== null)
+            this.setCwd(this.state.dirs.parent);
     }
 
+}
+
+interface DirectoryProps {
+    dirName: string
+    path: string
+    onClick: (path:string) => void
+}
+const Directory = ({dirName, path, onClick} : DirectoryProps) => {
+    const clickHandler = useCallback(() => onClick(path), [ path ]);
+    return (
+        <li onClick={clickHandler}>{dirName}</li>
+    );
 }
