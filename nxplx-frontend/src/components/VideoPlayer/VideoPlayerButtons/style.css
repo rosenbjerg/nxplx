@@ -1,0 +1,17 @@
+.centerPlayButton {
+    font-size: 100px;
+    color: white;
+    cursor: pointer;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    top: calc(50% + 28px);
+    margin-top: -50px;
+    text-shadow: 1px 1px 3px black;
+}
+
+.fullscreen .centerPlayButton {
+    top: 50%;
+}

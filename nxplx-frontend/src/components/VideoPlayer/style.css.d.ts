@@ -2,16 +2,11 @@
 declare namespace StyleCssNamespace {
     export interface IStyleCss {
         bottomControls: string;
-        centerPlayButton: string;
         focused: string;
-        hover: string;
-        loaded: string;
         playing: string;
-        range: string;
         title: string;
         topControls: string;
         touch: string;
-        track: string;
         video: string;
         videoContainer: string;
         videoControls: string;
