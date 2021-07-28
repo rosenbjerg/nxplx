@@ -12,10 +12,12 @@
         <PackageReference Include="NUnit" Version="3.13.2" />
         <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+        <PackageReference Include="TngTech.ArchUnitNET.NUnit" Version="0.7.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Mapping\NxPlx.Application.Mapping.csproj" />
+      <ProjectReference Include="..\NxPlx.ApplicationHost.Api\NxPlx.ApplicationHost.Api.csproj" />
       <ProjectReference Include="..\NxPlx.Services.Indexing\NxPlx.Services.Indexing.csproj" />
     </ItemGroup>
 
