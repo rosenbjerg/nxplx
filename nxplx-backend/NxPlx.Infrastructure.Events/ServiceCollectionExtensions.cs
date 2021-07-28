@@ -11,7 +11,7 @@ namespace NxPlx.Infrastructure.Events
         {
             return serviceCollection
                 .AddScoped<IEventDispatcher, EventDispatcher>()
-                .AddScoped<CachingApplicationEventDispatcher>()
+                .AddScoped<ICachingEventDispatcher, CachingApplicationEventDispatcher>()
                 .AddScoped<IApplicationEventDispatcher, ApplicationEventDispatcher>()
                 .AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         }

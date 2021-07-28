@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NxPlx.Application.Models\NxPlx.Application.Models.csproj" />
       <ProjectReference Include="..\NxPlx.Infrastructure.Events\NxPlx.Infrastructure.Events.csproj" />
     </ItemGroup>
 
