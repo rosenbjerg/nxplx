@@ -9,9 +9,10 @@
     box-shadow: 2px 2px 5px 0 rgba(33, 33, 33, 1);
     border-radius: 2px;
     cursor: pointer;
-    transition: border 100ms;
+    transition: border 100ms, box-shadow 150ms;
     /*vertical-align: middle;*/
 }
+
 .entry:hover,
 .entry:focus {
     box-shadow: 0 0 5px 3px var(--hover-border-color);
@@ -28,6 +29,7 @@
     box-shadow: 1px -1px 2px 0px rgba(0, 0, 0, 0.3);
     border-radius: 1px;
 }
+
 .autosize {
     width: 86px;
 }
@@ -37,21 +39,25 @@
         min-width: calc((100% / 13) - 8px);
     }
 }
+
 @media only screen and (min-width: 2339px) {
     .autosize {
         min-width: calc((100% / 17) - 8px);
     }
 }
+
 @media only screen and (min-width: 2808px) {
     .autosize {
         min-width: calc((100% / 20) - 8px);
     }
 }
+
 @media only screen and (min-width: 3114px) {
     .autosize {
         min-width: calc((100% / 23) - 8px);
     }
 }
+
 @media only screen and (min-width: 3726px) {
     .autosize {
         min-width: calc((100% / 29) - 8px);
@@ -63,56 +69,67 @@
         min-width: calc((100% / 12) - 8px);
     }
 }
+
 @media only screen and (max-width: 1737px) {
     .autosize {
         min-width: calc((100% / 11) - 8px);
     }
 }
+
 @media only screen and (max-width: 1584px) {
     .autosize {
         min-width: calc((100% / 10) - 8px);
     }
 }
+
 @media only screen and (max-width: 1431px) {
     .autosize {
         min-width: calc((100% / 9) - 8px);
     }
 }
+
 @media only screen and (max-width: 1278px) {
     .autosize {
         min-width: calc((100% / 8) - 8px);
     }
 }
+
 @media only screen and (max-width: 1125px) {
     .autosize {
         min-width: calc((100% / 7) - 8px);
     }
 }
+
 @media only screen and (max-width: 972px) {
     .autosize {
         min-width: calc((100% / 6) - 8px);
     }
 }
+
 @media only screen and (max-width: 819px) {
     .autosize {
         min-width: calc((100% / 5) - 8px);
     }
 }
+
 @media only screen and (max-width: 666px) {
     .autosize {
         min-width: calc((100% / 4) - 8px);
     }
 }
+
 @media only screen and (max-width: 513px) {
     .autosize {
         min-width: calc((100% / 3) - 8px);
     }
 }
+
 @media only screen and (max-width: 360px) {
     .autosize {
         min-width: calc((100% / 2) - 8px);
     }
 }
+
 @media only screen and (max-width: 207px) {
     .autosize {
         min-width: calc((100% / 1) - 8px);
