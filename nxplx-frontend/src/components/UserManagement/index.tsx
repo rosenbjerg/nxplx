@@ -18,6 +18,23 @@ interface State {
 	showAll: boolean;
 }
 
+const OnlineIndicator = (props: { isOnline: boolean, lastSeen: string }) => {
+	return (
+		<span style={{ 'color': props.isOnline ? 'green' : 'gray', 'margin-right': '4px', 'cursor': 'default' }} title={props.lastSeen}>•</span>
+	);
+};
+
+const AdminIndicator = () => {
+	return (
+		<i class="material-icons" style="font-size: 10pt; cursor: default" title={translate('admin')}>supervisor_account</i>
+	);
+};
+const HasChangedPasswordIndicator = () => {
+	return (
+		<i class="material-icons" style="font-size: 9pt; cursor: default" title={translate('has changed password')}>lock</i>
+	);
+};
+
 export default class UserManagement extends Component<Props, State> {
 	public componentDidMount() {
 		http.getJson<User[]>('/api/user/list').then(users => {
@@ -51,10 +68,10 @@ export default class UserManagement extends Component<Props, State> {
 							return (
 								<tr key={u.id}>
 									<td colSpan={1}>
-										<span style={{ 'color': u.isOnline ? 'green' : 'gray', 'margin-right': '4px', 'cursor:': '' }}
-											  title={u.lastSeen}>•</span>
+										<OnlineIndicator isOnline={u.isOnline} lastSeen={u.lastSeen} />
 										<span style="font-size: 12pt;">{u.username}</span>
-										{u.admin && <i class="material-icons" style="font-size: 12pt;">supervisor_account</i>}
+										{u.admin && <AdminIndicator />}
+										{u.hasChangedPassword && <HasChangedPasswordIndicator />}
 									</td>
 									<td>
 										{!u.admin && (
