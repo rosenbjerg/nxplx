@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -36,14 +37,13 @@ namespace NxPlx.Test.UnitTests
             var finalSourceModel = ((IMutableModel)sourceModel).FinalizeModel().GetRelationalModel();
             var finalTargetModel = databaseContext.Model.GetRelationalModel();
 
-            var hasDifferences = modelDiffer.HasDifferences(finalSourceModel, finalTargetModel);
-            if(hasDifferences)
+            var differences = modelDiffer.GetDifferences(finalSourceModel, finalTargetModel);
+            if (differences.Any())
             {
-                var changes = modelDiffer.GetDifferences(finalSourceModel, finalTargetModel);
-                Assert.True(false, $"{changes.Count} changes between migrations and model. Debug this test for more details");
+                Assert.True(false, $"{differences.Count} changes between migrations and model. Debug this test for more details");
             }
 
-            Assert.False(hasDifferences);
+            Assert.Pass();
         }
     }
 }

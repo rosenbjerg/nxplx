@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -9,25 +7,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
+using NxPlx.Application.Events;
 using NxPlx.Application.Mapping;
 using NxPlx.Application.Services;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
-using NxPlx.Domain.Events.Sessions;
-using NxPlx.Domain.Models;
-using NxPlx.Domain.Services;
 using NxPlx.Domain.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Infrastructure.Events;
-using NxPlx.Infrastructure.Events.Handling;
+using NxPlx.Infrastructure.Events.Dispatching;
 using NxPlx.Services.Index;
 using Serilog.Core;
+using SessionOptions = NxPlx.Application.Core.Options.SessionOptions;
 
 namespace NxPlx.ApplicationHost.Api
 {
@@ -44,7 +40,7 @@ namespace NxPlx.ApplicationHost.Api
             AddOptions<LoggingOptions>(services);
             AddOptions<JobDashboardOptions>(services);
             AddOptions<ApiDocumentationOptions>(services);
-            AddOptions<NxPlx.Application.Core.Options.SessionOptions>(services);
+            AddOptions<SessionOptions>(services);
             return services.BuildServiceProvider();
         }
         
@@ -59,19 +55,18 @@ namespace NxPlx.ApplicationHost.Api
                 })
                 .AddJsonOptions(options => ConfigureJsonSerializer(options.JsonSerializerOptions));
 
-            services.AddJobProcessing(optionsProvider);
+            var connectionStrings = optionsProvider.GetRequiredService<ConnectionStrings>();
+            var hostingOptions = optionsProvider.GetRequiredService<HostingOptions>();
+            var apiDocumentationOptions = optionsProvider.GetRequiredService<ApiDocumentationOptions>();
+            
             
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
-
             
-            var hostingOptions = optionsProvider.GetRequiredService<HostingOptions>();
             services.AddWebSockets(options => options.AllowedOrigins.Add(hostingOptions.Origin));
-
-            services.AddApiDocumentation(optionsProvider);
-            
+            services.AddApiDocumentation(apiDocumentationOptions);
+            services.AddJobProcessing(connectionStrings);
             services.AddAutoMapper(typeof(DtoProfile), typeof(TMDbProfile));
             
-            var connectionStrings = optionsProvider.GetRequiredService<ConnectionStrings>();
             
             services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             services.AddDbContext<DatabaseContext>(options =>
@@ -111,9 +106,9 @@ namespace NxPlx.ApplicationHost.Api
             );
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseContext databaseContext, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider)
         {
-            InitializeDatabase(databaseContext);
+            InitializeDatabase(serviceProvider);
 
             app.UseMiddleware<OperationContextMiddleware>();
             app.UseMiddleware<LoggingEnrichingMiddleware>();
@@ -123,8 +118,11 @@ namespace NxPlx.ApplicationHost.Api
             app.UseForwardedHeaders();
             if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             
-            app.UseJobDashboard("/api/dashboard", serviceProvider);
-            app.UseApiDocumentation("/api/swagger", serviceProvider);
+            var jobDashboardOptions = serviceProvider.GetRequiredService<JobDashboardOptions>();
+            app.UseJobDashboard("/api/dashboard", jobDashboardOptions);
+            
+            var apiDocumentationOptions = serviceProvider.GetRequiredService<ApiDocumentationOptions>();
+            app.UseApiDocumentation("/api/swagger", apiDocumentationOptions);
             
             app.UseWebSockets();
             app.UseRouting();
@@ -132,19 +130,14 @@ namespace NxPlx.ApplicationHost.Api
             app.UseStaticFileHandler("public");
         }
 
-        private static void InitializeDatabase(DatabaseContext databaseContext)
+        private static void InitializeDatabase(IServiceProvider serviceProvider)
         {
+            using var scope = serviceProvider.CreateScope();
+            var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             databaseContext.Database.Migrate();
-            if (!databaseContext.Users.Any(u => u.Username == "admin"))
-            {
-                databaseContext.Add(new User
-                {
-                    Username = "admin",
-                    PasswordHash = PasswordUtils.Hash("changemebaby"),
-                    Admin = true
-                });
-                databaseContext.SaveChanges();
-            }
+            
+            var eventDispatcher = scope.ServiceProvider.GetRequiredService<IApplicationEventDispatcher>();
+            var d = eventDispatcher.Dispatch(new CreateAdminCommand()).GetAwaiter().GetResult();
         }
     }
 }

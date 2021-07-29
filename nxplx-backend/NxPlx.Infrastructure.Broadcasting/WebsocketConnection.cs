@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Net.WebSockets;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using NxPlx.Abstractions;
@@ -13,13 +14,11 @@ namespace NxPlx.Infrastructure.Broadcasting
     public class WebsocketConnection : Connection
     {
         private readonly HttpContext _httpContext;
-        private readonly IOperationContext _operationContext;
         private WebSocket? _websocket;
 
         public WebsocketConnection(HttpContext httpContext, IOperationContext operationContext) : base(operationContext)
         {
             _httpContext = httpContext;
-            _operationContext = operationContext;
         }
 
         public override Task SendMessage(Message message)
@@ -29,26 +28,35 @@ namespace NxPlx.Infrastructure.Broadcasting
             return _websocket.SendAsync(JsonSerializer.SerializeToUtf8Bytes(message), WebSocketMessageType.Text, true, _httpContext.RequestAborted);
         }
 
-        public override async Task KeepConnectionOpen()
+        public override async Task KeepConnectionOpen(CancellationToken cancellationToken)
         {
             if (_websocket != null) throw new Exception("WebSocket has already been accepted");
 
             try
             {
                 _websocket = await _httpContext.WebSockets.AcceptWebSocketAsync();
-            
+
                 var buffer = ArrayPool<byte>.Shared.Rent(4096);
-                while (!_operationContext.OperationCancelled.IsCancellationRequested && (_websocket.State == WebSocketState.Connecting || _websocket.State == WebSocketState.Open))
+                while (!cancellationToken.IsCancellationRequested && _websocket.State is WebSocketState.Connecting or WebSocketState.Open)
                 {
                     WebSocketReceiveResult message;
                     try
                     {
-                        message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), _httpContext.RequestAborted);
+                        message = await _websocket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
                     }
-                    catch (OperationCanceledException) { break; }
-                    catch (WebSocketException) { break; }
-                    catch (IOException) { break; }
-                
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (WebSocketException)
+                    {
+                        break;
+                    }
+                    catch (IOException)
+                    {
+                        break;
+                    }
+
                     if (message.MessageType == WebSocketMessageType.Close)
                         break;
 
@@ -60,9 +68,14 @@ namespace NxPlx.Infrastructure.Broadcasting
                             if (parsed != null)
                                 OnMessageReceived(parsed);
                         }
-                        catch (JsonException) { }
+                        catch (JsonException)
+                        {
+                        }
                     }
                 }
+            }
+            catch (Exception)
+            {
             }
             finally
             {

@@ -1,13 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Distributed;
-using NxPlx.Application.Core;
-using NxPlx.Infrastructure.Events.Dispatching;
-using NxPlx.Infrastructure.Events.Events;
-using NxPlx.Infrastructure.Events.Handling;
-
-namespace NxPlx.Application.Services.EventHandlers
+﻿namespace NxPlx.Application.Services.EventHandlers
 {
 
     

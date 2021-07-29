@@ -113,7 +113,9 @@ namespace NxPlx.Application.Mapping
             CreateMap<Creator, CreatorDto>();
 
             CreateMap<User, UserDto>()
-                .ForMember(dst => dst.Libraries, opt => opt.MapFrom(src => src.LibraryAccessIds));
+                .ForMember(dst => dst.Libraries, opt => opt.MapFrom(src => src.LibraryAccessIds))
+                .ForMember(dst => dst.LastSeen, opt => opt.MapFrom(src => src.LastOnline ?? src.LastLogin))
+                .ForMember(dst => dst.IsOnline, opt => opt.Ignore());
             
             CreateMap<Library, LibraryDto>()
                 .ForMember(dst => dst.Kind, opt => opt.MapFrom(src => src.Kind.ToString().ToLowerInvariant()));

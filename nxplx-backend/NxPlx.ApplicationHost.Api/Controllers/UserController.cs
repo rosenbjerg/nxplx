@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NxPlx.Application.Events;
 using NxPlx.Application.Models;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Domain.Events.Film;

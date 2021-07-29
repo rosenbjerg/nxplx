@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Domain.Events.File;
-using NxPlx.Domain.Models.File;
 using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Domain.Services.EventHandlers.File

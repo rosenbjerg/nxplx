@@ -9,7 +9,6 @@ using NxPlx.Infrastructure.Events.Events;
 namespace NxPlx.Infrastructure.Events.Dispatching
 {
     public class CachingApplicationEventDispatcher : ICachingEventDispatcher
-
     {
         private readonly IEventDispatcher _eventDispatcher;
         private readonly IOperationContext _operationContext;
