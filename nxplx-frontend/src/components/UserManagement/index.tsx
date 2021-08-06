@@ -5,9 +5,9 @@ import http from '../../utils/http';
 import { translate } from '../../utils/localisation';
 import { User } from '../../utils/models';
 import Loading from '../Loading';
-import UserPermissions from '../UserPermissions';
 import CreateUserModal from '../../modals/CreateUserModal';
 import { orderBy } from 'lodash';
+import EditUserLibraryAccessModal from '../../modals/EditUserLibraryAccessModal';
 
 interface Props {}
 
@@ -39,7 +39,7 @@ export default class UserManagement extends Component<Props, State> {
 	public componentDidMount() {
 		http.getJson<User[]>('/api/user/list').then(users => {
 			users.forEach(u => {
-				// if (u.isOnline) u.lastSeen = translate('now');
+				if (u.isOnline) u.lastSeen = translate('now');
 				if (u.lastSeen) u.lastSeen = new Date(u.lastSeen + 'Z').toString();
 				else u.lastSeen = translate('never');
 			});
@@ -54,20 +54,25 @@ export default class UserManagement extends Component<Props, State> {
 					<CreateUserModal onDismiss={() => this.setState({ createUserModalOpen: false })}
 									 onCreated={u => this.setState({ users: add(this.state.users, u) })} />
 				)}
+				{selectedUser && (
+					<EditUserLibraryAccessModal user={selectedUser}
+												onDismiss={() => this.setState({ selectedUser: undefined })}
+												onSaved={() => this.setState({ selectedUser: undefined })} />
+				)}
 
 				{!users ? (<Loading />) : (
 					<table>
 						<thead>
 						<tr>
-							<th colSpan={1}>{translate('username')}</th>
-							<th colSpan={1}>{translate('actions')}</th>
+							<th>{translate('username')}</th>
+							<th>{translate('actions')}</th>
 						</tr>
 						</thead>
 						<tbody>
 						{(showAll ? users : (users.slice(0, 6))).map(u => {
 							return (
 								<tr key={u.id}>
-									<td colSpan={1}>
+									<td>
 										<OnlineIndicator isOnline={u.isOnline} lastSeen={u.lastSeen} />
 										<span style="font-size: 12pt;">{u.username}</span>
 										{u.admin && <AdminIndicator />}
@@ -89,11 +94,11 @@ export default class UserManagement extends Component<Props, State> {
 						})}
 						{users.length > 6 && (
 							<tr>
-								<td colSpan={1} style="cursor: pointer">
+								<td style="cursor: pointer">
 									<span onClick={() => this.setState({ showAll: !showAll })}>
-										<span
-											style="font-size: 12pt; text-decoration: underline">{showAll ? translate('show less') : translate('show all')}</span>
-										<i class="material-icons" style="font-size: 8pt;">{showAll ? 'unfold_less' : 'unfold_more'}</i>
+									<span
+										style="font-size: 12pt; text-decoration: underline">{showAll ? translate('show less') : translate('show all')}</span>
+									<i class="material-icons" style="font-size: 8pt;">{showAll ? 'unfold_less' : 'unfold_more'}</i>
 									</span>
 								</td>
 							</tr>
@@ -103,7 +108,6 @@ export default class UserManagement extends Component<Props, State> {
 				)}
 
 				<button class="bordered" onClick={() => this.setState({ createUserModalOpen: true })}>{translate('create user')}</button>
-				<UserPermissions user={selectedUser} onSave={() => this.setState({ selectedUser: undefined })} />
 			</div>
 		);
 	}

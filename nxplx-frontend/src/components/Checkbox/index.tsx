@@ -1,17 +1,23 @@
-import { h } from "preact";
-import * as style from "./style.css";
+import { h } from 'preact';
+import * as style from './style.css';
+import { useCallback } from 'preact/hooks';
 
 interface Props {
-    checked: boolean,
-    onInput: (ev: any) => void
+	checked: boolean,
+	onInput: (checked: boolean) => void
 }
 
 const Checkbox = (props: Props) => {
-    return (
-        <label>
-            <input class={style.checkbox} checked={props.checked} onInput={props.onInput} type="checkbox"/>
-            <span>&nbsp;</span>
-        </label>
-    );
+	const onInput = useCallback((ev) => {
+		const value = ev.target.checked as boolean;
+		props.onInput(value);
+	}, [props.onInput]);
+
+	return (
+		<label>
+			<input class={style.checkbox} checked={props.checked} onInput={onInput} type="checkbox" />
+			<span>&nbsp;</span>
+		</label>
+	);
 };
 export default Checkbox;
