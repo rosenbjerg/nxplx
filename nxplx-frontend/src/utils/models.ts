@@ -116,6 +116,8 @@ export interface FileInfo {
 	backdropPath: string;
 	backdropBlurHash: string;
 	subtitles: string[];
+	seriesId?: number;
+	seasonNo?: number;
 }
 
 export interface Creator {

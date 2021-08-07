@@ -24,6 +24,7 @@ interface Props {
 	duration: number;
 	playNext: () => any;
 	isSeries: boolean;
+	onBackToSeason: () => any;
 }
 
 interface State {
@@ -92,7 +93,7 @@ export default class VideoPlayer extends Component<Props, State> {
 		}
 	}
 
-	render({ backdrop, src, startTime, subtitles, title, playNext, duration, isSeries }: Props, {
+	render({ backdrop, src, startTime, subtitles, title, playNext, duration, isSeries, onBackToSeason }: Props, {
 		fullscreen,
 		playing,
 		volume,
@@ -105,7 +106,10 @@ export default class VideoPlayer extends Component<Props, State> {
 		return (
 			<div tabIndex={0} autofocus onKeyDown={this.onKeyPress} ref={this.bindVideoContainer}
 				 class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
-				<span class={`${style.title} ${style.topControls}`}>{title}</span>
+				<span class={`${style.title} ${style.topControls}`}>
+					{isSeries && (<i onClick={onBackToSeason} style="cursor: pointer" class="material-icons">arrow_back_ios</i>)}
+					<span>{title}</span>
+				</span>
 				<div class={style.bottomControls}>
 					<SeekTrack onSeek={this.onSeek} primaryPct={(currentTime / duration) * 100} secondaryPct={(buffered / duration) * 100} />
 					<span style="margin-left: 10px; display: inline-block;">
@@ -272,7 +276,6 @@ export default class VideoPlayer extends Component<Props, State> {
 		if (this.video) this.props.events('state_changed', { state: 'ended', time: this.video.currentTime });
 		this.setState({ playing: false });
 	};
-
 	private bindVideo = (ref: HTMLVideoElement | null) => {
 		if (ref !== null)
 			ref.onerror = (e) => console.log(e);
