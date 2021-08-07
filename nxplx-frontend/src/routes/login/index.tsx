@@ -4,8 +4,8 @@ import { Store } from "unistore";
 import { connect } from "unistore/preact";
 import http from "../../utils/http";
 import { translate } from "../../utils/localisation";
-import * as style from "./style.css";
 import PageTitle from "../../components/PageTitle";
+import * as S from "./login.styled";
 
 const actions = (store:Store<NxPlxStore>) => (
     {
@@ -31,17 +31,20 @@ const actions = (store:Store<NxPlxStore>) => (
 const Login = connect([], actions)(
     // @ts-ignore
     ({ login }) => {
-        return (<div class={style.login}>
+        return (
+            <S.Wrapper>
             <PageTitle title='Login at nxplx' />
-            <h1>nxplx</h1>
-            <form onSubmit={login}>
-                <div>
-                    <input class="inline-edit" placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={20} required/>
-                    <input class="inline-edit" placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required/>
-                </div>
-                <button class="bordered">{translate('login')}</button>
-            </form>
-        </div>)
+                <S.Content>
+                    <S.H1>Login</S.H1>
+                    <S.StyledForm onSubmit={login}>
+                        <S.Input placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={50} required/>
+                        <S.Input placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required/>
+                        <S.BottomControls>
+                            <S.Button>{translate('login')}</S.Button>
+                        </S.BottomControls>
+                    </S.StyledForm>
+                </S.Content>
+        </S.Wrapper>)
     }
 );
 export default Login;

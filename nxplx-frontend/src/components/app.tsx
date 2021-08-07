@@ -18,6 +18,8 @@ import http from "../utils/http";
 import { setLocale } from "../utils/localisation";
 import Header from "./Header";
 import Store from "../utils/storage";
+import { ThemeProvider } from "styled-components";
+import { dark } from "../style/themes";
 
 if ((module as any).hot) {
     import("preact/debug");
@@ -33,21 +35,23 @@ export default class App extends Component {
     public render() {
         return (
             <Provider store={store}>
-                <div id="app">
-                    <Header/>
-                    <Router>
-                        <Route path="/" default component={Home}/>
-                        <Route path="/login" component={Login}/>
-                        <Route path="/film/:id" component={Film}/>
-                        <Route path="/collection/:id" component={Collection}/>
-                        <Route path="/series/:id" component={Series}/>
-                        <Route path="/series/:id/:season" component={Season}/>
-                        <Route path="/admin" component={Admin}/>
-                        <Route path="/profile" component={Profile}/>
-                        <Route path="/dashboard" component={Dashboard}/>
-                        <Route path="/watch/:kind/:fid" component={Watch}/>
-                    </Router>
-                </div>
+                <ThemeProvider theme={dark}>
+                    <div id="app">
+                        <Header/>
+                        <Router>
+                            <Route path="/" default component={Home}/>
+                            <Route path="/login" component={Login}/>
+                            <Route path="/film/:id" component={Film}/>
+                            <Route path="/collection/:id" component={Collection}/>
+                            <Route path="/series/:id" component={Series}/>
+                            <Route path="/series/:id/:season" component={Season}/>
+                            <Route path="/admin" component={Admin}/>
+                            <Route path="/profile" component={Profile}/>
+							<Route path="/dashboard" component={Dashboard}/>
+                            <Route path="/watch/:kind/:fid" component={Watch}/>
+                        </Router>
+                    </div>
+                </ThemeProvider>
             </Provider>
         );
     }
