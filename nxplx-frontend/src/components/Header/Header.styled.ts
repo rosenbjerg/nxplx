@@ -8,9 +8,28 @@ export const Wrapper = styled.header`
   left: 0;
   justify-content: space-between;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  position: fixed;
+  position: sticky;
   width: 100%;
+  height: 64px;
 `;
+
+export const Content = styled.div`
+  
+`
+
+export const DesktopMenu = styled.div`
+  display: none;
+  @media(min-width: 400px){
+    display: flex;
+  }
+`
+
+export const MobileMenu = styled.div`
+  display: block;
+  @media(min-width: 400px){
+      display: none;
+  }
+`
 
 export const Img = styled.img`
 
@@ -25,7 +44,6 @@ export const Nav = styled.nav`
 `;
 
 export const NavLink = styled(Link)`
-  padding-right: 16px;
   display: grid;
   place-content: center;
   text-decoration: none;
@@ -35,9 +53,14 @@ export const NavLink = styled(Link)`
 export const Icon = styled.i`
   color: ${props => props.theme.white};
   font-size: 26px;
+  height: 64px;
+  width: 64px;
+  line-height: 64px;
+  text-align: center;
 
 `;
 
-export const DesktopMenu = styled.span`
-  
+export const MenuItems = styled.div<{mobile:boolean}>`
+  display: flex;
+  flex-direction: ${props => props.mobile? "column" : "row"};
 `
