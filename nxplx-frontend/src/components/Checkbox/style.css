@@ -33,6 +33,7 @@
     background-position: center;
     background-size: 25px;
     border-radius: 2px;
+    filter: invert(1);
 }
 
 .checkbox:disabled + span {
