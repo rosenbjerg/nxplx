@@ -30,20 +30,20 @@ export default class BlurhashCanvas extends Component<Props> {
     };
 
     draw = () => {
-        const { hash, height, punch, width } = this.props;
+        if (!this.canvas)
+            return;
 
-        if (this.canvas) {
-            const pixels = decode(hash, width, height, punch);
-            const ctx = this.canvas.getContext('2d');
-            const imageData = ctx!.createImageData(width, height);
-            imageData.data.set(pixels);
-            ctx?.putImageData(imageData, 0, 0);
-        }
+        const { hash, height, punch, width } = this.props;
+        const pixels = decode(hash, width, height, punch);
+        const ctx = this.canvas.getContext("2d");
+        const imageData = ctx!.createImageData(width, height);
+        imageData.data.set(pixels);
+        ctx?.putImageData(imageData, 0, 0);
     };
 
-    render() {
-        const { hash, height, width, style, setRef, ...rest } = this.props;
-
-        return (<canvas {...rest} style={style} height={height} width={width} ref={this.handleRef} />);
+    render({ hash, height, width, style, setRef, ...rest }: Props) {
+        return (
+            <canvas {...rest} style={style} height={height} width={width} ref={this.handleRef} />
+        );
     }
 }

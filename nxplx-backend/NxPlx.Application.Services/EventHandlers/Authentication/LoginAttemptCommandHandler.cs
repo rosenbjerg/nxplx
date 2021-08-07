@@ -2,11 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
+using NxPlx.Application.Core.Options;
 using NxPlx.Application.Events.Authentication;
-
 using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;
 using NxPlx.Domain.Services;
@@ -24,14 +23,13 @@ namespace NxPlx.Application.Services.EventHandlers.Authentication
         private readonly ILogger<LoginAttemptCommandHandler> _logger;
         private readonly TimeSpan _sessionLength;
 
-        public LoginAttemptCommandHandler(DatabaseContext databaseContext, OperationContext operationContext, IConfiguration configuration, IApplicationEventDispatcher dispatcher, ILogger<LoginAttemptCommandHandler> logger)
+        public LoginAttemptCommandHandler(DatabaseContext databaseContext, OperationContext operationContext, SessionOptions sessionOptions, IApplicationEventDispatcher dispatcher, ILogger<LoginAttemptCommandHandler> logger)
         {
             _databaseContext = databaseContext;
             _operationContext = operationContext;
             _dispatcher = dispatcher;
             _logger = logger;
-            var sessionConfig = configuration.GetSection("Session");
-            _sessionLength = TimeSpan.FromDays(int.Parse(sessionConfig["LengthInDays"] ?? "20"));
+            _sessionLength = TimeSpan.FromDays(sessionOptions.LengthInDays ?? 20);
         }
 
         public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Handle(LoginAttemptCommand command, CancellationToken cancellationToken = default)
@@ -48,6 +46,10 @@ namespace NxPlx.Application.Services.EventHandlers.Authentication
                     UserId = user.Id,
                 };
                 await _dispatcher.Dispatch(new CreateSessionCommand(session.UserId, token, session, _sessionLength));
+                
+                user.LastLogin = DateTime.UtcNow;
+                await _databaseContext.SaveChangesAsync(cancellationToken);
+                
                 _logger.LogInformation("User logged in");
                 _operationContext.Session = session;
                 return (token, expiry, user.Admin);

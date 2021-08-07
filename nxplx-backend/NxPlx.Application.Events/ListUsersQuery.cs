@@ -2,9 +2,9 @@
 using NxPlx.Application.Models;
 using NxPlx.Infrastructure.Events.Events;
 
-namespace NxPlx.Domain.Events.Film
+namespace NxPlx.Application.Events
 {
-    public class ListUsersQuery : IDomainQuery<IEnumerable<UserDto>>
+    public class ListUsersQuery : IApplicationQuery<IEnumerable<UserDto>>
     {
     }
 }

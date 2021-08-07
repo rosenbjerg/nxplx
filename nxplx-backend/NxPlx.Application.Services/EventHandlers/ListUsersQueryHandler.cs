@@ -1,32 +1,44 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using NxPlx.Application.Events;
 using NxPlx.Application.Models;
-using NxPlx.Domain.Events.Film;
+using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Infrastructure.Events.Handling;
 
-namespace NxPlx.Domain.Services.EventHandlers.User
+namespace NxPlx.Application.Services.EventHandlers
 {
-    public class ListUsersQueryHandler : IDomainEventHandler<ListUsersQuery, IEnumerable<UserDto>>
+    public class ListUsersQueryHandler : IApplicationEventHandler<ListUsersQuery, IEnumerable<UserDto>>
     {
         private readonly DatabaseContext _context;
         private readonly IMapper _mapper;
+        private readonly ConnectionHub _connectionHub;
 
-        public ListUsersQueryHandler(DatabaseContext context, IMapper mapper)
+        public ListUsersQueryHandler(DatabaseContext context, IMapper mapper, ConnectionHub connectionHub)
         {
             _context = context;
             _mapper = mapper;
+            _connectionHub = connectionHub;
         }
 
         public async Task<IEnumerable<UserDto>> Handle(ListUsersQuery query, CancellationToken cancellationToken = default)
         {
-            return await _context.Users.AsNoTracking()
+            var users = await _context.Users.AsNoTracking()
                 .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
+
+            var online = _connectionHub.ConnectedIds();
+            foreach (var user in users.Where(u => online.Contains(u.Id)))
+            {
+                user.IsOnline = true;
+            }
+
+            return users;
         }
     }
 }

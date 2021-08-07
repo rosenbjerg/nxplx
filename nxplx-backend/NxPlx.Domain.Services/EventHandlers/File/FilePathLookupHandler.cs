@@ -7,7 +7,6 @@ using NxPlx.Abstractions;
 using NxPlx.Application.Models;
 using NxPlx.Domain.Events.File;
 using NxPlx.Domain.Events.Library;
-using NxPlx.Domain.Models.File;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Infrastructure.Events.Dispatching;
 using NxPlx.Infrastructure.Events.Handling;
@@ -42,6 +41,24 @@ namespace NxPlx.Domain.Services.EventHandlers.File
                 
                 _ => throw new ArgumentOutOfRangeException()
             };
+        }
+    }    public class FileLentOutCommandHandler : IDomainEventHandler<FileLentOutCommand, bool>
+    {
+        private readonly IDomainEventDispatcher _eventDispatcher;
+        private readonly IOperationContext _operationContext;
+        private readonly DatabaseContext _databaseContext;
+
+        public FileLentOutCommandHandler(IDomainEventDispatcher eventDispatcher, IOperationContext operationContext, DatabaseContext databaseContext)
+        {
+            _eventDispatcher = eventDispatcher;
+            _operationContext = operationContext;
+            _databaseContext = databaseContext;
+        }
+        public async Task<bool> Handle(FileLentOutCommand query, CancellationToken cancellationToken = default)
+        {
+
+            return true;
+
         }
     }
 }

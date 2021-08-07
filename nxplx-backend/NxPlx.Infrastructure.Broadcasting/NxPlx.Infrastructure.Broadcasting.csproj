@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -14,6 +14,7 @@
     <ItemGroup>
       <ProjectReference Include="..\NxPlx.Application.Core\NxPlx.Application.Core.csproj" />
       <ProjectReference Include="..\NxPlx.Domain.Models\NxPlx.Domain.Models.csproj" />
+      <ProjectReference Include="..\NxPlx.Infrastructure.Database\NxPlx.Infrastructure.Database.csproj" />
     </ItemGroup>
 
 </Project>

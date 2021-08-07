@@ -4,12 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using NxPlx.Application.Models;
-using NxPlx.Application.Services.EventHandlers;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.Domain.Events;
 using NxPlx.Domain.Events.Library;
 using NxPlx.Infrastructure.Events.Dispatching;
-using NxPlx.Infrastructure.Events.Events;
 
 namespace NxPlx.ApplicationHost.Api.Controllers
 {
@@ -19,11 +17,11 @@ namespace NxPlx.ApplicationHost.Api.Controllers
     public class OverviewController : ControllerBase
     {
         private readonly IApplicationEventDispatcher _dispatcher;
-        private readonly CachingApplicationEventDispatcher _cachingApplicationEventDispatcher;
+        private readonly ICachingEventDispatcher _cachingApplicationEventDispatcher;
 
         public OverviewController(
             IApplicationEventDispatcher dispatcher,
-            CachingApplicationEventDispatcher cachingApplicationEventDispatcher)
+            ICachingEventDispatcher cachingApplicationEventDispatcher)
         {
             _dispatcher = dispatcher;
             _cachingApplicationEventDispatcher = cachingApplicationEventDispatcher;

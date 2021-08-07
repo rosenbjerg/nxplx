@@ -1,6 +1,4 @@
-﻿using NxPlx.Application.Core.ValidationFilters;
-
-namespace NxPlx.Application.Core.Options
+﻿namespace NxPlx.Application.Core.Options
 {
     public class JobDashboardOptions : INxplxOptions
     {

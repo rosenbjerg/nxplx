@@ -14,4 +14,9 @@ namespace NxPlx.Domain.Events.File
         public StreamKind StreamKind { get; }
         public long Id { get; }
     }
+
+    public class FileLentOutCommand : IDomainCommand<bool>
+    {
+        
+    }
 }

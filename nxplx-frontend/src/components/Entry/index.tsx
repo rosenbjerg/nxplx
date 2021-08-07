@@ -1,63 +1,7 @@
-import { Component, h } from "preact";
+import { h } from "preact";
 import { Link } from "preact-router";
 import * as style from "./style.css";
-import { useState } from "preact/hooks";
-import { useInView } from "react-intersection-observer";
-import BlurhashCanvas from "../Blurhash";
-
-interface Props2 {
-    src: string;
-    blurhash: string;
-    alt?: string;
-    class?: string
-    blurhashWidth: number
-    blurhashHeight: number
-}
-
-export class LazyImage extends Component<Props2> {
-    private mounted = false;
-    private loadStarted = false;
-    private image = new Image();
-    private intersectionOptions = {
-        threshold: 0.0
-    };
-
-    componentDidMount() {
-        this.mounted = true;
-    }
-
-    componentWillUnmount() {
-        this.mounted = false;
-        if (this.image) this.image.src = "";
-    }
-
-    render() {
-        const [imageLoaded, setImageLoaded] = useState(false);
-
-        if (imageLoaded)
-            return (<img class={this.props.class} src={this.props.src} alt={this.props.alt} />);
-
-        const [ref, inView, _] = useInView(this.intersectionOptions);
-        if (inView && !this.loadStarted) {
-            this.image.addEventListener("load", () => {
-                if (this.mounted) setImageLoaded(true);
-            });
-            this.image.src = this.props.src;
-            this.loadStarted = true;
-        }
-
-        return (
-            <BlurhashCanvas
-                setRef={ref}
-                hash={this.props.blurhash || "LEHV6nWB2yk8pyo0adR*.7kCMdnj"}
-                width={this.props.blurhashWidth}
-                height={this.props.blurhashHeight}
-                class={this.props.class}
-                punch={1}
-            />
-        );
-    }
-}
+import LazyImage from "../LazyImage";
 
 interface Props {
     key: number | string

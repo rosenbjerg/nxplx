@@ -1,6 +1,6 @@
 import orderBy from "lodash/orderBy";
 import { Component, h } from "preact";
-import Entry, { LazyImage } from "../../components/Entry";
+import Entry from "../../components/Entry";
 import Loading from "../../components/Loading";
 import http from "../../utils/http";
 import { imageUrl, MovieCollection } from "../../utils/models";
@@ -8,33 +8,32 @@ import * as style from "./style.css";
 import AdminOnly from "../../components/AdminOnly";
 import { EditDetails } from "../../components/EditDetails";
 import PageTitle from "../../components/PageTitle";
+import { useBackgroundGradient } from "../../utils/hooks";
+import LazyImage from "../../components/LazyImage";
 
 interface Props {
     id: string
 }
 
 interface State {
-    details: MovieCollection,
-    bg: string
+    details: MovieCollection
 }
 
 export default class Collection extends Component<Props, State> {
     public componentDidMount(): void {
         http.get(`/api/film/collection/${this.props.id}/details`)
             .then(response => response.json())
-            .then((details: MovieCollection) => {
-                const bg = `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(details.backdropPath, 1280)}");`;
-                this.setState({ details, bg });
-            });
+            .then((details: MovieCollection) => this.setState({ details }));
     }
 
 
-    public render(_, { details, bg }: State) {
+    public render(_, { details }: State) {
         if (!details) {
             return (<Loading fullscreen/>);
         }
+        const gradient = useBackgroundGradient(details.backdropPath);
         return (
-            <div class={style.bg} style={bg} data-bg={details.backdropPath}>
+            <div class={style.bg} style={gradient} data-bg={details.backdropPath}>
                 <PageTitle title={`${details.name} - nxplx`}/>
                 <div class={`nx-scroll ${style.content}`}>
                     <div>

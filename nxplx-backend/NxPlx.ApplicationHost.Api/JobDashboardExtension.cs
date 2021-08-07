@@ -12,7 +12,7 @@ namespace NxPlx.ApplicationHost.Api
 {
     public static class JobDashboardExtension
     {
-        public static void AddJobProcessing(this IServiceCollection services, IServiceProvider serviceProvider)
+        public static void AddJobProcessing(this IServiceCollection services, ConnectionStrings connectionStrings)
         {
             services.AddHangfireServer(options =>
             {
@@ -20,15 +20,13 @@ namespace NxPlx.ApplicationHost.Api
                 options.Queues = JobQueueNames.All;
             });
 
-            var connectionStrings = serviceProvider.GetRequiredService<ConnectionStrings>();
             HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             var hangfireConfiguration = ConfigureHangfire(connectionStrings);
             services.AddHangfire(hangfireConfiguration);
         }
         
-        public static void UseJobDashboard(this IApplicationBuilder app, string dashboardUrl, IServiceProvider serviceProvider)
+        public static void UseJobDashboard(this IApplicationBuilder app, string dashboardUrl, JobDashboardOptions jobDashboardOptions)
         {
-            var jobDashboardOptions = serviceProvider.GetRequiredService<JobDashboardOptions>();
             if (jobDashboardOptions.Enabled)
             {
                 app.UseHangfireDashboard(dashboardUrl, new DashboardOptions

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace NxPlx.Domain.Models
@@ -10,5 +11,7 @@ namespace NxPlx.Domain.Models
         public bool HasChangedPassword { get; set; }
         public bool Admin { get; set; }
         public List<int> LibraryAccessIds { get; set; }
+        public DateTime? LastLogin { get; set; }
+        public DateTime? LastOnline { get; set; }
     }
 }

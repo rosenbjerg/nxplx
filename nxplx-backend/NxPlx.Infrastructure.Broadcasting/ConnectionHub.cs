@@ -60,14 +60,17 @@ namespace NxPlx.Infrastructure.Broadcasting
             connection.Disconnected -= OnDisconnected;
             connection.MessageReceived -= OnMessageReceived;
 
-            if (!_connectionTable.TryGetValue(connection.OperationContext.Session.UserId, out var userConnections))
+            var userId = connection.OperationContext.Session.UserId;
+            
+            
+            if (!_connectionTable.TryGetValue(userId, out var userConnections))
                 return;
             
             lock (userConnections.Sync)
             {
                 userConnections.Connections.Remove(connection);
                 if (userConnections.Connections.Count == 0)
-                    _connectionTable.TryRemove(connection.OperationContext.Session.UserId, out _);
+                    _connectionTable.TryRemove(userId, out _);
             }
         }
 

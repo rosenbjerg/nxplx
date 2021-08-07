@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NxPlx.Abstractions;
 using NxPlx.Application.Core;
@@ -16,7 +17,7 @@ namespace NxPlx.Infrastructure.Broadcasting
 
         public abstract Task SendMessage(Message message);
 
-        public abstract Task KeepConnectionOpen();
+        public abstract Task KeepConnectionOpen(CancellationToken cancellationToken);
         
         public event EventHandler<Message>? MessageReceived;
         public event EventHandler? Disconnected;
