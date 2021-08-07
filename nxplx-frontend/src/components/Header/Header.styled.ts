@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { Link } from "preact-router";
+import styled from 'styled-components';
+import { Link } from 'preact-router';
 
 export const Wrapper = styled.header`
   background-color: ${props => props.theme.darkGray};
@@ -10,26 +10,26 @@ export const Wrapper = styled.header`
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
   position: sticky;
   width: 100%;
-  height: 64px;
+  height: 56px;
 `;
 
 export const Content = styled.div`
-  
-`
+
+`;
 
 export const DesktopMenu = styled.div`
   display: none;
-  @media(min-width: 500px){
+  @media (min-width: 500px) {
     display: flex;
   }
-`
+`;
 
 export const MobileMenu = styled.div`
   display: block;
-  @media(min-width: 500px){
-      display: none;
+  @media (min-width: 500px) {
+    display: none;
   }
-`
+`;
 
 export const Img = styled.img`
 
@@ -53,14 +53,14 @@ export const NavLink = styled(Link)`
 export const Icon = styled.i`
   color: ${props => props.theme.white};
   font-size: 26px;
-  height: 64px;
+  height: 56px;
   width: 64px;
-  line-height: 64px;
+  line-height: 56px;
   text-align: center;
 
 `;
 
-export const MenuItems = styled.div<{mobile:boolean}>`
+export const MenuItems = styled.div<{ mobile: boolean }>`
   display: flex;
-  flex-direction: ${props => props.mobile? "column" : "row"};
-`
+  flex-direction: ${props => props.mobile ? 'column' : 'row'};
+`;
