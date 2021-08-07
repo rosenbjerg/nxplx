@@ -101,7 +101,6 @@ namespace NxPlx.Application.Mapping
                 .ForMember(dto => dto.Subtitles, opt => opt.MapFrom(src => src.Subtitles.Select(s => s.Language)))
                 .ForMember(dto => dto.Duration, opt => opt.MapFrom(src => src.MediaDetails.Duration))
                 .ForMember(dto => dto.FilePath, opt => opt.Ignore());
-            
 
             CreateMap<SubtitleFile, SubtitleFileDto>();
             CreateMap<Genre, GenreDto>();
