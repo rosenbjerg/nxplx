@@ -10,21 +10,15 @@ const BurgerMenu = ({ children }: BurgerMenuProps) => {
     const [open, setOpen] = useState(false);
 
     return (
-        <S.Wrapper tabIndex={0} onBlur={() => { setOpen(false)}}
-                   onClick={() => {setOpen(true)}}
+        <S.Wrapper
+                   onClick={() => {setOpen(!open)}}
         >
-            {!open ? (
-                    <S.BurgerIcon>
-                        <S.Icon className="material-icons">menu</S.Icon>
+                    <S.BurgerIcon visible={true}>
+                        <S.Icon className="material-icons">{open? "expand_less": "menu"}</S.Icon>
                     </S.BurgerIcon>
-                )
-                :
-                (
-                    <S.Menu>
+                    <S.Menu visible={!open}>
                         {children}
                     </S.Menu>
-                )
-            }
         </S.Wrapper>
     );
 };

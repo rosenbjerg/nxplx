@@ -19,14 +19,14 @@ export const Content = styled.div`
 
 export const DesktopMenu = styled.div`
   display: none;
-  @media(min-width: 400px){
+  @media(min-width: 500px){
     display: flex;
   }
 `
 
 export const MobileMenu = styled.div`
   display: block;
-  @media(min-width: 400px){
+  @media(min-width: 500px){
       display: none;
   }
 `

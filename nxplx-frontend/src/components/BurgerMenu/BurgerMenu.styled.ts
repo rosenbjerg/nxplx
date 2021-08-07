@@ -1,15 +1,18 @@
 import styled from "styled-components";
 
 export const Wrapper = styled.div`
-  
+  display: flex;
+  flex-direction: column;
 `
 
-export const BurgerIcon = styled.div`
+export const BurgerIcon = styled.div<{visible:boolean}>`
   height: 64px;
   width: 64px;
+  display: ${props => props.visible? "block":"none"};
 `
 
-export const Menu = styled.div`
+export const Menu = styled.div<{visible:boolean}>`
+  display: ${props => props.visible? "none":"block"};
   background-color: ${props=>props.theme.darkGray};
   @keyframes slideInFromLeft {
     0% {
