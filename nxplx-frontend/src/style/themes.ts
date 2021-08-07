@@ -7,6 +7,8 @@ export const dark = {
     green: "#2BEBC8",
     purple: "#6746ED",
     purpleBlue: "#4657ed",
+    purpleBlueHover: "#4150d7",
+    purpleBlueActive: "#3c4ac6",
     white: "#fff",
     secondaryGray: "#0D0C0F",
     secondaryBlack: "#000000",

@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { PrimaryButton, StyledInput } from "../../components/styled/GeneralComponents";
 
 
 export const Wrapper = styled.div`
@@ -8,8 +9,10 @@ export const Wrapper = styled.div`
 export const Content = styled.div`
   display: flex;
   flex-direction: column;
-  max-width: 460px;
-  margin: 8px;
+  max-width: 492px;
+  align-content: center;
+  margin: 20vh auto auto;
+  padding: 0 16px;
 `
 export const StyledForm = styled.form`
   display: flex;
@@ -19,22 +22,27 @@ export const StyledForm = styled.form`
 export const H1 = styled.h1`
   color:${props => props.theme.white};
   margin-bottom: 8px;
-  font-weight: 400;
+  font-weight: 700;
+  font-family: Hind, sans-serif;
+  letter-spacing: 0.05em;
+  line-height: 64px;
+  margin-left: 8px;
 `
 
 
-export const StyledInput = styled.input`
-  padding-left: 16px;
-  height: 62px;
-  border-radius: 16px;
--webkit-appearance:none;
-background-color:${props => props.theme.darkGray};
-  border:none;
-  color:${props => props.theme.white};
-  margin-bottom: 16px;
-  outline:0;
-  &:focus{
-    outline: none;
-  }
+export const Input = styled(StyledInput)`
+  margin-bottom: 24px;
+
+
+`
+
+export const BottomControls = styled.div`
+ display: flex;
+  place-content: flex-end;
+  margin-top: 4px;
+`
+
+export const Button = styled(PrimaryButton)`
+  
 `
 
