@@ -13,7 +13,7 @@ using NxPlx.Infrastructure.Events.Handling;
 
 namespace NxPlx.Domain.Services.EventHandlers.Series
 {
-    public class EpisodeFileInfoQueryHandler : IDomainEventHandler<EpisodeFileInfoQuery, InfoDto?>
+    public class EpisodeFileInfoQueryHandler : IDomainEventHandler<EpisodeFileInfoQuery, EpisodeInfoDto?>
     {
         private readonly DatabaseContext _context;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Series
             _mapper = mapper;
             _dispatcher = dispatcher;
         }
-        public async Task<InfoDto?> Handle(EpisodeFileInfoQuery @event, CancellationToken cancellationToken = default)
+        public async Task<EpisodeInfoDto?> Handle(EpisodeFileInfoQuery @event, CancellationToken cancellationToken = default)
         {
             var episodeFile = await _context.EpisodeFiles
                 .Include(ef => ef.SeriesDetails)
@@ -34,7 +34,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Series
                 .Include(ef => ef.Subtitles)
                 .Where(ef => ef.Id == @event.Id)
                 .FirstOrDefaultAsync(cancellationToken);
-            var dto = _mapper.Map<EpisodeFile, InfoDto>(episodeFile);
+            var dto = _mapper.Map<EpisodeFile, EpisodeInfoDto>(episodeFile);
             dto!.FilePath = await _dispatcher.Dispatch(new StreamUrlQuery(StreamKind.Episode, episodeFile.Id));
             return dto;
         }

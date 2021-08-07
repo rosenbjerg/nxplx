@@ -30,7 +30,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
         [HttpGet("{fileId}/info")]
         [Send404WhenNull]
-        public Task<InfoDto?> GetFileInfo([FromRoute, Required] int fileId) 
+        public Task<EpisodeInfoDto?> GetFileInfo([FromRoute, Required] int fileId) 
             => _dispatcher.Dispatch(new EpisodeFileInfoQuery(fileId));
         
         [HttpGet("{seriesId}/next")]

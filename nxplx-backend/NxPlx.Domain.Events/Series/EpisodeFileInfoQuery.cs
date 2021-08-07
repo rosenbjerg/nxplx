@@ -3,7 +3,7 @@ using NxPlx.Infrastructure.Events.Events;
 
 namespace NxPlx.Domain.Events.Series
 {
-    public class EpisodeFileInfoQuery : IDomainQuery<InfoDto?>
+    public class EpisodeFileInfoQuery : IDomainQuery<EpisodeInfoDto?>
     {
         public EpisodeFileInfoQuery(int id)
         {
