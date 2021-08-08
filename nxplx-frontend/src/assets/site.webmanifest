@@ -1,6 +1,10 @@
 {
     "name": "nxplx",
     "short_name": "nxplx",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1E1F22",
+    "theme_color": "#151718",
     "icons": [
         {
             "src": "/assets/icons/android-chrome-144x144.png",
@@ -8,7 +12,4 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#424242",
-    "background_color": "#424242",
-    "display": "standalone"
 }
