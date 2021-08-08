@@ -26,6 +26,14 @@ namespace NxPlx.ApplicationHost.Api.Controllers
         [HttpGet("")]
         public Task<SessionDto[]> GetSessions()
             => _dispatcher.Dispatch(new SessionsQuery(_operationContext.Session.UserId));
+        
+        [HttpDelete("")]
+        public Task CloseSession([Required, FromBody]string session)
+            => _dispatcher.Dispatch(new RemoveSessionCommand(_operationContext.Session.UserId, session));
+        
+        [HttpPost("clear-all")]
+        public Task ClearSessions()
+            => _dispatcher.Dispatch(new ClearSessionsCommand(_operationContext.Session.UserId));
 
         [HttpGet("{userId}")]
         [AdminOnly]

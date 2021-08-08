@@ -50,7 +50,7 @@ namespace NxPlx.Application.Services.EventHandlers.Authentication
                 user.LastLogin = DateTime.UtcNow;
                 await _databaseContext.SaveChangesAsync(cancellationToken);
                 
-                _logger.LogInformation("User logged in");
+                _logger.LogInformation("User {UserId} logged in", user.Id);
                 _operationContext.Session = session;
                 return (token, expiry, user.Admin);
             }

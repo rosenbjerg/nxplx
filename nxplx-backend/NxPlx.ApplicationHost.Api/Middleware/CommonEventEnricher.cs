@@ -15,6 +15,9 @@ namespace NxPlx.ApplicationHost.Api.Middleware
 
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
+            logEvent.RemovePropertyIfPresent("ActionId");
+            logEvent.RemovePropertyIfPresent("ConnectionId");
+            logEvent.RemovePropertyIfPresent("RequestId");
             logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.SessionId), _operationContext.SessionId));
             if (_operationContext.Session != null)
                 logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(nameof(IOperationContext.Session.UserId), _operationContext.Session.UserId));
