@@ -31,15 +31,6 @@ export const MobileMenu = styled.div`
   }
 `;
 
-export const Img = styled.img`
-
-  max-height: 48px;
-  margin: 4px 4px 4px 6px;
-`;
-
-export const Logo = styled(Img)`
-`;
-
 export const Nav = styled.nav`
 `;
 
