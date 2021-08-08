@@ -32,7 +32,7 @@ USER nxplx
 
 EXPOSE 5353
 ARG BUILD_VERSION
-ENV NXPLX_BUILD__VERSION=$BUILD_VERSION
+ENV NxPlx__Build__Version=$BUILD_VERSION
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/

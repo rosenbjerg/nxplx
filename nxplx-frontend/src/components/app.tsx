@@ -71,7 +71,7 @@ export default class App extends Component {
 	private loadBuild() {
 		void http.get('/api/build')
 			.then(response => response.text())
-			.then(text => store.setState({ build: text }));
+			.then(text => store.setState({ build: text || 'dev' }));
 	}
 
 	private checkLoggedIn = async () => {
