@@ -40,10 +40,10 @@ export default class UserManagement extends Component<Props, State> {
 		http.getJson<User[]>('/api/user/list').then(users => {
 			users.forEach(u => {
 				if (u.isOnline) u.lastSeen = translate('now');
-				if (u.lastSeen) u.lastSeen = new Date(u.lastSeen + 'Z').toString();
+				else if (u.lastSeen) u.lastSeen = new Date(u.lastSeen + 'Z').toString();
 				else u.lastSeen = translate('never');
 			});
-			this.setState({ users: orderBy(users, ['isOnline', 'lastOnline', 'username'], ['desc', 'desc', 'asc']) });
+			this.setState({ users: orderBy(users, ['isOnline', 'lastSeen', 'username'], ['desc', 'desc', 'asc']) });
 		});
 	}
 
