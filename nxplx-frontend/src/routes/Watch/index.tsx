@@ -38,7 +38,7 @@ export default class Watch extends Component<Props, State> {
 		if (!info) return (<Loading fullscreen />);
 		return (
 			<div class={style.container}>
-				<PageTitle title={`${this.state.playerState === 'playing' ? '▶' : '❚❚'} ${info.title} - nxplx`} />
+				<PageTitle title={`${this.state.playerState === 'playing' ? '▶' : '❚❚'} ${info.title}`} />
 				<VideoPlayer
 					isSeries={kind === 'series'}
 					duration={info.duration}

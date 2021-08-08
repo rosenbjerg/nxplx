@@ -8,7 +8,7 @@ import PageTitle from '../../components/PageTitle';
 
 const Admin = () => (
 	<div class={style.profile}>
-		<PageTitle title="Administration - nxplx" />
+		<PageTitle title="Administration" />
 		<h1>{translate('admin stuff')}</h1>
 
 		<h2>{translate('libraries')}</h2>

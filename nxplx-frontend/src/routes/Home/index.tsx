@@ -4,12 +4,11 @@ import Entry from '../../components/Entry';
 import Loading from '../../components/Loading';
 import http from '../../utils/http';
 import { imageUrl, OverviewElement } from '../../utils/models';
-import * as style from './style.css';
 import PageTitle from '../../components/PageTitle';
 import SearchBar from '../../components/SearchBar';
 import ContinueWatchingRow from '../../components/ContinueWatchingRow';
 import Store from '../../utils/storage';
-
+import * as S from './Home.styled';
 
 interface Props {
 }
@@ -35,11 +34,11 @@ export default class Home extends Component<Props, State> {
 
 	public render(_, { overview, search }: State) {
 		return (
-			<div class={style.home}>
-				<PageTitle title="Home - nxplx" />
+			<S.Wrapper>
+				<PageTitle title="Home" />
 				<SearchBar value={this.state.search} onInput={this.onSearchTermChanged} />
 
-				<div class={`${style.entryContainer} nx-scroll`}>
+				<S.EntryContainer>
 					{!search && (<ContinueWatchingRow />)}
 
 					{overview === undefined ? (
@@ -60,8 +59,8 @@ export default class Home extends Component<Props, State> {
 								),
 							)
 					)}
-				</div>
-			</div>
+				</S.EntryContainer>
+			</S.Wrapper>
 		);
 	}
 
