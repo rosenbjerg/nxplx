@@ -6,7 +6,7 @@ import { translate } from '../../utils/localisation';
 import { User } from '../../utils/models';
 import Loading from '../Loading';
 import CreateUserModal from '../../modals/CreateUserModal';
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import EditUserLibraryAccessModal from '../../modals/EditUserLibraryAccessModal';
 
 interface Props {}
