@@ -12,14 +12,17 @@
     grid-row-start: 1;
     grid-row-end: 2;
 }
+
 .search::placeholder {
     color: var(--faded-text);
     opacity: 1;
     transition: color 250ms;
 }
+
 .search:focus {
     outline: none;
 }
+
 .search:focus::placeholder {
     color: #bdbdbd;
     transition: color 250ms;
@@ -27,12 +30,13 @@
 
 .top {
     border: 2px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 2px;
     transition: border-color 1100ms;
     display: grid;
     grid-template-columns: auto 75px;
     grid-template-rows: auto auto;
 }
+
 .top:active, .top:focus, .top:hover {
     transition: border-color 200ms, box-shadow 200ms;
     box-shadow: 0 0 5px 0 var(--hover-border-color);

@@ -21,10 +21,12 @@
         "preact-router": "^3.2.1",
         "react-intersection-observer": "^8.32.0",
         "reconnecting-websocket": "^4.4.0",
+        "styled-components": "^5.3.0",
         "ua-parser-js": "^0.7.28",
         "unistore": "^3.5.1"
     },
     "devDependencies": {
+        "@types/styled-components": "^5.1.11",
         "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
         "@types/lodash": "^4.14.149",
         "@types/ua-parser-js": "^0.7.33",

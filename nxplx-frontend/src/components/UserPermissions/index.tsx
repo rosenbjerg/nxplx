@@ -6,7 +6,7 @@ import Checkbox from '../Checkbox';
 import Loading from '../Loading';
 import * as style from './style.css';
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import { createSnackbar } from '@snackbar/core';
 
 interface LibraryAccess {

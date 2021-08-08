@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;

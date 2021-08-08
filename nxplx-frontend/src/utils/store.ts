@@ -1,5 +1,6 @@
 interface NxPlxStore {
-    isLoggedIn:boolean
-    isAdmin:boolean
-    build:string
+	isLoggingIn: boolean;
+	isLoggedIn: boolean;
+	isAdmin: boolean;
+	build: string;
 }
