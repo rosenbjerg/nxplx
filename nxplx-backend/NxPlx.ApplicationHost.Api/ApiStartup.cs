@@ -34,6 +34,7 @@ namespace NxPlx.ApplicationHost.Api
         public ServiceProvider ConfigureOptions(IServiceCollection services)
         {
             AddOptions<ApiKeyOptions>(services);
+            AddOptions<BuildOptions>(services);
             AddOptions<ConnectionStrings>(services);
             AddOptions<FolderOptions>(services);
             AddOptions<HostingOptions>(services);

@@ -31,8 +31,8 @@ RUN addgroup -S nxplx && adduser -S nxplx -G nxplx
 USER nxplx
 
 EXPOSE 5353
-ARG build
-ENV NXPLX_BUILD=$build
+ARG BUILD_VERSION
+ENV NXPLX_BUILD__VERSION=$BUILD_VERSION
 WORKDIR /app
 COPY --from=backendBuilder /app/build ./
 COPY --from=frontendBuilder /app/build ./public/

@@ -40,7 +40,7 @@ jobs:
         run: |
           NXPLX_BUILD=`printf '%(%y.%m.%d)T' -1` && \
           docker build \
-            --build-arg "build=$NXPLX_BUILD" \
+            --build-arg "BUILD_VERSION=$NXPLX_BUILD" \
             --build-arg BASE_IMAGE=amd64/alpine \
             --build-arg DOTNET_RID=linux-musl-x64 \
             --build-arg TINI_BUILD=tini-static-amd64 \
