@@ -8,7 +8,7 @@ interface Props {
 
 const Logo = (props: Props) => {
 	return (
-		<svg version="1.0" xmlns="http://www.w3.org/2000/svg" style="padding: 2px" height="100%" viewBox="0 0 2910 1200"
+		<svg version="1.0" xmlns="http://www.w3.org/2000/svg" style="padding: 2px 2px 2px 4px" height="100%" viewBox="0 0 2910 1200"
 			 preserveAspectRatio="xMidYMid meet">
 			<defs>
 				<linearGradient id="gradient" x1="0%" y1="0%" x2="35%" y2="75%" gradientUnits="userSpaceOnUse">
