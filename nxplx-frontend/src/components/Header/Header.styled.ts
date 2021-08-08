@@ -11,6 +11,7 @@ export const Wrapper = styled.header`
   position: sticky;
   width: 100%;
   height: 56px;
+  z-index: 1;
 `;
 
 export const Content = styled.div`
