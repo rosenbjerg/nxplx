@@ -29,7 +29,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
             
             foreach (var user in await _context.Users.ToListAsync(cancellationToken))
             {
-                user.LibraryAccessIds.Remove(command.LibraryId);
+                user.LibraryAccessIds?.Remove(command.LibraryId);
             }
             await _context.SaveChangesAsync(cancellationToken);
 
@@ -37,7 +37,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
             await _context.SaveChangesAsync(CancellationToken.None);
             await _cacheClearer.Clear("overview");
 
-            _logger.LogInformation("Deleted library {Username}", library.Name);
+            _logger.LogInformation("Deleted library {LibraryName}", library.Name);
             return true;
         }
     }
