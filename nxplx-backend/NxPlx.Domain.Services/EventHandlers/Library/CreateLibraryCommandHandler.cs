@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models.Jobs;
@@ -15,14 +16,14 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
     {
         private readonly DatabaseContext _context;
         private readonly ILogger<CreateLibraryCommandHandler> _logger;
-        private readonly ICacheClearer _cacheClearer;
+        private readonly IDistributedCache _distributedCache;
         private readonly IMapper _mapper;
 
-        public CreateLibraryCommandHandler(DatabaseContext context, ILogger<CreateLibraryCommandHandler> logger, ICacheClearer cacheClearer, IMapper mapper)
+        public CreateLibraryCommandHandler(DatabaseContext context, ILogger<CreateLibraryCommandHandler> logger, IDistributedCache distributedCache, IMapper mapper)
         {
             _context = context;
             _logger = logger;
-            _cacheClearer = cacheClearer;
+            _distributedCache = distributedCache;
             _mapper = mapper;
         }
         public async Task<AdminLibraryDto> Handle(CreateLibraryCommand command, CancellationToken cancellationToken = default)
@@ -38,7 +39,7 @@ namespace NxPlx.Domain.Services.EventHandlers.Library
             _context.Libraries.Add(lib);
             await _context.SaveChangesAsync(cancellationToken);
             _logger.LogInformation("Created library {Name} with {Path}", lib.Name, lib.Path);
-            await _cacheClearer.Clear("overview");
+            await _distributedCache.ClearList("overview", "sys", cancellationToken);
             
             return _mapper.Map<Domain.Models.Library, AdminLibraryDto>(lib)!;
         }
