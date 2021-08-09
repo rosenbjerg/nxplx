@@ -22,28 +22,26 @@ namespace NxPlx.Infrastructure.Events.Dispatching
             _distributedCache = distributedCache;
         }
 
-        public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event, string cacheKey, TimeSpan cacheExpiry)
+        public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event, string cachePrefix, string cacheOwner, string cacheKey, TimeSpan cacheExpiry)
             where TEvent : IEvent<TResult>
             where TResult : class
         {
-            return await Dispatch<TEvent, TResult>(@event, _ => Task.FromResult(cacheKey), cacheExpiry);
+            return await Dispatch<TEvent, TResult>(@event, _ => Task.FromResult((cachePrefix, cacheOwner, cacheKey)), cacheExpiry);
         }
 
-        public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event, Func<TEvent, Task<string>> cacheKeyGenerator,
+        public async Task<TResult> Dispatch<TEvent, TResult>(TEvent @event, Func<TEvent, Task<(string CachePrefix, string CacheOwner, string CacheKey)>> cacheKeyGenerator,
             TimeSpan cacheExpiry)
             where TEvent : IEvent<TResult>
             where TResult : class
         {
-            var cacheKey = await cacheKeyGenerator(@event);
+            var (cachePrefix, cacheOwner, cacheKey) = await cacheKeyGenerator(@event);
 #if DEBUG
 #else
-            var cached =
- await _distributedCache.GetObjectAsync<TResult>(cacheKey, _operationContext.OperationCancelled);
+            var cached = await _distributedCache.GetObjectAsync<TResult>($"{cachePrefix}:{cacheKey}", _operationContext.OperationCancelled);
             if (cached != null) return cached;
 #endif
             var generated = await _eventDispatcher.Dispatch(@event);
-            await _distributedCache.SetObjectAsync(cacheKey, generated!,
-                new DistributedCacheEntryOptions { SlidingExpiration = cacheExpiry }, CancellationToken.None);
+            await _distributedCache.AddToList(cachePrefix, cacheOwner, cacheKey, generated, cacheExpiry, CancellationToken.None);
             return generated;
         }
     }

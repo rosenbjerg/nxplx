@@ -69,21 +69,17 @@ export default class App extends Component {
 	}
 
 	private loadBuild() {
-		void http.get('/api/build')
-			.then(response => response.text())
+		void http.getJson<string>('/api/build')
 			.then(text => store.setState({ build: text || 'dev' }));
 	}
 
 	private checkLoggedIn = async () => {
-		const response = await http.get('/api/authentication/verify');
-		if (response.ok) {
-			const isAdmin: boolean = await response.json();
+		try {
+			const isAdmin = await http.getJson<boolean>('/api/authentication/verify');
 			store.setState({ isLoggedIn: true, isAdmin });
 			if (location.pathname === '/login') {
 				route('/', true);
 			}
-		} else {
-			route('/login', true);
-		}
+		} catch (e) { }
 	};
 }

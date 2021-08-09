@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
 using NxPlx.Infrastructure.Database;
@@ -13,13 +14,13 @@ namespace NxPlx.Services.Index
     public class LibraryCleanupService
     {
         private readonly DatabaseContext _databaseContext;
-        private readonly ICacheClearer _cacheClearer;
+        private readonly IDistributedCache _distributedCache;
         private readonly ILogger<LibraryCleanupService> _logger;
 
-        public LibraryCleanupService(DatabaseContext databaseContext, ICacheClearer cacheClearer, ILogger<LibraryCleanupService> logger)
+        public LibraryCleanupService(DatabaseContext databaseContext, IDistributedCache distributedCache, ILogger<LibraryCleanupService> logger)
         {
             _databaseContext = databaseContext;
-            _cacheClearer = cacheClearer;
+            _distributedCache = distributedCache;
             _logger = logger;
         }
         [Queue(JobQueueNames.FileIndexing)]
@@ -36,7 +37,7 @@ namespace NxPlx.Services.Index
                 var toDelete = await _databaseContext.FilmFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
                 _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
-                await _cacheClearer.Clear("overview");
+                await _distributedCache.ClearList("overview", "sys");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }
@@ -55,7 +56,7 @@ namespace NxPlx.Services.Index
                 var toDelete = await _databaseContext.EpisodeFiles.Where(f => deletedIds.Contains(f.Id)).ToListAsync();
                 _databaseContext.RemoveRange(toDelete);
                 await _databaseContext.SaveChangesAsync();
-                await _cacheClearer.Clear("overview");
+                await _distributedCache.ClearList("overview", "sys");
                 _logger.LogInformation("Deleted {DeletedAmount} film from Library {LibaryId} because files were removed", toDelete.Count, libraryId);
             }
         }

@@ -13,19 +13,19 @@ const actions = (store: Store<NxPlxStore>) => (
 			if (state.isLoggedIn) return;
 			ev.preventDefault();
 			store.setState({ isLoggingIn: true });
-			const formdata = new FormData(ev.target);
-			const response = await http.post('/api/authentication/login', formdata, false);
-			if (response.ok) {
-				const isAdmin = await response.json();
-				route('/', true);
+			try {
+				const isAdmin = await http.postForm('/api/authentication/login', ev.target).then(response => response.json());
+				const urlParams = new URLSearchParams(window.location.search);
+				route(urlParams.get('redirect') || '/', true);
 				store.setState({
 					isLoggedIn: true,
 					isAdmin,
 				});
-			} else {
+			} catch (e) {
 				ev.target.reset();
+			} finally {
+				store.setState({ isLoggingIn: false });
 			}
-			store.setState({ isLoggingIn: false });
 		},
 	});
 

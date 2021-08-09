@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
+using NxPlx.Abstractions;
 using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Domain.Events.Sessions;
@@ -14,10 +15,12 @@ namespace NxPlx.Domain.Services.Sessions
     {
         private const string SessionPrefix = "session";
         private readonly IDistributedCache _distributedCache;
+        private readonly IOperationContext _operationContext;
 
-        public AllSessionsQueryHandler(IDistributedCache distributedCache)
+        public AllSessionsQueryHandler(IDistributedCache distributedCache, IOperationContext operationContext)
         {
             _distributedCache = distributedCache;
+            _operationContext = operationContext;
         }
 
         public async Task<SessionDto[]> Handle(SessionsQuery @event, CancellationToken cancellationToken = default)
@@ -26,7 +29,8 @@ namespace NxPlx.Domain.Services.Sessions
             return sessions.Select(s => new SessionDto
             {
                 Token = s.Key,
-                UserAgent = s.Element.UserAgent
+                UserAgent = s.Element.UserAgent,
+                Current = _operationContext.SessionId == s.Key
             }).ToArray();
         }
     }

@@ -19,8 +19,8 @@ namespace NxPlx.Infrastructure.Broadcasting
 
         public abstract Task KeepConnectionOpen(CancellationToken cancellationToken);
         
-        public event EventHandler<Message>? MessageReceived;
-        public event EventHandler? Disconnected;
+        public event EventHandler<Message> MessageReceived = null!;
+        public event EventHandler Disconnected = null!;
 
         protected void OnMessageReceived(Message message) => MessageReceived?.Invoke(this, message);
         protected void OnDisconnected() => Disconnected?.Invoke(this, EventArgs.Empty);

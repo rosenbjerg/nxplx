@@ -1,12 +1,11 @@
 import { createSnackbar } from '@snackbar/core';
 import { Component, h } from 'preact';
-import { add, remove } from '../../utils/arrays';
+import { add, orderBy, remove } from '../../utils/arrays';
 import http from '../../utils/http';
 import { translate } from '../../utils/localisation';
 import { User } from '../../utils/models';
 import Loading from '../Loading';
 import CreateUserModal from '../../modals/CreateUserModal';
-import orderBy from 'lodash/orderBy';
 import EditUserLibraryAccessModal from '../../modals/EditUserLibraryAccessModal';
 
 interface Props {}
@@ -39,12 +38,12 @@ export default class UserManagement extends Component<Props, State> {
 	public componentDidMount() {
 		http.getJson<User[]>('/api/user/list').then(users => {
 			users.forEach(u => {
-				u.hasBeenOnline = !!u.lastSeen;
+				u.sortOrder = u.lastSeen ? new Date(u.lastSeen + 'Z').getTime() : 0;
 				if (u.isOnline) u.lastSeen = translate('now');
 				else if (u.lastSeen) u.lastSeen = new Date(u.lastSeen + 'Z').toString();
 				else u.lastSeen = translate('never');
 			});
-			this.setState({ users: orderBy(users, ['isOnline', 'hasBeenOnline', 'lastSeen', 'username'], ['desc', 'desc', 'desc', 'asc']) });
+			this.setState({ users: orderBy(users, ['isOnline', 'sortOrder', 'username'], ['desc', 'desc', 'asc']) });
 		});
 	}
 

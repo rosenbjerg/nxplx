@@ -1,10 +1,10 @@
 import { createSnackbar } from '@snackbar/core';
 import { Component, h } from 'preact';
-import { UAParser } from 'ua-parser-js';
-import { remove } from '../../utils/arrays';
-import http from '../../utils/http';
+import { removeWhere } from '../../utils/arrays';
 import { translate } from '../../utils/localisation';
 import Loading from '../Loading';
+import { useCallback } from 'preact/hooks';
+import SessionClient, { Browser, Os, Session } from '../../utils/clients/SessionClient';
 
 interface Props {
 	userId?: number;
@@ -14,43 +14,50 @@ interface State {
 	sessions: Session[];
 }
 
-interface UserSession {
-	token: string;
-	userAgent: string;
-}
-
-interface Session {
+interface SessionProps {
 	id: string;
 	browser: Browser;
 	os: Os;
+	current: boolean;
+	onClosed: (id: string) => any;
 }
 
-interface Browser {
-	name: string;
-	version: string;
-}
+const SessionElement = (props: SessionProps) => {
+	const closeSession = useCallback(async () => {
+		try {
+			await SessionClient.closeSession(props.id);
+			if (props.current) {
+				location.reload();
+			} else {
+				createSnackbar('Session closed', { timeout: 1500 });
+				props.onClosed(props.id);
+			}
+		} catch (e) {
+			createSnackbar('Unable to close that session', { timeout: 2500 });
+		}
+	}, [props.id]);
 
-interface Os {
-	name: string;
-	version: string;
-}
+	return (
+		<tr>
+			<td title={translate('browser on device', {
+				browser: `${props.browser.name} ${props.browser.version}`,
+				device: `${props.os.name} ${props.os.version}`,
+			})}>
+				{translate('browser on device', { browser: props.browser.name, device: props.os.name })}{(props.current ? ` (${translate('current')})` : '')}
+			</td>
+			<td>
+				<button title={translate('close this session')} onClick={closeSession} className="material-icons bordered">close</button>
+			</td>
+		</tr>
+	);
+};
 
 export default class SessionManager extends Component<Props, State> {
 
 	public componentDidMount(): void {
-		const adminUserIdQuery = this.props.userId ? `/all?userId=${this.props.userId}` : '';
-		void http.getJson<UserSession[]>(`/api/session${adminUserIdQuery}`).then(sessions => {
-			const parser = new UAParser();
-			const parsed = sessions.map(session => {
-				parser.setUA(session.userAgent);
-				return {
-					id: session.token,
-					browser: parser.getBrowser() as Browser,
-					os: parser.getOS() as Os,
-				};
-			});
-			this.setState({ sessions: parsed });
-		});
+		SessionClient
+			.getSession(this.props.userId)
+			.then(sessions => this.setState({ sessions }));
 	}
 
 	public render(_, { sessions }: State) {
@@ -60,43 +67,26 @@ export default class SessionManager extends Component<Props, State> {
 				<table>
 					<tbody>
 					{sessions.map(session => (
-						<tr key={session.id}>
-							<td title={translate('browser on device', {
-								browser: `${session.browser.name} ${session.browser.version}`,
-								device: `${session.os.name} ${session.os.version}`,
-							})}>
-								{translate('browser on device', { browser: session.browser.name, device: session.os.name })}
-							</td>
-							<td>
-								<button title={translate('close this session')} onClick={this.closeSession(session)}
-										class="material-icons bordered">close
-								</button>
-							</td>
-						</tr>
+						<SessionElement key={session.id} id={session.id} current={session.current} browser={session.browser} os={session.os}
+										onClosed={this.onSessionClosed} />
 					))}
 					</tbody>
 				</table>
-				<button onClick={this.clearSessions} className="bordered">Close all sessions (including this one)
-				</button>
+				<button onClick={this.clearSessions} className="bordered">{translate('close all sessions')}</button>
 			</div>
 		);
 	}
 
-	private closeSession = (session: Session) => async () => {
-		const response = await http.delete(`/api/session`, session.id);
-		if (response.ok) {
-			createSnackbar('Session closed', { timeout: 1500 });
-			this.setState({ sessions: remove(this.state.sessions, session) });
-		} else {
-			createSnackbar('Unable to close that session', { timeout: 2500 });
-		}
+	private onSessionClosed = (id: string) => {
+		this.setState({ sessions: removeWhere(this.state.sessions, s => s.id === id) });
 	};
+
 	private clearSessions = async () => {
-		const response = await http.post(`/api/session/clear-all`);
-		if (response.ok) {
+		try {
+			await SessionClient.clearSessions();
 			createSnackbar('All sessions closed!', { timeout: 1500 });
 			location.reload();
-		} else {
+		} catch (e) {
 			createSnackbar('Unable to clear sessions', { timeout: 2500 });
 		}
 	};

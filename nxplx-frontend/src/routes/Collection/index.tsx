@@ -1,4 +1,4 @@
-import orderBy from 'lodash/orderBy';
+import { orderBy } from '../../utils/arrays';
 import { Component, h } from 'preact';
 import Entry from '../../components/Entry';
 import Loading from '../../components/Loading';
@@ -21,9 +21,8 @@ interface State {
 
 export default class Collection extends Component<Props, State> {
 	public componentDidMount(): void {
-		http.get(`/api/film/collection/${this.props.id}/details`)
-			.then(response => response.json())
-			.then((details: MovieCollection) => this.setState({ details }));
+		http.getJson<MovieCollection>(`/api/film/collection/${this.props.id}/details`)
+			.then(details => this.setState({ details }));
 	}
 
 
@@ -45,7 +44,7 @@ export default class Collection extends Component<Props, State> {
 					<LazyImage class={style.poster} src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32}
 							   blurhashWidth={20} />
 					<div>
-						{orderBy(details.movies, ['year', 'title'], ['asc'])
+						{orderBy(details.movies, ['year', 'title'])
 							.map(movie => (
 									<Entry
 										key={movie.id}

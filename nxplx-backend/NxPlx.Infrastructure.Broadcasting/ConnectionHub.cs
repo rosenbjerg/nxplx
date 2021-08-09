@@ -20,8 +20,9 @@ namespace NxPlx.Infrastructure.Broadcasting
             connection.MessageReceived += OnMessageReceived;
         }
 
-        private void OnMessageReceived(object sender, Message msg)
+        private void OnMessageReceived(object? sender, Message msg)
         {
+            if (sender == null) return;
             var connection = (Connection)sender;
             
         }
@@ -54,8 +55,9 @@ namespace NxPlx.Infrastructure.Broadcasting
             return Task.WhenAll(copy.Select(connection => connection.SendMessage(message)));
         }
         
-        private void OnDisconnected(object sender, EventArgs e)
+        private void OnDisconnected(object? sender, EventArgs e)
         {
+            if (sender == null) return;
             var connection = (Connection)sender;
             connection.Disconnected -= OnDisconnected;
             connection.MessageReceived -= OnMessageReceived;

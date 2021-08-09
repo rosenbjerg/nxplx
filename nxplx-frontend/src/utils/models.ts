@@ -78,7 +78,7 @@ export interface Library {
 }
 
 export interface User {
-	hasBeenOnline: boolean;
+	sortOrder: number;
 	id: number;
 	username: string;
 	email: string;

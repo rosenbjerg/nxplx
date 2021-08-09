@@ -100,7 +100,7 @@ export default class Watch extends Component<Props, State> {
 		const { kind, fid } = this.props;
 		void Promise.all([
 			http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
-			http.get(`/api/subtitle/preference/${kind}/${fid}`).then(res => res.text()),
+			http.getJson<string>(`/api/subtitle/preference/${kind}/${fid}`),
 			http.getJson<number>(`/api/progress/${kind}/${fid}`),
 		]).then(results => {
 			const completed = (results[2] / results[0].duration) > 0.92;

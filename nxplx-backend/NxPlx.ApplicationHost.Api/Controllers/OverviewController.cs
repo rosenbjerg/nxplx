@@ -36,12 +36,12 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
         [HttpGet("genres")]
         public Task<IEnumerable<GenreDto>> GetGenres()
-            => _cachingApplicationEventDispatcher.Dispatch<GenreOverviewQuery, IEnumerable<GenreDto>>(new GenreOverviewQuery(), "overview:genres", TimeSpan.FromDays(7));
+            => _cachingApplicationEventDispatcher.Dispatch<GenreOverviewQuery, IEnumerable<GenreDto>>(new GenreOverviewQuery(), "overview", "sys", "genre", TimeSpan.FromDays(7));
         
-        private async Task<string> CacheKeyGenerator(MediaOverviewQuery _)
+        private async Task<(string CachePrefix, string CacheOwner, string CacheKey)> CacheKeyGenerator(MediaOverviewQuery _)
         {
             var libs = await _dispatcher.Dispatch(new CurrentUserLibraryAccessQuery());
-            return "overview:" + string.Join(',', libs.OrderBy(i => i));
+            return ("overview", "sys", string.Join(',', libs.OrderBy(i => i)));
         }
     }
 }

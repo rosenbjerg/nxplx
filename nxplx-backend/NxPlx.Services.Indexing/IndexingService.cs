@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Application.Core;
 using NxPlx.Application.Services;
 using NxPlx.Domain.Models;
@@ -16,20 +17,20 @@ namespace NxPlx.Services.Index
     public class IndexingService : IIndexingService
     {
         private readonly DatabaseContext _context;
-        private readonly ICacheClearer _cacheClearer;
+        private readonly IDistributedCache _distributedCache;
         private readonly LibraryDeduplicationService _deduplicationService;
         private readonly LibraryMetadataService _metadataService;
         private readonly IBackgroundJobClient _backgroundJobClient;
 
         public IndexingService(
             DatabaseContext context,
-            ICacheClearer cacheClearer,
+            IDistributedCache distributedCache,
             LibraryDeduplicationService deduplicationService,
             LibraryMetadataService metadataService,
             IBackgroundJobClient backgroundJobClient)
         {
             _context = context;
-            _cacheClearer = cacheClearer;
+            _distributedCache = distributedCache;
             _deduplicationService = deduplicationService;
             _metadataService = metadataService;
             _backgroundJobClient = backgroundJobClient;
@@ -92,7 +93,7 @@ namespace NxPlx.Services.Index
 
                 _context.FilmFiles.AddRange(newFilm);
                 await _context.SaveChangesAsync();
-                await _cacheClearer.Clear("overview");
+                await _distributedCache.ClearList("overview", "sys");
 
                 foreach (var detail in details)
                     _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessFilmDetails(detail.Id));
@@ -136,7 +137,7 @@ namespace NxPlx.Services.Index
 
             _context.AddRange(newEpisodes);
             await _context.SaveChangesAsync();
-            await _cacheClearer.Clear("overview");
+            await _distributedCache.ClearList("overview", "sys");
 
             foreach (var detail in details)
                 _backgroundJobClient.Enqueue<ImageProcessor>(service => service.ProcessSeries(detail.Id));
@@ -167,6 +168,7 @@ namespace NxPlx.Services.Index
             var existingGenres = await _context.Genre.Where(g => newGenreIds.Contains(g.Id)).Select(g => g.Id).ToListAsync();
             _context.AddRange(availableGenres.Where(g => !existingGenres.Contains(g.Id)));
             await _context.SaveChangesAsync();
+            await _distributedCache.RemoveFromList("overview", "sys", "genre");
         }
 
         private async Task<(string[] newFiles, int[] updatedFiles)> IndexMediaFiles<TLibraryMember>(Library library)

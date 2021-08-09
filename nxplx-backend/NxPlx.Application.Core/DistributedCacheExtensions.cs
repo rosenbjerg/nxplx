@@ -29,13 +29,14 @@ namespace NxPlx.Application.Core
         {
             var sessions = await distributedCache.GetObjectAsync<HashSet<string>>($"{prefix}:list:{owner}", cancellationToken);
             sessions ??= new HashSet<string>();
+
             await distributedCache.SetObjectAsync($"{prefix}:{key}", element, new DistributedCacheEntryOptions
             {
                 SlidingExpiration = validity
             }, cancellationToken);
             
-            sessions.Add(key);
-            await distributedCache.SetObjectAsync($"{prefix}:list:{owner}", sessions, cancellationToken: CancellationToken.None);
+            if (sessions.Add(key))
+                await distributedCache.SetObjectAsync($"{prefix}:list:{owner}", sessions, cancellationToken: CancellationToken.None);
         }
 
         public static async Task<string[]> GetListKeys(this IDistributedCache distributedCache, string prefix, string owner, CancellationToken cancellationToken = default)

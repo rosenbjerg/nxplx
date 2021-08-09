@@ -18,8 +18,7 @@ interface State {details?: FilmDetails;}
 
 export default class Film extends Component<Props, State> {
 	public componentDidMount(): void {
-		http.get(`/api/film/${this.props.id}/details`)
-			.then(response => response.json())
+		http.getJson<FilmDetails>(`/api/film/${this.props.id}/details`)
 			.then(details => this.setState({ details }));
 	}
 

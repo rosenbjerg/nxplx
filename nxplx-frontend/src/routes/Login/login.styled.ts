@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { PrimaryButton, StyledInput } from '../../components/styled/GeneralComponents';
+import { StyledInput } from '../../components/styled/StyledInput';
+import PrimaryButton from '../../components/styled/PrimaryButton';
 
 
 export const Wrapper = styled.div`
