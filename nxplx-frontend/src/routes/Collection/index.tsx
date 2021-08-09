@@ -21,9 +21,8 @@ interface State {
 
 export default class Collection extends Component<Props, State> {
 	public componentDidMount(): void {
-		http.get(`/api/film/collection/${this.props.id}/details`)
-			.then(response => response.json())
-			.then((details: MovieCollection) => this.setState({ details }));
+		http.getJson<MovieCollection>(`/api/film/collection/${this.props.id}/details`)
+			.then(details => this.setState({ details }));
 	}
 
 

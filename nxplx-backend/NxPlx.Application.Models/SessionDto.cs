@@ -2,6 +2,7 @@
 {
     public class SessionDto : IDto
     {
+        public bool Current { get; set; }
         public string Token { get; set; } = null!;
         public string UserAgent { get; set; } = null!;
     }

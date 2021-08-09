@@ -26,9 +26,8 @@ interface State {
 
 export default class Series extends Component<Props, State> {
 	public componentDidMount(): void {
-		http.get(`/api/series/${this.props.id}/detail`)
-			.then(response => response.json())
-			.then((details: SeriesDetails) => this.setState({ details }));
+		http.getJson<SeriesDetails>(`/api/series/${this.props.id}/detail`)
+			.then(details => this.setState({ details }));
 	}
 
 

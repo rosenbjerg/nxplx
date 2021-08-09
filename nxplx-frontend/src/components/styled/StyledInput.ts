@@ -26,7 +26,7 @@ export const StyledInput = styled.input`
   &:-webkit-autofill:focus,
   &:-webkit-autofill:active {
     background-color: ${props => props.theme.darkGray};
-    -webkit-box-shadow: 0 0 0 32px ${props => props.theme.darkGray} inset; {
+    -webkit-box-shadow: 0 0 0 32px ${props => props.theme.darkGray} inset;
     -webkit-text-fill-color: ${props => props.theme.white} !important;;
     -webkit-background-clip: text !important;
   }
