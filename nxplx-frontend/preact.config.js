@@ -28,10 +28,9 @@ export default {
                 disableLocalsExport: true
             }
         });
-
-        config.resolve.alias['react'] = 'preact/compat';
-        config.resolve.alias['react-dom/test-utils'] = 'preact/test-utils';
-        config.resolve.alias['react-dom'] = 'preact/compat';
+        config.resolve.alias["react"] = "preact/compat";
+        config.resolve.alias["react-dom/test-utils"] = "preact/test-utils";
+        config.resolve.alias["react-dom"] = "preact/compat";
         config.resolve.alias["preact-cli-entrypoint"] = resolve(process.cwd(), "src", "index");
     }
 };
