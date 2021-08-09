@@ -1,8 +1,7 @@
-import orderBy from 'lodash/orderBy';
 import { Component, h } from 'preact';
-import { EpisodeEntry } from '../../components/EpisodeEntry';
+import EpisodeEntry from '../../components/EpisodeEntry';
 import Loading from '../../components/Loading';
-import { toMap } from '../../utils/arrays';
+import { orderBy, toMap } from '../../utils/arrays';
 import { formatInfoPair } from '../../utils/common';
 import http from '../../utils/http';
 import { imageUrl, SeasonDetails, SeriesDetails } from '../../utils/models';

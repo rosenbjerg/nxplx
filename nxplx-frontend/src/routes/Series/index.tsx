@@ -1,4 +1,4 @@
-import orderBy from 'lodash/orderBy';
+import { orderBy } from '../../utils/arrays';
 import { Component, h } from 'preact';
 import Loading from '../../components/Loading';
 import { SeasonEntry } from '../../components/SeasonEntry';

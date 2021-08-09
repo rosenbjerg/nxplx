@@ -15,7 +15,6 @@
     "@snackbar/core": "^1.7.0",
     "blurhash": "^1.1.3",
     "linkstate": "^2.0.1",
-    "lodash": "^4.17.21",
     "preact": "^10.5.13",
     "preact-portal": "^1.1.3",
     "preact-router": "^3.2.1",

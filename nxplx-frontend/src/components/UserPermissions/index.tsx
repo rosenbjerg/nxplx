@@ -6,7 +6,7 @@ import Checkbox from '../Checkbox';
 import Loading from '../Loading';
 import * as style from './style.css';
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import orderBy from 'lodash/orderBy';
+import { orderBy } from '../../utils/arrays';
 import { createSnackbar } from '@snackbar/core';
 
 interface LibraryAccess {
@@ -47,7 +47,7 @@ const UserPermissions = ({ onSave, user: { id, username } }: Props) => {
 		]).then(results => {
 			const libraries: Library[] = results[0];
 			const permissionIds = results[1];
-			const permissions = orderBy(libraries, ['language', 'name'], ['asc', 'asc']).map(lib => ({
+			const permissions = orderBy(libraries, ['language', 'name']).map(lib => ({
 				library: lib,
 				hasAccess: permissionIds.includes(lib.id),
 			}));
