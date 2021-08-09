@@ -78,7 +78,6 @@ namespace NxPlx.ApplicationHost.Api
             services.AddSingleton<ConnectionHub>();
             services.AddSingleton<IHttpSessionService, CookieSessionService>();
             services.AddSingleton<IRouteSessionTokenExtractor, RouteSessionTokenExtractor>();
-            services.AddSingleton<ICacheClearer, RedisCacheClearer>();
             services.AddSingleton<IDetailsApi, TMDbApi>();
 
             services.AddScoped<ILogEventEnricher, CommonEventEnricher>();
