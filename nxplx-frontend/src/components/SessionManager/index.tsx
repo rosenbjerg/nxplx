@@ -1,10 +1,11 @@
 import { createSnackbar } from '@snackbar/core';
 import { Component, h } from 'preact';
 import { UAParser } from 'ua-parser-js';
-import { remove } from '../../utils/arrays';
+import { removeWhere } from '../../utils/arrays';
 import http from '../../utils/http';
 import { translate } from '../../utils/localisation';
 import Loading from '../Loading';
+import { useCallback } from 'preact/hooks';
 
 interface Props {
 	userId?: number;
@@ -35,6 +36,39 @@ interface Os {
 	version: string;
 }
 
+interface SessionProps {
+	id: string;
+	browser: Browser;
+	os: Os;
+	onClosed: (id: string) => any;
+}
+
+const Session = (props: SessionProps) => {
+	const closeSession = useCallback(async () => {
+		const response = await http.delete(`/api/session`, props.id);
+		if (response.ok) {
+			createSnackbar('Session closed', { timeout: 1500 });
+			props.onClosed(props.id);
+		} else {
+			createSnackbar('Unable to close that session', { timeout: 2500 });
+		}
+	}, [props.id]);
+
+	return (
+		<tr>
+			<td title={translate('browser on device', {
+				browser: `${props.browser.name} ${props.browser.version}`,
+				device: `${props.os.name} ${props.os.version}`,
+			})}>
+				{translate('browser on device', { browser: props.browser.name, device: props.os.name })}
+			</td>
+			<td>
+				<button title={translate('close this session')} onClick={closeSession} className="material-icons bordered">close</button>
+			</td>
+		</tr>
+	);
+};
+
 export default class SessionManager extends Component<Props, State> {
 
 	public componentDidMount(): void {
@@ -60,19 +94,7 @@ export default class SessionManager extends Component<Props, State> {
 				<table>
 					<tbody>
 					{sessions.map(session => (
-						<tr key={session.id}>
-							<td title={translate('browser on device', {
-								browser: `${session.browser.name} ${session.browser.version}`,
-								device: `${session.os.name} ${session.os.version}`,
-							})}>
-								{translate('browser on device', { browser: session.browser.name, device: session.os.name })}
-							</td>
-							<td>
-								<button title={translate('close this session')} onClick={this.closeSession(session)}
-										class="material-icons bordered">close
-								</button>
-							</td>
-						</tr>
+						<Session key={session.id} id={session.id} browser={session.browser} os={session.os} onClosed={this.onSessionClosed} />
 					))}
 					</tbody>
 				</table>
@@ -82,15 +104,10 @@ export default class SessionManager extends Component<Props, State> {
 		);
 	}
 
-	private closeSession = (session: Session) => async () => {
-		const response = await http.delete(`/api/session`, session.id);
-		if (response.ok) {
-			createSnackbar('Session closed', { timeout: 1500 });
-			this.setState({ sessions: remove(this.state.sessions, session) });
-		} else {
-			createSnackbar('Unable to close that session', { timeout: 2500 });
-		}
+	private onSessionClosed = (id: string) => {
+		this.setState({ sessions: removeWhere(this.state.sessions, s => s.id === id) });
 	};
+
 	private clearSessions = async () => {
 		const response = await http.post(`/api/session/clear-all`);
 		if (response.ok) {

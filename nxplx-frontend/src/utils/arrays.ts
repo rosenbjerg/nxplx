@@ -4,7 +4,10 @@ export const add = (array: any[], ...elements: any[]) => {
 };
 
 export const remove = (array: any[], ...elements: any[]) => {
-	return array.filter(e => !elements.includes(e));
+	return removeWhere(array, e => !elements.includes(e));
+};
+export const removeWhere = <T extends {}>(array: T[], predicate: (e: T) => boolean) => {
+	return array.filter(e => !predicate(e));
 };
 
 type Ordering = 'asc' | 'desc';

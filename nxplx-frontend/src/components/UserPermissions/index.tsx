@@ -42,10 +42,10 @@ const UserPermissions = ({ onSave, user: { id, username } }: Props) => {
 
 	useEffect(() => {
 		Promise.all([
-			http.get(`/api/library/list`).then(res => res.json()),
-			http.get(`/api/library/permissions?userId=${id}`).then(res => res.json()),
+			http.getJson<Library[]>(`/api/library/list`),
+			http.getJson<number[]>(`/api/library/permissions?userId=${id}`),
 		]).then(results => {
-			const libraries: Library[] = results[0];
+			const libraries = results[0];
 			const permissionIds = results[1];
 			const permissions = orderBy(libraries, ['language', 'name']).map(lib => ({
 				library: lib,
