@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "license": "AGPLv3",
   "scripts": {
-    "build": "preact build",
+    "build": "cross-env NODE_ENV=production preact build",
     "dev": "preact watch",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'"
   },
@@ -34,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^4.22.1",
     "@typescript-eslint/parser": "^4.22.1",
     "babel-plugin-styled-components": "^1.13.2",
+    "cross-env": "^7.0.3",
     "css-loader": "^5.2.4",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.3.0",
