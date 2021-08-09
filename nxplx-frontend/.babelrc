@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["preact-cli/babel", {"modules": "commonjs"}]
+  ],
+  "plugins": [
+    "babel-plugin-styled-components",
+    ["@babel/plugin-proposal-private-methods", {"loose": true}],
+    ["@babel/plugin-proposal-class-properties", {"loose": true}]
+  ]
+}
