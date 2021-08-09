@@ -64,7 +64,17 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "react": [
+        "node_modules/preact/compat/"
+      ],
+      "react-dom": [
+        "node_modules/preact/compat/"
+      ]
+    }
   },
   "include": [
     "src/**/*.tsx",
