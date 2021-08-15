@@ -9,6 +9,7 @@ import SearchBar from '../../components/SearchBar';
 import ContinueWatchingRow from '../../components/ContinueWatchingRow';
 import Store from '../../utils/storage';
 import * as S from './Home.styled';
+import { translate } from '../../utils/localisation';
 
 interface Props {
 }
@@ -35,11 +36,11 @@ export default class Home extends Component<Props, State> {
 	public render(_, { overview, search }: State) {
 		return (
 			<S.Wrapper>
-				<PageTitle title="Home" />
+				<PageTitle title={translate('overview')} />
 				<SearchBar value={this.state.search} onInput={this.onSearchTermChanged} />
 
 				<S.EntryContainer>
-					{!search && (<ContinueWatchingRow />)}
+					<ContinueWatchingRow hidden={!!search} />
 
 					{overview === undefined ? (
 						<Loading fullscreen />
@@ -52,7 +53,7 @@ export default class Home extends Component<Props, State> {
 										title={entry.title}
 										href={`/${entry.kind}/${entry.id}`}
 										image={imageUrl(entry.posterPath, 190)}
-										imageBlurHash={entry.posterBlurHash}
+										imageBlurhash={entry.posterBlurhash}
 										blurhashWidth={20}
 										blurhashHeight={32}
 									/>

@@ -8,7 +8,7 @@ import PageTitle from '../../components/PageTitle';
 
 const Admin = () => (
 	<div class={style.profile}>
-		<PageTitle title="Administration" />
+		<PageTitle title={translate('administration')} />
 		<h1>{translate('admin stuff')}</h1>
 
 		<h2>{translate('libraries')}</h2>

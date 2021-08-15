@@ -29,7 +29,7 @@ export default class Film extends Component<Props, State> {
 		const gradient = useBackgroundGradient(details.backdropPath);
 		return (
 			<div class={style.bg} style={gradient} data-bg={details.backdropPath}>
-				<PageTitle title={`${details.title}`} />
+				<PageTitle title={details.title} />
 				<div class={`nx-scroll ${style.content}`}>
 					<div>
 						<h2 class={[style.title, style.marked].join(' ')}>{details.title}</h2>
@@ -42,7 +42,7 @@ export default class Film extends Component<Props, State> {
 							<h4 class={[style.tag, style.marked].join(' ')}>{details.tagline}</h4>
 						</div>
 					)}
-					<FilmPoster poster={details.posterPath} blurhash={details.posterBlurHash} href={`/watch/film/${details.fid}`} />
+					<FilmPoster poster={details.posterPath} blurhash={details.posterBlurhash} href={`/watch/film/${details.fid}`} />
 					<span class={[style.info, style.marked].join(' ')}>
                     <table>
                         {

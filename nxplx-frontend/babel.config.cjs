@@ -12,7 +12,12 @@ module.exports = api => {
             ["@babel/plugin-proposal-private-methods", { "loose": true }],
             ["@babel/plugin-proposal-class-properties", { "loose": true }]
         ]
-    ) : [];
+    ) : [
+
+        "babel-plugin-styled-components",
+        ["@babel/plugin-proposal-private-methods", { "loose": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
+    ];
 
     return {
         presets,

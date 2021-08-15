@@ -33,7 +33,7 @@ export default class Collection extends Component<Props, State> {
 		const gradient = useBackgroundGradient(details.backdropPath);
 		return (
 			<div class={style.bg} style={gradient} data-bg={details.backdropPath}>
-				<PageTitle title={`${details.name}`} />
+				<PageTitle title={details.name} />
 				<div class={`nx-scroll ${style.content}`}>
 					<div>
 						<h2 class={[style.title, style.marked].join(' ')}>{details.name}</h2>
@@ -41,7 +41,7 @@ export default class Collection extends Component<Props, State> {
 							<EditDetails setPoster setBackdrop entityType={'collection'} entityId={details.id} />
 						</AdminOnly>
 					</div>
-					<LazyImage class={style.poster} src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32}
+					<LazyImage class={style.poster} src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurhash} blurhashHeight={32}
 							   blurhashWidth={20} />
 					<div>
 						{orderBy(details.movies, ['year', 'title'])
@@ -51,7 +51,7 @@ export default class Collection extends Component<Props, State> {
 										title={movie.title}
 										href={`/${movie.kind}/${movie.id}`}
 										image={imageUrl(movie.posterPath, 190, details.posterPath)}
-										imageBlurHash={movie.posterBlurHash || details.posterBlurHash}
+										imageBlurhash={movie.posterBlurhash || details.posterBlurhash}
 										blurhashWidth={20}
 										blurhashHeight={32}
 									/>

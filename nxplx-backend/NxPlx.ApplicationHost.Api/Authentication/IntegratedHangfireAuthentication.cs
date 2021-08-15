@@ -17,7 +17,7 @@ namespace NxPlx.ApplicationHost.Api.Authentication
             if (!string.IsNullOrEmpty(sessionToken))
             {
                 var session = dispatcher.Dispatch(new SessionQuery(sessionToken)).GetAwaiter().GetResult();
-                return session != null;
+                return session is { IsAdmin: true };
             }
 
             return false;
