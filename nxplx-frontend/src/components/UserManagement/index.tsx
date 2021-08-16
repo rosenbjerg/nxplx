@@ -7,6 +7,9 @@ import { User } from '../../utils/models';
 import Loading from '../Loading';
 import CreateUserModal from '../../modals/CreateUserModal';
 import EditUserLibraryAccessModal from '../../modals/EditUserLibraryAccessModal';
+import * as S from './UserManagement.styled';
+import { useCallback } from 'preact/hooks';
+import PrimaryButton from '../styled/PrimaryButton';
 
 interface Props {}
 
@@ -19,18 +22,53 @@ interface State {
 
 const OnlineIndicator = (props: { isOnline: boolean, lastSeen: string }) => {
 	return (
-		<span style={{ 'color': props.isOnline ? 'green' : 'gray', 'margin-right': '4px', 'cursor': 'default' }} title={props.lastSeen}>•</span>
+		<S.OnlineIndicator online={props.isOnline} title={props.lastSeen}>•</S.OnlineIndicator>
 	);
 };
 
 const AdminIndicator = () => {
 	return (
-		<i class="material-icons" style="font-size: 10pt; cursor: default" title={translate('admin')}>supervisor_account</i>
+		<S.SmallIcon title={translate('admin')}>supervisor_account</S.SmallIcon>
 	);
 };
 const HasChangedPasswordIndicator = () => {
 	return (
-		<i class="material-icons" style="font-size: 9pt; cursor: default" title={translate('has changed password')}>lock</i>
+		<S.SmallIcon title={translate('has changed password')}>lock</S.SmallIcon>
+	);
+};
+
+interface UserElementProps {
+	user: User;
+	onSelect: (user: User) => any;
+	onDeleted: (user: User) => any;
+
+}
+
+const UserElement = (props: UserElementProps) => {
+	const selectUSer = useCallback(() => props.onSelect(props.user), [props.user, props.onSelect]);
+	const deleteUser = useCallback(() => {
+		props.onDeleted(props.user);
+	}, [props.user, props.onDeleted]);
+
+	return (
+		<S.Element>
+			<OnlineIndicator isOnline={props.user.isOnline} lastSeen={props.user.lastSeen} />
+			<S.ElementText>{props.user.username}</S.ElementText>
+			{props.user.admin && <AdminIndicator />}
+			{props.user.hasChangedPassword && <HasChangedPasswordIndicator />}
+			<S.ElementButtonGroup>
+				{!props.user.admin && (
+					<S.ElementButton type="button" title={translate('set library permissions')} onClick={selectUSer}>
+						<S.MediumIcon>video_library</S.MediumIcon>
+					</S.ElementButton>
+				)}
+				{props.user.username !== 'admin' && (
+					<S.ElementButton type="button" title={translate('delete user')} onClick={deleteUser}>
+						<S.MediumIcon>close</S.MediumIcon>
+					</S.ElementButton>
+				)}
+			</S.ElementButtonGroup>
+		</S.Element>
 	);
 };
 
@@ -47,7 +85,7 @@ export default class UserManagement extends Component<Props, State> {
 		});
 	}
 
-	public render(_, { users, selectedUser, createUserModalOpen, showAll }: State) {
+	public render(_, { users, selectedUser, createUserModalOpen }: State) {
 		return (
 			<div>
 				{createUserModalOpen && (
@@ -60,59 +98,32 @@ export default class UserManagement extends Component<Props, State> {
 												onSaved={() => this.setState({ selectedUser: undefined })} />
 				)}
 
-				{!users ? (<Loading />) : (
-					<table>
-						<thead>
-						<tr>
-							<th>{translate('username')}</th>
-							<th>{translate('actions')}</th>
-						</tr>
-						</thead>
-						<tbody>
-						{(showAll ? users : (users.slice(0, 6))).map(u => {
+				<S.Container>
+					{!users ? (<Loading />) : (
+						users.map(u => {
 							return (
-								<tr key={u.id}>
-									<td>
-										<OnlineIndicator isOnline={u.isOnline} lastSeen={u.lastSeen} />
-										<span style="font-size: 12pt;">{u.username}</span>
-										{u.admin && <AdminIndicator />}
-										{u.hasChangedPassword && <HasChangedPasswordIndicator />}
-									</td>
-									<td>
-										{!u.admin && (
-											<button type="button" title={translate('set library permissions')}
-													onClick={() => this.setState({ selectedUser: u })}
-													class="material-icons noborder" style="font-size: 12pt;">video_library</button>
-										)}
-										{u.username !== 'admin' && (
-											<button type="button" title={translate('delete user')} onClick={this.deleteUser(u)} class="material-icons noborder"
-													style="font-size: 12pt;">close</button>
-										)}
-									</td>
-								</tr>
+								<UserElement key={u.id} user={u} onDeleted={this.deleteUser} onSelect={this.selectUser} />
 							);
-						})}
-						{users.length > 6 && (
-							<tr>
-								<td style="cursor: pointer">
-									<span onClick={() => this.setState({ showAll: !showAll })}>
-									<span
-										style="font-size: 12pt; text-decoration: underline">{showAll ? translate('show less') : translate('show all')}</span>
-									<i class="material-icons" style="font-size: 8pt;">{showAll ? 'unfold_less' : 'unfold_more'}</i>
-									</span>
-								</td>
-							</tr>
-						)}
-						</tbody>
-					</table>
-				)}
+						})
+					)}
+				</S.Container>
 
-				<button class="bordered" onClick={() => this.setState({ createUserModalOpen: true })}>{translate('create user')}</button>
+				<S.ElementButtonGroup>
+					<PrimaryButton onClick={this.openCreateUserModal}>{translate('create user')}</PrimaryButton>
+				</S.ElementButtonGroup>
 			</div>
 		);
 	}
 
-	private deleteUser = (user: User) => () => {
+	private openCreateUserModal = () => {
+		this.setState({ createUserModalOpen: true });
+	};
+
+	private selectUser = (user: User) => {
+		this.setState({ selectedUser: user });
+	};
+
+	private deleteUser = (user: User) => {
 		http.delete('/api/user', user.username).then(response => {
 			if (response.ok) {
 				this.setState({ users: remove(this.state.users, user) });

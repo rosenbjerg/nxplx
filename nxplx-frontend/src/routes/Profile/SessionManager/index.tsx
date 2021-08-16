@@ -8,7 +8,6 @@ import SessionClient, { Browser, Os, Session } from '../../../utils/clients/Sess
 import * as SS from '../Profile.styled';
 import * as S from './SessionManager.styled';
 import { useState } from 'react';
-import Icon from '../../../components/styled/Icon';
 
 interface Props {
 	userId?: number;
@@ -46,7 +45,7 @@ const SessionElement = (props: SessionProps) => {
 				{translate('browser on device', { browser: props.browser.name, device: props.os.name })}{(props.current ? ` (${translate('current')})` : '')}
 			</S.ElementText>
 			<S.ElementButton onClick={closeSession} title={translate('close this session')}>
-				<Icon>close</Icon>
+				<S.ElementButtonIcon>close</S.ElementButtonIcon>
 			</S.ElementButton>
 		</S.Element>
 	);
@@ -86,7 +85,7 @@ const SessionManager = (props: Props) => {
 				) : (<Loading />)}
 			</S.Container>
 
-			<SS.Button onClick={clearSessions}>{translate('close all sessions')}</SS.Button>
+			<SS.ButtonWide onClick={clearSessions}>{translate('close all sessions')}</SS.ButtonWide>
 		</S.Wrapper>
 	);
 };

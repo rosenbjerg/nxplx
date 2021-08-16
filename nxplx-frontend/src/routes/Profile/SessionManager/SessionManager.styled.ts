@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import PrimaryButton from '../../../components/styled/PrimaryButton';
+import SecondaryButton from '../../../components/styled/SecondaryButton';
+import Icon from '../../../components/styled/Icon';
 
 
 export const Wrapper = styled.div`
@@ -22,9 +23,12 @@ export const ElementText = styled.div`
   margin-right: 8px;
   font-family: Poppins, sans-serif;
 `;
-export const ElementButton = styled(PrimaryButton)`
+export const ElementButton = styled(SecondaryButton)`
   height: 100%;
   border-radius: 10px;
   width: 40px;
   padding: 0 0;
+`;
+export const ElementButtonIcon = styled(Icon)`
+  line-height: 36px;
 `;

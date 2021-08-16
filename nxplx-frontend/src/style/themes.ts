@@ -18,16 +18,19 @@ interface Theme {
 	textColorPrimary: string;
 	textColorDisabled: string;
 	backgroundColorPrimary: string;
+	backgroundColorSecondary: string;
 	borderColorPrimary: string;
 	boxShadowHeader: string;
 	buttonPrimaryBackgroundColor: string;
 	buttonPrimaryActiveBackgroundColor: string;
 	buttonPrimaryHoverBackgroundColor: string;
 	buttonPrimaryDisabledBackgroundColor: string;
+	palette: Record<string, string>;
 }
 
 export const DarkTheme: Theme = {
 	backgroundColorPrimary: palette.darkGray,
+	backgroundColorSecondary: palette.gray,
 	borderColorPrimary: palette.purple,
 	textColorPrimary: palette.white,
 	textColorDisabled: palette.lightGray,
@@ -36,4 +39,5 @@ export const DarkTheme: Theme = {
 	buttonPrimaryActiveBackgroundColor: palette.purpleBlueHover,
 	buttonPrimaryHoverBackgroundColor: palette.purpleBlueActive,
 	buttonPrimaryDisabledBackgroundColor: palette.darkGray,
+	palette,
 };

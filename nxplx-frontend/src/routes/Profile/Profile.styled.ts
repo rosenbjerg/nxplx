@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import Form from '../../components/Form';
 import StyledInput from '../../components/styled/StyledInput';
 import PrimaryButton from '../../components/styled/PrimaryButton';
+import SecondaryButton from '../../components/styled/SecondaryButton';
 
 export const Content = styled.div`
   display: flex;
@@ -49,4 +50,9 @@ export const H2 = styled.h2`
 export const Button = styled(PrimaryButton)`
   height: 40px;
   border-radius: 10px;
+`;
+export const ButtonWide = styled(SecondaryButton)`
+  height: 40px;
+  border-radius: 10px;
+  width: 100%;
 `;

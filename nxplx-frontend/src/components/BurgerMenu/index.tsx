@@ -1,6 +1,6 @@
 import * as S from './BurgerMenu.styled';
 import { h, VNode } from 'preact';
-import { useState } from 'preact/hooks';
+import { useCallback, useState } from 'preact/hooks';
 
 interface BurgerMenuProps {
 	children: VNode;
@@ -8,11 +8,12 @@ interface BurgerMenuProps {
 
 const BurgerMenu = ({ children }: BurgerMenuProps) => {
 	const [open, setOpen] = useState(false);
+	const close = useCallback(() => setOpen(false), [setOpen]);
 
 	return (
-		<S.Wrapper onClick={() => setOpen(!open)}>
-			<S.BurgerIcon visible={true}>
-				<S.Icon className="material-icons">{open ? 'expand_less' : 'menu'}</S.Icon>
+		<S.Wrapper tabIndex={0} onBlur={close} onClick={() => setOpen(!open)}>
+			<S.BurgerIcon visible={!open}>
+				<S.Icon className="material-icons">menu</S.Icon>
 			</S.BurgerIcon>
 			<S.Menu visible={!open}>
 				{children}
