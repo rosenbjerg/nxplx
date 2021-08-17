@@ -1,17 +1,18 @@
 import * as S from './BurgerMenu.styled';
 import { h, VNode } from 'preact';
-import { useCallback, useState } from 'preact/hooks';
+import { useBooleanState } from '../../utils/hooks';
+import { useCallback } from 'preact/hooks';
 
 interface BurgerMenuProps {
 	children: VNode;
 }
 
 const BurgerMenu = ({ children }: BurgerMenuProps) => {
-	const [open, setOpen] = useState(false);
-	const close = useCallback(() => setOpen(false), [setOpen]);
+	const [open, _, setClosed, toggle] = useBooleanState(false);
+	const delayedClose = useCallback(() => { setTimeout(setClosed, 0); }, [setClosed]);
 
 	return (
-		<S.Wrapper tabIndex={0} onBlur={close} onClick={() => setOpen(!open)}>
+		<S.Wrapper tabIndex={0} onBlur={delayedClose} onClick={toggle}>
 			<S.BurgerIcon visible={!open}>
 				<S.Icon className="material-icons">menu</S.Icon>
 			</S.BurgerIcon>
