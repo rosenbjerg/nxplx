@@ -102,7 +102,6 @@ export default class VideoPlayer extends Component<Props, State> {
 		buffered,
 		focused,
 	}: State) {
-		setTimeout(() => this.videoContainer?.focus(), 0);
 		return (
 			<div tabIndex={0} autofocus onKeyDown={this.onKeyPress} ref={this.bindVideoContainer}
 				 class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
