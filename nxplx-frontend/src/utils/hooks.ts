@@ -14,3 +14,11 @@ export function useLinkedState<T>(initialState?: T): [T | undefined, StateUpdate
 
 	return [state, setState, setLinkedState];
 }
+
+export function useBooleanState(initialState: boolean): [boolean, () => any, () => any, () => any] {
+	const [state, setState] = useState(initialState);
+	const disable = useCallback(() => { setState(false); }, [setState]);
+	const enable = useCallback(() => { setState(true); }, [setState]);
+	const toggle = useCallback(() => { setState(!state); }, [setState]);
+	return [state, enable, disable, toggle];
+}
