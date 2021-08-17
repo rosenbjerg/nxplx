@@ -30,7 +30,7 @@ interface Theme {
 
 export const DarkTheme: Theme = {
 	backgroundColorPrimary: palette.darkGray,
-	backgroundColorSecondary: palette.gray,
+	backgroundColorSecondary: palette.darkerGray,
 	borderColorPrimary: palette.purple,
 	textColorPrimary: palette.white,
 	textColorDisabled: palette.lightGray,
