@@ -1,9 +1,9 @@
-import { h, VNode } from 'preact';
+import { ComponentChildren, h } from 'preact';
 import { useCallback } from 'preact/hooks';
 
 interface FormProps {
 	onSubmit: (formData: FormData) => Promise<boolean> | boolean;
-	children: VNode[];
+	children: ComponentChildren;
 }
 
 const Form = ({ children, onSubmit, ...rest }: FormProps) => {
