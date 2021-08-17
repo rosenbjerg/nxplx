@@ -124,6 +124,7 @@ export default class UserManagement extends Component<Props, State> {
 	};
 
 	private deleteUser = (user: User) => {
+		if (!confirm(`Are you sure you want to delete ${user.username}?`)) return;
 		http.delete('/api/user', user.username).then(response => {
 			if (response.ok) {
 				this.setState({ users: remove(this.state.users, user) });

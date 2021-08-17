@@ -19,6 +19,10 @@ const StyledInput = styled.input`
     border: 2px solid ${props => props.theme.borderColorPrimary};
     transition: border-width 50ms linear;
 
+    &:invalid {
+      border: 2px solid ${props => props.theme.palette.red};
+      border-color: ${props => props.theme.palette.red};
+    }
   }
 
   &:disabled {

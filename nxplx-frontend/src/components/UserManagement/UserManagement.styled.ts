@@ -32,7 +32,7 @@ export const Element = styled.div`
   flex-direction: row;
   height: 40px;
   margin-right: 2px;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: default;
 
   &:nth-child(odd) {
