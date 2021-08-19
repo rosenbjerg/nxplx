@@ -104,7 +104,7 @@ export default class VideoPlayer extends Component<Props, State> {
 	}: State) {
 		return (
 			<div tabIndex={0} autofocus onKeyDown={this.onKeyPress} ref={this.bindVideoContainer}
-				 class={`${style.videoContainer}${focused ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
+				 class={`${style.videoContainer}${focused || !playing ? ` ${style.focused}` : ''}${playing ? ` ${style.playing}` : ''}`}>
 				<span class={`${style.title} ${style.topControls}`}>
 					{isSeries && (<i onClick={onBackToSeason} style="cursor: pointer" class="material-icons">arrow_back_ios</i>)}
 					<span>{title}</span>
