@@ -5,24 +5,25 @@ import { connect } from 'unistore/preact';
 import http from '../../utils/http';
 import { translate } from '../../utils/localisation';
 import PageTitle from '../../components/PageTitle';
-import * as S from './login.styled';
+import * as S from './Login.styled';
+import PrimaryButton from '../../components/styled/PrimaryButton';
 
 const actions = (store: Store<NxPlxStore>) => (
 	{
-		async login(state, ev: any) {
-			if (state.isLoggedIn) return;
-			ev.preventDefault();
+		async login(state, formData: FormData) {
+			if (state.isLoggedIn) return true;
 			store.setState({ isLoggingIn: true });
 			try {
-				const isAdmin = await http.postForm('/api/authentication/login', ev.target).then(response => response.json());
+				const isAdmin = await http.post('/api/authentication/login', formData, false).then(response => response.json());
 				const urlParams = new URLSearchParams(window.location.search);
 				route(urlParams.get('redirect') || '/', true);
 				store.setState({
 					isLoggedIn: true,
 					isAdmin,
 				});
+				return true;
 			} catch (e) {
-				ev.target.reset();
+				return false;
 			} finally {
 				store.setState({ isLoggingIn: false });
 			}
@@ -34,16 +35,14 @@ const Login = connect(['isLoggingIn'], actions)(
 	({ isLoggingIn, login }) => {
 		return (
 			<S.Wrapper>
-				<PageTitle title="Login at nxplx" />
+				<PageTitle title={translate('login')} />
 				<S.Content>
 					<S.H1>Login</S.H1>
 					<S.StyledForm onSubmit={login}>
-						<S.Input disabled={isLoggingIn} placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={50}
-								 required />
-						<S.Input disabled={isLoggingIn} placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50}
-								 required />
+						<S.Input disabled={isLoggingIn} placeholder={translate('username')} type="text" name={'username'} minLength={4} maxLength={50} required />
+						<S.Input disabled={isLoggingIn} placeholder={translate('password')} type="password" name={'password'} minLength={6} maxLength={50} required />
 						<S.BottomControls>
-							<S.Button disabled={isLoggingIn}>{translate('login')}</S.Button>
+							<PrimaryButton disabled={isLoggingIn}>{translate('login')}</PrimaryButton>
 						</S.BottomControls>
 					</S.StyledForm>
 				</S.Content>

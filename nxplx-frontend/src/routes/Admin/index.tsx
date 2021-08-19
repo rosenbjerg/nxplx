@@ -3,22 +3,22 @@ import AdminCommands from '../../components/AdminCommands';
 import LibraryManagement from '../../components/LibraryManagement';
 import UserManagement from '../../components/UserManagement';
 import { translate } from '../../utils/localisation';
-import * as style from './style.css';
 import PageTitle from '../../components/PageTitle';
+import * as S from './Admin.styled';
 
 const Admin = () => (
-	<div class={style.profile}>
-		<PageTitle title="Administration" />
-		<h1>{translate('admin stuff')}</h1>
+	<S.Content>
+		<PageTitle title={translate('administration')} />
+		<S.H1>{translate('admin stuff')}</S.H1>
 
-		<h2>{translate('libraries')}</h2>
+		<S.H2>{translate('libraries')}</S.H2>
 		<LibraryManagement />
 
-		<h2>{translate('users')}</h2>
+		<S.H2>{translate('users')}</S.H2>
 		<UserManagement />
 
-		<h2>Commands</h2>
+		<S.H2>Commands</S.H2>
 		<AdminCommands />
-	</div>
+	</S.Content>
 );
 export default Admin;

@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using NxPlx.Abstractions;
+using NxPlx.Application.Core;
 using NxPlx.Application.Models;
 using NxPlx.Domain.Events.File;
 using NxPlx.Domain.Events.Library;
@@ -42,23 +44,39 @@ namespace NxPlx.Domain.Services.EventHandlers.File
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
-    }    public class FileLentOutCommandHandler : IDomainEventHandler<FileLentOutCommand, bool>
+    }    
+    public class FileReservationCommandHandler : IDomainEventHandler<FileReservationCommand, bool>
     {
         private readonly IDomainEventDispatcher _eventDispatcher;
         private readonly IOperationContext _operationContext;
         private readonly DatabaseContext _databaseContext;
+        private readonly IDistributedCache _distributedCache;
 
-        public FileLentOutCommandHandler(IDomainEventDispatcher eventDispatcher, IOperationContext operationContext, DatabaseContext databaseContext)
+        public FileReservationCommandHandler(IDomainEventDispatcher eventDispatcher, IOperationContext operationContext, DatabaseContext databaseContext, IDistributedCache distributedCache)
         {
             _eventDispatcher = eventDispatcher;
             _operationContext = operationContext;
             _databaseContext = databaseContext;
+            _distributedCache = distributedCache;
         }
-        public async Task<bool> Handle(FileLentOutCommand query, CancellationToken cancellationToken = default)
+        public async Task<bool> Handle(FileReservationCommand query, CancellationToken cancellationToken = default)
         {
-
+            var key = $"{query.StreamKind}={query.Id}";
+            var userId = _operationContext.Session.UserId;
+            await _distributedCache.AddToList("reservation", "sys", key, userId, TimeSpan.FromMinutes(5), cancellationToken);
+            await _distributedCache.SetStringAsync($"reservation:{userId}:{key}", "", new DistributedCacheEntryOptions{ AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5) }, cancellationToken);
             return true;
 
         }
+    }
+
+    public class FileReservationService
+    {
+        
+    }
+
+    public class DA
+    {
+        
     }
 }

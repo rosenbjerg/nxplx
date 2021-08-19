@@ -1,5 +1,9 @@
 {
   "login": "Log in",
+  "profile": "Profile",
+  "administration": "Administration",
+  "browse": "Browse",
+  "job dashboard": "Job dashboard",
   "continue watching": "Continue watching",
   "search here": "search here",
   "filters": "Filters",
@@ -36,7 +40,7 @@
   "initial password": "Initial password",
   "initial password again": "Initial password (again)",
   "libraries username has access to": "Libraries that {{username}} has access to",
-  "account settings for": "Account settings for",
+  "account": "Account",
   "your account details": "Your account details",
   "change your password": "Change your password",
   "old password": "Old password",

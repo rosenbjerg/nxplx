@@ -19,7 +19,7 @@ import { setLocale } from '../utils/localisation';
 import Header from './Header';
 import Store from '../utils/storage';
 import { ThemeProvider } from 'styled-components';
-import { dark } from '../style/themes';
+import { DarkTheme } from '../style/themes';
 
 if ((module as any).hot) {
 	import('preact/debug');
@@ -36,7 +36,7 @@ export default class App extends Component {
 	public render() {
 		return (
 			<Provider store={store}>
-				<ThemeProvider theme={dark}>
+				<ThemeProvider theme={DarkTheme}>
 					<div id="app">
 						<Header />
 						<Router>
@@ -57,9 +57,9 @@ export default class App extends Component {
 		);
 	}
 
-	public componentDidMount() {
-		void setLocale(Store.local.getEntry('locale', 'en'));
-		void this.checkLoggedIn();
+	public async componentDidMount() {
+		await setLocale(Store.local.getEntry('locale', 'en'));
+		await this.checkLoggedIn();
 		store.subscribe(state => {
 			if (!state.build && state.isLoggedIn) {
 				this.loadBuild();

@@ -8,14 +8,14 @@
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
       <PackageReference Include="Hangfire.AspNetCore" Version="1.7.24" />
-      <PackageReference Include="Hangfire.PostgreSql" Version="1.8.5.4" />
-      <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.8">
+      <PackageReference Include="Hangfire.PostgreSql" Version="1.8.6" />
+      <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.9">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.9" />
       <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="5.0.1" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.7" />
       <PackageReference Include="Scrutor" Version="3.3.0" />
@@ -24,7 +24,7 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
       <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.1" />
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
     </ItemGroup>
 
     <ItemGroup>
