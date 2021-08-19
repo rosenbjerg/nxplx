@@ -9,12 +9,12 @@
         <PackageReference Include="AutoMapper" Version="10.1.1" />
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.2" />
         <PackageReference Include="BlurHashSharp.Drawing" Version="1.2.0" />
-        <PackageReference Include="FFMpegCore" Version="4.4.0" />
+        <PackageReference Include="FFMpegCore" Version="4.5.0" />
         <PackageReference Include="Instances" Version="1.6.0" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />
         <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     </ItemGroup>
 
