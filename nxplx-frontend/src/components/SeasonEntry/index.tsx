@@ -14,7 +14,7 @@ export const SeasonEntry = ({ details, season, progress }: Props) => (
     <Entry
         key={season.number}
         image={imageUrl(season.posterPath, 190, details.posterPath)}
-        imageBlurHash={season.posterBlurHash}
+        imageBlurhash={season.posterBlurHash}
         href={`/series/${details.id}/${season.number}`}
         title={`Season ${season.number}`}
         progress={progress}

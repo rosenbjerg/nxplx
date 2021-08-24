@@ -163,13 +163,18 @@
 }
 
 html,
-body,
-#app {
+body{
     background: #1E1F22;
     font-family: "Lato", "Helvetica Neue", arial, sans-serif;
     color: white;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+#app{
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr;
 }
 
 .nx-scroll {

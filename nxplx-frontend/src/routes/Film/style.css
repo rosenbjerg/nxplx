@@ -1,6 +1,5 @@
 .bg {
     padding: 5px 5px;
-    height: calc(100vh - 56px);
     width: 100%;
     background-size: cover;
     background-repeat: repeat-y;

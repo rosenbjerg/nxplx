@@ -8,7 +8,7 @@ export const Wrapper = styled.div`
 `;
 
 export const EntryContainer = styled(Scroll)`
-  padding-top: 10px;
+  padding-top: 70px;
   height: calc(100vh - 110px);
   overflow: auto;
   margin-right: -8px;

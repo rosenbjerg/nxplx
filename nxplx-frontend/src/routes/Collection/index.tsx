@@ -51,7 +51,7 @@ export default class Collection extends Component<Props, State> {
 										title={movie.title}
 										href={`/${movie.kind}/${movie.id}`}
 										image={imageUrl(movie.posterPath, 190, details.posterPath)}
-										imageBlurHash={movie.posterBlurHash || details.posterBlurHash}
+										imageBlurhash={movie.posterBlurHash || details.posterBlurHash}
 										blurhashWidth={20}
 										blurhashHeight={32}
 									/>

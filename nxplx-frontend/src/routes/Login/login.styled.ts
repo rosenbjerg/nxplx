@@ -33,6 +33,7 @@ export const H1 = styled.h1`
 
 export const Input = styled(StyledInput)`
   margin-bottom: 24px;
+  padding-left: 16px;
 
   &:disabled {
     color: ${props => props.theme.lightGray};

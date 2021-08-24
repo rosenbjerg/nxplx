@@ -52,7 +52,7 @@ export default class Home extends Component<Props, State> {
 										title={entry.title}
 										href={`/${entry.kind}/${entry.id}`}
 										image={imageUrl(entry.posterPath, 190)}
-										imageBlurHash={entry.posterBlurHash}
+										imageBlurhash={entry.posterBlurHash}
 										blurhashWidth={20}
 										blurhashHeight={32}
 									/>
@@ -75,13 +75,33 @@ export default class Home extends Component<Props, State> {
 			entry.title.toLowerCase().includes(lowercaseSearch);
 	};
 
+
 	private load = () => {
+		const films:OverviewElement[] = []
+		for(let i = 0;i<100;i++){
+			films.push({
+				id:i,
+				title:"film: "+i,
+				posterPath:"",
+				posterBlurHash:"",
+				kind:"film"
+			})
+		}
 		if (!this.state.overview) {
 			http.getJson<OverviewElement[]>('/api/overview')
-				.then(overview => this.setState({ overview: orderBy(overview, ['title'], ['asc']) }));
+				.then(() => this.setState({ overview: orderBy(films, ['title'], ['asc']) }));
 		}
 		const initialSearchTerm = Store.session.getEntry('search_term', '');
 		this.setState({ search: initialSearchTerm });
 	};
 
+//	private load = () => {
+//		if (!this.state.overview) {
+//			http.getJson<OverviewElement[]>('/api/overview')
+//				.then(overview => this.setState({ overview: orderBy(overview, ['title'], ['asc']) }));
+//		}
+//		const initialSearchTerm = Store.session.getEntry('search_term', '');
+//		this.setState({ search: initialSearchTerm });
+//	};
+//
 }

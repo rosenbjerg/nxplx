@@ -25,7 +25,7 @@ const ContinueWatching = () => {
                         title={p.title}
                         href={`/watch/${p.kind}/${p.fileId}`}
                         image={imageUrl(p.posterPath, 190)}
-                        imageBlurHash={p.posterBlurHash}
+                        imageBlurhash={p.posterBlurHash}
                         progress={p.progress}
                         blurhashWidth={20}
                         blurhashHeight={32}
