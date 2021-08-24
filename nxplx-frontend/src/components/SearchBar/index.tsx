@@ -1,7 +1,8 @@
 import { translate } from "../../utils/localisation";
 import { h } from "preact";
-import { useCallback } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
 import * as S from "./SearchBar.styled";
+import MultiSelect, { Item } from "../MultiSelect";
 // import { useState } from "preact/hooks";
 // import Select, { Option } from "../Select";
 
@@ -33,15 +34,27 @@ interface Props {
 //     );
 // }
 
+const categories:Item[] = []
+
 const SearchBar = (props: Props) => {
     const onInput = useCallback((ev) => props.onInput(ev.target.value), [props.onInput]);
+    const [selectedCategories, setSelectedCategories] = useState<Item[]>([])
+
+    function handleCategoryOnChange(items:Item[]) {
+        setSelectedCategories(items)
+    }
+
     return (
         <S.Wrapper>
-            <S.SearchIcon>search</S.SearchIcon>
-
-            <S.Input open={!!props.value} tabIndex={0} autoFocus={true} placeholder={translate("search here")}
+            <S.SearchWrapper>
+                <S.SearchIcon>search</S.SearchIcon>
+                <S.Input open={!!props.value} tabIndex={0} autoFocus={true} placeholder={translate("search here")}
                          type="search" value={props.value} onInput={onInput}>
-            </S.Input>
+                </S.Input>
+            </S.SearchWrapper>
+            <S.CategoryWrapper>
+                <MultiSelect items={categories} selected={selectedCategories} onChange={handleCategoryOnChange}/>
+            </S.CategoryWrapper>
             {/*<button class={`noborder ${style.showFilters}`} onClick={() => setOpen(!open)}>*/}
             {/*    <span style="line-height: 22px;">{translate("filters")}</span>*/}
             {/*    <i class="material-icons" style="float: right; margin-top: -1px;">expand_more</i>*/}

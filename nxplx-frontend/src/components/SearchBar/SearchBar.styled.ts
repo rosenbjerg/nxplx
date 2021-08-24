@@ -3,25 +3,28 @@ import { StyledInput } from "../styled/StyledInput";
 
 export const Wrapper = styled.div`
   position: fixed;
-  display: grid;
-  top: 64px;
-  left: 10px;
-  overflow: hidden;
-  border-radius: 16px;
-  box-sizing: border-box;
+  top: 72px;
+  left: 18px;
   z-index: 1;
 
 `
 
+export const SearchWrapper = styled.div`
+  
+`
+
 export const Input = styled(StyledInput)<{open?:boolean}>`
-  width: ${props => props.open ? "512px" : "64px"};
+  width: ${props => props.open ? "320px" : "64px"};
   box-sizing: border-box;
   padding-left: 64px;
   transition: width 100ms;
-  
+  cursor: pointer;
+
   &:focus{
     transition: width 100ms;
-    width: 512px;
+    width: 320px;
+    cursor: auto;
+
   }
 `
 
@@ -35,7 +38,10 @@ export const SearchIcon = styled.div`
   line-height: 64px;
   text-align: center;
   font-size: 42px;
-  color: ${props => props.theme.};
+  color: ${props => props.theme.primaryColor};
   pointer-events: none;
-  cursor: pointer;
+`
+
+export const CategoryWrapper = styled.div`
+  
 `

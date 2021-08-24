@@ -2,14 +2,13 @@ import styled from 'styled-components';
 import Scroll from '../../components/styled/Scroll';
 
 export const Wrapper = styled.div`
-  padding: 10px 10px;
-  height: calc(100vh - 56px);
+  padding: 0 10px;
   width: 100%;
 `;
 
 export const EntryContainer = styled(Scroll)`
   padding-top: 70px;
-  height: calc(100vh - 110px);
+  height: calc(100vh - 56px);
   overflow: auto;
   margin-right: -8px;
 

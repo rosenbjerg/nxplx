@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-const StyledInput = styled.input`
+export const StyledInput = styled.input`
   box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.15) inset;
 
   font-family: Poppins, sans-serif;

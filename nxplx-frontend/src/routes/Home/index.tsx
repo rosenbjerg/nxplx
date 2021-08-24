@@ -84,7 +84,7 @@ export default class Home extends Component<Props, State> {
 				id:i,
 				title:"film: "+i,
 				posterPath:"",
-				posterBlurHash:"",
+				posterBlurhash:"",
 				kind:"film"
 			})
 		}
