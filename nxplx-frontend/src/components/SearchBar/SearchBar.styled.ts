@@ -6,11 +6,11 @@ export const Wrapper = styled.div`
   top: 72px;
   left: 18px;
   z-index: 1;
+  display: flex;
 
 `
 
 export const SearchWrapper = styled.div`
-  
 `
 
 export const Input = styled(StyledInput)<{open?:boolean}>`
@@ -22,7 +22,6 @@ export const Input = styled(StyledInput)<{open?:boolean}>`
 
   &:focus{
     transition: width 100ms;
-    width: 320px;
     cursor: auto;
 
   }
@@ -43,5 +42,10 @@ export const SearchIcon = styled.div`
 `
 
 export const CategoryWrapper = styled.div`
-  
+  height: 64px;
+  width: 64px;
+  border-radius: 16px;
+  margin-left: 16px;
+  background-color: #fff;
+  display: none;
 `
