@@ -15,8 +15,15 @@ namespace NxPlx.Domain.Events.File
         public long Id { get; }
     }
 
-    public class FileLentOutCommand : IDomainCommand<bool>
+    public class FileReservationCommand : IDomainCommand<bool>
     {
-        
+        public FileReservationCommand(StreamKind streamKind, long id)
+        {
+            StreamKind = streamKind;
+            Id = id;
+        }
+
+        public StreamKind StreamKind { get; }
+        public long Id { get; }
     }
 }

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using NxPlx.Abstractions;
 using NxPlx.Application.Events;
 using NxPlx.Application.Models;
 using NxPlx.Infrastructure.Broadcasting;
@@ -18,12 +20,14 @@ namespace NxPlx.Application.Services.EventHandlers
         private readonly DatabaseContext _context;
         private readonly IMapper _mapper;
         private readonly ConnectionHub _connectionHub;
+        private readonly IOperationContext _operationContext;
 
-        public ListUsersQueryHandler(DatabaseContext context, IMapper mapper, ConnectionHub connectionHub)
+        public ListUsersQueryHandler(DatabaseContext context, IMapper mapper, ConnectionHub connectionHub, IOperationContext operationContext)
         {
             _context = context;
             _mapper = mapper;
             _connectionHub = connectionHub;
+            _operationContext = operationContext;
         }
 
         public async Task<IEnumerable<UserDto>> Handle(ListUsersQuery query, CancellationToken cancellationToken = default)
@@ -33,7 +37,7 @@ namespace NxPlx.Application.Services.EventHandlers
                 .ToListAsync(cancellationToken);
 
             var online = _connectionHub.ConnectedIds();
-            foreach (var user in users.Where(u => online.Contains(u.Id)))
+            foreach (var user in users.Where(u => u.Id == _operationContext.Session.UserId || online.Contains(u.Id)))
             {
                 user.IsOnline = true;
             }

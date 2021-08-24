@@ -1,72 +1,101 @@
-import { createSnackbar } from "@snackbar/core";
-import { Component, h } from "preact";
-import { add, remove } from "../../utils/arrays";
-import http from "../../utils/http";
-import { translate } from "../../utils/localisation";
-import { Library } from "../../utils/models";
-import Loading from "../Loading";
-import Flag from "../Flag";
-import CreateLibraryModal from "../../modals/CreateLibraryModal";
+import { createSnackbar } from '@snackbar/core';
+import { h } from 'preact';
+import { add, orderBy, remove } from '../../utils/arrays';
+import http from '../../utils/http';
+import { translate } from '../../utils/localisation';
+import { Library } from '../../utils/models';
+import Loading from '../Loading';
+import Flag from '../Flag';
+import CreateLibraryModal from '../../modals/CreateLibraryModal';
+import PrimaryButton from '../styled/PrimaryButton';
+import * as S from './LibraryManagement.styled';
+import Icon from '../styled/Icon';
+import { useCallback, useEffect, useState } from 'preact/hooks';
+import { useBooleanState } from '../../utils/hooks';
 
-interface Props {}
-interface State {
-    libraries: Library[]
-    createLibraryModalOpen: boolean
-}
+const MediaKindIcon = ({ kind }: { kind: string }) => {
+	return (
+		<Icon title={translate(kind)}>{kind === 'series' ? 'tv' : 'local_movies'}</Icon>
+	);
+};
+const LibraryElement = ({ library, onDeleted }: { library: Library, onDeleted: (library: Library) => any }) => {
+	const indexLibrary = useCallback(async () => {
+		const response = await http.post('/api/indexing', [library.id]);
+		const msg = response.ok ? `Indexing ${library.name}..` : 'Unable to start indexing :/';
+		createSnackbar(msg, { timeout: 1500 });
+	}, [library]);
+	const deleteLibrary = useCallback(async () => {
+		try {
+			await http.delete('/api/library', library.id);
+			createSnackbar(`${library.name} deleted!`, { timeout: 1500 });
+			onDeleted(library);
+		} catch (e) {
+			createSnackbar('Unable to remove the library :/', { timeout: 1500 });
+		}
+	}, [library]);
 
-export default class LibraryManagement extends Component<Props, State> {
-    public componentDidMount() {
-        http.getJson<Library[]>('/api/library/list').then(libraries => this.setState({ libraries }));
-    }
-    public render(_, { libraries, createLibraryModalOpen }) {
-        return (
-            <div>
-                {createLibraryModalOpen && (
-                    <CreateLibraryModal onDismiss={() => this.setState({createLibraryModalOpen: false})} onCreated={lib => this.setState({ libraries: add(this.state.libraries, lib) })} />
-                )}
+	return (
+		<S.Element>
+			<MediaKindIcon kind={library.kind} />
+			<S.ElementText title={translate('title')}>{library.name}</S.ElementText>
+			<Flag language={library.language} />
+			<S.ElementButtonGroup>
+				<S.ElementButton onClick={indexLibrary} title={translate('index library')}>
+					<S.MediumIcon>refresh</S.MediumIcon>
+				</S.ElementButton>
+				<S.ElementButton onClick={deleteLibrary} title={translate('delete library')}>
+					<S.MediumIcon>close</S.MediumIcon>
+				</S.ElementButton>
+			</S.ElementButtonGroup>
+		</S.Element>
+	);
+};
 
-                <ul class="fullwidth" style="list-style-type: none; margin: 0; padding: 0;">
-                    {
-                        !libraries ? (<Loading />) : libraries.map(lib => (
-                            <li key={lib.id} class="bordered" style="display: inline-block; padding: 2px 8px; margin: 2px">
-                                <div style="display: inline-grid; grid-template-columns: 32px auto;">
-                                    <div style="margin: auto 0" title={translate(lib.kind)}>
-                                        <i class="material-icons" style="">{lib.kind === 'series' ? 'tv' : 'local_movies'}</i>
-                                    </div>
-                                    <div>
-                                        <div>
-                                            <b title={translate('title')}>{lib.name}</b>
-                                            <Flag language={lib.language}/>
-                                        </div>
-                                        <button type="button" title={translate('index library')} onClick={this.indexLibrary(lib)} class="material-icons noborder" style="font-size: 18px;">refresh</button>
-                                        <button type="button" title={translate('delete library')} onClick={this.deleteLibrary(lib)} class="material-icons noborder" style="font-size: 18px;">close</button>
-                                    </div>
-                                </div>
-                            </li>
-                        ))
-                    }
-                </ul>
-                <button class="bordered" onClick={() => this.setState({ createLibraryModalOpen: true })}>{translate('create library')}</button>
-                <button class="bordered" onClick={this.indexAllLibraries}>{translate('index all libraries')}</button>
-            </div>
-        );
-    }
+const LibraryManagement = () => {
+	const [libraries, setLibraries] = useState<Library[]>();
+	const [createLibraryModalOpen, openCreateLibraryModal, closeCreateLibraryModal] = useBooleanState(false);
 
+	const indexAll = useCallback(async () => {
+		if (!libraries) return;
+		try {
+			await http.post('/api/indexing', libraries.map(lib => lib.id));
+			createSnackbar('Indexing all libraries..', { timeout: 1000 });
+		} catch (e) {
+			createSnackbar('Unable to start indexing :/', { timeout: 1500 });
+		}
+	}, [libraries]);
 
-    private indexLibrary = (library:Library) => async () => {
-        const response = await http.post('/api/indexing', [ library.id ]);
-        const msg = response.ok ? `Indexing ${library.name}..` : 'Unable to start indexing :/';
-        createSnackbar(msg, { timeout: 1500 });
-    };
-    private deleteLibrary = (library:Library) => async () => {
-        const response = await http.delete('/api/library', library.id);
-        if (response.ok) this.setState({ libraries: remove(this.state.libraries, library) });
-        const msg = response.ok ? `${library.name} deleted!` : 'Unable to remove the library :/';
-        createSnackbar(msg, { timeout: 1500 });
-    };
-    private indexAllLibraries = async () => {
-        const response = await http.post('/api/indexing', this.state.libraries.map(lib => lib.id));
-        const msg = response.ok ? 'Indexing all libraries..' : 'Unable to start indexing :/';
-        createSnackbar(msg, { timeout: 1500 });
-    };
-}
+	const onLibraryDeleted = useCallback((library: Library) => {
+		if (!libraries) return;
+		setLibraries(remove(libraries, library));
+	}, [libraries, setLibraries]);
+
+	const onLibraryCreated = useCallback((library: Library) => {
+		if (!libraries) return;
+		setLibraries(add(libraries, library));
+	}, [libraries, setLibraries]);
+
+	useEffect(() => {
+		http.getJson<Library[]>('/api/library/list').then(libs => setLibraries(orderBy(libs, ['kind', 'name', 'language'])));
+	}, [setLibraries]);
+
+	return (
+		<div>
+			{createLibraryModalOpen && (
+				<CreateLibraryModal onDismiss={closeCreateLibraryModal} onCreated={onLibraryCreated} />
+			)}
+			<S.Container>
+				{!libraries ? (<Loading />) : (
+					libraries.map(lib => (
+						<LibraryElement key={lib.id} library={lib} onDeleted={onLibraryDeleted} />
+					))
+				)}
+			</S.Container>
+			<S.BottomControls>
+				<S.IndexAllButton onClick={indexAll}>{translate('index all libraries')}</S.IndexAllButton>
+				<PrimaryButton onClick={openCreateLibraryModal}>{translate('create library')}</PrimaryButton>
+			</S.BottomControls>
+		</div>
+	);
+};
+export default LibraryManagement;

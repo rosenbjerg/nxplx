@@ -34,7 +34,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
             => _dispatcher.Dispatch(new SetSubtitleLanguagePreferenceCommand(kind, fileId, preference));
         
         [HttpGet("file/{kind}/{fileId}/{language}")]
-        public async Task<ActionResult<PhysicalFileResult>> Get([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromRoute, Required]string language)
+        public async Task<IActionResult> Get([FromRoute, Required]MediaFileType kind, [FromRoute, Required]int fileId, [FromRoute, Required]string language)
         {
             var subtitlePath = await _dispatcher.Dispatch(new SubtitlePathQuery(kind, fileId, language));
             if (!string.IsNullOrEmpty(subtitlePath))

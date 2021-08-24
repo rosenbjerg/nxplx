@@ -1,12 +1,15 @@
 import styled from 'styled-components';
+import Select from '../Select';
 
-const StyledInput = styled.input`
+const StyledSelect = styled(Select)`
   box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.15) inset;
 
   font-family: Poppins, sans-serif;
 
-  height: ${props => props.height? props.height : "62px"};
-  border-radius: 16px;
+  padding-left: 16px;
+  height: 48px;
+  width: 100px;
+  border-radius: 12px;
   -webkit-appearance: none;
   background-color: ${props => props.theme.backgroundColorPrimary};
   border: none;
@@ -18,10 +21,6 @@ const StyledInput = styled.input`
     border: 2px solid ${props => props.theme.borderColorPrimary};
     transition: border-width 50ms linear;
 
-    &:invalid {
-      border: 2px solid ${props => props.theme.palette.red};
-      border-color: ${props => props.theme.palette.red};
-    }
   }
 
   &:disabled {
@@ -39,4 +38,4 @@ const StyledInput = styled.input`
   }
 `;
 
-export default StyledInput;
+export default StyledSelect;

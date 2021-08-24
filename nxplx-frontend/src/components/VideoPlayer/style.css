@@ -4,11 +4,12 @@
     background-color: black;
     outline: none;
     overflow: hidden;
+    position: relative;
 }
 
 .videoContainer .topControls {
     position: absolute;
-    top: -100px;
+    top: -200px;
     transition: top 250ms;
     z-index: 20;
     text-shadow: 1px 1px 3px black;
@@ -19,7 +20,7 @@
     position: absolute;
     transition: bottom 250ms;
     display: inline-block;
-    bottom: -200px;
+    bottom: -300px;
     text-shadow: 1px 1px 3px black;
 }
 
@@ -65,11 +66,7 @@
 }
 
 .videoContainer.focused .topControls, .topControls:hover {
-    top: 66px;
-}
-
-.videoContainer:fullscreen.focused .topControls, .videoContainer:fullscreen .topControls:hover {
-    top: 10px;
+    top: 16px;
 }
 
 .videoContainer.focused .bottomControls, .bottomControls:hover {

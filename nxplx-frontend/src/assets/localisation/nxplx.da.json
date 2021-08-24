@@ -1,5 +1,9 @@
 {
   "login": "Log ind",
+  "profile": "Profil",
+  "administration": "Administration",
+  "browse": "Oversigt",
+  "job dashboard": "Job oversigt",
   "continue watching": "Forsæt med",
   "search here": "Søg her",
   "filters": "Filtre",
@@ -36,7 +40,7 @@
   "initial password": "Første adgangskode",
   "initial password again": "Første adgangskode (gentag)",
   "libraries username has access to": "Biblioteker som {{username}} har adgang til",
-  "account settings for": "Profil for",
+  "account": "Profil",
   "your account details": "Din profil",
   "change your password": "Skift din adgangskode",
   "old password": "Gammel adgangskode",

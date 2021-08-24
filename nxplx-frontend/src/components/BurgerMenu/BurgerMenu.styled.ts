@@ -13,7 +13,7 @@ export const BurgerIcon = styled.div<{ visible: boolean }>`
 
 export const Menu = styled.div<{ visible: boolean }>`
   display: ${props => props.visible ? 'none' : 'block'};
-  background-color: ${props => props.theme.darkGray};
+  background-color: ${props => props.theme.backgroundColorPrimary};
   @keyframes slideInFromLeft {
     0% {
       transform: translatey(-120%);
@@ -27,7 +27,7 @@ export const Menu = styled.div<{ visible: boolean }>`
 `;
 
 export const Icon = styled.i`
-  color: ${props => props.theme.white};
+  color: ${props => props.theme.textColorPrimary};
   font-size: 28px;
   line-height: 56px;
   text-align: center;

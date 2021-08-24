@@ -116,13 +116,12 @@ namespace NxPlx.ApplicationHost.Api
             app.UseMiddleware<PerformanceInterceptorMiddleware>();
             app.UseMiddleware<AuthenticationMiddleware>();
             app.UseForwardedHeaders();
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
             
             var jobDashboardOptions = serviceProvider.GetRequiredService<JobDashboardOptions>();
             app.UseJobDashboard("/api/dashboard", jobDashboardOptions);
             
             var apiDocumentationOptions = serviceProvider.GetRequiredService<ApiDocumentationOptions>();
-            app.UseApiDocumentation("/api/swagger", apiDocumentationOptions);
+            app.UseApiDocumentation("/swagger", apiDocumentationOptions);
             
             app.UseWebSockets();
             app.UseRouting();
@@ -137,7 +136,7 @@ namespace NxPlx.ApplicationHost.Api
             databaseContext.Database.Migrate();
             
             var eventDispatcher = scope.ServiceProvider.GetRequiredService<IApplicationEventDispatcher>();
-            var d = eventDispatcher.Dispatch(new CreateAdminCommand()).GetAwaiter().GetResult();
+            eventDispatcher.Dispatch(new CreateAdminCommand()).GetAwaiter().GetResult();
         }
     }
 }

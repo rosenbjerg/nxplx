@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Link } from 'preact-router';
 
 export const Wrapper = styled.header`
-  background-color: ${props => props.theme.darkGray};
+  background-color: ${props => props.theme.backgroundColorPrimary};
   display: flex;
   top: 0;
   left: 0;
@@ -43,7 +43,7 @@ export const NavLink = styled(Link)`
 `;
 
 export const Icon = styled.i`
-  color: ${props => props.theme.white};
+  color: ${props => props.theme.textColorPrimary};
   font-size: 26px;
   height: 56px;
   width: 64px;

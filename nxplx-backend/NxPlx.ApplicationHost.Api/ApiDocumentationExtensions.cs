@@ -19,7 +19,11 @@ namespace NxPlx.ApplicationHost.Api
             if (apiDocumentationOptions.Enabled)
             {
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint($"${documentationUrl}/v1/swagger.json", "NxPlx API"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.RoutePrefix = documentationUrl;
+                    c.SwaggerEndpoint($"/api/swagger/v1/swagger.json", "NxPlx API");
+                });
             }
         }
     }
