@@ -9,6 +9,7 @@ import { FileInfo, imageUrl } from '../../utils/models';
 import * as style from './style.css';
 import Store from '../../utils/storage';
 import PageTitle from '../../components/PageTitle';
+import SubtitleClient from '../../utils/clients/SubtitleClient';
 
 
 interface NextEpisode {
@@ -100,7 +101,7 @@ export default class Watch extends Component<Props, State> {
 		const { kind, fid } = this.props;
 		void Promise.all([
 			http.getJson<FileInfo>(`/api/${kind}/${fid}/info`),
-			http.getJson<string>(`/api/subtitle/preference/${kind}/${fid}`),
+			SubtitleClient.getPreference(kind, fid),
 			http.getJson<number>(`/api/progress/${kind}/${fid}`),
 		]).then(results => {
 			const completed = (results[2] / results[0].duration) > 0.92;
