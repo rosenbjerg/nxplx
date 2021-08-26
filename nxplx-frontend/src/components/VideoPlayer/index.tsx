@@ -5,13 +5,9 @@ import * as style from './style.css';
 import VideoPlayerTime from './VideoPlayerTime';
 import { SeekTrack } from './VideoPlayerTracks';
 import { CenterPlayButton, NextButton, ToggleFullscreenButton, TogglePlayButton, VolumeButton } from './VideoPlayerButtons';
+import Subtitles from './VideoSubtitleSelect';
+import { TextTrack } from '../../utils/models';
 
-interface TextTrack {
-	displayName: string;
-	language: string;
-	path: string;
-	default: boolean;
-}
 
 interface Props {
 	events: Events;
@@ -35,6 +31,7 @@ interface State {
 	currentTime: number;
 	buffered: number;
 	focused: boolean;
+	selectedTrack: TextTrack;
 }
 
 let volume: number = Store.local.getFloatEntry('player_volume') || 1.0;
@@ -101,6 +98,7 @@ export default class VideoPlayer extends Component<Props, State> {
 		currentTime,
 		buffered,
 		focused,
+		selectedTrack,
 	}: State) {
 		return (
 			<div tabIndex={0} autofocus onKeyDown={this.onKeyPress} ref={this.bindVideoContainer}
@@ -119,9 +117,7 @@ export default class VideoPlayer extends Component<Props, State> {
                     </span>
 					<span style="margin-right: 10px; float: right;">
                         {subtitles && subtitles.length > 0 && (
-							<select class="noborder">
-								{subtitles.map(track => (<option key={track.language} value={track.language}>{track.displayName}</option>))}
-							</select>
+							<Subtitles onTrackSelected={this.onSubtitleSelected} subtitles={subtitles}></Subtitles>
 						)}
 						<ToggleFullscreenButton isFullscreen={fullscreen} onEnterClicked={this.enterFullscreen} onExitClicked={this.exitFullscreen} />
                     </span>
@@ -141,14 +137,18 @@ export default class VideoPlayer extends Component<Props, State> {
 					   onPause={this.onPause}
 					   onEnded={this.onEnded}>
 					<source src={`${src}#t=${startTime}`} type="video/mp4" />
-					{subtitles && subtitles.map(track => (
-						<track key={track.path} default={track.default} src={track.path} kind="captions"
-							   srcLang={track.language} label={track.displayName} />
-					))}
+					{selectedTrack && (
+						<track key={selectedTrack.path} default={true} src={selectedTrack.path} kind="captions"
+							   srcLang={selectedTrack.language} label={selectedTrack.displayName} />
+					)}
 				</video>
 			</div>
 		);
 	}
+
+	private onSubtitleSelected = (selectedTrack: TextTrack | undefined) => {
+		this.setState({ selectedTrack });
+	};
 
 	private onKeyPress = async (ev: KeyboardEvent) => {
 		if (ev.defaultPrevented || this.isHandlingKey) return;

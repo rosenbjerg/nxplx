@@ -173,4 +173,11 @@ export interface EpisodeDetails {
 	voteCount: number;
 }
 
+export interface TextTrack {
+	displayName: string;
+	language: string;
+	path: string;
+	default: boolean;
+}
+
 export const round = (num: number) => Math.round(num * 100) / 100;
