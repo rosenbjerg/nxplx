@@ -14,7 +14,7 @@
 
     <ItemGroup>
       <PackageReference Include="Fastenshtein" Version="1.0.0.7" />
-      <PackageReference Include="Hangfire.Core" Version="1.7.24" />
+      <PackageReference Include="Hangfire.Core" Version="1.7.25" />
     </ItemGroup>
 
 </Project>
