@@ -22,7 +22,7 @@
     "react-intersection-observer": "^8.32.0",
     "reconnecting-websocket": "^4.4.0",
     "styled-components": "5.3.0",
-    "ua-parser-js": "^0.7.28",
+    "ua-parser-js": "^0.7.30",
     "unistore": "^3.5.1"
   },
   "devDependencies": {
