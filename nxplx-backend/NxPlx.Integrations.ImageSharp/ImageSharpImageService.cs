@@ -19,7 +19,7 @@ public class ImageSharpImageService : IImageService
     
     public async Task<string> GenerateBlurhash(string inputFile)
     {
-        using var image = await Resized(inputFile, 90, 90);
+        using var image = await Resized(inputFile, 80, 80);
         using var rgb24Clone = image.CloneAs<Rgb24>();
         var isPortrait = image.Height > image.Width;
         return isPortrait 
