@@ -21,6 +21,7 @@ using NxPlx.Integrations.TMDb;
 using NxPlx.Infrastructure.Database;
 using NxPlx.Infrastructure.Events;
 using NxPlx.Infrastructure.Events.Dispatching;
+using NxPlx.Integrations.ImageSharp;
 using NxPlx.Services.Index;
 using Serilog.Core;
 using SessionOptions = NxPlx.Application.Core.Options.SessionOptions;
@@ -66,6 +67,7 @@ namespace NxPlx.ApplicationHost.Api
             services.AddWebSockets(options => options.AllowedOrigins.Add(hostingOptions.Origin));
             services.AddApiDocumentation(apiDocumentationOptions);
             services.AddJobProcessing(connectionStrings);
+            services.AddImageSharpImageService();
             services.AddAutoMapper(typeof(DtoProfile), typeof(TMDbProfile));
             
             

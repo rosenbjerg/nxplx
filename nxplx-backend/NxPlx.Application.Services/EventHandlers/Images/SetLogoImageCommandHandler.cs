@@ -8,7 +8,8 @@ namespace NxPlx.Application.Services.EventHandlers.Images
 {
     public class SetLogoImageCommandHandler : SetImageCommandHandler<ILogoImageOwner>
     {
-        public SetLogoImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService) : base(folderOptions, tempFileService)
+        public SetLogoImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService, IImageService imageService)
+            : base(folderOptions, tempFileService, imageService)
         {
         }
 
@@ -18,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.LogoPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.LogoPath, 120);
             command.ImageOwner.LogoPath = command.OutputFilename;
-            command.ImageOwner.LogoBlurHash = await GenerateBlurhashFromThumbnail(command.InputFilepath);
+            command.ImageOwner.LogoBlurHash = await ImageService.GenerateBlurhash(command.InputFilepath);
         }
     }
 }

@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Domain.Events", "NxPl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Application.Events", "NxPlx.Application.Events\NxPlx.Application.Events.csproj", "{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NxPlx.Integrations.ImageSharp", "NxPlx.Integrations.ImageSharp\NxPlx.Integrations.ImageSharp.csproj", "{2BA7422C-E0F0-46EF-9636-0A654AD62E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,5 +104,9 @@ Global
 		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59D3170C-BAA1-4416-A3C6-A44D228DAD3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BA7422C-E0F0-46EF-9636-0A654AD62E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BA7422C-E0F0-46EF-9636-0A654AD62E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BA7422C-E0F0-46EF-9636-0A654AD62E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BA7422C-E0F0-46EF-9636-0A654AD62E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

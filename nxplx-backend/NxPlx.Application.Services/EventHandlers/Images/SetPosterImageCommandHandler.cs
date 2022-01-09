@@ -8,7 +8,8 @@ namespace NxPlx.Application.Services.EventHandlers.Images
 {
     public class SetPosterImageCommandHandler : SetImageCommandHandler<IPosterImageOwner>
     {
-        public SetPosterImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService) : base(folderOptions, tempFileService)
+        public SetPosterImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService, IImageService imageService) 
+            : base(folderOptions, tempFileService, imageService)
         {
         }
 
@@ -19,7 +20,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.PosterPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.PosterPath, 190, 270);
             command.ImageOwner.PosterPath = command.OutputFilename;
-            command.ImageOwner.PosterBlurHash = await GenerateBlurhashFromThumbnail(command.InputFilepath);
+            command.ImageOwner.PosterBlurHash = await ImageService.GenerateBlurhash(command.InputFilepath);
         }
     }
 }
