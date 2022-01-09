@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
@@ -14,7 +16,7 @@ namespace NxPlx.ApplicationHost.Api
 
         public static IApplicationBuilder UseStaticFileHandler(this IApplicationBuilder applicationBuilder, string directory)
         {
-            return applicationBuilder.Use(async (context, next) =>
+            return applicationBuilder.Use(async (HttpContext context, Func<Task> next) =>
             {
                 var path = context.Request.Path.ToString().TrimStart('/');
                 var file = Path.Combine(directory, path);

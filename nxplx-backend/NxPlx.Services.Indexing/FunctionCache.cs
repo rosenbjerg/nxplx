@@ -17,7 +17,7 @@ namespace NxPlx.Services.Index
 
         public async ValueTask<TResult> Invoke(TArg1 arg1)
         {
-            TResult result;
+            TResult? result;
             if (!_dictionary.TryGetValue(arg1, out result))
             {
                 result = await _function(arg1);
@@ -38,7 +38,7 @@ namespace NxPlx.Services.Index
 
         public async ValueTask<TResult> Invoke(TArg1 arg1, TArg2 arg2)
         {
-            TResult result;
+            TResult? result;
             var key = (arg1, arg2);
             if (!_dictionary.TryGetValue(key, out result))
             {

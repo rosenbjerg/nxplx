@@ -17,33 +17,37 @@ namespace NxPlx.Test.UnitTests
         [Test]
         public async Task PendingModelChangesTest()
         {
-            var dummyConnectionString = "Host=localhost;Database=nxplx_db;Username=postgres;Password=dev";
-            var databaseContextOptions = new DbContextOptionsBuilder<DatabaseContext>().UseNpgsql(dummyConnectionString,
-                b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)).Options;
+            var dummyConnectionString = "Host=localhost;Database=postgres;Username=postgres;Password=postgres";
+            var databaseContextOptions = new DbContextOptionsBuilder<DatabaseContext>()
+                .UseNpgsql(dummyConnectionString, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName))
+                .Options;
             await using var databaseContext = new DatabaseContext(databaseContextOptions, new OperationContext());
-
-            var modelDiffer = databaseContext.GetService<IMigrationsModelDiffer>();
+            
             var migrationsAssembly = databaseContext.GetService<IMigrationsAssembly>();
 
-            var dependencies = databaseContext.GetService<ProviderConventionSetBuilderDependencies>();
-            var relationalDependencies = databaseContext.GetService<RelationalConventionSetBuilderDependencies>();
+            if (migrationsAssembly.ModelSnapshot != null) {
+                var snapshotModel = migrationsAssembly.ModelSnapshot?.Model;
 
-            var typeMappingConvention = new TypeMappingConvention(dependencies);
-            typeMappingConvention.ProcessModelFinalizing(((IConventionModel)migrationsAssembly.ModelSnapshot.Model).Builder, null);
+                if (snapshotModel is IMutableModel mutableModel) {
+                    snapshotModel = mutableModel.FinalizeModel();
+                }
 
-            var relationalModelConvention = new RelationalModelConvention(dependencies, relationalDependencies);
-            var sourceModel = relationalModelConvention.ProcessModelFinalized(migrationsAssembly.ModelSnapshot.Model);
+                snapshotModel = databaseContext.GetService<IModelRuntimeInitializer>().Initialize(snapshotModel!);
+                var differences = databaseContext.GetService<IMigrationsModelDiffer>().GetDifferences(
+                    snapshotModel.GetRelationalModel(),
+                    databaseContext.GetService<IDesignTimeModel>().Model.GetRelationalModel());
 
-            var finalSourceModel = ((IMutableModel)sourceModel).FinalizeModel().GetRelationalModel();
-            var finalTargetModel = databaseContext.Model.GetRelationalModel();
-
-            var differences = modelDiffer.GetDifferences(finalSourceModel, finalTargetModel);
-            if (differences.Any())
-            {
-                Assert.True(false, $"{differences.Count} changes between migrations and model. Debug this test for more details");
+                if (differences.Any())
+                {
+                    Assert.Fail($"{differences.Count} changes between migrations and model. Debug this test for more details");
+                }
+            
+                Assert.Pass();
             }
-
-            Assert.Pass();
+            else
+            {
+                Assert.Fail("No snapshot of the model found: no migrations created yet, or incorrect MigrationsAssembly specified");
+            }
         }
     }
 }

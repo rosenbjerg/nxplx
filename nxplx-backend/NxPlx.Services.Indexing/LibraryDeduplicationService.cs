@@ -105,6 +105,7 @@ namespace NxPlx.Services.Index
             Func<TEntity, TKey> idSelector, 
             Func<List<TKey>, Expression<Func<TEntity, bool>>> existingSelector)
             where TEntity : class
+            where TKey : notnull
         {
             var ids = details.SelectMany(d => entitySelector(d).Select(idSelector)).Distinct().ToList();
             var existing = await _databaseContext.Set<TEntity>().Where(existingSelector(ids)).ToDictionaryAsync(idSelector);
