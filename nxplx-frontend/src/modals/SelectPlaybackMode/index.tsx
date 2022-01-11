@@ -22,7 +22,7 @@ interface NextEpisode {
 	fid: number;
 	title: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 }
 
 export default class SelectPlaybackMode extends Component<Props> {

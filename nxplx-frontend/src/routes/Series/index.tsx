@@ -51,7 +51,7 @@ export default class Series extends Component<Props, State> {
 							<EditDetails setPoster setBackdrop entityType={'series'} entityId={details.id} />
 						</AdminOnly>
 					</div>
-					<LazyImage src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurhash} blurhashHeight={32} blurhashWidth={20}
+					<LazyImage src={imageUrl(details.posterPath, 270)} blurhash={details.posterBlurHash} blurhashHeight={32} blurhashWidth={20}
 							   class={style.poster} />
 					<span class={[style.info, style.marked].join(' ')}>
                         <table>

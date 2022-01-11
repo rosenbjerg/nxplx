@@ -17,7 +17,7 @@ public class ImageSharpImageService : IImageService
         _blurhashEncoder = new Encoder();
     }
     
-    public async Task<string> GenerateBlurhash(string inputFile)
+    public async Task<string> GenerateBlurHash(string inputFile)
     {
         using var image = await Resized(inputFile, 80, 80);
         using var rgb24Clone = image.CloneAs<Rgb24>();

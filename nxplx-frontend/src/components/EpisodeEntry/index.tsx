@@ -13,7 +13,7 @@ const EpisodeEntry = ({ episode, progress }: Props) => (
 	<Entry
 		key={episode.number}
 		image={imageUrl(episode.stillPath, 260)}
-		imageBlurhash={episode.stillBlurhash}
+		imageBlurHash={episode.stillBlurHash}
 		href={`/watch/series/${episode.fileId}`}
 		title={episode.name}
 		progress={progress}

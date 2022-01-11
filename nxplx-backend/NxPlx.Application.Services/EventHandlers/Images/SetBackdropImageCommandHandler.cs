@@ -19,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.BackdropPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.BackdropPath, 1280);
             command.ImageOwner.BackdropPath = command.OutputFilename;
-            command.ImageOwner.BackdropBlurHash = await ImageService.GenerateBlurhash(command.InputFilepath);
+            command.ImageOwner.BackdropBlurHash = await ImageService.GenerateBlurHash(command.InputFilepath);
         }
     }
 }

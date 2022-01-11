@@ -19,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.LogoPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.LogoPath, 120);
             command.ImageOwner.LogoPath = command.OutputFilename;
-            command.ImageOwner.LogoBlurHash = await ImageService.GenerateBlurhash(command.InputFilepath);
+            command.ImageOwner.LogoBlurHash = await ImageService.GenerateBlurHash(command.InputFilepath);
         }
     }
 }

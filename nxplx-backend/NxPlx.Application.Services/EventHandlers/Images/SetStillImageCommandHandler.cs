@@ -19,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.StillPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.StillPath, 260);
             command.ImageOwner.StillPath = command.OutputFilename;
-            command.ImageOwner.StillBlurHash = await ImageService.GenerateBlurhash(command.InputFilepath);
+            command.ImageOwner.StillBlurHash = await ImageService.GenerateBlurHash(command.InputFilepath);
         }
     }
 }
