@@ -8,7 +8,8 @@ namespace NxPlx.Application.Services.EventHandlers.Images
 {
     public class SetBackdropImageCommandHandler : SetImageCommandHandler<IBackdropImageOwner>
     {
-        public SetBackdropImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService) : base(folderOptions, tempFileService)
+        public SetBackdropImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService, IImageService imageService)
+            : base(folderOptions, tempFileService, imageService)
         {
         }
 
@@ -18,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.BackdropPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.BackdropPath, 1280);
             command.ImageOwner.BackdropPath = command.OutputFilename;
-            command.ImageOwner.BackdropBlurHash = await GenerateBlurhashFromThumbnail(command.InputFilepath);
+            command.ImageOwner.BackdropBlurHash = await ImageService.GenerateBlurHash(command.InputFilepath);
         }
     }
 }

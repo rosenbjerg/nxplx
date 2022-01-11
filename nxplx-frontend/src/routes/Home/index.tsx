@@ -53,7 +53,7 @@ export default class Home extends Component<Props, State> {
 										title={entry.title}
 										href={`/${entry.kind}/${entry.id}`}
 										image={imageUrl(entry.posterPath, 190)}
-										imageBlurhash={entry.posterBlurhash}
+										imageBlurHash={entry.posterBlurHash}
 										blurhashWidth={20}
 										blurhashHeight={32}
 									/>

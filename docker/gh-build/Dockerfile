@@ -1,6 +1,6 @@
 ﻿ARG BASE_IMAGE
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS backendBuilder
+FROM mcr.microsoft.com/dotnet/sdk:6.0-alpine AS backendBuilder
 WORKDIR /app
 COPY ./nxplx-backend/ ./
 ARG DOTNET_RID
@@ -8,7 +8,7 @@ RUN dotnet publish NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj -c
 
 
 
-FROM node:14-alpine AS frontendBuilder
+FROM node:16-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY ./nxplx-frontend/ ./
@@ -21,7 +21,7 @@ FROM $BASE_IMAGE AS runtime
 LABEL maintainer="rosenbjerg"
 LABEL description="NxPlx"
 LABEL repository="github.com/rosenbjerg/NxPlx"
-RUN apk add -q --update --no-cache ffmpeg imagemagick icu-libs
+RUN apk add -q --update --no-cache ffmpeg icu-libs
 RUN apk add -q --update --no-cache libgdiplus --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
 ARG TINI_VERSION=v0.19.0
 ARG TINI_BUILD

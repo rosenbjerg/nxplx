@@ -65,7 +65,7 @@ export default class Season extends Component<Props, State> {
 						</AdminOnly>
 					</div>
 
-					<LazyImage src={imageUrl(season.posterPath, 270, series.posterPath)} blurhash={season.posterBlurhash || series.posterBlurhash}
+					<LazyImage src={imageUrl(season.posterPath, 270, series.posterPath)} blurhash={season.posterBlurHash || series.posterBlurHash}
 							   blurhashHeight={32} blurhashWidth={20} class={style.poster} />
 					<span class={[style.info, style.marked].join(' ')}>
                     <table>

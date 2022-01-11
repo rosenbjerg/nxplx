@@ -1,6 +1,6 @@
 import { Component, h } from 'preact';
-import http from '../../utils/http';
 import Select from '../Select';
+import SubtitleClient from '../../utils/clients/SubtitleClient';
 
 interface Props {
 	kind: 'film' | 'series',
@@ -51,11 +51,11 @@ export function formatSubtitleName(name: string): string {
 export default class SubtitleSelector extends Component<Props, State> {
 
 	public componentDidMount(): void {
-		http.getJson<string[]>(`/api/subtitle/languages/${this.props.kind}/${this.props.file_id}`)
+		SubtitleClient.getAvailableLanguages(this.props.kind, this.props.file_id)
 			.then(langs => this.setState({ languages: langs }));
 
-		http.getJson<string>(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`)
-			.then(preference => this.setState({ selected: preference || 'none' }));
+		SubtitleClient.getPreference(this.props.kind, this.props.file_id)
+			.then(preference => this.setState({ selected: preference }));
 	}
 
 	public render(_, state: State) {
@@ -74,6 +74,6 @@ export default class SubtitleSelector extends Component<Props, State> {
 	}
 
 	private setSubtitle = (selected: string) => {
-		void http.put(`/api/subtitle/preference/${this.props.kind}/${this.props.file_id}`, selected);
+		void SubtitleClient.setPreference(this.props.kind, this.props.file_id, selected);
 	};
 }

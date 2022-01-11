@@ -31,9 +31,9 @@ export interface FilmDetails {
 	fid: number;
 	title: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	backdropPath: string;
-	backdropBlurhash: string;
+	backdropBlurHash: string;
 	subtitles: SubtitleFile[];
 	budget: number;
 	imdbId: string;
@@ -63,9 +63,9 @@ export interface MovieCollection {
 	id: number;
 	name: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	backdropPath: string;
-	backdropBlurhash: string;
+	backdropBlurHash: string;
 	movies: OverviewElement[];
 }
 
@@ -93,7 +93,7 @@ export interface OverviewElement {
 	id: number;
 	title: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	kind: 'film' | 'series';
 }
 
@@ -101,7 +101,7 @@ export interface ContinueWatchingElement {
 	fileId: number;
 	title: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	kind: string;
 	watched: string;
 	progress: number;
@@ -113,9 +113,9 @@ export interface FileInfo {
 	duration: number;
 	title: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	backdropPath: string;
-	backdropBlurhash: string;
+	backdropBlurHash: string;
 	subtitles: string[];
 	seriesId?: number;
 	seasonNo?: number;
@@ -128,7 +128,7 @@ export interface Creator {
 export interface Network {
 	name: string;
 	logoPath: string;
-	logoBlurhash: string;
+	logoBlurHash: string;
 	originCountry: string;
 }
 
@@ -136,9 +136,9 @@ export interface SeriesDetails {
 	id: number;
 	fid: number;
 	backdropPath: string;
-	backdropBlurhash: string;
+	backdropBlurHash: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	voteAverage: number;
 	voteCount: number;
 	name: string;
@@ -156,7 +156,7 @@ export interface SeasonDetails {
 	name: string;
 	overview: string;
 	posterPath: string;
-	posterBlurhash: string;
+	posterBlurHash: string;
 	number: number;
 	episodes?: EpisodeDetails[];
 }
@@ -168,9 +168,16 @@ export interface EpisodeDetails {
 	overview: string;
 	airDate: string;
 	stillPath: string;
-	stillBlurhash: string;
+	stillBlurHash: string;
 	voteAverage: number;
 	voteCount: number;
+}
+
+export interface TextTrack {
+	displayName: string;
+	language: string;
+	path: string;
+	default: boolean;
 }
 
 export const round = (num: number) => Math.round(num * 100) / 100;

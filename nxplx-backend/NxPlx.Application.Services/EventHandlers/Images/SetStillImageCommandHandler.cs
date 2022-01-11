@@ -8,7 +8,8 @@ namespace NxPlx.Application.Services.EventHandlers.Images
 {
     public class SetStillImageCommandHandler : SetImageCommandHandler<IStillImageOwner>
     {
-        public SetStillImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService) : base(folderOptions, tempFileService)
+        public SetStillImageCommandHandler(FolderOptions folderOptions, TempFileService tempFileService, IImageService imageService)
+            : base(folderOptions, tempFileService, imageService)
         {
         }
 
@@ -18,7 +19,7 @@ namespace NxPlx.Application.Services.EventHandlers.Images
             if (command.ImageOwner.StillPath != command.OutputFilename)
                 DeleteOldImages(command.ImageOwner.StillPath, 260);
             command.ImageOwner.StillPath = command.OutputFilename;
-            command.ImageOwner.StillBlurHash = await GenerateBlurhashFromThumbnail(command.InputFilepath);
+            command.ImageOwner.StillBlurHash = await ImageService.GenerateBlurHash(command.InputFilepath);
         }
     }
 }

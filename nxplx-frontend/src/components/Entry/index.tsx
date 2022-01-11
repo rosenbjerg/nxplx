@@ -8,7 +8,7 @@ interface Props {
 	title: string;
 	href: string;
 	image: string;
-	imageBlurhash: string;
+	imageBlurHash: string;
 	progress?: number;
 	autosizeOverride?: string;
 	children?: any;
@@ -16,10 +16,10 @@ interface Props {
 	blurhashHeight: number;
 }
 
-const Entry = ({ href, image, imageBlurhash, key, progress, title, autosizeOverride, children, blurhashWidth, blurhashHeight }: Props) => {
+const Entry = ({ href, image, imageBlurHash, key, progress, title, autosizeOverride, children, blurhashWidth, blurhashHeight }: Props) => {
 	return (
 		<Link key={key} class={style.link} title={title} href={href}>
-			<LazyImage class={`${style.entry} ${autosizeOverride || style.autosize}`} alt={title} src={image} blurhash={imageBlurhash}
+			<LazyImage class={`${style.entry} ${autosizeOverride || style.autosize}`} alt={title} src={image} blurhash={imageBlurHash}
 					   blurhashHeight={blurhashHeight} blurhashWidth={blurhashWidth} />
 			{children}
 			{!!progress && (

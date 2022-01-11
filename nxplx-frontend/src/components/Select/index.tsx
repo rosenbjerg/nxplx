@@ -16,6 +16,7 @@ interface Props {
 	disabled?: boolean;
 }
 
+
 const Select = ({ defaultOption, name, onInput, options, selected, disabled, ...rest }: Props) => {
 	// @ts-ignore
 	const input = useCallback((ev: { target: EventTarget | null }) => onInput(ev.target.value), []);

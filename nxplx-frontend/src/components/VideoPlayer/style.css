@@ -80,6 +80,10 @@
     outline: none;
 }
 
+.video::cue {
+    font-size: 42px;
+}
+
 .videoControls {
     position: absolute;
     left: 0;
