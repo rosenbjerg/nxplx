@@ -41,10 +41,10 @@ public class ImageSharpImageService : IImageService
         }
         else if (imageExtension is ".jpg" or ".jpeg")
         {
-            await image.SaveAsJpegAsync(outputPath, new JpegEncoder()
+            await image.SaveAsJpegAsync(outputPath, new JpegEncoder
             {
                 Quality = 80,
-                Subsample = JpegSubsample.Ratio420
+                ColorType = JpegColorType.YCbCrRatio420
             });
         }
     }

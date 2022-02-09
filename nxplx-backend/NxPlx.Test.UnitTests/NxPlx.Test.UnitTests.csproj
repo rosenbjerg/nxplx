@@ -10,7 +10,7 @@
         <PackageReference Include="GitHubActionsTestLogger" Version="1.2.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.13" />
         <PackageReference Include="NUnit" Version="3.13.2" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.2.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
         <PackageReference Include="TngTech.ArchUnitNET.NUnit" Version="0.9.0" />
     </ItemGroup>

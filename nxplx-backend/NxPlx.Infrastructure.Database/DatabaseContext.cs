@@ -92,12 +92,9 @@ namespace NxPlx.Infrastructure.Database
                     ls => string.Join(',', ls),
                     str => str.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
 
-            if (_operationContext.Session?.IsAdmin == false)
-            {
-                modelBuilder.Entity<User>().HasQueryFilter(e => e.Id == _operationContext.Session.UserId);
-                modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
-                modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => e.UserId == _operationContext.Session.UserId);
-            }
+            modelBuilder.Entity<User>().HasQueryFilter(e => _operationContext.Session == null || (_operationContext.Session.IsAdmin || e.Id == _operationContext.Session.UserId));
+            modelBuilder.Entity<SubtitlePreference>().HasQueryFilter(e => _operationContext.Session != null && (_operationContext.Session.IsAdmin || e.UserId == _operationContext.Session.UserId));
+            modelBuilder.Entity<WatchingProgress>().HasQueryFilter(e => _operationContext.Session != null && (_operationContext.Session.IsAdmin || e.UserId == _operationContext.Session.UserId));
         }
 
         private static void ConfigureFilmFileEntity(ModelBuilder modelBuilder)
