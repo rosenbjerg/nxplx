@@ -1348,9 +1348,9 @@
   integrity sha512-Fx+NpfOO0CpeYX2g9bkvX8O5qh9wrU1sOF4g8sft4Mu7z+qfe387YlyY8w8daDyDsKY5vUxM0yxkAYnbkRbZEw==
 
 "@types/wicg-mediasession@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/wicg-mediasession/-/wicg-mediasession-1.1.0.tgz#368bb113ffc1a5410895cbb1e5ba50ee291f162f"
-  integrity sha512-aA6+ZUHgNpXqWEL8UdS1fx/oCFSrh/Hu9BbM8rXYZLiCQSuZ8+Lzu1//LKwHMNBAXgen7/8LoThDEKS9VEaGxw==
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@types/wicg-mediasession/-/wicg-mediasession-1.1.4.tgz#5b30c50384c05e5b54cf1c4cb530e8ca63233417"
+  integrity sha512-x6qWKaAoae/yjKThSsFeZ4SP6036zLrYUOx3Mg1BrbUR38FiKQetWO8owq261XXkdsLg52PyQ2/BZ8Wy038woQ==
 
 "@typescript-eslint/eslint-plugin@^4.22.1":
   version "4.24.0"
@@ -7553,11 +7553,6 @@ rc@^1.2.8:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
-
-"react-dom@npm:@preact/compat", "react@npm:@preact/compat":
-  version "17.1.2"
-  resolved "https://registry.yarnpkg.com/@preact/compat/-/compat-17.1.2.tgz#928756713b07af6faf7812f6a56840d8ce6fed37"
-  integrity sha512-7pOZN9lMDDRQ+6aWvjwTp483KR8/zOpfS83wmOo3zfuLKdngS8/5RLbsFWzFZMGdYlotAhX980hJ75bjOHTwWg==
 
 react-intersection-observer@^8.32.0:
   version "8.32.0"
