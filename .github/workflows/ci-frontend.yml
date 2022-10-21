@@ -26,6 +26,10 @@ jobs:
     - name: Cancel outdated workflow-runs
       uses: fkirc/skip-duplicate-actions@master
     
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
     - name: Install dependencies
       working-directory: ${{env.working-directory}}
       run: npm ci --quiet
