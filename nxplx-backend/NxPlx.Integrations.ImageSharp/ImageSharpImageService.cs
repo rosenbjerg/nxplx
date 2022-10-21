@@ -10,21 +10,14 @@ namespace NxPlx.Integrations.ImageSharp;
 
 public class ImageSharpImageService : IImageService
 {
-    private readonly Encoder _blurhashEncoder;
-
-    public ImageSharpImageService()
-    {
-        _blurhashEncoder = new Encoder();
-    }
-    
     public async Task<string> GenerateBlurHash(string inputFile)
     {
         using var image = await Resized(inputFile, 80, 80);
         using var rgb24Clone = image.CloneAs<Rgb24>();
         var isPortrait = image.Height > image.Width;
         return isPortrait 
-            ? _blurhashEncoder.Encode(rgb24Clone, 3, 4) 
-            : _blurhashEncoder.Encode(rgb24Clone, 4, 3);
+            ? Blurhasher.Encode(rgb24Clone, 3, 4) 
+            : Blurhasher.Encode(rgb24Clone, 4, 3);
     }
         
     public async Task ResizeImage(string imagePath, int width, int height, string outputPath)
