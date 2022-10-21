@@ -12,8 +12,8 @@ FROM node:16-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY ./nxplx-frontend/ ./
-RUN npm ci --quiet
-RUN npm run build
+RUN yarn install --frozen-lockfile --no-progress --silent
+RUN yarn build
 
 
 

@@ -32,8 +32,8 @@ jobs:
 
     - name: Install dependencies
       working-directory: ${{env.working-directory}}
-      run: npm ci
+      run: yarn install --frozen-lockfile --no-progress --silent
 
     - name: Build frontend
       working-directory: ${{env.working-directory}}
-      run: npm run build
+      run: yarn build
