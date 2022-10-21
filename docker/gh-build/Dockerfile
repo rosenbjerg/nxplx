@@ -12,7 +12,7 @@ FROM node:16-alpine AS frontendBuilder
 RUN apk --update --no-cache --quiet add git openssh
 WORKDIR /app
 COPY ./nxplx-frontend/ ./
-RUN npm ci -q
+RUN npm ci --quiet
 RUN npm run build
 
 
