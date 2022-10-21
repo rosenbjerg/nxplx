@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Blurhash.ImageSharp" Version="1.1.1" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="2.0.0" />
+      <PackageReference Include="Blurhash.ImageSharp" Version="3.0.0" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
     </ItemGroup>
 
     <ItemGroup>
