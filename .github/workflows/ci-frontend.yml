@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 10
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       
     - name: Cancel outdated workflow-runs
       uses: fkirc/skip-duplicate-actions@master
@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies
       working-directory: ${{env.working-directory}}
-      run: npm ci --quiet
+      run: npm ci
 
     - name: Build frontend
       working-directory: ${{env.working-directory}}
