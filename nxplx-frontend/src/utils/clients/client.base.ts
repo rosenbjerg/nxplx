@@ -1,5 +1,6 @@
 import { route } from 'preact-router';
 import { createSnackbar } from '@snackbar/core';
+import { translate } from '../localisation';
 
 export class BaseClient {
 	protected getBaseUrl(defaultUrl: string, _: string | undefined): string {
