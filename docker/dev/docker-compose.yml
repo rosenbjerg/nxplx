@@ -2,14 +2,16 @@
 
 services:
   nxplx-database:
-    image: bitnami/postgresql:13
+    image: bitnami/postgresql:14
     environment:
       - POSTGRESQL_PASSWORD=dev
+    volumes:
+      - pgsql:/bitnami/postgresql
     ports:
       - "5432:5432"
       
   nxplx-cache:
-    image: bitnami/redis:6.2
+    image: bitnami/redis:7.0
     environment:
       - REDIS_PASSWORD=dev
       - REDIS_AOF_ENABLED=no
@@ -20,6 +22,16 @@ services:
     image: datalust/seq
     environment:
       - ACCEPT_EULA=Y
+    volumes:
+      - seq:/data
     ports:
       - "5342:80"
       - "5341:5341"
+    deploy:
+      resources:
+        limits:
+          memory: 4000M
+
+volumes:
+  pgsql:
+  seq:
