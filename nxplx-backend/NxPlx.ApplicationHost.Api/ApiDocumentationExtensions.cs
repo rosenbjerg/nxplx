@@ -1,29 +1,48 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
+using NJsonSchema;
+using NJsonSchema.Generation;
 using NxPlx.Application.Core.Options;
 
 namespace NxPlx.ApplicationHost.Api
 {
-    public static class ApiDocumentationExtensions
+    public static class ApiDocumentationServiceCollectionExtensions
     {
-        public static IServiceCollection AddApiDocumentation(this IServiceCollection serviceCollection, ApiDocumentationOptions apiDocumentationOptions)
-        {
-            if (apiDocumentationOptions.Enabled) 
-                serviceCollection.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "NxPlx API", Version = "v1" }));
-            return serviceCollection;
-        }
-
-        public static void UseApiDocumentation(this IApplicationBuilder app, string documentationUrl, ApiDocumentationOptions apiDocumentationOptions)
+        public static IApplicationBuilder UseApiDocumentation(this IApplicationBuilder app, ApiDocumentationOptions apiDocumentationOptions)
         {
             if (apiDocumentationOptions.Enabled)
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
+                app.UseOpenApi(options => options.Path = apiDocumentationOptions.PathPrefix);
+            }
+
+            return app;
+        }
+
+        public static IServiceCollection AddApiDocumentation(this IServiceCollection serviceCollection)
+        {
+            return serviceCollection
+                .AddHttpContextAccessor()
+                .AddTransient<ISchemaProcessor, MarkAsRequiredIfNonNullableSchemaProcessor>()
+                .AddOpenApiDocument((settings, provider) =>
                 {
-                    c.RoutePrefix = documentationUrl;
-                    c.SwaggerEndpoint($"/api/swagger/v1/swagger.json", "NxPlx API");
+                    var schemaProcessors = provider.GetServices<ISchemaProcessor>();
+                    foreach (var schemaProcessor in schemaProcessors)
+                    {
+                        settings.SchemaProcessors.Add(schemaProcessor);
+                    }
                 });
+        }
+        private class MarkAsRequiredIfNonNullableSchemaProcessor : ISchemaProcessor
+        {
+            public void Process(SchemaProcessorContext context)
+            {
+                foreach (var (_, prop) in context.Schema.Properties)
+                {
+                    if (!prop.IsNullable(SchemaType.OpenApi3))
+                    {
+                        prop.IsRequired = true;
+                    }
+                }
             }
         }
     }

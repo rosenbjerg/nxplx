@@ -15,6 +15,7 @@ using NxPlx.Application.Mapping;
 using NxPlx.Application.Services;
 using NxPlx.ApplicationHost.Api.Authentication;
 using NxPlx.ApplicationHost.Api.Middleware;
+using NxPlx.Domain.Models;
 using NxPlx.Domain.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Integrations.TMDb;
@@ -65,7 +66,7 @@ namespace NxPlx.ApplicationHost.Api
             services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             
             services.AddWebSockets(options => options.AllowedOrigins.Add(hostingOptions.Origin));
-            services.AddApiDocumentation(apiDocumentationOptions);
+            services.AddApiDocumentation();
             services.AddJobProcessing(connectionStrings);
             services.AddImageSharpImageService();
             services.AddAutoMapper(typeof(DtoProfile), typeof(TMDbProfile));
@@ -123,7 +124,7 @@ namespace NxPlx.ApplicationHost.Api
             app.UseJobDashboard("/api/dashboard", jobDashboardOptions);
             
             var apiDocumentationOptions = serviceProvider.GetRequiredService<ApiDocumentationOptions>();
-            app.UseApiDocumentation("/swagger", apiDocumentationOptions);
+            app.UseApiDocumentation(apiDocumentationOptions);
             
             app.UseWebSockets();
             app.UseRouting();
@@ -134,8 +135,10 @@ namespace NxPlx.ApplicationHost.Api
         private static void InitializeDatabase(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
+
             var databaseContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             databaseContext.Database.Migrate();
+
             
             var eventDispatcher = scope.ServiceProvider.GetRequiredService<IApplicationEventDispatcher>();
             eventDispatcher.Dispatch(new CreateAdminCommand()).GetAwaiter().GetResult();
