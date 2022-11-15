@@ -20,7 +20,6 @@ namespace NxPlx.ApplicationHost.Api
                 options.Queues = JobQueueNames.All;
             });
 
-            HangfireContext.EnsureCreated(connectionStrings.HangfirePgsql);
             var hangfireConfiguration = ConfigureHangfire(connectionStrings);
             services.AddHangfire(hangfireConfiguration);
         }

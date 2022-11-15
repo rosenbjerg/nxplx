@@ -4,21 +4,15 @@ namespace NxPlx.Infrastructure.Database
 {
     public class HangfireContext : DbContext
     {
-        private readonly string _connectionString;
-
-        public static void EnsureCreated(string connectionString)
+        public HangfireContext(DbContextOptions<HangfireContext> options)
+            : base(options)
         {
-            using var context = new HangfireContext(connectionString);
-            context.Database.EnsureCreated();
         }
 
-        private HangfireContext(string connectionString)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            _connectionString = connectionString;
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder.UseNpgsql(_connectionString));
+            base.OnModelCreating(modelBuilder);
+            // modelBuilder.HasDefaultSchema("hangfire");
         }
     }
 }

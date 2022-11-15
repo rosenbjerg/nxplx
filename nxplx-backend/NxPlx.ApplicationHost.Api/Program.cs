@@ -66,11 +66,11 @@ namespace NxPlx.ApplicationHost.Api
             builder.Services.AddJobProcessing(connectionStrings);
             builder.Services.AddImageSharpImageService();
             builder.Services.AddAutoMapper(typeof(DtoProfile), typeof(TMDbProfile));
-            
-            
+
             builder.Services.AddStackExchangeRedisCache(options => options.Configuration = connectionStrings.Redis);
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(connectionStrings.Pgsql, b => b.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
+            builder.Services.AddDbContext<HangfireContext>(options => options.UseNpgsql(connectionStrings.HangfirePgsql));
             
             builder.Services.AddHttpContextAccessor();
 
@@ -94,7 +94,7 @@ namespace NxPlx.ApplicationHost.Api
 
             builder.Services
                 .AddEventHandlingFramework()
-                .AddApplicationEventHandlers(typeof(Application.Services.AssemblyMarker))
+                .AddApplicationEventHandlers(typeof(AssemblyMarker))
                 .AddDomainEventHandlers(typeof(Domain.Services.AssemblyMarker));
             
             builder.Services.Scan(scan => scan
