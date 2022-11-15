@@ -25,8 +25,9 @@ namespace NxPlx.ApplicationHost.Api
             services.AddHangfire(hangfireConfiguration);
         }
         
-        public static void UseJobDashboard(this IApplicationBuilder app, string dashboardUrl, JobDashboardOptions jobDashboardOptions)
+        public static void UseJobDashboard(this WebApplication app, string dashboardUrl)
         {
+            var jobDashboardOptions = app.Services.GetRequiredService<JobDashboardOptions>();
             if (jobDashboardOptions.Enabled)
             {
                 app.UseHangfireDashboard(dashboardUrl, new DashboardOptions

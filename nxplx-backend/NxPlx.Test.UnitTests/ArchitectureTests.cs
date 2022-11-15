@@ -18,7 +18,7 @@ namespace NxPlx.Test.UnitTests
                     typeof(Application.Mapping.MappingAssemblyMarker).Assembly,
                     typeof(Application.Models.IDto).Assembly,
                     typeof(Application.Services.AssemblyMarker).Assembly,
-                    typeof(ApplicationHost.Api.ApiStartup).Assembly,
+                    typeof(ApplicationHost.Api.Program).Assembly,
                     typeof(Domain.Events.MediaOverviewQuery).Assembly,
                     typeof(Domain.Models.ITrackedEntity).Assembly,
                     typeof(Domain.Services.AssemblyMarker).Assembly,

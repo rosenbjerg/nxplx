@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NxPlx.Application.Core;
-using NxPlx.Application.Core.Options;
 using NxPlx.Application.Events.Authentication;
 using NxPlx.Domain.Events.Sessions;
 using NxPlx.Domain.Models;
@@ -23,13 +22,13 @@ namespace NxPlx.Application.Services.EventHandlers.Authentication
         private readonly ILogger<LoginAttemptCommandHandler> _logger;
         private readonly TimeSpan _sessionLength;
 
-        public LoginAttemptCommandHandler(DatabaseContext databaseContext, OperationContext operationContext, SessionOptions sessionOptions, IApplicationEventDispatcher dispatcher, ILogger<LoginAttemptCommandHandler> logger)
+        public LoginAttemptCommandHandler(DatabaseContext databaseContext, OperationContext operationContext, IApplicationEventDispatcher dispatcher, ILogger<LoginAttemptCommandHandler> logger)
         {
             _databaseContext = databaseContext;
             _operationContext = operationContext;
             _dispatcher = dispatcher;
             _logger = logger;
-            _sessionLength = TimeSpan.FromDays(sessionOptions.LengthInDays ?? 20);
+            _sessionLength = TimeSpan.FromDays(30);
         }
 
         public async Task<(string Token, DateTime Expiry, bool IsAdmin)> Handle(LoginAttemptCommand command, CancellationToken cancellationToken = default)
