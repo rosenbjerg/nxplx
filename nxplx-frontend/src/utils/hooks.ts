@@ -5,8 +5,8 @@ export const useBackgroundGradient = (backgroundImageUrl: string, size: imagesiz
 	return `background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url("${imageUrl(backgroundImageUrl, size)}");`;
 };
 
-export function useLinkedState<T>(initialState?: T): [T | undefined, StateUpdater<T> | StateUpdater<T | undefined>, (ev: any) => any] {
-	const [state, setState] = initialState !== undefined ? useState(initialState) : useState<T>();
+export function useLinkedState<T>(initialState?: T): [T | undefined, StateUpdater<T | undefined>, (ev: any) => any] {
+	const [state, setState] = useState(initialState);
 	const setLinkedState = useCallback((ev: any) => {
 		const value = ev.target.value;
 		setState(value);
