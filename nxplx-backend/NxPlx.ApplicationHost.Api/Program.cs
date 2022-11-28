@@ -12,6 +12,7 @@ using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Domain.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.Database;
+using NxPlx.Infrastructure.Database.Repositories;
 using NxPlx.Infrastructure.Events;
 using NxPlx.Integrations.ImageSharp;
 using NxPlx.Integrations.TMDb;
@@ -24,16 +25,38 @@ namespace NxPlx.ApplicationHost.Api
     {
         public static async Task Main(string[] args)
         {
-            using var host = BuildHost(args);
+            var hostBuilder = PrepareWebHostBuilder(args);
+            
+            var app = hostBuilder.Build();
+            app.UseMiddleware<OperationContextMiddleware>();
+            app.UseMiddleware<LoggingEnrichingMiddleware>();
+            app.UseMiddleware<ExceptionInterceptorMiddleware>();
+            app.UseMiddleware<PerformanceInterceptorMiddleware>();
+            app.UseMiddleware<AuthenticationMiddleware>();
+
+            
+            app.UseForwardedHeaders();
+            app.UseApiDocumentation();
+            
+            
+            app.UseWebSockets();
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapJobDashboard();
+            });
+            app.UseStaticFileHandler("public");
 
             if (args.Contains("--auto-migrate"))
             {
-                await host.InitializeDatabase(CancellationToken.None);
+                await app.InitializeDatabase(CancellationToken.None);
             }
-            await host.RunAsync();
+
+            await app.RunAsync();
         }
 
-        private static IHost BuildHost(string[] args)
+        public static WebApplicationBuilder PrepareWebHostBuilder(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +108,8 @@ namespace NxPlx.ApplicationHost.Api
             builder.Services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             builder.Services.AddScoped<OperationContext>();
             builder.Services.AddScoped<ReadOnlyDatabaseContext>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             
             builder.Services.AddScoped<TempFileService>();
             builder.Services.AddScoped<LibraryCleanupService>();
@@ -104,25 +129,7 @@ namespace NxPlx.ApplicationHost.Api
                         .WithScopedLifetime()
             );
 
-            var app = builder.Build();
-            app.UseMiddleware<OperationContextMiddleware>();
-            app.UseMiddleware<LoggingEnrichingMiddleware>();
-            app.UseMiddleware<ExceptionInterceptorMiddleware>();
-            app.UseMiddleware<PerformanceInterceptorMiddleware>();
-            app.UseMiddleware<AuthenticationMiddleware>();
-            
-            app.UseForwardedHeaders();
-            
-            app.UseJobDashboard("/api/dashboard");
-            app.UseApiDocumentation();
-            
-            
-            app.UseWebSockets();
-            app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
-            app.UseStaticFileHandler("public");
-
-            return app;
+            return builder;
         }
     }
 }

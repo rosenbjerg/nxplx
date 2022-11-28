@@ -1,14 +1,23 @@
-﻿using ArchUnitNET.Domain;
-using ArchUnitNET.Fluent;
+﻿using System;
+using ArchUnitNET.Domain;
 using ArchUnitNET.Loader;
 using ArchUnitNET.NUnit;
 using NUnit.Framework;
+using NxPlx.ApplicationHost.Api;
 using static ArchUnitNET.Fluent.ArchRuleDefinition;
 
 namespace NxPlx.Test.UnitTests
 {
     public class ArchitectureTests
     {
+        [Test]
+        public void VerifyDependencies()
+        {
+            var hostBuilder = Program.PrepareWebHostBuilder(Array.Empty<string>());
+            using var host = hostBuilder.Build();
+            Assert.NotNull(host);
+        }
+        
         private static readonly Architecture Architecture =
             new ArchLoader().LoadAssemblies(new []
                 {

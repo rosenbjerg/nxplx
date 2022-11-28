@@ -1,48 +1,48 @@
-﻿using System;
+﻿using System.Reflection;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using NxPlx.Application.Core;
 using NxPlx.Application.Core.Options;
 using NxPlx.ApplicationHost.Api.Authentication;
-using NxPlx.Infrastructure.Database;
 
 namespace NxPlx.ApplicationHost.Api
 {
     public static class JobDashboardExtension
     {
-        public static void AddJobProcessing(this IServiceCollection services, ConnectionStrings connectionStrings)
+        public static IServiceCollection AddJobProcessing(this IServiceCollection services, ConnectionStrings connectionStrings)
         {
+            if (IsNSwagBuild())
+                return services;
+
+            services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(connectionStrings.HangfirePgsql));
+
             services.AddHangfireServer(options =>
             {
                 options.WorkerCount = Math.Max(Environment.ProcessorCount - 1, 2);
                 options.Queues = JobQueueNames.All;
             });
-
-            var hangfireConfiguration = ConfigureHangfire(connectionStrings);
-            services.AddHangfire(hangfireConfiguration);
+            return services;
         }
-        
-        public static void UseJobDashboard(this WebApplication app, string dashboardUrl)
+
+        public static IEndpointRouteBuilder MapJobDashboard(this IEndpointRouteBuilder endpointRouteBuilder)
         {
-            var jobDashboardOptions = app.Services.GetRequiredService<JobDashboardOptions>();
-            if (jobDashboardOptions.Enabled)
+            if (IsNSwagBuild())
+                return endpointRouteBuilder;
+
+            endpointRouteBuilder.MapHangfireDashboard("/api/dashboard", new DashboardOptions
             {
-                app.UseHangfireDashboard(dashboardUrl, new DashboardOptions
-                {
-                    Authorization = new[] { new IntegratedHangfireAuthentication() }
-                });
-            }
+                Authorization = new[] { new IntegratedHangfireAuthentication() }
+            });
+            return endpointRouteBuilder;
         }
 
-        private static Action<IGlobalConfiguration> ConfigureHangfire(ConnectionStrings connectionStrings)
+        private static bool IsNSwagBuild()
         {
-            return hangfireConfiguration => hangfireConfiguration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(connectionStrings.HangfirePgsql);
+            return Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "NSwag";
         }
     }
 }
