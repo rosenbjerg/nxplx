@@ -12,7 +12,6 @@ using NxPlx.ApplicationHost.Api.Middleware;
 using NxPlx.Domain.Services.Commands;
 using NxPlx.Infrastructure.Broadcasting;
 using NxPlx.Infrastructure.Database;
-using NxPlx.Infrastructure.Database.Repositories;
 using NxPlx.Infrastructure.Events;
 using NxPlx.Integrations.ImageSharp;
 using NxPlx.Integrations.TMDb;
@@ -108,9 +107,7 @@ namespace NxPlx.ApplicationHost.Api
             builder.Services.AddScoped<IOperationContext>(serviceProvider => serviceProvider.GetRequiredService<OperationContext>());
             builder.Services.AddScoped<OperationContext>();
             builder.Services.AddScoped<ReadOnlyDatabaseContext>();
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
-            
+
             builder.Services.AddScoped<TempFileService>();
             builder.Services.AddScoped<LibraryCleanupService>();
             builder.Services.AddScoped<LibraryMetadataService>();
