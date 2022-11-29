@@ -3,7 +3,7 @@ import { route } from 'preact-router';
 
 interface Http {
 	get: (url: string) => Promise<Response>,
-	getJson: <T>(url: string) => Promise<T>,
+	getJson: <T extends {}>(url: string) => Promise<T>,
 	post: (url: string, body?: any, json?: boolean) => Promise<Response>,
 	put: (url: string, body?: any, json?: boolean) => Promise<Response>,
 	delete: (url: string, body?: any, json?: boolean) => Promise<Response>
@@ -40,7 +40,7 @@ const redirectToLoginOn401 = (errorReason: HTTPError) => {
 
 const http: Http = {
 	get: url => withErrorHandlers(ky.get(url), redirectToLoginOn401),
-	getJson: url => withErrorHandlers(ky.get(url).json(), redirectToLoginOn401),
+	getJson: <T extends {}>(url) => withErrorHandlers(ky.get(url).json<T>(), redirectToLoginOn401),
 	post: (url, body, json = true) => withErrorHandlers(ky(url, buildOptions('POST', body, json)), redirectToLoginOn401),
 	put: (url, body, json = true) => withErrorHandlers(ky(url, buildOptions('PUT', body, json)), redirectToLoginOn401),
 	delete: (url, body, json = true) => withErrorHandlers(ky(url, buildOptions('DELETE', body, json)), redirectToLoginOn401),

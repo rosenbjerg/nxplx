@@ -26,7 +26,7 @@ namespace NxPlx.ApplicationHost.Api.Controllers
 
         [HttpPost("invoke")]
         [Send404WhenNull]
-        public Task<string?> Invoke([FromQuery]string command, [FromQuery]string[] arguments)
-            => _eventDispatcher.Dispatch(new AdminCommandInvocationCommand(command, arguments));
+        public Task<string?> Invoke([FromQuery]string command, [FromQuery]string[] parameters)
+            => _eventDispatcher.Dispatch(new AdminCommandInvocationCommand(command, parameters));
     }
 }

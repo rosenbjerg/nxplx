@@ -30,6 +30,19 @@ jobs:
       with:
         node-version: 16
 
+    - name: Prepare .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Generate typescript clients
+      working-directory: ./nxplx-backend
+      run: dotnet build NxPlx.ApplicationHost.Api/NxPlx.ApplicationHost.Api.csproj
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
     - name: Install dependencies
       working-directory: ${{env.working-directory}}
       run: yarn install --frozen-lockfile --no-progress --silent
